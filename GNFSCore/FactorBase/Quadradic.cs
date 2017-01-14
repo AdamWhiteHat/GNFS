@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-namespace GNFSCore
+namespace GNFSCore.FactorBase
 {
-	public class PrimeFactorization
+	public class Quadradic
 	{
-
+		public Quadradic(int max)
+		{
+			// f(r) = 0 mod p
+			// where p > AFB.p 
+		}
 	}
 }

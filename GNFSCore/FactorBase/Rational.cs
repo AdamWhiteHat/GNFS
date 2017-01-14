@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-namespace GNFSCore
+namespace GNFSCore.FactorBase
 {
-	public class FactorBases
+	public class Rational
 	{
-
+		public Rational(int bound)
+		{
+			// array of (p, p mod m) up to bound
+		}
 	}
 }

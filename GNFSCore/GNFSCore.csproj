@@ -41,12 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FactorBase\Algebraic.cs" />
+    <Compile Include="FactorBase\Quadradic.cs" />
+    <Compile Include="Prime\Eratosthenes.cs" />
     <Compile Include="Solving.cs" />
     <Compile Include="Polynomial.cs" />
-    <Compile Include="FactorBases.cs" />
+    <Compile Include="FactorBase\Rational.cs" />
     <Compile Include="NullMatrix.cs" />
     <Compile Include="Sieve.cs" />
-    <Compile Include="PrimeFactorization.cs" />
+    <Compile Include="Prime\Factorization.cs" />
     <Compile Include="Scores.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
