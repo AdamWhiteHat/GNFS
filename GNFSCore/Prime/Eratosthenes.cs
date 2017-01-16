@@ -1,36 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace GNFSCore.Prime
 {
 	// TODO: Make return IEnumerable
 	public static class Eratosthenes
 	{
-		private static List<long> longestSieve;
+		private static List<int> longestSieve;
 		private static List<bool> longestprimeMembershipArray;
 
 		static Eratosthenes()
 		{
-			longestSieve = new List<long>();
+			longestSieve = new List<int>();
 			longestprimeMembershipArray = new List<bool>();
 		}
 
-		public static List<long> Sieve(long ceiling)
+		public static List<int> Sieve(int ceiling)
 		{
 			return Sieve(2, ceiling);
 		}
 
-		public static List<long> Sieve(int floor, long ceiling)
+		public static List<int> Sieve(int floor, int ceiling)
 		{
 			if (floor < 2)
 			{
 				floor = 2;
 			}
 
-			long cacheMaxValue = 0;
+			int cacheMaxValue = 0;
 			if (longestSieve.Count > 0)
 			{
 				cacheMaxValue = longestSieve.Last();
@@ -42,10 +42,10 @@ namespace GNFSCore.Prime
 				return longestSieve.TakeWhile(l => l < ceiling).ToList();
 			}
 
-			long counter = 0;
-			long counterStart = 3;
-			long inc;
-			long sqrt = 3;
+			int counter = 0;
+			int counterStart = 3;
+			int inc;
+			int sqrt = 3;
 			bool[] primeMembershipArray = new bool[ceiling + 1];
 
 			if (longestprimeMembershipArray.Count > counterStart /*&& longestprimeMembershipArray.Length < ceiling+1*/)
@@ -84,7 +84,7 @@ namespace GNFSCore.Prime
 				}
 			} while (sqrt * sqrt <= ceiling);
 			
-			List<long> result = Enumerable.Range(2, (int)ceiling - 2).Select(n => (long)n).Where(l => l >= floor && primeMembershipArray[l]).ToList();
+			List<int> result = Enumerable.Range(2, (int)ceiling - 2).Select(n => (int)n).Where(l => l >= floor && primeMembershipArray[l]).ToList();
 
 			if (result.Count > longestSieve.Count)
 			{
