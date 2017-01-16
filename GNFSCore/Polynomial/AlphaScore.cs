@@ -8,7 +8,7 @@ using System.Collections.Concurrent;
 
 namespace GNFSCore
 {
-    public class Scores
+    public class AlphaScore
     {
 
     }

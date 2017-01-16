@@ -6,16 +6,10 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-namespace GNFSCore.FactorBase
+namespace GNFSCore
 {
-	public class Rational
+    public class MurpheyEScore
 	{
-		public Rational(BigInteger polynomialBase, int bound)
-		{
-			// m
-			// array of (p, p mod m) up to bound
 
-
-		}
-	}
+    }
 }

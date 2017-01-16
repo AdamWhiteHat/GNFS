@@ -11,6 +11,8 @@ namespace GNFSCore.FactorBase
 		public Algebraic(int max)
 		{
 			// array of (p, r) where f(r) = 0 mod p
+
+			// quantity = 2-3 times RFB.quantity
 		}
 	}
 }

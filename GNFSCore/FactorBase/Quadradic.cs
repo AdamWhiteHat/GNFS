@@ -14,6 +14,8 @@ namespace GNFSCore.FactorBase
 		{
 			// f(r) = 0 mod p
 			// where p > AFB.p 
+
+			// quantity = < 100
 		}
 	}
 }
