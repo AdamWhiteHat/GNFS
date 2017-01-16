@@ -10,12 +10,18 @@ namespace GNFSCore.FactorBase
 {
 	public class Rational
 	{
-		public Rational(BigInteger polynomialBase, int bound)
+		// m = polynomial base
+		// array of (p, p mod m) up to bound
+		// quantity = phi(bound)
+
+		public static IEnumerable<Tuple<int, int>> GetRationalFactorBase(BigInteger polynomialBase, int bound)
 		{
-			// m
-			// array of (p, p mod m) up to bound
+			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
 
 
+
+
+			return result;
 		}
 	}
 }

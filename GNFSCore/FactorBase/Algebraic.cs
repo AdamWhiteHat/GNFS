@@ -8,11 +8,17 @@ namespace GNFSCore.FactorBase
 {
 	public class Algebraic
 	{
-		public Algebraic(int max)
-		{
-			// array of (p, r) where f(r) = 0 mod p
+		// array of (p, r) where f(r) = 0 mod p
+		// quantity = 2-3 times RFB.quantity
 
-			// quantity = 2-3 times RFB.quantity
+		public static IEnumerable<Tuple<int, int>> GetAlgebraicFactorBase(int quantity)
+		{
+			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+
+
+
+
+			return result;
 		}
 	}
 }

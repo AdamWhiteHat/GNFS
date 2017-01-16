@@ -10,12 +10,18 @@ namespace GNFSCore.FactorBase
 {
 	public class Quadradic
 	{
-		public Quadradic(int max)
-		{
-			// f(r) = 0 mod p
-			// where p > AFB.p 
+		// f(r) = 0 mod p
+		// where p > AFB.p
+		// quantity = < 100
 
-			// quantity = < 100
+		public static IEnumerable<Tuple<int, int>> GetQuadradicFactorBase(int max)
+		{
+			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+
+
+
+
+			return result;
 		}
 	}
 }
