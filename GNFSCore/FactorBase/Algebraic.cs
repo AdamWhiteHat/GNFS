@@ -13,12 +13,11 @@ namespace GNFSCore.FactorBase
 
 		public static IEnumerable<Tuple<int, int>> GetAlgebraicFactorBase(int quantity)
 		{
-			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
 
 
 
 
-			return result;
+			return new List<Tuple<int, int>>();
 		}
 	}
 }
