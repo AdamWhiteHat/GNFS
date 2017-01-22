@@ -10,9 +10,9 @@ namespace GNFSCore
 {
 	public class Polynomial
 	{
-		//public BigInteger N { get; private set; }
-		//public BigInteger Base { get; private set; }
-		//public int Degree { get; private set; } = 0;		
+		public BigInteger N { get; private set; }
+		public BigInteger Base { get; private set; }
+		public int Degree { get; private set; } = 0;		
 
 		//public BigInteger Terms { get; private set;} = new List<BigInteger>();
 		//public BigInteger Total { get; private set; } = 0;
@@ -25,5 +25,10 @@ namespace GNFSCore
 			
 		}
 
+
+		public BigInteger Value(BigInteger i)
+		{
+			return -1;
+		}
 	}
 }

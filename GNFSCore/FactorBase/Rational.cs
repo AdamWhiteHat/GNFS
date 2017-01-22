@@ -17,8 +17,14 @@ namespace GNFSCore.FactorBase
 
 		public static IEnumerable<Tuple<int, int>> GetRationalFactorBase(BigInteger polynomialBase, int bound)
 		{
-			List<int> primes = Eratosthenes.Sieve(bound);			
-			return primes.Select(p => new Tuple<int, int>(p, (int)(polynomialBase % p)));
+			List<int> primes = Eratosthenes.Sieve(bound);
+			IEnumerable<Tuple<int,int>> result = primes.Select(p => new Tuple<int, int>(p, (int)(polynomialBase % p)));
+			return result;
+		}
+
+		public static BigInteger Norm(int a, int b, BigInteger polyBase)
+		{
+			return BigInteger.Add(a, BigInteger.Multiply(b, polyBase));
 		}
 	}
 }
