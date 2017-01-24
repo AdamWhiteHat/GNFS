@@ -15,7 +15,7 @@ namespace GNFSCore.FactorBase
 		// where p > AFB.Last().p
 		// quantity = < 100
 
-		public static IEnumerable<Tuple<int, int>> GetQuadradicFactorBase(int min, int max)
+		public static IEnumerable<Tuple<int, int>> GetQuadradicFactorBase(Polynomial poly, int min, int max)
 		{
 			List<int> primes = Eratosthenes.Sieve(max);
 			primes = primes.Except(Enumerable.Range(0, min)).ToList();
@@ -24,7 +24,7 @@ namespace GNFSCore.FactorBase
 			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
 			foreach (int p in primes)
 			{
-				IEnumerable<int> factors = integers.Where(i => i % p == 0);
+				IEnumerable<int> factors = integers.Where(i => poly.EvalMod(p, i) == 0);
 
 				if (factors.Any())
 				{

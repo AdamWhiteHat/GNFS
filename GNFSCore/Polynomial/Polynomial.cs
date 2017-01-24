@@ -5,6 +5,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Text;
 
 namespace GNFSCore
 {
@@ -69,9 +70,9 @@ namespace GNFSCore
 			return result;
 		}
 
-		public BigInteger EvalMod(BigInteger primeBase, BigInteger p)
+		public BigInteger EvalMod(BigInteger primeBase, BigInteger mod)
 		{
-			return Eval(primeBase) % p;
+			return Eval(primeBase) % mod;
 		}
 
 		public void MakeMonic()
@@ -87,6 +88,26 @@ namespace GNFSCore
 		public BigInteger[] GetRoots()
 		{
 			throw new NotImplementedException();
+		}
+
+		public override string ToString()
+		{
+			return Polynomial.FormatString(Base, Terms);
+		}
+
+		public static string FormatString(BigInteger polyBase, List<BigInteger> terms)
+		{
+			List<string> stringTerms = new List<string>();
+
+			int degree = terms.Count - 1;
+			while (degree >= 0)
+			{
+				stringTerms.Add($"{terms[degree]} * {polyBase}^{degree}");
+
+				degree--;
+			}
+
+			return string.Join(" +  ", stringTerms);
 		}
 	}
 }
