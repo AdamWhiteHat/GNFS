@@ -13,30 +13,33 @@ namespace GNFSCore
 	{
 		public BigInteger N { get; private set; }
 		public BigInteger Base { get; private set; }
-		public int Degree { get; private set; } = 0;
-		public List<BigInteger> Terms { get; private set; } = new List<BigInteger>();
+		public int Degree { get; private set; }
+		public BigInteger[] Terms { get; private set; }
 
 		public Polynomial(BigInteger n, BigInteger primeBase, int degree)
 		{
 			N = n;
 			Base = primeBase;
 			Degree = degree;
+			Terms = Enumerable.Repeat(BigInteger.Zero, degree + 1).ToArray();
 
-
-			BigInteger toAdd = N;
-			Terms = new List<BigInteger>();
+			BigInteger toAdd = N;			
 
 			int d = Degree;
 			while (d >= 0)
 			{
 				BigInteger placeValue = BigInteger.Pow(Base, d);
-				BigInteger maxPlaceValue = BigInteger.Multiply(placeValue, Base);
+				//BigInteger maxPlaceValue = BigInteger.Multiply(placeValue, Base);
 
-				if (toAdd == 0 || placeValue < toAdd)
+				if (toAdd == 0 || placeValue > toAdd)
 				{
-					Terms.Add(0);
+					Terms[d] = 0;
 				}
-				else if (placeValue > toAdd)
+				else if (placeValue == 1)
+				{
+					Terms[d] = toAdd;
+				}
+				else if (placeValue < toAdd)
 				{
 					BigInteger quotient = BigInteger.Divide(toAdd, placeValue);
 					if (quotient > Base)
@@ -44,8 +47,9 @@ namespace GNFSCore
 						quotient = Base;
 					}
 
-					Terms.Add(quotient);
-					toAdd -= BigInteger.Multiply(quotient, placeValue);
+					Terms[d] = quotient;
+					BigInteger toSubtract = BigInteger.Multiply(quotient, placeValue);
+					toAdd -= toSubtract;
 				}
 
 				d--;
@@ -72,7 +76,9 @@ namespace GNFSCore
 
 		public BigInteger EvalMod(BigInteger primeBase, BigInteger mod)
 		{
-			return Eval(primeBase) % mod;
+			BigInteger polyValue = Eval(primeBase);
+			BigInteger result = polyValue % mod;
+			return result;
 		}
 
 		public void MakeMonic()
@@ -95,11 +101,11 @@ namespace GNFSCore
 			return Polynomial.FormatString(Base, Terms);
 		}
 
-		public static string FormatString(BigInteger polyBase, List<BigInteger> terms)
+		public static string FormatString(BigInteger polyBase, BigInteger[] terms)
 		{
 			List<string> stringTerms = new List<string>();
 
-			int degree = terms.Count - 1;
+			int degree = terms.Length - 1;
 			while (degree >= 0)
 			{
 				stringTerms.Add($"{terms[degree]} * {polyBase}^{degree}");

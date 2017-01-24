@@ -16,20 +16,28 @@ namespace GNFSCore.FactorBase
 		public static IEnumerable<Tuple<int, int>> GetAlgebraicFactorBase(Polynomial poly, int bound)
 		{
 			List<int> primes = Eratosthenes.Sieve(bound);
-			List<int> integers = Enumerable.Range(2, primes.Last()).ToList();
+			List<int> integers = Enumerable.Range(3, primes.Last()-1).ToList();
 
+			return GetFactorBase(poly, primes, integers);
+		}
+
+		internal static IEnumerable<Tuple<int, int>> GetFactorBase(Polynomial poly, List<int> primes, List<int> integers)
+		{
 			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
-			foreach(int p in primes)
+			foreach (int r in integers)
 			{
-				IEnumerable<int> factors = integers.Where(i => poly.EvalMod(p, i) == 0);
+				BigInteger polyR = poly.Eval(r);
 
-				if(factors.Any())
+				IEnumerable<BigInteger> residues = primes.Select(p => polyR % p);
+				IEnumerable<int> factors = primes.Where(p => ((polyR % p) == 0));
+
+				if (factors.Any())
 				{
-					result.AddRange(factors.Select(f => new Tuple<int, int>(p, f)));
+					result.AddRange(factors.Select(p => new Tuple<int, int>(p, r)));
 				}
 			}
-						
-			return result;
+
+			return result.OrderBy(tup => tup.Item1);
 		}
 
 		// The elements(a, b) with algebraic norm divisible by element(p, r) from AFB

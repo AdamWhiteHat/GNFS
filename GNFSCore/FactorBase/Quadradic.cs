@@ -21,18 +21,7 @@ namespace GNFSCore.FactorBase
 			primes = primes.Except(Enumerable.Range(0, min)).ToList();
 			List<int> integers = Enumerable.Range(min, max).ToList();
 
-			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
-			foreach (int p in primes)
-			{
-				IEnumerable<int> factors = integers.Where(i => poly.EvalMod(p, i) == 0);
-
-				if (factors.Any())
-				{
-					result.AddRange(factors.Select(f => new Tuple<int, int>(p, f)));
-				}
-			}
-
-			return result;
+			return Algebraic.GetFactorBase(poly, primes, integers);
 		}
 	}
 }
