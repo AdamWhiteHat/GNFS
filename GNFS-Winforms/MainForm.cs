@@ -51,10 +51,12 @@ namespace GNFS_Winforms
 
 			Polynomial p = new Polynomial(n, polyBase, degree);
 
+			int algebraicBound = bound * (10 / 3);
+			int quadraticBound = algebraicBound  + bound;
 
-			IEnumerable<Tuple<int, int>> RFB = Rational.GetRationalFactorBase(polyBase, bound);
-			IEnumerable<Tuple<int, int>> AFB = Algebraic.GetAlgebraicFactorBase(p, 198);
-			IEnumerable<Tuple<int, int>> QFB = Quadradic.GetQuadradicFactorBase(p, 130, 281);
+			IEnumerable<Tuple<int, int>> RFB = Rational.GetRationalFactorBase(polyBase, bound);			
+			IEnumerable<Tuple<int, int>> AFB = Algebraic.GetAlgebraicFactorBase(p, algebraicBound);
+			IEnumerable<Tuple<int, int>> QFB = Quadradic.GetQuadradicFactorBase(p, quadraticBound, quadraticBound+bound);
 
 			LogOutput($"Polynomial(degree: {degree}, base: {polyBase}):");
 			LogOutput(p.ToString());
@@ -68,7 +70,7 @@ namespace GNFS_Winforms
 			LogOutput(FormatTupleCollection(AFB));
 			LogOutput();
 
-			LogOutput($"Quadradic Factor Base (QFB):");
+			LogOutput($"Quadratic Factor Base (QFB):");
 			LogOutput(FormatTupleCollection(QFB));
 			LogOutput();
 		}
