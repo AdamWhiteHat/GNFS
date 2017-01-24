@@ -42,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FactorBase\Algebraic.cs" />
-    <Compile Include="FactorBase\Norms.cs" />
     <Compile Include="FactorBase\Quadradic.cs" />
     <Compile Include="Polynomial\MurpheyEScore.cs" />
     <Compile Include="Prime\Eratosthenes.cs" />

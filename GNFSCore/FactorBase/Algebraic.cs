@@ -32,6 +32,8 @@ namespace GNFSCore.FactorBase
 			return result;
 		}
 
+		// The elements(a, b) with algebraic norm divisible by element(p, r) from AFB
+		// are those with a on the form a = −br + kp for k ∈ Z.
 		public static BigInteger Norm(int a, int b, Polynomial poly)
 		{
 			BigInteger left = BigInteger.Pow((-1 * b), poly.Degree);
