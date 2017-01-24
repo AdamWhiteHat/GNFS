@@ -8,8 +8,8 @@ using System.Collections.Concurrent;
 
 namespace GNFSCore
 {
-    public class AlphaScore
-    {
+	public class AlphaScore
+	{
 
-    }
+	}
 }

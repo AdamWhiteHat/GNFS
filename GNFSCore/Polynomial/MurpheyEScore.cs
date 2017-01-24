@@ -8,8 +8,8 @@ using System.Collections.Concurrent;
 
 namespace GNFSCore
 {
-    public class MurpheyEScore
+	public class MurpheyEScore
 	{
 
-    }
+	}
 }
