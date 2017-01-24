@@ -36,7 +36,7 @@ namespace GNFSCore.FactorBase
 		{
 			BigInteger left = BigInteger.Pow((-1 * b), poly.Degree);
 			BigInteger f = BigInteger.Divide(a, b) * -1;
-			BigInteger right = poly.Value(f);
+			BigInteger right = poly.Eval(f);
 
 			return BigInteger.Multiply(left, right);
 		}

@@ -12,7 +12,7 @@ namespace GNFSCore.Prime
 	{
 		public static IEnumerable<int> GetPrimeFactoriation(int value)
 		{ 
-			var eratosthenes = Eratosthenes.Sieve((long)Math.Sqrt(value));
+			var eratosthenes = Eratosthenes.Sieve((int)Math.Sqrt(value)+1);
 
 			List<int> factors = new List<int>();
 			foreach (int prime in eratosthenes)
