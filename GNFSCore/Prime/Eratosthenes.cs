@@ -30,7 +30,16 @@ namespace GNFSCore.Prime
 				floor = 2;
 			}
 
-			int cacheMaxValue = 0;
+			if (ceiling < 10)
+			{
+				throw new ArgumentOutOfRangeException("ceiling < 10");
+			}
+			if (floor > ceiling)
+			{
+				throw new ArgumentOutOfRangeException("floor > ceiling");
+			}
+
+				int cacheMaxValue = 0;
 			if (longestSieve.Count > 0)
 			{
 				cacheMaxValue = longestSieve.Last();
@@ -65,7 +74,7 @@ namespace GNFSCore.Prime
 				}
 			}
 
-			do
+			while (sqrt * sqrt <= ceiling)
 			{
 				counter = sqrt * sqrt;
 				inc = sqrt + sqrt;
@@ -82,7 +91,7 @@ namespace GNFSCore.Prime
 				{
 					sqrt++;
 				}
-			} while (sqrt * sqrt <= ceiling);
+			} 
 			
 			List<int> result = Enumerable.Range(2, (int)ceiling - 2).Select(n => (int)n).Where(l => l >= floor && primeMembershipArray[l]).ToList();
 

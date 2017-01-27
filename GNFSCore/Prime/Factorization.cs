@@ -11,8 +11,8 @@ namespace GNFSCore.Prime
 	public class Factorization
 	{
 		public static IEnumerable<int> GetPrimeFactoriation(int value)
-		{ 
-			var eratosthenes = Eratosthenes.Sieve((int)Math.Sqrt(value)+1);
+		{
+			List<int> eratosthenes = Eratosthenes.Sieve((int)Math.Sqrt(value));
 
 			List<int> factors = new List<int>();
 			foreach (int prime in eratosthenes)
@@ -29,7 +29,14 @@ namespace GNFSCore.Prime
 				}
 			}
 
+			factors.Add(value);
+
 			return factors;
+		}
+
+		public static string GetPrimeFactoriationString(int value)
+		{
+			return $"{ string.Join(",", Factorization.GetPrimeFactoriation(value))}";			
 		}
 	}
 }

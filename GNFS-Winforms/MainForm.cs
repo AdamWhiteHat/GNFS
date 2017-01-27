@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GNFSCore;
+using GNFSCore.Prime;
 using GNFSCore.FactorBase;
 
 namespace GNFS_Winforms
@@ -73,8 +74,14 @@ namespace GNFS_Winforms
 			LogOutput($"Quadratic Factor Base (QFB):");
 			LogOutput(FormatTupleCollection(QFB));
 			LogOutput();
+
+			List<int> potentialFactors = QFB.SelectMany(tup => new int[] { tup.Item1, tup.Item2 }).Distinct().OrderBy(i => i).ToList();
+			IEnumerable<string> factorized = potentialFactors.Select(i => $"[{i}:{{{Factorization.GetPrimeFactoriationString(i)}}}]");
+
+			LogOutput($"Factorization of QFB:");
+			LogOutput(string.Join(Environment.NewLine, factorized));			
 		}
-		
+
 	}
 }
 
