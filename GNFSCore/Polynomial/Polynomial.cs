@@ -20,16 +20,15 @@ namespace GNFSCore
 		{
 			N = n;
 			Base = primeBase;
-			Degree = degree;
+			int d = Degree = degree;
 			Terms = Enumerable.Repeat(BigInteger.Zero, degree + 1).ToArray();
 
-			BigInteger toAdd = N;			
+			BigInteger toAdd = N;
 
-			int d = Degree;
+			// Build out Terms[]
 			while (d >= 0)
 			{
 				BigInteger placeValue = BigInteger.Pow(Base, d);
-				//BigInteger maxPlaceValue = BigInteger.Multiply(placeValue, Base);
 
 				if (toAdd == 0 || placeValue > toAdd)
 				{

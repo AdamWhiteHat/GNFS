@@ -5,7 +5,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using GNFSCore.Prime;
+using GNFSCore.IntegerMath;
 
 namespace GNFSCore.FactorBase
 {

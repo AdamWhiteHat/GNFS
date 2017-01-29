@@ -44,13 +44,15 @@
     <Compile Include="FactorBase\Algebraic.cs" />
     <Compile Include="FactorBase\Quadradic.cs" />
     <Compile Include="Polynomial\MurpheyEScore.cs" />
-    <Compile Include="Prime\Eratosthenes.cs" />
+    <Compile Include="IntegerMath\CoPrime.cs" />
+    <Compile Include="IntegerMath\Eratosthenes.cs" />
+    <Compile Include="IntegerMath\GCD.cs" />
     <Compile Include="Solving.cs" />
     <Compile Include="Polynomial\Polynomial.cs" />
     <Compile Include="FactorBase\Rational.cs" />
     <Compile Include="NullMatrix.cs" />
     <Compile Include="Sieve.cs" />
-    <Compile Include="Prime\Factorization.cs" />
+    <Compile Include="IntegerMath\Factorization.cs" />
     <Compile Include="Polynomial\AlphaScore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace GNFSCore.Prime
+namespace GNFSCore.IntegerMath
 {
 	// TODO: Make return IEnumerable
 	public static class Eratosthenes
@@ -30,16 +30,31 @@ namespace GNFSCore.Prime
 				floor = 2;
 			}
 
-			if (ceiling < 10)
-			{
-				throw new ArgumentOutOfRangeException("ceiling < 10");
-			}
 			if (floor > ceiling)
 			{
 				throw new ArgumentOutOfRangeException("floor > ceiling");
 			}
+			if (ceiling < 10)
+			{
+				if (ceiling == 9 || ceiling == 8 || ceiling == 7)
+				{
+					return new List<int>() { 2, 3, 5, 7 };
+				}
+				else if (ceiling == 6 || ceiling == 5)
+				{
+					return new List<int>() { 2, 3, 5 };
+				}
+				else if (ceiling == 4 || ceiling == 3)
+				{
+					return new List<int>() { 2, 3 };
+				}
+				else
+				{
+					return new List<int>() { 2 };
+				}
+			}
 
-				int cacheMaxValue = 0;
+			int cacheMaxValue = 0;
 			if (longestSieve.Count > 0)
 			{
 				cacheMaxValue = longestSieve.Last();
@@ -91,8 +106,8 @@ namespace GNFSCore.Prime
 				{
 					sqrt++;
 				}
-			} 
-			
+			}
+
 			List<int> result = Enumerable.Range(2, (int)ceiling - 2).Select(n => (int)n).Where(l => l >= floor && primeMembershipArray[l]).ToList();
 
 			if (result.Count > longestSieve.Count)

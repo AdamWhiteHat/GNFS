@@ -5,7 +5,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using GNFSCore.Prime;
+using GNFSCore.IntegerMath;
 
 namespace GNFSCore.FactorBase
 {
@@ -18,7 +18,7 @@ namespace GNFSCore.FactorBase
 		public static IEnumerable<Tuple<int, int>> GetRationalFactorBase(BigInteger polynomialBase, int bound)
 		{
 			List<int> primes = Eratosthenes.Sieve(bound);
-			IEnumerable<Tuple<int,int>> result = primes.Select(p => new Tuple<int, int>(p, (int)(polynomialBase % p)));
+			IEnumerable<Tuple<int, int>> result = primes.Select(p => new Tuple<int, int>(p, (int)(polynomialBase % p)));
 			return result;
 		}
 
