@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="FactorBase\Algebraic.cs" />
     <Compile Include="FactorBase\Quadradic.cs" />
+    <Compile Include="IntegerMath\BigIntegerExtensionMethods.cs" />
     <Compile Include="Polynomial\MurpheyEScore.cs" />
     <Compile Include="IntegerMath\CoPrime.cs" />
     <Compile Include="IntegerMath\Eratosthenes.cs" />
