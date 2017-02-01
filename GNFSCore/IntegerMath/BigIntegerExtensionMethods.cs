@@ -13,7 +13,10 @@ namespace GNFSCore.IntegerMath
 
 		public static bool IsSquare(this BigInteger input)
 		{
-			if (input == BigInteger.Zero) { return false; }
+			if (input == BigInteger.Zero)
+			{
+				return false;
+			}
 
 			int base16 = (int)(input & Fifteen); // Convert to base 16 number
 			if (base16 > 9)
@@ -27,11 +30,11 @@ namespace GNFSCore.IntegerMath
 				BigInteger remainder = new BigInteger();
 				BigInteger sqrt = input.NthRoot(2, ref remainder);
 
-				return remainder == 0;
+				return (remainder == 0);
 				// - OR -
 				//return (sqrt.Square() == input);
 			}
-			return false;
+			return true;
 		}
 
 		public static BigInteger Square(this BigInteger input)

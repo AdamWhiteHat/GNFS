@@ -16,6 +16,9 @@ namespace GNFSCore.IntegerMath
 
 		public static BigInteger FindGCD(BigInteger value1, BigInteger value2)
 		{
+			value1 = BigInteger.Abs(value1);
+			value2 = BigInteger.Abs(value2);
+
 			while (value1 != 0 && value2 != 0)
 			{
 				if (value1 > value2)
