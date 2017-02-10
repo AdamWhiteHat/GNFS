@@ -43,15 +43,17 @@
   <ItemGroup>
     <Compile Include="FactorBase\Algebraic.cs" />
     <Compile Include="FactorBase\Quadradic.cs" />
+    <Compile Include="GNFS.cs" />
     <Compile Include="IntegerMath\BigIntegerExtensionMethods.cs" />
+    <Compile Include="Polynomial\Cyclotomic.cs" />
     <Compile Include="Polynomial\MurpheyEScore.cs" />
     <Compile Include="IntegerMath\CoPrime.cs" />
     <Compile Include="IntegerMath\Eratosthenes.cs" />
     <Compile Include="IntegerMath\GCD.cs" />
-    <Compile Include="Solving.cs" />
-    <Compile Include="Polynomial\Polynomial.cs" />
+    <Compile Include="Polynomial\Irreducible.cs" />
     <Compile Include="FactorBase\Rational.cs" />
     <Compile Include="NullMatrix.cs" />
+    <Compile Include="RelationCollection.cs" />
     <Compile Include="Sieve.cs" />
     <Compile Include="IntegerMath\Factorization.cs" />
     <Compile Include="Polynomial\AlphaScore.cs" />

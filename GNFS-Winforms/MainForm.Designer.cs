@@ -51,6 +51,7 @@
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
 			this.tbOutput.Size = new System.Drawing.Size(477, 132);
 			this.tbOutput.TabIndex = 0;
+			this.tbOutput.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbOutput_KeyUp);
 			// 
 			// tbN
 			// 
@@ -74,6 +75,7 @@
 			// 
 			this.tbBound.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbBound.Enabled = false;
 			this.tbBound.Location = new System.Drawing.Point(348, 76);
 			this.tbBound.Name = "tbBound";
 			this.tbBound.Size = new System.Drawing.Size(133, 20);

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-namespace GNFSCore
+namespace GNFSCore.Polynomial
 {
 	public class AlphaScore
 	{

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Numerics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -18,12 +19,12 @@ namespace GNFSCore.IntegerMath
 			longestprimeMembershipArray = new List<bool>();
 		}
 
-		public static List<int> Sieve(int ceiling)
+		public static List<int> Sieve(BigInteger ceiling)
 		{
 			return Sieve(2, ceiling);
 		}
 
-		public static List<int> Sieve(int floor, int ceiling)
+		public static List<int> Sieve(BigInteger floor, BigInteger ceiling)
 		{
 			if (floor < 2)
 			{
@@ -70,11 +71,13 @@ namespace GNFSCore.IntegerMath
 			int counterStart = 3;
 			int inc;
 			int sqrt = 3;
-			bool[] primeMembershipArray = new bool[ceiling + 1];
+
+			int ceil = ceiling > Int32.MaxValue ? Int32.MaxValue - 2 : (int)ceiling;
+			bool[] primeMembershipArray = new bool[ceil + 1];
 
 			if (longestprimeMembershipArray.Count > counterStart /*&& longestprimeMembershipArray.Length < ceiling+1*/)
 			{
-				Array.ConstrainedCopy(longestprimeMembershipArray.ToArray(), 0, primeMembershipArray, 0, (int)Math.Min(longestprimeMembershipArray.Count, ceiling + 1));
+				Array.ConstrainedCopy(longestprimeMembershipArray.ToArray(), 0, primeMembershipArray, 0, (int)Math.Min(longestprimeMembershipArray.Count, ceil + 1));
 				//counterStart = longestprimeMembershipArray.Count - 2;
 			}
 

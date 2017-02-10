@@ -34,7 +34,7 @@ namespace GNFSCore.IntegerMath
 				// - OR -
 				//return (sqrt.Square() == input);
 			}
-			return true;
+			return false;
 		}
 
 		public static BigInteger Square(this BigInteger input)
