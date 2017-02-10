@@ -27,7 +27,7 @@ namespace GNFSCore.IntegerMath
 				{
 					primeCounter += 1;
 				}
-				else
+				else if(lastPrime != -1)
 				{
 					result.Add(new Tuple<int, int>(lastPrime, primeCounter));
 					primeCounter = 1;
@@ -36,10 +36,7 @@ namespace GNFSCore.IntegerMath
 				lastPrime = prime;
 			}
 
-			if(primeCounter > 1)
-			{
-				result.Add(new Tuple<int, int>(lastPrime, primeCounter));
-			}
+			result.Add(new Tuple<int, int>(lastPrime, primeCounter));
 			
 			if(factorization.Distinct().Count() != result.Count)
 			{
@@ -67,7 +64,7 @@ namespace GNFSCore.IntegerMath
 			}
 
 			List<int> factors = new List<int>();
-			List<int> eratosthenes = Eratosthenes.Sieve(value);
+			List<int> eratosthenes = Eratosthenes.Sieve(value.SquareRoot()+3);
 			foreach (int prime in eratosthenes)
 			{
 				while (value % prime == 0)
