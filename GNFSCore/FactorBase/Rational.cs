@@ -32,7 +32,7 @@ namespace GNFSCore.FactorBase
 
 		internal static bool IsSmooth(int number, IEnumerable<int> primeFactorBase)
 		{
-			IEnumerable<int> primeFactorization = Factorization.GetPrimeFactoriation(number);			
+			IEnumerable<int> primeFactorization = Factorization.GetPrimeFactorization(number);			
 			return primeFactorization.Count() > 1 && primeFactorization.All(p => primeFactorBase.Contains(p));
 		}
 

@@ -12,15 +12,15 @@ namespace GNFSCore.IntegerMath
 	{
 		public static int LargestFactorPower(BigInteger value)
 		{
-			return GetPrimeFactoriationTuple(value).Select(tup => tup.Item2).OrderByDescending(i => i).First();
+			return GetPrimeFactorizationTuple(value).Select(tup => tup.Item2).OrderByDescending(i => i).First();
 		}
 
-		public static IEnumerable<Tuple<int, int>> GetPrimeFactoriationTuple(BigInteger value)
+		public static IEnumerable<Tuple<int, int>> GetPrimeFactorizationTuple(BigInteger value)
 		{
 			int lastPrime = -1;
 			int primeCounter = 1;
 			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
-			var factorization = GetPrimeFactoriation(value);
+			var factorization = GetPrimeFactorization(value);
 			foreach (int prime in factorization)
 			{
 				if (prime == lastPrime)
@@ -40,13 +40,13 @@ namespace GNFSCore.IntegerMath
 			
 			if(factorization.Distinct().Count() != result.Count)
 			{
-				throw new Exception($"There is a bug in {nameof(Factorization.GetPrimeFactoriationTuple)}!");
+				throw new Exception($"There is a bug in {nameof(Factorization.GetPrimeFactorizationTuple)}!");
 			}
 
 			return result;
 		}
 
-		public static IEnumerable<int> GetPrimeFactoriation(BigInteger value)
+		public static IEnumerable<int> GetPrimeFactorization(BigInteger value)
 		{
 			value = BigInteger.Abs(value);
 
@@ -79,13 +79,17 @@ namespace GNFSCore.IntegerMath
 				}
 			}
 
-			factors.Add((int)value);
+			if (value != 1)
+			{
+				factors.Add((int)value);
+			}
+
 			return factors;
 		}
 
-		public static string GetPrimeFactoriationString(int value)
+		public static string GetPrimeFactorizationString(int value)
 		{
-			var factorization = GetPrimeFactoriationTuple(value);
+			var factorization = GetPrimeFactorizationTuple(value);
 			return $"{value}: {string.Join(" * ", factorization.Select(tup => $"{tup.Item1}^{tup.Item2}"))}";
 		}
 	}
