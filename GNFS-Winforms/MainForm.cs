@@ -86,15 +86,15 @@ namespace GNFS_Winforms
 
 			//var rationalSieve = Sieve.LineSieve(gnfs, 100);
 
-			LogOutput($"Rational sieve relations:");
-			LogOutput(FormatTupleCollection(rationalSieve));
-			LogOutput();
+			//LogOutput($"Rational sieve relations:");
+			//LogOutput(FormatTupleCollection(rationalSieve));
+			//LogOutput();
 
 			//var smooth = Sieve.Smooth(gnfs, rationalSieve);
 
-			LogOutput($"Relations after smooth:");
-			LogOutput(FormatTupleCollection(smooth));
-			LogOutput();
+			//LogOutput($"Relations after smooth:");
+			//LogOutput(FormatTupleCollection(smooth));
+			//LogOutput();
 
 			//IEnumerable<Tuple<int, int>> relationsFound = Sieve.LineSieveForRelations(poly, 200, relationsNeeded, bound);
 
