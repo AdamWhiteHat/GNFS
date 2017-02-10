@@ -25,38 +25,6 @@ namespace GNFSCore.FactorBase
 				List<int> integers = Enumerable.Range(2, min).ToList();
 				return GNFS.PolynomialModP(gnfs.AlgebraicPolynomial, primes, integers);
 			}
-		}
-
-		// a = (c^2)−(d^2);
-		// a + d^2 = c^2;
-		// b = 2*c*d = 2*c*(b/(2*c));
-		// b = 2*d*(b/(2*d))
-
-		// c^2 = b^2-c^4 / 4*a
-		// c = b/(2*d);
-		// c =(2*c*d)/(2*d);
-		// c = b/2*b/2*c;
-		// d = (b/(2*c));
-		// d = (2*c*d)/(2*c);
-		// d = (b/(2*(b/(2*d))));
-
-		// d = b/2*b/2*d;
-		// d = (b/2)^2*d;
-
-		// c^2-a = -1 * d^2;
-		//
-		// 0 = c^4−4*a*c^2−b^2;
-		// 0 = c^4−4*a*c^2−b^2;
-
-		// 0 = c^4 − 4*a*c^2 − (2*c*d)^2;
-
-		// 0 = c^2*c^2 − 4^2*a^2*c^2 − 4*c^2*d^2
-
-		// x^2 = a + b*i;
-
-		// b^2 = c^4 − 4*a*c^2
-
-
-
+		}		
 	}
 }

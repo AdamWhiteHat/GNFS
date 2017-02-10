@@ -32,15 +32,5 @@ namespace GNFSCore.IntegerMath
 			}
 			return BigInteger.Max(value1, value2);
 		}
-
-		//public static BigInteger FindLCM(IEnumerable<BigInteger> numbers)
-		//{
-		//	return numbers.Aggregate(FindLCM);
-		//}
-
-		//public static BigInteger FindLCM(BigInteger num1, BigInteger num2)
-		//{
-		//	return (num1 * num2) / FindGCD(num1, num2);
-		//}
 	}
 }

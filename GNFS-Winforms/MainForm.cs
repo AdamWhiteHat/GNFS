@@ -80,61 +80,8 @@ namespace GNFS_Winforms
 			LogOutput($"Quadratic Factor Base (QFB):");
 			LogOutput(FormatTupleCollection(gnfs.QFB));
 			LogOutput();
-
-
-
-
-			//var rationalSieve = Sieve.LineSieve(gnfs, 100);
-
-			//LogOutput($"Rational sieve relations:");
-			//LogOutput(FormatTupleCollection(rationalSieve));
-			//LogOutput();
-
-			//var smooth = Sieve.Smooth(gnfs, rationalSieve);
-
-			//LogOutput($"Relations after smooth:");
-			//LogOutput(FormatTupleCollection(smooth));
-			//LogOutput();
-
-			//IEnumerable<Tuple<int, int>> relationsFound = Sieve.LineSieveForRelations(poly, 200, relationsNeeded, bound);
-
-			//LogOutput($"Relations found after sieve:");
-			//LogOutput(FormatTupleCollection(relationsFound));
-			//LogOutput();
-
-			var rfbFactors = gnfs.RFB.SelectMany(tup => new int[] { tup.Item2 });
-			var afbFactors = gnfs.AFB.SelectMany(tup => new int[] { tup.Item2 });
-			var qfbFactors = gnfs.QFB.SelectMany(tup => new int[] { tup.Item1, tup.Item2 });
-			var potentialRFactors = rfbFactors.Distinct().OrderByDescending(i => i).ToList();
-			var potentialAFactors = afbFactors.Distinct().OrderByDescending(i => i).ToList();
-			var potentialQFactors = qfbFactors.Distinct().OrderByDescending(i => i).ToList();
-
-			var potentialFactors = qfbFactors.Union(rfbFactors).Union(afbFactors).Distinct().OrderByDescending(i => i);
-
-			var powers = potentialFactors.Select(i => new Tuple<int, int>(i, Factorization.LargestFactorPower(i))).Distinct().OrderByDescending(tup => tup.Item2);
-			var mediumPowers = powers.Where(tup => tup.Item2 > 1);
-
-			//List<string> factorized = new string[] { "-- R --" };
-			//factorized.AddRange(potentialRFactors.Select(i => $"[{i}:{{{Factorization.GetPrimeFactoriationString(i)}}}]").ToList());
-			//factorized.Add("-- A --");
-			//factorized.AddRange(potentialAFactors.Select(i => $"[{i}:{{{Factorization.GetPrimeFactoriationString(i)}}}]").ToList());
-			//factorized.Add("-- Q --");
-			//factorized.AddRange(potentialQFactors.Select(i => $"[{i}:{{{Factorization.GetPrimeFactoriationString(i)}}}]").ToList());
-			//factorized.Add("-- fin --");
-
-			LogOutput($"Prime factorization of factor bases:");
-			LogOutput(string.Join(Environment.NewLine, string.Join(Environment.NewLine, mediumPowers.Select(tup => $"[{tup.Item1}: {tup.Item2}]")))); 
-			LogOutput();
-
-			//var enumenumTuple = potentialQFactors.Select(q => Factorization.GetPrimeFactoriationTuple(q).Where(tup => (tup.Item2 % 2 == 0)));
-			//qfbFactors.Select(q => Factorization.GetPrimeFactoriationTuple(q)/*.Where(tup => (tup.Item2%2==0))*/);
 			
-			LogOutput($"Prime factor exponents:");
-			LogOutput(string.Join(Environment.NewLine, potentialFactors.Select(i => $"{i}: {Factorization.GetPrimeFactoriationString(i)}")));
-			LogOutput();
 		}
-
-
 	}
 }
 

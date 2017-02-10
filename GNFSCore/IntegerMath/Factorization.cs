@@ -60,10 +60,6 @@ namespace GNFSCore.IntegerMath
 
 			if (value < 10)
 			{
-				//if (value == 9)		return new List<int>() { 3, 3, 3 };
-				//else if (value == 8)	return new List<int>() { 2, 2, 2 };
-				//else if (value == 6)	return new List<int>() { 2, 3 };
-				//else if (value == 4)	return new List<int>() { 2, 2 };
 				if (value == 0 || value == 1 || value == 2 || value == 3 || value == 5 || value == 7)
 				{
 					return new List<int>() { (int)value };
