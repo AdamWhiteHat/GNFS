@@ -18,10 +18,10 @@ namespace GNFSCore.FactorBase
 		{
 			public static IEnumerable<Tuple<int, int>> GetAlgebraicFactorBase(GNFS gnfs)
 			{
-				int algebraicBound = gnfs.PrimeBound * 3;
-				IEnumerable<int> primes = PrimeFactory.GetPrimes(algebraicBound);
-				IEnumerable<int> integers = Enumerable.Range(3, primes.Last() - 1);
-				integers = integers.Except(primes);
+				int algebraicBound = (int)(gnfs.PrimeBound * 3.3);
+				int primeBound = PrimeFactory.GetIndexFromValue(algebraicBound);
+				IEnumerable<int> primes = PrimeFactory.GetPrimes(primeBound);
+				IEnumerable<int> integers = Enumerable.Range(0, primes.Last());
 				return GNFS.PolynomialModP(gnfs.AlgebraicPolynomial, primes, integers);
 			}
 		}

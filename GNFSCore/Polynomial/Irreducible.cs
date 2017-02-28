@@ -19,7 +19,7 @@ namespace GNFSCore.Polynomial
 		{
 			Base = polynomialBase;
 			Degree = degree;
-			Terms = Enumerable.Repeat(BigInteger.Zero, degree + 1).ToArray();
+			Terms = Enumerable.Repeat(BigInteger.Zero, degree).ToArray();
 
 			SetPolynomialValue(n);
 		}
@@ -35,11 +35,7 @@ namespace GNFSCore.Polynomial
 			{
 				BigInteger placeValue = BigInteger.Pow(Base, d);
 
-				if (toAdd == 0 || placeValue > toAdd)
-				{
-					Terms[d] = 0;
-				}
-				else if (placeValue == 1)
+				if (placeValue == 1)
 				{
 					Terms[d] = toAdd;
 				}
@@ -60,14 +56,14 @@ namespace GNFSCore.Polynomial
 			}
 		}
 
-		public BigInteger Eval(BigInteger primeBase)
+		public BigInteger Eval(BigInteger baseM)
 		{
 			BigInteger result = 0;
 
-			int d = Degree;
+			int d = Degree-1;
 			while (d >= 0)
 			{
-				BigInteger placeValue = BigInteger.Pow(primeBase, d);
+				BigInteger placeValue = BigInteger.Pow(baseM, d);
 				BigInteger addValue = Terms[d] * placeValue;
 
 				result += addValue;
@@ -78,9 +74,11 @@ namespace GNFSCore.Polynomial
 			return result;
 		}
 
-		public BigInteger EvalMod(BigInteger primeBase, int mod)
+		public IEnumerable<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
 		{
-			return Eval(primeBase) % mod;
+			BigInteger polyResult = Eval(baseM);
+			IEnumerable<int> result = modList.Where(mod => (polyResult % mod) == 0);
+			return result;
 		}
 
 		public override string ToString()
@@ -95,7 +93,7 @@ namespace GNFSCore.Polynomial
 			int degree = terms.Length - 1;
 			while (degree >= 0)
 			{
-				if(degree > 1)
+				if (degree > 1)
 				{
 					if (terms[degree] == 1)
 					{
@@ -106,7 +104,7 @@ namespace GNFSCore.Polynomial
 						stringTerms.Add($"{terms[degree]} * {polyBase}^{degree}");
 					}
 				}
-				else if(degree == 1)
+				else if (degree == 1)
 				{
 					stringTerms.Add($"{terms[degree]} * {polyBase}");
 				}
@@ -114,7 +112,7 @@ namespace GNFSCore.Polynomial
 				{
 					stringTerms.Add($"{terms[degree]}");
 				}
-				
+
 				degree--;
 			}
 

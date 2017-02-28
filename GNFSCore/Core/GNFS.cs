@@ -29,7 +29,7 @@ namespace GNFSCore
 			N = n;
 			//degree = 3; // or 4
 			BigInteger remainder = new BigInteger();
-			PrimeBound = (int)n.NthRoot(degree, ref remainder); // 60;
+			PrimeBound = (int)((int)n.NthRoot(degree, ref remainder) * 1.5); // 60;
 
 			ConstructPolynomial(polynomialBase, degree);
 			ConstructFactorBase();
@@ -50,12 +50,19 @@ namespace GNFSCore
 
 		internal static IEnumerable<Tuple<int, int>> PolynomialModP(Irreducible poly, IEnumerable<int> primes, IEnumerable<int> integers)
 		{
-			IEnumerable<Tuple<int, int>> factors = integers
-				.SelectMany(r => primes.Where(p => (poly.EvalMod(r, p).IsZero))
-				.Select(p => new Tuple<int, int>(p, r)));
-			return factors.OrderBy(tup => tup.Item1);
+			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+
+			foreach (int r in integers)
+			{
+				var modList = primes.Where(p => p > r);
+				var roots = poly.GetRootsMod(r, modList);
+				if (roots.Any())
+				{
+					result.AddRange(roots.Select(p => new Tuple<int, int>(p, r)));
+				}
+			}
+
+			return result.OrderBy(tup => tup.Item1);
 		}
-
-
 	}
 }
