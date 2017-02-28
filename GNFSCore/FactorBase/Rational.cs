@@ -19,7 +19,7 @@ namespace GNFSCore.FactorBase
 		{
 			public static IEnumerable<Tuple<int, int>> BuildRationalFactorBase(GNFS gnfs)
 			{
-				int boundIndex = PrimeFactory.GetPrimeIndexFromValue(gnfs.PrimeBound);
+				int boundIndex = PrimeFactory.GetIndexFromValue(gnfs.PrimeBound);
 				IEnumerable<int> primes = PrimeFactory.GetPrimes(boundIndex);
 				IEnumerable<Tuple<int, int>> result = primes.Select(p => new Tuple<int, int>(p, (int)(gnfs.AlgebraicPolynomial.Base % p)));
 				return result.Distinct();

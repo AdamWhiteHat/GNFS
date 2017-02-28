@@ -7,18 +7,8 @@ using System.Collections.Generic;
 
 namespace GNFSCore.IntegerMath.Internal
 {
-	// TODO: Make return IEnumerable
 	public static class Eratosthenes
 	{
-		private static List<int> longestSieve;
-		private static List<bool> longestprimeMembershipArray;
-
-		static Eratosthenes()
-		{
-			longestSieve = new List<int>();
-			longestprimeMembershipArray = new List<bool>();
-		}
-
 		public static List<int> Sieve(int ceiling)
 		{
 			if (ceiling < 10)
@@ -41,18 +31,6 @@ namespace GNFSCore.IntegerMath.Internal
 				}
 			}
 
-			int cacheMaxValue = 0;
-			if (longestSieve.Count > 0)
-			{
-				cacheMaxValue = longestSieve.Last();
-			}
-
-			if (cacheMaxValue >= ceiling || longestprimeMembershipArray.Count >= ceiling)
-			{
-				// Cached Value					
-				return longestSieve.TakeWhile(l => l < ceiling).ToList();
-			}
-
 			int counter = 0;
 			int counterStart = 3;
 			int inc;
@@ -61,18 +39,12 @@ namespace GNFSCore.IntegerMath.Internal
 			int ceil = ceiling > Int32.MaxValue ? Int32.MaxValue - 2 : (int)ceiling;
 			bool[] primeMembershipArray = new bool[ceil + 1];
 
-			if (longestprimeMembershipArray.Count > counterStart /*&& longestprimeMembershipArray.Length < ceiling+1*/)
-			{
-				Array.ConstrainedCopy(longestprimeMembershipArray.ToArray(), 0, primeMembershipArray, 0, (int)Math.Min(longestprimeMembershipArray.Count, ceil + 1));
-				//counterStart = longestprimeMembershipArray.Count - 2;
-			}
-
 			primeMembershipArray[2] = true;
 
 			// Set all odds as true
 			for (counter = counterStart; counter <= ceiling; counter += 2)
 			{
-				if ((counter & 1) == 1)//% 2 == 1) // Check if odd
+				if ((counter & 1) == 1) // Check if odd. &1 is the same as: %2
 				{
 					primeMembershipArray[counter] = true;
 				}
@@ -97,17 +69,7 @@ namespace GNFSCore.IntegerMath.Internal
 				}
 			}
 
-			List<int> result = Enumerable.Range(2, (int)ceiling - 2).ToList();
-
-			if (result.Count > longestSieve.Count)
-			{
-				longestSieve = result;
-			}
-
-			if (primeMembershipArray.Length > longestprimeMembershipArray.Count)
-			{
-				longestprimeMembershipArray = primeMembershipArray.ToList();
-			}
+			List<int> result = Enumerable.Range(2, (int)ceiling - 2).Where(l => primeMembershipArray[l]).ToList();
 
 			return result;
 		}

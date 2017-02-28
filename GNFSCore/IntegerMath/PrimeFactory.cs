@@ -31,13 +31,14 @@ namespace GNFSCore.IntegerMath
 			SetPrimes();
 		}
 
-		public static int GetPrimeIndexFromValue(int value)
+		public static int GetIndexFromValue(int value)
 		{
 			while(primes[primes.Length-1] < value)
 			{
 				IncreaseBound();
 			}
-			return primes.First(p => p >= value);
+			int result = primes.First(p => p >= value);
+			return result;
 		}
 
 		public static int[] GetPrimes(int quantity)

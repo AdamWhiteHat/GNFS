@@ -28,8 +28,8 @@ namespace GNFSCore
 		{
 			N = n;
 			//degree = 3; // or 4
-			//BigInteger remainder = new BigInteger();
-			PrimeBound = 60;//(int)n.NthRoot(degree, ref remainder);
+			BigInteger remainder = new BigInteger();
+			PrimeBound = (int)n.NthRoot(degree, ref remainder); // 60;
 
 			ConstructPolynomial(polynomialBase, degree);
 			ConstructFactorBase();
