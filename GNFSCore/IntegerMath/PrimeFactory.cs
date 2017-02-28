@@ -37,8 +37,9 @@ namespace GNFSCore.IntegerMath
 			{
 				IncreaseBound();
 			}
-			int result = primes.First(p => p >= value);
-			return result;
+			int primeValue = primes.First(p => p >= value);
+			int index = Array.IndexOf<int>(primes, primeValue);
+			return index;
 		}
 
 		public static int[] GetPrimes(int quantity)
