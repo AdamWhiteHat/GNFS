@@ -19,54 +19,66 @@ namespace GNFSCore.FactorBase
 		{
 			public static IEnumerable<Tuple<int, int>> BuildRationalFactorBase(GNFS gnfs)
 			{
-				IEnumerable<int> primes = gnfs.Primes.Take(gnfs.PrimeBound);
+				int boundIndex = PrimeFactory.GetPrimeIndexFromValue(gnfs.PrimeBound);
+				IEnumerable<int> primes = PrimeFactory.GetPrimes(boundIndex);
 				IEnumerable<Tuple<int, int>> result = primes.Select(p => new Tuple<int, int>(p, (int)(gnfs.AlgebraicPolynomial.Base % p)));
-				return result;
+				return result.Distinct();
 			}
 		}
-		
-		public static BigInteger Norm(int a, int b, BigInteger polyBase)
+
+		public static BigInteger Norm(int b, BigInteger baseM, int k, int prime)
 		{
-			return BigInteger.Add(a, BigInteger.Multiply(b, polyBase));
+			return BigInteger.Add(BigInteger.Multiply(-b, baseM), BigInteger.Multiply(k, prime));
 		}
 
-		internal static bool IsSmooth(int number, IEnumerable<int> primeFactorBase)
+		public static bool IsSmooth(int number, IEnumerable<int> primeFactorBase)
 		{
-			IEnumerable<int> primeFactorization = Factorization.GetPrimeFactorization(number);			
+			IEnumerable<int> primeFactorization = Factorization.GetPrimeFactorization(number,primeFactorBase.Last());
 			return primeFactorization.Count() > 1 && primeFactorization.All(p => primeFactorBase.Contains(p));
 		}
 
-		public static IEnumerable<Tuple<int, int>> GetRationalNormsElements(GNFS gnfs, int range)
+		public static IEnumerable<Tuple<int, int>> GetRationalNormRelations(GNFS gnfs, int range)
 		{
 			int m = (int)gnfs.AlgebraicPolynomial.Base;
 			var result = new List<Tuple<int, int>>();
 			int relationsNeeded = gnfs.RFB.Count() + gnfs.AFB.Count() + gnfs.QFB.Count();
 
-			int counter = 0;
-			while (result.Count < relationsNeeded && counter++ < 100)
+			int b = 1;
+			while (result.Count < relationsNeeded && b < 1000)
 			{
+				int bm = -b * m;
+
 				result.AddRange(
-					gnfs.Primes.SelectMany(p =>
-						Enumerable.Range(1, range / 2).SelectMany(b =>
-							   GetDivisibleElements(b, p, m, range).Select(a => new Tuple<int, int>(a, b))
-						)
+					gnfs.RFB.SelectMany(tup =>
+						GetDivisibleElements(gnfs, b, m, tup.Item1, range)
+						.Select(a => new Tuple<int, int>(a, b))
 					)
 				);
+
+				b++;
 			}
-			return result;
+			return result.Distinct();
 		}
-		
-		internal static IEnumerable<int> GetDivisibleElements(int b, int p, int m, int range)
+
+		internal static IEnumerable<int> GetDivisibleElements(GNFS gnfs, int b, int m, int p, int range)
 		{
 			int bm = b * m;
+			var divisible = GetNormsRange(range, bm, p).Select(k => -bm + (p * k)).Distinct();
+			var primeBase = PrimeFactory.GetPrimes(gnfs.PrimeBound);
+			var smoothNorms = divisible.Where(a => IsSmooth(a, primeBase));
+			var rationalNorms = smoothNorms.Where(a => CoPrime.IsCoprime(a, b));
+			return rationalNorms;
+		}
 
-			int kLower = (-range + bm) / p;
+		internal static IEnumerable<int> GetNormsRange(int range, int bm, int p)
+		{
+
+			int kLower = (/*-range*/0 + bm) / p;
 			int kUpper = (range + bm) / p;
 			int count = Math.Abs(kLower) + Math.Abs(kUpper);
 
-			var divisible = Enumerable.Range(kLower, count).Select(k => -bm + (p * k));
-			var rationalNormsA = divisible.Where(a => CoPrime.IsCoprime(a, b)).Distinct();
-			return rationalNormsA;
+			var result = Enumerable.Range(kLower, count);
+			return result;
 		}
 	}
 }

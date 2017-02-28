@@ -41,10 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IntegerMath\PrimeFactory.cs" />
+    <Compile Include="Misc\Combinatorics.cs" />
     <Compile Include="FactorBase\Algebraic.cs" />
     <Compile Include="FactorBase\Quadradic.cs" />
-    <Compile Include="GNFS.cs" />
-    <Compile Include="IntegerMath\BigIntegerExtensionMethods.cs" />
+    <Compile Include="Core\GNFS.cs" />
+    <Compile Include="Misc\IEnumerableExtensionMethods.cs" />
+    <Compile Include="Misc\BigIntegerExtensionMethods.cs" />
+    <Compile Include="Misc\BigComplex.cs" />
     <Compile Include="Polynomial\Cyclotomic.cs" />
     <Compile Include="Polynomial\MurpheyEScore.cs" />
     <Compile Include="IntegerMath\CoPrime.cs" />
@@ -52,9 +56,8 @@
     <Compile Include="IntegerMath\GCD.cs" />
     <Compile Include="Polynomial\Irreducible.cs" />
     <Compile Include="FactorBase\Rational.cs" />
-    <Compile Include="NullMatrix.cs" />
-    <Compile Include="RelationCollection.cs" />
-    <Compile Include="Sieve.cs" />
+    <Compile Include="Misc\RelationCollection.cs" />
+    <Compile Include="Core\Sieve.cs" />
     <Compile Include="IntegerMath\Factorization.cs" />
     <Compile Include="Polynomial\AlphaScore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

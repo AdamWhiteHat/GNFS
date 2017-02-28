@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace GNFSCore.IntegerMath
+namespace GNFSCore.IntegerMath.Internal
 {
 	// TODO: Make return IEnumerable
 	public static class Eratosthenes
@@ -19,22 +19,8 @@ namespace GNFSCore.IntegerMath
 			longestprimeMembershipArray = new List<bool>();
 		}
 
-		public static List<int> Sieve(BigInteger ceiling)
+		public static List<int> Sieve(int ceiling)
 		{
-			return Sieve(2, ceiling);
-		}
-
-		public static List<int> Sieve(BigInteger floor, BigInteger ceiling)
-		{
-			if (floor < 2)
-			{
-				floor = 2;
-			}
-
-			if (floor > ceiling)
-			{
-				throw new ArgumentOutOfRangeException("floor > ceiling");
-			}
 			if (ceiling < 10)
 			{
 				if (ceiling == 9 || ceiling == 8 || ceiling == 7)
@@ -111,7 +97,7 @@ namespace GNFSCore.IntegerMath
 				}
 			}
 
-			List<int> result = Enumerable.Range(2, (int)ceiling - 2).Select(n => (int)n).Where(l => l >= floor && primeMembershipArray[l]).ToList();
+			List<int> result = Enumerable.Range(2, (int)ceiling - 2).ToList();
 
 			if (result.Count > longestSieve.Count)
 			{

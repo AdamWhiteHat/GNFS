@@ -78,14 +78,14 @@ namespace GNFSCore.Polynomial
 			return result;
 		}
 
-		public int EvalMod(BigInteger primeBase, int mod)
+		public BigInteger EvalMod(BigInteger primeBase, int mod)
 		{
-			return (int)Eval(primeBase) % mod;
+			return Eval(primeBase) % mod;
 		}
 
 		public override string ToString()
 		{
-			return base.ToString();
+			return FormatString(this.Base, this.Terms);
 		}
 
 		public static string FormatString(BigInteger polyBase, BigInteger[] terms)
@@ -95,12 +95,30 @@ namespace GNFSCore.Polynomial
 			int degree = terms.Length - 1;
 			while (degree >= 0)
 			{
-				stringTerms.Add($"{terms[degree]} * {polyBase}^{degree}");
-
+				if(degree > 1)
+				{
+					if (terms[degree] == 1)
+					{
+						stringTerms.Add($"{polyBase}^{degree}");
+					}
+					else
+					{
+						stringTerms.Add($"{terms[degree]} * {polyBase}^{degree}");
+					}
+				}
+				else if(degree == 1)
+				{
+					stringTerms.Add($"{terms[degree]} * {polyBase}");
+				}
+				else if (degree == 0)
+				{
+					stringTerms.Add($"{terms[degree]}");
+				}
+				
 				degree--;
 			}
 
-			return string.Join(" +  ", stringTerms);
+			return string.Join(" + ", stringTerms);
 		}
 	}
 }

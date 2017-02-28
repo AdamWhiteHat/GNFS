@@ -10,12 +10,12 @@ using GNFSCore.IntegerMath;
 
 namespace GNFSCore
 {
-	public class GNFS
+	public partial class GNFS
 	{
 		public BigInteger N { get; private set; }
 
 		public int PrimeBound { get; private set; }
-		internal List<int> Primes { get; private set; }
+		//public List<int> Primes { get; private set; }
 
 		public Cyclotomic RationalPolynomial { get; private set; }
 		public Irreducible AlgebraicPolynomial { get; private set; }
@@ -24,14 +24,12 @@ namespace GNFSCore
 		public IEnumerable<Tuple<int, int>> AFB { get; internal set; } = null;
 		public IEnumerable<Tuple<int, int>> QFB { get; internal set; } = null;
 
-
 		public GNFS(BigInteger n, BigInteger polynomialBase, int degree)
 		{
 			N = n;
 			//degree = 3; // or 4
-			Primes = Eratosthenes.Sieve(1000);
-			BigInteger remainder = new BigInteger();
-			PrimeBound = (int)n.NthRoot(degree, ref remainder);
+			//BigInteger remainder = new BigInteger();
+			PrimeBound = 60;//(int)n.NthRoot(degree, ref remainder);
 
 			ConstructPolynomial(polynomialBase, degree);
 			ConstructFactorBase();
@@ -53,8 +51,11 @@ namespace GNFSCore
 		internal static IEnumerable<Tuple<int, int>> PolynomialModP(Irreducible poly, IEnumerable<int> primes, IEnumerable<int> integers)
 		{
 			IEnumerable<Tuple<int, int>> factors = integers
-				.SelectMany(i => primes.Where(p => (poly.EvalMod(i, p) == 0)).Select(p => new Tuple<int, int>(p, i)));
+				.SelectMany(r => primes.Where(p => (poly.EvalMod(r, p).IsZero))
+				.Select(p => new Tuple<int, int>(p, r)));
 			return factors.OrderBy(tup => tup.Item1);
 		}
+
+
 	}
 }

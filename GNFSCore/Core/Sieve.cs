@@ -17,13 +17,13 @@ namespace GNFSCore
 		// are those with a on the form a = −bm + kp for k ∈ Z.
 		public static IEnumerable<Tuple<int, int>> LineSieve(GNFS gnfs, int range)
 		{
-			var rationalNormsA = Rational.GetRationalNormsElements(gnfs, range);
+			var rationalNormsA = Rational.GetRationalNormRelations(gnfs, range);
 			return rationalNormsA;
 		}
 
 		public static IEnumerable<Tuple<int, int>> Smooth(GNFS gnfs, IEnumerable<Tuple<int, int>> rels)
 		{
-			var primeBase = gnfs.Primes.Take(gnfs.PrimeBound);
+			var primeBase = PrimeFactory.GetPrimes(gnfs.PrimeBound);
 			var rationalSmooth = rels.Where(a => Rational.IsSmooth(a.Item1, primeBase) && Rational.IsSmooth(a.Item2, primeBase));
 			var algebraicSmooth = rationalSmooth.Where(a => Rational.IsSmooth((int)Algebraic.Norm(a.Item1, a.Item2, gnfs.AlgebraicPolynomial), primeBase));
 
