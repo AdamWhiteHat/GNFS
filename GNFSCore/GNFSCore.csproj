@@ -42,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntegerMath\PrimeFactory.cs" />
-    <Compile Include="Core\SquareBuilder.cs" />
     <Compile Include="LinearAlgebra\BitVector2.cs" />
     <Compile Include="LinearAlgebra\BitVector.cs" />
     <Compile Include="Misc\Combinatorics.cs" />

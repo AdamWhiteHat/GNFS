@@ -100,7 +100,7 @@ namespace GNFS_Winforms
 
 
 			LogOutput($"Prime factorization example:");
-			LogOutput(string.Join(Environment.NewLine, gnfs.AFB.Select(tup => $"{tup.Item2}" + FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(tup.Item2, gnfs.PrimeBound)))));
+			LogOutput(string.Join(Environment.NewLine, gnfs.AFB.Select(tup => $"{tup.Item2}" + Factorization.FormatString.PrimeFactorization(Factorization.GetPrimeFactorizationTuple(tup.Item2, gnfs.PrimeBound)))));
 			LogOutput();
 
 			List<int> factoringExample = new List<int>();

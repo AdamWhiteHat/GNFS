@@ -36,7 +36,7 @@ namespace GNFSCore.LinearAlgebra
 		{
 			bool[] result = new bool[width];
 
-			IEnumerable<Tuple<int, int>> factorization = FactorizationFactory.GetPrimeFactorizationTuple(number, width);
+			IEnumerable<Tuple<int, int>> factorization = Factorization.GetPrimeFactorizationTuple(number, width);
 			foreach (Tuple<int, int> factor in factorization)
 			{
 				if (factor.Item1 > width)
