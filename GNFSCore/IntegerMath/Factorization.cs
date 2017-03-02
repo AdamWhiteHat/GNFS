@@ -8,21 +8,16 @@ using System.Collections.Concurrent;
 
 namespace GNFSCore.IntegerMath
 {
-	public class Factorization
+	public class FactorizationFactory
 	{
 		private static int[] primes;
 
-		static Factorization()
+		static FactorizationFactory()
 		{
 			primes = PrimeFactory.GetPrimes(1000);
 		}
 
-		public static int LargestFactorPower(BigInteger value, BigInteger maxValue)
-		{
-			return GetPrimeFactorizationTuple(value, maxValue).Select(tup => tup.Item2).OrderByDescending(i => i).First();
-		}
-
-		public static IEnumerable<Tuple<int, int>> GetPrimeFactorizationTuple(BigInteger value, BigInteger maxValue)
+		public static IEnumerable<Tuple<int, int>> GetPrimeFactorizationTuple(BigInteger value, int maxValue)
 		{
 			int lastPrime = -1;
 			int primeCounter = 1;
@@ -47,13 +42,13 @@ namespace GNFSCore.IntegerMath
 
 			if (factorization.Distinct().Count() != result.Count)
 			{
-				throw new Exception($"There is a bug in {nameof(Factorization.GetPrimeFactorizationTuple)}!");
+				throw new Exception($"There is a bug in {nameof(FactorizationFactory.GetPrimeFactorizationTuple)}!");
 			}
 
 			return result;
 		}
 
-		public static IEnumerable<int> GetPrimeFactorization(BigInteger value, BigInteger maxValue)
+		public static IEnumerable<int> GetPrimeFactorization(BigInteger value, int maxValue)
 		{
 			value = BigInteger.Abs(value);
 
@@ -72,7 +67,7 @@ namespace GNFSCore.IntegerMath
 
 			if (primes.Length < maxValue + 1)
 			{
-				primes = PrimeFactory.GetPrimes((int)maxValue + 1);
+				primes = PrimeFactory.GetPrimes(maxValue + 1);
 			}
 
 			if (primes.Contains((int)value))
@@ -103,10 +98,12 @@ namespace GNFSCore.IntegerMath
 			return factors;
 		}
 
-		public static string GetPrimeFactorizationString(int value, BigInteger maxValue)
+		public static class FormatString
 		{
-			var factorization = GetPrimeFactorizationTuple(value, maxValue);
-			return $"{value}: {string.Join(" * ", factorization.Select(tup => $"{tup.Item1}^{tup.Item2}"))}";
+			public static string PrimeFactorization(IEnumerable<Tuple<int, int>> factorization)
+			{
+				return $"{string.Join(" * ", factorization.Select(tup => $"{tup.Item1}^{tup.Item2}"))}";
+			}
 		}
 	}
 }

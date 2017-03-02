@@ -49,7 +49,7 @@
 			this.tbOutput.Multiline = true;
 			this.tbOutput.Name = "tbOutput";
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.tbOutput.Size = new System.Drawing.Size(477, 132);
+			this.tbOutput.Size = new System.Drawing.Size(703, 352);
 			this.tbOutput.TabIndex = 0;
 			this.tbOutput.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbOutput_KeyUp);
 			// 
@@ -59,7 +59,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbN.Location = new System.Drawing.Point(20, 4);
 			this.tbN.Name = "tbN";
-			this.tbN.Size = new System.Drawing.Size(461, 20);
+			this.tbN.Size = new System.Drawing.Size(687, 20);
 			this.tbN.TabIndex = 1;
 			// 
 			// tbBase
@@ -68,7 +68,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbBase.Location = new System.Drawing.Point(348, 28);
 			this.tbBase.Name = "tbBase";
-			this.tbBase.Size = new System.Drawing.Size(133, 20);
+			this.tbBase.Size = new System.Drawing.Size(359, 20);
 			this.tbBase.TabIndex = 2;
 			// 
 			// tbBound
@@ -78,7 +78,7 @@
 			this.tbBound.Enabled = false;
 			this.tbBound.Location = new System.Drawing.Point(348, 76);
 			this.tbBound.Name = "tbBound";
-			this.tbBound.Size = new System.Drawing.Size(133, 20);
+			this.tbBound.Size = new System.Drawing.Size(359, 20);
 			this.tbBound.TabIndex = 3;
 			// 
 			// label1
@@ -114,7 +114,7 @@
 			// btnGetFactorBases
 			// 
 			this.btnGetFactorBases.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnGetFactorBases.Location = new System.Drawing.Point(405, 100);
+			this.btnGetFactorBases.Location = new System.Drawing.Point(631, 100);
 			this.btnGetFactorBases.Name = "btnGetFactorBases";
 			this.btnGetFactorBases.Size = new System.Drawing.Size(75, 23);
 			this.btnGetFactorBases.TabIndex = 7;
@@ -138,14 +138,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbDegree.Location = new System.Drawing.Point(348, 52);
 			this.tbDegree.Name = "tbDegree";
-			this.tbDegree.Size = new System.Drawing.Size(133, 20);
+			this.tbDegree.Size = new System.Drawing.Size(359, 20);
 			this.tbDegree.TabIndex = 8;
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(484, 262);
+			this.ClientSize = new System.Drawing.Size(710, 482);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.tbDegree);
 			this.Controls.Add(this.btnGetFactorBases);

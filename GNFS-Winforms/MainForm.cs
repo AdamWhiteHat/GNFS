@@ -7,13 +7,16 @@ using System.Numerics;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using GNFSCore;
-using GNFSCore.FactorBase;
-using GNFSCore.IntegerMath;
-using GNFSCore.Polynomial;
+
 
 namespace GNFS_Winforms
 {
+	using GNFSCore;
+	using GNFSCore.Polynomial;
+	using GNFSCore.FactorBase;
+	using GNFSCore.IntegerMath;
+	using GNFSCore.LinearAlgebra;
+
 	public partial class MainForm : Form
 	{
 		public MainForm()
@@ -95,7 +98,24 @@ namespace GNFS_Winforms
 			LogOutput(FormatTupleCollection(gnfs.QFB));
 			LogOutput();
 
-			
+
+			LogOutput($"Prime factorization example:");
+			LogOutput(string.Join(Environment.NewLine, gnfs.AFB.Select(tup => $"{tup.Item2}" + FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(tup.Item2, gnfs.PrimeBound)))));
+			LogOutput();
+
+			List<int> factoringExample = new List<int>();
+			factoringExample.AddRange(gnfs.RFB.Select(tup => tup.Item2));
+			factoringExample.AddRange(gnfs.AFB.Select(tup => tup.Item2));
+			factoringExample.AddRange(gnfs.QFB.Select(tup => tup.Item1));
+
+			factoringExample = factoringExample.Distinct().OrderBy(i => i).ToList();
+
+			BitVector2 exampleVectors = new BitVector2(factoringExample, gnfs.PrimeBound);
+
+			LogOutput($"Prime factorization as exponent vectors:");
+			LogOutput(exampleVectors.ToString());
+			LogOutput();
+
 			//int range = 200;
 			//var rationalNormsR = Rational.GetRationalNormRelations(gnfs, range);
 			//var smoothNormsR = rationalNormsR.Where(t => Rational.IsSmooth(t.Item1, gnfs.Primes.Take(gnfs.PrimeBound)));
@@ -105,10 +125,8 @@ namespace GNFS_Winforms
 			//LogOutput(FormatTupleCollection(orderedNormsR));
 			//LogOutput();
 
-
 			//var polyCycles = Enumerable.Range(1, 15).Select(i => gnfs.AlgebraicPolynomial.Eval(i));
 			//var modPoly = polyCycles.Select(i => n % i);
-
 
 			//LogOutput($"Polynomial roots:");
 			//LogOutput(string.Join(Environment.NewLine, polyCycles));
