@@ -25,7 +25,7 @@ namespace GNFSCore.FactorBase
 				return result.Distinct();
 			}
 		}
-
+		/*
 		public static BigInteger Norm(int b, BigInteger baseM, int k, int prime)
 		{
 			return BigInteger.Add(BigInteger.Multiply(-b, baseM), BigInteger.Multiply(k, prime));
@@ -73,12 +73,13 @@ namespace GNFSCore.FactorBase
 		internal static IEnumerable<int> GetNormsRange(int range, int bm, int p)
 		{
 
-			int kLower = (/*-range*/0 + bm) / p;
+			int kLower = (0 + bm) / p; // (-range + bm) / p;
 			int kUpper = (range + bm) / p;
 			int count = Math.Abs(kLower) + Math.Abs(kUpper);
 
 			var result = Enumerable.Range(kLower, count);
 			return result;
 		}
+		*/
 	}
 }

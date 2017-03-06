@@ -13,6 +13,7 @@ namespace GNFSCore
 {
 	public class Sieve
 	{
+		/*
 		// The elements (a, b) with rational norm divisible by element (p, r) from RFB
 		// are those with a on the form a = −bm + kp for k ∈ Z.
 		public static IEnumerable<Tuple<int, int>> LineSieve(GNFS gnfs, int range)
@@ -31,6 +32,6 @@ namespace GNFSCore
 			var results = ordered.Distinct();			
 			return results;
 		}
-
+		*/
 	}
 }

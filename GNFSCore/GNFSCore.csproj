@@ -42,8 +42,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntegerMath\PrimeFactory.cs" />
-    <Compile Include="LinearAlgebra\BitVector2.cs" />
-    <Compile Include="LinearAlgebra\BitVector.cs" />
+    <Compile Include="PrimeSignature\BitMatrix.cs" />
+    <Compile Include="PrimeSignature\BitPattern.cs" />
+    <Compile Include="PrimeSignature\BitVector.cs" />
     <Compile Include="Misc\Combinatorics.cs" />
     <Compile Include="FactorBase\Algebraic.cs" />
     <Compile Include="FactorBase\Quadradic.cs" />

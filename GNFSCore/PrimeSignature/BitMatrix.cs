@@ -7,9 +7,9 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace GNFSCore.LinearAlgebra
+namespace GNFSCore.PrimeSignature
 {
-	public class BitVector2
+	public class BitMatrix
 	{
 		public int Width;
 		public BitVector[] Rows;
@@ -39,11 +39,11 @@ namespace GNFSCore.LinearAlgebra
 			return result;
 		}
 
-		public BitVector2(IEnumerable<int> array, int width)
+		public BitMatrix(IEnumerable<int> array, int width)
 		{
 			Width = width;
 			Rows = array.Select(i => new BitVector(i, width)).ToArray();
-			Rows = Rows.Where(bv => bv.Columns.Any(b => b)).ToArray();
+			Rows = Rows.Where(bv => bv.Elements.Any(b => b)).ToArray();
 			SortRows();
 		}
 
@@ -72,7 +72,7 @@ namespace GNFSCore.LinearAlgebra
 			sb.AppendLine();
 			sb.AppendLine(string.Join(Environment.NewLine, RowSums));
 			sb.AppendLine();
-			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(bv => string.Join(",", bv.GetPattern().Select(i => i.ToString())))));
+			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(bv => string.Join(",", BitPattern.GetPattern(bv).Select(i => i.ToString())))));
 
 			return sb.ToString();
 		}

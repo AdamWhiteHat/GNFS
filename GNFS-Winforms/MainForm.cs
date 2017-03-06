@@ -15,7 +15,7 @@ namespace GNFS_Winforms
 	using GNFSCore.Polynomial;
 	using GNFSCore.FactorBase;
 	using GNFSCore.IntegerMath;
-	using GNFSCore.LinearAlgebra;
+	using GNFSCore.PrimeSignature;
 
 	public partial class MainForm : Form
 	{
@@ -110,7 +110,7 @@ namespace GNFS_Winforms
 
 			factoringExample = factoringExample.Distinct().OrderBy(i => i).ToList();
 
-			BitVector2 exampleVectors = new BitVector2(factoringExample, gnfs.PrimeBound);
+			BitMatrix exampleVectors = new BitMatrix(factoringExample, gnfs.PrimeBound);
 
 			LogOutput($"Prime factorization as exponent vectors:");
 			LogOutput(exampleVectors.ToString());

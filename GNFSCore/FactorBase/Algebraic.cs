@@ -26,9 +26,9 @@ namespace GNFSCore.FactorBase
 			}
 		}
 
+		/*
 		// The elements(a, b) with algebraic norm divisible by element(p, r) from AFB
 		// are those with a on the form a = −br + kp for k ∈ Z.
-
 		public static IEnumerable<Tuple<int, int>> GetAlgebraicNormRelations(GNFS gnfs, int range)
 		{
 			int m = (int)gnfs.AlgebraicPolynomial.Base;
@@ -71,7 +71,7 @@ namespace GNFSCore.FactorBase
 
 		public static BigInteger Norm(int a, int b, Irreducible poly)
 		{
-			// b^deg(f)*f(a / b) 
+			// -b^deg * f( -a/b ) 
 			int bneg = -1 * b;
 			BigInteger left = BigInteger.Pow(bneg, poly.Degree);
 			BigInteger f = BigInteger.Divide(a, bneg);
@@ -79,5 +79,6 @@ namespace GNFSCore.FactorBase
 
 			return BigInteger.Multiply(left, right);
 		}
+		*/
 	}
 }

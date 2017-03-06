@@ -4,35 +4,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace GNFSCore.LinearAlgebra
+namespace GNFSCore.PrimeSignature
 {
 	using IntegerMath;
 
 	public class BitVector
 	{
 		public int Number;
-		public bool[] Columns;
+		public bool[] Elements;
 
-		public bool this[int index] => Columns[index];
+		public bool this[int index] => Elements[index];
 
 		public BitVector(int number, int width)
 		{
 			Number = number;
-			Columns = GetVector(number, width);
+			Elements = BuildExponentVector(number, width);
 		}
 
-		public bool IsMatch(int[] pattern)
-		{
-			if (pattern == null) return false;
-			return pattern.All(i => Columns[i] == true);
-		}
-
-		public int[] GetPattern()
-		{
-			return Enumerable.Range(0, Columns.Length).Where(i => Columns[i] == true).ToArray();
-		}
-
-		private static bool[] GetVector(int number, int width)
+		
+		private static bool[] BuildExponentVector(int number, int width)
 		{
 			bool[] result = new bool[width];
 
@@ -51,22 +41,22 @@ namespace GNFSCore.LinearAlgebra
 
 		internal int IndexOfRightmostElement()
 		{
-			return Array.LastIndexOf(Columns, true);
+			return Array.LastIndexOf(Elements, true);
 		}
 
 		internal int IndexOfLeftmostElement()
 		{
-			return Array.IndexOf(Columns, true);
+			return Array.IndexOf(Elements, true);
 		}
 
 		internal int FactorCount()
 		{
-			return Columns.Count(b => b == true);
+			return Elements.Count(b => b == true);
 		}
 
 		public override string ToString()
 		{
-			return $"{string.Join(",", Columns.Select(b => b ? "1" : "0"))}";
+			return $"{string.Join(",", Elements.Select(b => b ? "1" : "0"))}";
 		}
 	}
 }
