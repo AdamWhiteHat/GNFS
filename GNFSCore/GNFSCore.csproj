@@ -53,7 +53,6 @@
     <Compile Include="Misc\BigIntegerExtensionMethods.cs" />
     <Compile Include="Misc\BigComplex.cs" />
     <Compile Include="Polynomial\Cyclotomic.cs" />
-    <Compile Include="Polynomial\MurpheyEScore.cs" />
     <Compile Include="IntegerMath\CoPrime.cs" />
     <Compile Include="IntegerMath\Eratosthenes.cs" />
     <Compile Include="IntegerMath\GCD.cs" />
@@ -62,7 +61,6 @@
     <Compile Include="Misc\RelationCollection.cs" />
     <Compile Include="Core\Sieve.cs" />
     <Compile Include="IntegerMath\Factorization.cs" />
-    <Compile Include="Polynomial\AlphaScore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
