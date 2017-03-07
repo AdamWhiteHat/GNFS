@@ -8,7 +8,7 @@ namespace GNFSCore.IntegerMath
 {
 	using Internal;
 
-	public class PrimeFactory
+	public static class PrimeFactory
 	{
 		private static int bound;
 		private static int[] primes;

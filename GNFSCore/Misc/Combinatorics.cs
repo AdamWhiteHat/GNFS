@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GNFSCore
 {
-	public class Combinatorics
+	public static class Combinatorics
 	{
 		/*  n take 2 : Combination with repetition
 		 quantity returned = (n + 1)! / 2 * (n - 1)!      */

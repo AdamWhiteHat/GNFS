@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GNFSCore.IntegerMath
 {
-	public class GCD
+	public static class GCD
 	{
 		public static BigInteger FindGCD(IEnumerable<BigInteger> numbers)
 		{

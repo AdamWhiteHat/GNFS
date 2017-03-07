@@ -8,7 +8,7 @@ using System.Collections.Concurrent;
 
 namespace GNFSCore.IntegerMath
 {
-	public class Factorization
+	public static class Factorization
 	{
 		private static int[] primes;
 

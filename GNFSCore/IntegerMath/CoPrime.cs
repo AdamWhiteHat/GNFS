@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GNFSCore.IntegerMath
 {
-	public class CoPrime
+	public static class CoPrime
 	{
 		public static bool IsCoprime(BigInteger a, BigInteger b)
 		{
