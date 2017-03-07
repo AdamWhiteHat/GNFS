@@ -25,12 +25,13 @@ namespace GNFSCore.FactorBase
 				return result.Distinct();
 			}
 		}
-		/*
-		public static BigInteger Norm(int b, BigInteger baseM, int k, int prime)
+
+		public static BigInteger Norm(int a, int b, BigInteger polynomialBaseM)
 		{
-			return BigInteger.Add(BigInteger.Multiply(-b, baseM), BigInteger.Multiply(k, prime));
+			return BigInteger.Add(a, BigInteger.Multiply(b, polynomialBaseM));
 		}
 
+		/*
 		public static bool IsSmooth(int number, IEnumerable<int> primeFactorBase)
 		{
 			IEnumerable<int> primeFactorization = Factorization.GetPrimeFactorization(number,primeFactorBase.Last());

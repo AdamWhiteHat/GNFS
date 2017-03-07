@@ -74,9 +74,9 @@ namespace GNFSCore.FactorBase
 		{
 			// b^deg * f( a/b )
 			
-			BigInteger ab = BigInteger.Divide(a, b);
+			BigInteger ab = BigInteger.Divide(a, -b);
 			BigInteger right = poly.Eval(ab);
-			BigInteger left = BigInteger.Pow(b, poly.Degree);
+			BigInteger left = BigInteger.Pow(-b, poly.Degree);
 
 			return BigInteger.Multiply(left, right);
 		}

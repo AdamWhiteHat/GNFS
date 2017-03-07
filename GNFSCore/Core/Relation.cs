@@ -16,7 +16,10 @@ namespace GNFSCore
 		public int B;
 		public BigInteger AlgebraicNorm { get; private set; }
 		public BigInteger RationalNorm { get; private set; }
-		public bool IsSmooth { get { return AlgebraicNorm == 1 && RationalNorm == 1; } }
+		public BigInteger AlgebraicQuotient { get; private set; }
+		public BigInteger RationalQuotient { get; private set; }
+		
+		public bool IsSmooth { get { return BigInteger.Abs(AlgebraicQuotient) == 1 && BigInteger.Abs(RationalQuotient) == 1; } }
 
 		public Relation(int a, int b, Irreducible poly)
 		{
@@ -24,19 +27,21 @@ namespace GNFSCore
 			B = b;
 			AlgebraicNorm = Algebraic.Norm(a, b, poly);
 			RationalNorm = Rational.Norm(a, b, poly.Base);
+			AlgebraicQuotient = AlgebraicNorm;
+			RationalQuotient = RationalNorm;
 		}
 
 		public void RemoveAlgebraicFactors(IEnumerable<int> factors)
 		{
 			foreach (int factor in factors)
 			{
-				if (AlgebraicNorm == 1)
+				if (BigInteger.Abs(AlgebraicQuotient) == 1)
 				{
 					break;
 				}
-				while (AlgebraicNorm % factor == 0 && AlgebraicNorm != 1)
+				if (AlgebraicQuotient % factor == 0)// && BigInteger.Abs(AlgebraicNorm) != 1)
 				{
-					AlgebraicNorm /= factor;
+					AlgebraicQuotient /= factor;
 				}
 			}
 		}
@@ -45,20 +50,20 @@ namespace GNFSCore
 		{
 			foreach (int factor in factors)
 			{
-				if (AlgebraicNorm == 1)
+				if (BigInteger.Abs(RationalQuotient) == 1)
 				{
 					break;
 				}
-				while (RationalNorm % factor == 0)
+				if (RationalQuotient % factor == 0)// && BigInteger.Abs(RationalNorm) != 1)
 				{
-					RationalNorm /= factor;
+					RationalQuotient /= factor;
 				}
 			}
 		}
 
 		public override string ToString()
 		{
-			return $"({A},{B})";
+			return $"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(4)}\t{AlgebraicNorm.ToString().PadLeft(10)},{RationalNorm.ToString().PadLeft(10)})";
 		}
 	}
 }

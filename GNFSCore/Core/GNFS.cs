@@ -13,13 +13,8 @@ namespace GNFSCore
 	public partial class GNFS
 	{
 		public BigInteger N { get; private set; }
-
 		public int PrimeBound { get; private set; }
-		//public List<int> Primes { get; private set; }
-
-		public Cyclotomic RationalPolynomial { get; private set; }
 		public Irreducible AlgebraicPolynomial { get; private set; }
-
 		public IEnumerable<Tuple<int, int>> RFB { get; internal set; } = null;
 		public IEnumerable<Tuple<int, int>> AFB { get; internal set; } = null;
 		public IEnumerable<Tuple<int, int>> QFB { get; internal set; } = null;
@@ -37,7 +32,6 @@ namespace GNFSCore
 
 		private void ConstructPolynomial(BigInteger polynomialBase, int degree)
 		{
-			RationalPolynomial = new Cyclotomic(N);
 			AlgebraicPolynomial = new Irreducible(N, polynomialBase, degree);
 		}
 
@@ -63,6 +57,52 @@ namespace GNFSCore
 			}
 
 			return result.OrderBy(tup => tup.Item1);
+		}
+
+		public Relation[] GenerateRelations(int range)
+		{
+			List<Relation> result = new List<Relation>();
+
+			int b = 0;
+			BigInteger m = AlgebraicPolynomial.Base;
+			int quantity = RFB.Count() + AFB.Count();// + QFB.Count();
+			IEnumerable<int> A = Enumerable.Range(-range, range * 2);
+
+			IEnumerable<int> pRational = RFB.Select(tupl => tupl.Item1).OrderBy(i => i);
+			IEnumerable<int> pAlgebraic = AFB.Select(tupl => tupl.Item1).OrderBy(i => i).Distinct();
+
+			while (result.Count() < quantity)
+			{
+				b += 1;
+
+				IEnumerable<int> coprimes = A.Where(a => CoPrime.IsCoprime(a, b));
+				IEnumerable<Relation> unfactored = coprimes.Select(a => new Relation(a, b, AlgebraicPolynomial));
+
+				List<Relation> smooth = new List<Relation>();
+
+				foreach (Relation rel in unfactored)
+				{
+					rel.RemoveRationalFactors(pRational);
+					rel.RemoveAlgebraicFactors(pAlgebraic);
+					bool smth = rel.IsSmooth;
+					if (smth)
+					{
+						smooth.Add(rel);
+					}
+				}
+
+				if (smooth.Any())
+				{
+					result.AddRange(smooth);
+				}
+
+				if (b > range)
+				{
+					break;
+				}
+			}
+
+			return result.ToArray();
 		}
 	}
 }

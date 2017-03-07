@@ -104,16 +104,14 @@ namespace GNFS_Winforms
 			LogOutput();
 
 			List<int> factoringExample = new List<int>();
-			factoringExample.AddRange(gnfs.RFB.Select(tup => tup.Item2));
-			factoringExample.AddRange(gnfs.AFB.Select(tup => tup.Item2));
-			factoringExample.AddRange(gnfs.QFB.Select(tup => tup.Item1));
-
+			factoringExample.AddRange(gnfs.RFB.Select(tup => tup.Item1));
+			factoringExample.AddRange(gnfs.AFB.Select(tup => tup.Item1));
 			factoringExample = factoringExample.Distinct().OrderBy(i => i).ToList();
+			
+			IEnumerable<Relation> smoothRelations = gnfs.GenerateRelations(200);
 
-			BitMatrix exampleVectors = new BitMatrix(factoringExample, gnfs.PrimeBound);
-
-			LogOutput($"Prime factorization as exponent vectors:");
-			LogOutput(exampleVectors.ToString());
+			LogOutput($"Smooth relations:");
+			LogOutput(string.Join(Environment.NewLine, smoothRelations.Select(rel => rel.ToString())));
 			LogOutput();
 
 			//int range = 200;
