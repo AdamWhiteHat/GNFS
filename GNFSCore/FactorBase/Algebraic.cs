@@ -68,17 +68,18 @@ namespace GNFSCore.FactorBase
 		// p | Norm(a + bθ)
 		// which occurs iif
 		// a ≡ −br(mod p)
+		*/
 
 		public static BigInteger Norm(int a, int b, Irreducible poly)
 		{
-			// -b^deg * f( -a/b ) 
-			int bneg = -1 * b;
-			BigInteger left = BigInteger.Pow(bneg, poly.Degree);
-			BigInteger f = BigInteger.Divide(a, bneg);
-			BigInteger right = poly.Eval(f);
+			// b^deg * f( a/b )
+			
+			BigInteger ab = BigInteger.Divide(a, b);
+			BigInteger right = poly.Eval(ab);
+			BigInteger left = BigInteger.Pow(b, poly.Degree);
 
 			return BigInteger.Multiply(left, right);
 		}
-		*/
+	
 	}
 }
