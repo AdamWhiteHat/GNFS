@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Relation.cs" />
     <Compile Include="IntegerMath\PrimeFactory.cs" />
     <Compile Include="PrimeSignature\BitMatrix.cs" />
     <Compile Include="PrimeSignature\BitPattern.cs" />
@@ -52,13 +53,11 @@
     <Compile Include="Misc\IEnumerableExtensionMethods.cs" />
     <Compile Include="Misc\BigIntegerExtensionMethods.cs" />
     <Compile Include="Misc\BigComplex.cs" />
-    <Compile Include="Polynomial\Cyclotomic.cs" />
     <Compile Include="IntegerMath\CoPrime.cs" />
     <Compile Include="IntegerMath\Eratosthenes.cs" />
     <Compile Include="IntegerMath\GCD.cs" />
     <Compile Include="Polynomial\Irreducible.cs" />
     <Compile Include="FactorBase\Rational.cs" />
-    <Compile Include="Misc\RelationCollection.cs" />
     <Compile Include="Core\Sieve.cs" />
     <Compile Include="IntegerMath\Factorization.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

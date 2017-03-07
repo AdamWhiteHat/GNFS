@@ -8,6 +8,10 @@ namespace GNFSCore.PrimeSignature
 {
 	public class BitPattern
 	{
+		public BitPattern()
+		{
+		}
+
 		public static bool IsMatch(int[] oddParityIndicesPattern, BitVector tocheck)
 		{
 			if (oddParityIndicesPattern == null) return false;
@@ -21,9 +25,9 @@ namespace GNFSCore.PrimeSignature
 
 		public static BitVector FindMatch(int[] oddParityIndicesPattern, BitMatrix tocheck)
 		{
-			foreach(BitVector bitVector in tocheck.Rows)
+			foreach (BitVector bitVector in tocheck.Rows)
 			{
-				if(IsMatch(oddParityIndicesPattern, bitVector))
+				if (IsMatch(oddParityIndicesPattern, bitVector))
 				{
 					return bitVector;
 				}

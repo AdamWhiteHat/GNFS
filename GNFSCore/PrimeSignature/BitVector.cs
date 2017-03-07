@@ -21,7 +21,7 @@ namespace GNFSCore.PrimeSignature
 			Elements = BuildExponentVector(number, width);
 		}
 
-		
+
 		private static bool[] BuildExponentVector(int number, int width)
 		{
 			bool[] result = new bool[width];
