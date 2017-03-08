@@ -97,22 +97,23 @@ namespace GNFS_Winforms
 			LogOutput($"Quadratic Factor Base (QFB):");
 			LogOutput(FormatTupleCollection(gnfs.QFB));
 			LogOutput();
-
-
-			LogOutput($"Prime factorization example:");
-			LogOutput(string.Join(Environment.NewLine, gnfs.AFB.Select(tup => $"{tup.Item2}" + Factorization.FormatString.PrimeFactorization(Factorization.GetPrimeFactorizationTuple(tup.Item2, gnfs.PrimeBound)))));
-			LogOutput();
-
-			List<int> factoringExample = new List<int>();
-			factoringExample.AddRange(gnfs.RFB.Select(tup => tup.Item1));
-			factoringExample.AddRange(gnfs.AFB.Select(tup => tup.Item1));
-			factoringExample = factoringExample.Distinct().OrderBy(i => i).ToList();
-			
+					
 			IEnumerable<Relation> smoothRelations = gnfs.GenerateRelations(200);
 
 			LogOutput($"Smooth relations:");
 			LogOutput(string.Join(Environment.NewLine, smoothRelations.Select(rel => rel.ToString())));
 			LogOutput();
+
+			List<BigInteger> factoringExample = new List<BigInteger>();
+			factoringExample.AddRange(smoothRelations.Select(rel => rel.RationalNorm));
+			factoringExample.AddRange(smoothRelations.Select(rel => rel.AlgebraicNorm));
+			factoringExample = factoringExample.Distinct().OrderBy(i => i).ToList();
+			
+			LogOutput($"Prime factorization example:");
+			LogOutput(string.Join(Environment.NewLine, factoringExample.Select(i => $"{i}: ".PadRight(5) + Factorization.FormatString.PrimeFactorization(Factorization.GetPrimeFactorizationTuple(i, gnfs.PrimeBound)))));
+			LogOutput();
+
+
 
 			//int range = 200;
 			//var rationalNormsR = Rational.GetRationalNormRelations(gnfs, range);
