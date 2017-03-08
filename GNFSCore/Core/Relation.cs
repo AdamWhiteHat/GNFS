@@ -39,7 +39,7 @@ namespace GNFSCore
 				{
 					break;
 				}
-				if (AlgebraicQuotient % factor == 0)// && BigInteger.Abs(AlgebraicNorm) != 1)
+				while(AlgebraicQuotient % factor == 0)// && BigInteger.Abs(AlgebraicNorm) != 1)
 				{
 					AlgebraicQuotient /= factor;
 				}

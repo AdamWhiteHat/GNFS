@@ -18,6 +18,14 @@ namespace GNFSCore.PrimeSignature
 		public int[] RowSums { get { return Enumerable.Range(0, Rows.Length).Select(i => RowSum(i)).ToArray(); } }
 		public int[] ColumnSums { get { return Enumerable.Range(0, Width).Select(i => ColumnSum(i)).ToArray(); } }
 
+		public BitMatrix(IEnumerable<int> array, int width)
+		{
+			Width = width;
+			Rows = array.Select(i => new BitVector(i, width)).ToArray();
+			Rows = Rows.Where(bv => bv.Elements.Any(b => b)).ToArray();
+			SortRows();
+		}
+
 		public int ColumnParity(int index)
 		{
 			int sum = ColumnSum(index);
@@ -37,14 +45,6 @@ namespace GNFSCore.PrimeSignature
 		{
 			int result = Rows[index].FactorCount();
 			return result;
-		}
-
-		public BitMatrix(IEnumerable<int> array, int width)
-		{
-			Width = width;
-			Rows = array.Select(i => new BitVector(i, width)).ToArray();
-			Rows = Rows.Where(bv => bv.Elements.Any(b => b)).ToArray();
-			SortRows();
 		}
 
 		private void SortRows()
