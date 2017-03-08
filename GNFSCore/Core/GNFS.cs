@@ -63,9 +63,9 @@ namespace GNFSCore
 		{
 			List<Relation> result = new List<Relation>();
 
-			int b = 0;
+			int b = -1;
 			BigInteger m = AlgebraicPolynomial.Base;
-			int quantity = RFB.Count() + AFB.Count();// + QFB.Count();
+			int quantity = RFB.Count() + AFB.Count() + QFB.Count() + 1;
 			IEnumerable<int> A = Enumerable.Range(-range, range * 2);
 
 			IEnumerable<int> pRational = RFB.Select(tupl => tupl.Item1).OrderBy(i => i);
@@ -73,7 +73,7 @@ namespace GNFSCore
 
 			while (result.Count() < quantity)
 			{
-				b += 1;
+				b += 2;
 
 				IEnumerable<int> coprimes = A.Where(a => CoPrime.IsCoprime(a, b));
 				IEnumerable<Relation> unfactored = coprimes.Select(a => new Relation(a, b, AlgebraicPolynomial));
@@ -102,7 +102,7 @@ namespace GNFSCore
 				}
 			}
 
-			return result.ToArray();
+			return result.OrderBy(rel => rel.A).ToArray();
 		}
 	}
 }
