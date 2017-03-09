@@ -26,60 +26,15 @@ namespace GNFSCore.FactorBase
 			}
 		}
 
-		/*
-		// The elements(a, b) with algebraic norm divisible by element(p, r) from AFB
-		// are those with a on the form a = −br + kp for k ∈ Z.
-		public static IEnumerable<Tuple<int, int>> GetAlgebraicNormRelations(GNFS gnfs, int range)
-		{
-			int m = (int)gnfs.AlgebraicPolynomial.Base;
-			var result = new List<Tuple<int, int>>();
-			int relationsNeeded = gnfs.RFB.Count() + gnfs.AFB.Count() + gnfs.QFB.Count();
-
-			int b = 1;
-			while (result.Count < relationsNeeded && b < 1000)
-			{
-				result.AddRange(
-					gnfs.RFB.SelectMany(tup =>
-						GetDivisibleElements(b, tup.Item1, tup.Item2, range).Select(a => new Tuple<int, int>(a, b))
-					)
-				);
-
-				b++;
-			}
-			return result.Distinct();
-		}
-
-		internal static IEnumerable<int> GetDivisibleElements(int b, int p, int m, int range)
-		{
-			int bm = b * m;
-
-			int kLower = (-range + bm) / p;
-			int kUpper = (range + bm) / p;
-			int count = Math.Abs(kLower) + Math.Abs(kUpper);
-			var divisible = Enumerable.Range(kLower, count).Select(k => -bm + (p * k)).Distinct();
-
-			var algebraicNorms = divisible.Where(a => CoPrime.IsCoprime(a, b));
-			return algebraicNorms;
-		}
-
-		// A first degree prime ideal P represented by the pair 
-		// (r, p) | a + bθ
-		// iif
-		// p | Norm(a + bθ)
-		// which occurs iif
-		// a ≡ −br(mod p)
-		*/
-
 		public static BigInteger Norm(int a, int b, Irreducible poly)
 		{
 			// b^deg * f( a/b )
-			
+
 			BigInteger ab = BigInteger.Divide(a, -b);
 			BigInteger right = poly.Eval(ab);
 			BigInteger left = BigInteger.Pow(-b, poly.Degree);
 
 			return BigInteger.Multiply(left, right);
 		}
-	
 	}
 }

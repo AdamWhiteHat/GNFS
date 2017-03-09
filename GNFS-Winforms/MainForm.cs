@@ -97,119 +97,27 @@ namespace GNFS_Winforms
 			LogOutput($"Quadratic Factor Base (QFB):");
 			LogOutput(FormatTupleCollection(gnfs.QFB));
 			LogOutput();
-					
+
 			IEnumerable<Relation> smoothRelations = gnfs.GenerateRelations(200);
 
 			LogOutput($"Smooth relations:");
+			LogOutput($"Quantity: {(gnfs.RFB.Count() + gnfs.AFB.Count() + gnfs.QFB.Count() + 1).ToString()}");
 			LogOutput(string.Join(Environment.NewLine, smoothRelations.Select(rel => rel.ToString())));
 			LogOutput();
 
-			List<BigInteger> factoringExample = new List<BigInteger>();
-			factoringExample.AddRange(smoothRelations.Select(rel => rel.RationalNorm));
-			factoringExample.AddRange(smoothRelations.Select(rel => rel.AlgebraicNorm));
+			List<int> factoringExample = new List<int>();
+			factoringExample.AddRange(smoothRelations.Select(rel => rel.A));
 			factoringExample = factoringExample.Distinct().OrderBy(i => i).ToList();
-			
+
 			LogOutput($"Prime factorization example:");
 			LogOutput(string.Join(Environment.NewLine, factoringExample.Select(i => $"{i}: ".PadRight(5) + Factorization.FormatString.PrimeFactorization(Factorization.GetPrimeFactorizationTuple(i, gnfs.PrimeBound)))));
 			LogOutput();
 
+			BitMatrix primeSignatureMatrix = new BitMatrix(factoringExample, gnfs.PrimeBound);
 
-
-			//int range = 200;
-			//var rationalNormsR = Rational.GetRationalNormRelations(gnfs, range);
-			//var smoothNormsR = rationalNormsR.Where(t => Rational.IsSmooth(t.Item1, gnfs.Primes.Take(gnfs.PrimeBound)));
-			//var orderedNormsR = smoothNormsR.OrderBy(t => t.Item1);
-
-			//LogOutput($"Rational FB Relations:");
-			//LogOutput(FormatTupleCollection(orderedNormsR));
-			//LogOutput();
-
-			//var polyCycles = Enumerable.Range(1, 15).Select(i => gnfs.AlgebraicPolynomial.Eval(i));
-			//var modPoly = polyCycles.Select(i => n % i);
-
-			//LogOutput($"Polynomial roots:");
-			//LogOutput(string.Join(Environment.NewLine, polyCycles));
-			//LogOutput();
-
-			//LogOutput($"Polynomial roots MOD n:");
-			//LogOutput(string.Join(Environment.NewLine, modPoly));
-			//LogOutput();
-
-			//var combinations = Combinatorics.GetCombinations(12, 3);
-			//var products = combinations.Select(a => a.Prod()).Distinct().OrderBy(i => i);
-			//var congruent = products.Where(a => (gnfs.N % a)==0);
-
-			//LogOutput($"Combinatorics.GetCombinations(9, 2):");
-			//LogOutput(FormatArrayList(combinations));
-			//LogOutput();
-
-			//LogOutput($"Congruent products(p1,p2,pN):");
-			//LogOutput(FormatList(congruent));
-			//LogOutput();
-			/*
-
-			int minRelations = 10;
-
-			var rfbFactors = gnfs.RFB.Select(tup => tup.Item1);
-			var afbFactors = gnfs.AFB.Select(tup => tup.Item1);
-			var qfbFactors = gnfs.QFB.Select(tup => tup.Item1);
-			var potentialFactors = qfbFactors.Union(rfbFactors).Union(afbFactors).Distinct().OrderBy(i => i).Take(30).ToList();
-			//var intersection = qfbFactors.Intersect(rfbFactors).Intersect(afbFactors);
-
-			var sqrt = gnfs.N.SquareRoot();
-			var primes = gnfs.Primes.Where(p => p < sqrt);
-			//potentialFactors = primes.ToList();
-
-			int counter = 0;
-			bool done = false;
-			var results = new List<int>();
-			var congruentProduct = new List<int>();
-			while (!done && counter < 4)
-			{
-				var combination = Combinatorics.GetCombinations(potentialFactors.ToArray(), _take++);
-				var product = combination.Select(t => t.Sum()).Distinct();
-				var congruent = product.Where(p => (new BigInteger(p).IsPowerOfTwo) || (gnfs.N % p == 0) ); // mod N = 0
-				//congruentProduct = congruent.Select(t => t.Sum()).Distinct().ToList();
-
-				LogOutput($"Loop #{counter}:");
-				LogOutput($"------------------"); LogOutput();
-				//LogOutput($"Extracted Factor Bases:"); LogOutput(FormatList(potentialFactors)); LogOutput();
-				//LogOutput($"Products:"); LogOutput(FormatList(product)); LogOutput();
-				LogOutput($"Congruent:");
-				LogOutput(FormatList(congruent));
-				LogOutput();
-				LogOutput($"------------------"); LogOutput();
-
-				if (congruent.Any())
-				{
-					results.AddRange(congruent);
-				}
-
-				if (results.Count() >= minRelations)
-				{
-					done = true;
-					continue;
-				}
-
-				potentialFactors = product.ToList();
-
-				counter++;
-			}
-
-
-			//var factored = results.Select(ar => $"({string.Join(" \t , \t ", ar.Select(i => $"[{Factorization.GetPrimeFactorizationString(i)}]"))})");
-			//var discrete = results.Select(ar => ar.Select(i => Factorization.GetPrimeFactorization(i).ToList()));
-			var factorized = results.Select(p => Factorization.GetPrimeFactorizationString(p));
-
+			LogOutput($"Prime signature binary matrix:");
+			LogOutput(primeSignatureMatrix.ToString());
 			LogOutput();
-			LogOutput($"=================="); LogOutput();
-			LogOutput($"RESULTS:");
-			LogOutput(string.Join(Environment.NewLine, factorized));
-			//LogOutput(string.Join(Environment.NewLine, factored));
-			LogOutput();
-			LogOutput($"=================="); LogOutput();
-			*/
-
 		}
 	}
 }

@@ -58,7 +58,6 @@
     <Compile Include="IntegerMath\GCD.cs" />
     <Compile Include="Polynomial\Irreducible.cs" />
     <Compile Include="FactorBase\Rational.cs" />
-    <Compile Include="Core\Sieve.cs" />
     <Compile Include="IntegerMath\Factorization.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
