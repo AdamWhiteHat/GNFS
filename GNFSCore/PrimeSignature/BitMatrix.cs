@@ -65,15 +65,9 @@ namespace GNFSCore.PrimeSignature
 			SortRows();
 
 			StringBuilder sb = new StringBuilder();
-
-			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(i => i.ToString())));
-			sb.AppendLine();
 			sb.AppendLine(string.Join(",", ColumnSums));
 			sb.AppendLine();
-			sb.AppendLine(string.Join(Environment.NewLine, RowSums));
-			sb.AppendLine();
-			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(bv => string.Join(",", BitPattern.GetPattern(bv).Select(i => i.ToString())))));
-
+			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(i => i.ToString())));
 			return sb.ToString();
 		}
 	}
