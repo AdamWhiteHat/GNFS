@@ -18,7 +18,7 @@ namespace GNFSCore
 		public BigInteger RationalNorm { get; private set; }
 		public BigInteger AlgebraicQuotient { get; private set; }
 		public BigInteger RationalQuotient { get; private set; }
-		
+
 		public bool IsSmooth { get { return BigInteger.Abs(AlgebraicQuotient) == 1 && BigInteger.Abs(RationalQuotient) == 1; } }
 
 		public Relation(int a, int b, Irreducible poly)
@@ -33,13 +33,15 @@ namespace GNFSCore
 
 		public void RemoveAlgebraicFactors(IEnumerable<int> factors)
 		{
+			BigInteger sqrt = BigInteger.Abs(AlgebraicNorm).SquareRoot();
+
 			foreach (int factor in factors)
 			{
-				if (BigInteger.Abs(AlgebraicQuotient) == 1)
+				if (BigInteger.Abs(AlgebraicQuotient) == 1 || factor > sqrt)
 				{
 					break;
 				}
-				while(AlgebraicQuotient % factor == 0)// && BigInteger.Abs(AlgebraicNorm) != 1)
+				while (AlgebraicQuotient % factor == 0 && BigInteger.Abs(AlgebraicQuotient) != 1)
 				{
 					AlgebraicQuotient /= factor;
 				}
@@ -48,13 +50,15 @@ namespace GNFSCore
 
 		public void RemoveRationalFactors(IEnumerable<int> factors)
 		{
+			BigInteger sqrt = BigInteger.Abs(RationalNorm).SquareRoot();
+
 			foreach (int factor in factors)
 			{
-				if (BigInteger.Abs(RationalQuotient) == 1)
+				if (BigInteger.Abs(RationalQuotient) == 1 || factor > sqrt)
 				{
 					break;
 				}
-				if (RationalQuotient % factor == 0)// && BigInteger.Abs(RationalNorm) != 1)
+				while (RationalQuotient % factor == 0 && BigInteger.Abs(RationalQuotient) != 1)
 				{
 					RationalQuotient /= factor;
 				}
