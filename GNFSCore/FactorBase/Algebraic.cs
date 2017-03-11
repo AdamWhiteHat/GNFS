@@ -30,11 +30,14 @@ namespace GNFSCore.FactorBase
 		{
 			// b^deg * f( a/b )
 
-			BigInteger ab = BigInteger.Divide(a, -b);
-			BigInteger right = poly.Eval(ab);
-			BigInteger left = BigInteger.Pow(-b, poly.Degree);
+			int bneg = -b;
+			var ab = (double)a / (double)bneg;
+			double right = poly.Eval(ab);
+			double left = Math.Pow(bneg, poly.Degree);
+			double norm = left * right;
+			int result = (int)Math.Round(norm);
 
-			return BigInteger.Multiply(left, right);
+			return result;
 		}
 	}
 }
