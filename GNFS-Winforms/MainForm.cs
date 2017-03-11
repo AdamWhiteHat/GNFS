@@ -24,7 +24,7 @@ namespace GNFS_Winforms
 			InitializeComponent();
 			tbN.Text = "3218147";//"45113";//"3218147"; //"3580430111"
 			tbBase.Text = "117";//"31";"127";
-			tbDegree.Text = "4";
+			tbDegree.Text = "3";
 			//tbBound.Text = "35";//"60";
 		}
 
@@ -68,7 +68,6 @@ namespace GNFS_Winforms
 
 		}
 
-		private int _take = 2;
 		private void btnGetFactorBases_Click(object sender, EventArgs e)
 		{
 			BigInteger n = BigInteger.Parse(tbN.Text);

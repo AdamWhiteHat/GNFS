@@ -13,13 +13,13 @@ namespace GNFSCore.Polynomial
 		public int Degree { get; private set; }
 		public BigInteger N { get; private set; }
 		public BigInteger Base { get; private set; }
-		public BigInteger[] Terms { get; private set; }
+		public int[] Terms { get; private set; }
 
 		public Irreducible(BigInteger n, BigInteger polynomialBase, int degree)
 		{
 			Base = polynomialBase;
 			Degree = degree;
-			Terms = Enumerable.Repeat(BigInteger.Zero, degree).ToArray();
+			Terms = Enumerable.Repeat(0, degree + 1).ToArray();
 
 			SetPolynomialValue(n);
 		}
@@ -27,7 +27,7 @@ namespace GNFSCore.Polynomial
 		private void SetPolynomialValue(BigInteger value)
 		{
 			N = value;
-			int d = Degree;
+			int d = Degree + 1;
 			BigInteger toAdd = N;
 
 			// Build out Terms[]
@@ -37,7 +37,7 @@ namespace GNFSCore.Polynomial
 
 				if (placeValue == 1)
 				{
-					Terms[d] = toAdd;
+					Terms[d] = (int)toAdd;
 				}
 				else if (placeValue < toAdd)
 				{
@@ -47,7 +47,7 @@ namespace GNFSCore.Polynomial
 						quotient = Base;
 					}
 
-					Terms[d] = quotient;
+					Terms[d] = (int)quotient;
 					BigInteger toSubtract = BigInteger.Multiply(quotient, placeValue);
 					toAdd -= toSubtract;
 				}
@@ -56,15 +56,16 @@ namespace GNFSCore.Polynomial
 			}
 		}
 
-		public BigInteger Eval(BigInteger baseM)
+		public double Eval(double baseM)
 		{
-			BigInteger result = 0;
+			double result = 0;
 
-			int d = Degree-1;
+			int d = Degree;
 			while (d >= 0)
 			{
-				BigInteger placeValue = BigInteger.Pow(baseM, d);
-				BigInteger addValue = Terms[d] * placeValue;
+				double placeValue = Math.Pow(baseM, d);
+				//BigInteger placeValue = BigInteger.Pow(baseM, d);
+				var addValue = Terms[d] * placeValue;
 
 				result += addValue;
 
@@ -74,9 +75,9 @@ namespace GNFSCore.Polynomial
 			return result;
 		}
 
-		public IEnumerable<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
+		public IEnumerable<int> GetRootsMod(double baseM, IEnumerable<int> modList)
 		{
-			BigInteger polyResult = Eval(baseM);
+			double polyResult = Eval(baseM);
 			IEnumerable<int> result = modList.Where(mod => (polyResult % mod) == 0);
 			return result;
 		}
@@ -86,7 +87,7 @@ namespace GNFSCore.Polynomial
 			return FormatString(this.Base, this.Terms);
 		}
 
-		public static string FormatString(BigInteger polyBase, BigInteger[] terms)
+		public static string FormatString(BigInteger polyBase, int[] terms)
 		{
 			List<string> stringTerms = new List<string>();
 
