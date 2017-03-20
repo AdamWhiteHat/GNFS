@@ -104,9 +104,7 @@ namespace GNFS_Winforms
 			LogOutput(string.Join(Environment.NewLine, smoothRelations.Select(rel => rel.ToString())));
 			LogOutput();
 
-			List<int> factoringExample = new List<int>();
-			factoringExample.AddRange(smoothRelations.Select(rel => rel.A));
-			factoringExample = factoringExample.Distinct().OrderBy(i => i).ToList();
+			List<int> factoringExample = smoothRelations.Select(rel => rel.A).Distinct().OrderBy(i => i).ToList();
 
 			LogOutput($"Prime factorization example:");
 			LogOutput(string.Join(Environment.NewLine, factoringExample.Select(i => $"{i}: ".PadRight(5) + FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(i, gnfs.PrimeBound)))));
