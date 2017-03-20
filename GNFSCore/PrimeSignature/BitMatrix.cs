@@ -15,7 +15,6 @@ namespace GNFSCore.PrimeSignature
 	{
 		public int Width;
 		public BitVector[] Rows;
-		ReadOnlyCollection<bool[]> Columns { get { return Enumerable.Range(0, Width).Select(i => GetColumn(i)).ToList().AsReadOnly(); } }
 
 		public int[] RowSums { get { return Enumerable.Range(0, Rows.Length).Select(i => RowSum(i)).ToArray(); } }
 		public int[] ColumnSums { get { return Enumerable.Range(0, Width).Select(i => ColumnSum(i)).ToArray(); } }
@@ -24,9 +23,14 @@ namespace GNFSCore.PrimeSignature
 		{
 			Width = PrimeFactory.GetIndexFromValue(maxValue);
 
-			IEnumerable<int> distinctValuesArray = array.Select(i => Math.Abs(i)).Distinct();
-			Rows = distinctValuesArray.Select(i => new BitVector(i, maxValue)).ToArray();
-			//Rows = Rows.Where(bv => bv.Elements.Any(b => b)).ToArray(); // Removes even exponent factorizations
+			IEnumerable<int> distinctNonPrimeValues = array.Select(i => Math.Abs(i)).Distinct().Where(i => i > 1 && !PrimeFactory.IsPrime(i));
+			Rows = distinctNonPrimeValues.Select(i => new BitVector(i, maxValue)).ToArray();
+
+			IEnumerable<int> nonSquareColumsn = Enumerable.Range(0, Width).Where(i => ColumnSum(i) == 1).ToArray();
+			IEnumerable<BitVector> toRemove = nonSquareColumsn.SelectMany(col => Rows.Where(r => r.Elements[col] == true));
+
+			Rows = Rows.Except(toRemove).ToArray();
+
 			SortRows();
 		}
 
