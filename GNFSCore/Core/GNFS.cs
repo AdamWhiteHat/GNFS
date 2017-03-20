@@ -102,7 +102,7 @@ namespace GNFSCore
 				}
 			}
 
-			return result.OrderBy(rel => rel.A).ToArray();
+			return result.OrderBy(rel => rel.B).ThenBy(rel => rel.A).ToArray();
 		}
 	}
 }
