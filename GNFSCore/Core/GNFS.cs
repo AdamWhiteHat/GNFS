@@ -59,14 +59,14 @@ namespace GNFSCore
 			return result.OrderBy(tup => tup.Item1);
 		}
 
-		public Relation[] GenerateRelations(int range)
+		public Relation[] GenerateRelations(int valueRange)
 		{
 			List<Relation> result = new List<Relation>();
 
 			int b = -1;
 			BigInteger m = AlgebraicPolynomial.Base;
 			int quantity = RFB.Count() + AFB.Count() + QFB.Count() + 1;
-			IEnumerable<int> A = Enumerable.Range(-range, range * 2);
+			IEnumerable<int> A = Enumerable.Range(-valueRange, valueRange * 2);
 
 			IEnumerable<int> pRational = RFB.Select(tupl => tupl.Item1).OrderBy(i => i);
 			IEnumerable<int> pAlgebraic = AFB.Select(tupl => tupl.Item1).OrderBy(i => i).Distinct();
@@ -96,7 +96,7 @@ namespace GNFSCore
 					result.AddRange(smooth);
 				}
 
-				if (b > range)
+				if (b > valueRange)
 				{
 					break;
 				}

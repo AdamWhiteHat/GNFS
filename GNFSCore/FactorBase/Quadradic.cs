@@ -19,10 +19,10 @@ namespace GNFSCore.FactorBase
 		{
 			public static IEnumerable<Tuple<int, int>> GetQuadradicFactorBase(GNFS gnfs)
 			{
-				int min = gnfs.PrimeBound * 3;
-				int max = min + gnfs.PrimeBound;
-				List<int> primes = PrimeFactory.GetPrimes(max).Except(Enumerable.Range(0, min)).ToList();
-				List<int> integers = Enumerable.Range(2, min).ToList();
+				int minValue = gnfs.PrimeBound * 3;
+				int maxValue = minValue + gnfs.PrimeBound;
+				List<int> primes = PrimeFactory.GetPrimes(maxValue).Except(Enumerable.Range(0, minValue)).ToList();
+				List<int> integers = Enumerable.Range(2, minValue).ToList();
 				return GNFS.PolynomialModP(gnfs.AlgebraicPolynomial, primes, integers);
 			}
 		}		

@@ -9,6 +9,8 @@ using System.Collections.Specialized;
 
 namespace GNFSCore.PrimeSignature
 {
+	using IntegerMath;
+
 	public class BitMatrix
 	{
 		public int Width;
@@ -18,11 +20,13 @@ namespace GNFSCore.PrimeSignature
 		public int[] RowSums { get { return Enumerable.Range(0, Rows.Length).Select(i => RowSum(i)).ToArray(); } }
 		public int[] ColumnSums { get { return Enumerable.Range(0, Width).Select(i => ColumnSum(i)).ToArray(); } }
 
-		public BitMatrix(IEnumerable<int> array, int width)
+		public BitMatrix(IEnumerable<int> array, int maxValue)
 		{
-			Width = width;
-			Rows = array.Select(i => new BitVector(i, width)).ToArray();
-			Rows = Rows.Where(bv => bv.Elements.Any(b => b)).ToArray();
+			Width = PrimeFactory.GetIndexFromValue(maxValue);
+
+			IEnumerable<int> distinctValuesArray = array.Select(i => Math.Abs(i)).Distinct();
+			Rows = distinctValuesArray.Select(i => new BitVector(i, maxValue)).ToArray();
+			//Rows = Rows.Where(bv => bv.Elements.Any(b => b)).ToArray(); // Removes even exponent factorizations
 			SortRows();
 		}
 

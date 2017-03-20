@@ -10,50 +10,60 @@ namespace GNFSCore.IntegerMath
 
 	public static class PrimeFactory
 	{
-		private static int bound;
+		private static int MaxValue;
 		private static int[] primes;
 
 		static PrimeFactory()
 		{
-			bound = 2000;
+			MaxValue = 2000;
 			SetPrimes();
 		}
 
 		private static void SetPrimes()
 		{
-			primes = Eratosthenes.Sieve(bound).ToArray();
+			primes = Eratosthenes.Sieve(MaxValue).ToArray();
 		}
 
-		private static void IncreaseBound(int newMaxCount = 0)
+		private static void IncreaseMaxValue(int newMaxValue = 0)
 		{
 			// Increase bound
-			bound = Math.Max(newMaxCount + 1, bound + bound);
+			MaxValue = Math.Max(newMaxValue + 1, MaxValue + MaxValue);
 			SetPrimes();
 		}
 
 		public static int GetIndexFromValue(int value)
 		{
-			while (primes[primes.Length - 1] < value)
+			while (primes.Last() < value)
 			{
-				IncreaseBound();
+				IncreaseMaxValue();
 			}
 			int primeValue = primes.First(p => p >= value);
 			int index = Array.IndexOf<int>(primes, primeValue);
 			return index;
 		}
 
-		public static int[] GetPrimes(int quantity)
+		public static int GetValueFromIndex(int index)
 		{
-			if (quantity > bound)
+			while ((primes.Length - 1) < index)
 			{
-				IncreaseBound(quantity);
+				IncreaseMaxValue();
 			}
-			return primes.Take(quantity).ToArray();
+			int value = primes[index];
+			return value;
 		}
 
-		public static bool IsPrime(int number)
+		public static int[] GetPrimes(int maxValue)
 		{
-			return primes.Contains(number);
+			if (maxValue > MaxValue)
+			{
+				IncreaseMaxValue(maxValue);
+			}
+			return primes.Take(GetIndexFromValue(maxValue)).ToArray();
+		}
+
+		public static bool IsPrime(int value)
+		{
+			return primes.Contains(value);
 		}
 	}
 }

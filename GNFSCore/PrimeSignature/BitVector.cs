@@ -15,25 +15,25 @@ namespace GNFSCore.PrimeSignature
 
 		public bool this[int index] => Elements[index];
 
-		public BitVector(int number, int width)
-			: this(number, FactorizationFactory.GetPrimeFactorizationTuple(number, width))
+		public BitVector(int number, int maxValue)
+			: this(number, maxValue, FactorizationFactory.GetPrimeFactorizationTuple(number, maxValue))
 		{ }
 
-		public BitVector(int number, IEnumerable<Tuple<int, int>> primeFactorization)
+		public BitVector(int number, int maxValue, IEnumerable<Tuple<int, int>> primeFactorization)
 		{
 			Number = number;
 
-			int width = primeFactorization.Count() - 1;
-			bool[] Elements = new bool[width];
-
+			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue)];
 			foreach (Tuple<int, int> factor in primeFactorization)
 			{
-				if (factor.Item1 > width)
+				if (factor.Item1 > maxValue)
 				{
 					break;
 				}
-				Elements[factor.Item1] = ((factor.Item2 % 2) == 1);
+				result[PrimeFactory.GetIndexFromValue(factor.Item1)] = ((factor.Item2 % 2) == 1);
 			}
+
+			Elements = result;
 		}
 
 		public bool[] CombineVectors(BitVector vector)
@@ -98,9 +98,18 @@ namespace GNFSCore.PrimeSignature
 			return Elements.Count(b => b == true);
 		}
 
+		private int padLength = -1;
 		public override string ToString()
 		{
-			return $"{string.Join(",", Elements.Select(b => b ? '1' : '0'))}";
+			if (padLength == -1)
+			{
+				int maxValue = PrimeFactory.GetValueFromIndex(Elements.Length - 1);
+				string maxValueString = maxValue.ToString();
+				padLength = maxValueString.Length + 3;
+			}
+
+			string numberString = $"{Number}:".PadRight(padLength);
+			return numberString + string.Join(",", Elements.Select(b => b ? '1' : '0'));
 		}
 	}
 }

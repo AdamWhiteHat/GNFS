@@ -9,19 +9,19 @@ namespace GNFSCore.IntegerMath.Internal
 {
 	public static class Eratosthenes
 	{
-		public static List<int> Sieve(int ceiling)
+		public static List<int> Sieve(int maxValue)
 		{
-			if (ceiling < 10)
+			if (maxValue < 10)
 			{
-				if (ceiling == 9 || ceiling == 8 || ceiling == 7)
+				if (maxValue == 9 || maxValue == 8 || maxValue == 7)
 				{
 					return new List<int>() { 2, 3, 5, 7 };
 				}
-				else if (ceiling == 6 || ceiling == 5)
+				else if (maxValue == 6 || maxValue == 5)
 				{
 					return new List<int>() { 2, 3, 5 };
 				}
-				else if (ceiling == 4 || ceiling == 3)
+				else if (maxValue == 4 || maxValue == 3)
 				{
 					return new List<int>() { 2, 3 };
 				}
@@ -36,13 +36,13 @@ namespace GNFSCore.IntegerMath.Internal
 			int inc;
 			int sqrt = 3;
 
-			int ceil = ceiling > Int32.MaxValue ? Int32.MaxValue - 2 : (int)ceiling;
+			int ceil = maxValue > Int32.MaxValue ? Int32.MaxValue - 2 : (int)maxValue;
 			bool[] primeMembershipArray = new bool[ceil + 1];
 
 			primeMembershipArray[2] = true;
 
 			// Set all odds as true
-			for (counter = counterStart; counter <= ceiling; counter += 2)
+			for (counter = counterStart; counter <= maxValue; counter += 2)
 			{
 				if ((counter & 1) == 1) // Check if odd. &1 is the same as: %2
 				{
@@ -50,12 +50,12 @@ namespace GNFSCore.IntegerMath.Internal
 				}
 			}
 
-			while (sqrt * sqrt <= ceiling)
+			while (sqrt * sqrt <= maxValue)
 			{
 				counter = sqrt * sqrt;
 				inc = sqrt + sqrt;
 
-				while (counter <= ceiling)
+				while (counter <= maxValue)
 				{
 					primeMembershipArray[counter] = false;
 					counter += inc;
@@ -69,7 +69,7 @@ namespace GNFSCore.IntegerMath.Internal
 				}
 			}
 
-			List<int> result = Enumerable.Range(2, (int)ceiling - 2).Where(l => primeMembershipArray[l]).ToList();
+			List<int> result = Enumerable.Range(2, (int)maxValue - 2).Where(l => primeMembershipArray[l]).ToList();
 
 			return result;
 		}

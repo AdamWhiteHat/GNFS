@@ -52,7 +52,6 @@
     <Compile Include="Core\GNFS.cs" />
     <Compile Include="Misc\IEnumerableExtensionMethods.cs" />
     <Compile Include="Misc\BigIntegerExtensionMethods.cs" />
-    <Compile Include="Misc\BigComplex.cs" />
     <Compile Include="IntegerMath\CoPrime.cs" />
     <Compile Include="IntegerMath\Eratosthenes.cs" />
     <Compile Include="IntegerMath\GCD.cs" />

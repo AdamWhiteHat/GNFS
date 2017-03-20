@@ -65,7 +65,7 @@ namespace GNFSCore.IntegerMath
 				}
 			}
 
-			if (primes.Length < maxValue + 1)
+			if (primes.Last() < maxValue + 1)
 			{
 				primes = PrimeFactory.GetPrimes(maxValue + 1);
 			}
