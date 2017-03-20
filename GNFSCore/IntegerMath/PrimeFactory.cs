@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace GNFSCore.IntegerMath
 {
@@ -33,7 +33,7 @@ namespace GNFSCore.IntegerMath
 
 		public static int GetIndexFromValue(int value)
 		{
-			while(primes[primes.Length-1] < value)
+			while (primes[primes.Length - 1] < value)
 			{
 				IncreaseBound();
 			}
@@ -49,6 +49,11 @@ namespace GNFSCore.IntegerMath
 				IncreaseBound(quantity);
 			}
 			return primes.Take(quantity).ToArray();
+		}
+
+		public static bool IsPrime(int number)
+		{
+			return primes.Contains(number);
 		}
 	}
 }

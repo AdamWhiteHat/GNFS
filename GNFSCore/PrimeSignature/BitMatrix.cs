@@ -26,22 +26,12 @@ namespace GNFSCore.PrimeSignature
 			SortRows();
 		}
 
-		public int ColumnParity(int index)
-		{
-			int sum = ColumnSum(index);
-			if (sum == 0)
-			{
-				return -1;
-			}
-			return sum % 2;
-		}
-
-		public int ColumnSum(int index)
+		private int ColumnSum(int index)
 		{
 			return Rows.Select(bv => bv[index] ? 1 : 0).Sum();
 		}
 
-		public int RowSum(int index)
+		private int RowSum(int index)
 		{
 			int result = Rows[index].FactorCount();
 			return result;

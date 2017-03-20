@@ -8,11 +8,11 @@ using System.Collections.Concurrent;
 
 namespace GNFSCore.IntegerMath
 {
-	public static class Factorization
+	public static partial class FactorizationFactory
 	{
 		private static int[] primes;
 
-		static Factorization()
+		static FactorizationFactory()
 		{
 			primes = PrimeFactory.GetPrimes(1000);
 		}
@@ -42,7 +42,7 @@ namespace GNFSCore.IntegerMath
 
 			if (factorization.Distinct().Count() != result.Count)
 			{
-				throw new Exception($"There is a bug in {nameof(Factorization.GetPrimeFactorizationTuple)}!");
+				throw new Exception($"There is a bug in {nameof(FactorizationFactory.GetPrimeFactorizationTuple)}!");
 			}
 
 			return result;

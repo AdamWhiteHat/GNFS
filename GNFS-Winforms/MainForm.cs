@@ -109,7 +109,7 @@ namespace GNFS_Winforms
 			factoringExample = factoringExample.Distinct().OrderBy(i => i).ToList();
 
 			LogOutput($"Prime factorization example:");
-			LogOutput(string.Join(Environment.NewLine, factoringExample.Select(i => $"{i}: ".PadRight(5) + Factorization.FormatString.PrimeFactorization(Factorization.GetPrimeFactorizationTuple(i, gnfs.PrimeBound)))));
+			LogOutput(string.Join(Environment.NewLine, factoringExample.Select(i => $"{i}: ".PadRight(5) + FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(i, gnfs.PrimeBound)))));
 			LogOutput();
 
 			BitMatrix primeSignatureMatrix = new BitMatrix(factoringExample, gnfs.PrimeBound);

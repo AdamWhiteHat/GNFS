@@ -58,7 +58,7 @@
     <Compile Include="IntegerMath\GCD.cs" />
     <Compile Include="Polynomial\Irreducible.cs" />
     <Compile Include="FactorBase\Rational.cs" />
-    <Compile Include="IntegerMath\Factorization.cs" />
+    <Compile Include="IntegerMath\FactorizationFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
