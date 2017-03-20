@@ -63,7 +63,7 @@ namespace GNFSCore.IntegerMath
 
 		public static bool IsPrime(int value)
 		{
-			return primes.Contains(value);
+			return primes.Contains(Math.Abs(value));
 		}
 	}
 }
