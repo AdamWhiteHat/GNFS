@@ -31,6 +31,11 @@ namespace GNFSCore
 			RationalQuotient = RationalNorm;
 		}
 
+		public BigInteger GetContribution(BigInteger x)
+		{
+			return BigInteger.Multiply(A, BigInteger.Multiply(B, x));
+		}
+
 		public void RemoveAlgebraicFactors(IEnumerable<int> factors)
 		{
 			BigInteger sqrt = BigInteger.Abs(AlgebraicNorm).SquareRoot();

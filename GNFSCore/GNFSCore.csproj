@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Relation.cs" />
+    <Compile Include="Core\SquareFinder.cs" />
+    <Compile Include="IntegerMath\Legendre.cs" />
     <Compile Include="IntegerMath\PrimeFactory.cs" />
     <Compile Include="PrimeSignature\BitMatrix.cs" />
     <Compile Include="PrimeSignature\BitPattern.cs" />
@@ -58,6 +60,7 @@
     <Compile Include="Polynomial\Irreducible.cs" />
     <Compile Include="FactorBase\Rational.cs" />
     <Compile Include="IntegerMath\FactorizationFactory.cs" />
+    <Compile Include="PrimeSignature\MatrixSolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

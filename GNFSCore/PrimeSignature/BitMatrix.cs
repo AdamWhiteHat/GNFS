@@ -16,22 +16,72 @@ namespace GNFSCore.PrimeSignature
 		public int Width;
 		public BitVector[] Rows;
 
-		public int[] RowSums { get { return Enumerable.Range(0, Rows.Length).Select(i => RowSum(i)).ToArray(); } }
+		public int[] RowSums { get { return Rows.Select(r => r.RowSum).ToArray(); } }
 		public int[] ColumnSums { get { return Enumerable.Range(0, Width).Select(i => ColumnSum(i)).ToArray(); } }
 
-		public BitMatrix(IEnumerable<int> array, int maxValue)
+		public BitMatrix(IEnumerable<int> array, int primeBound)
 		{
-			Width = PrimeFactory.GetIndexFromValue(maxValue);
+			int maxArraySquareRoot = (int)Math.Ceiling(Math.Sqrt((double)array.Max())) + 1;
+			int maxArrayValue = PrimeFactory.GetValueFromIndex(maxArraySquareRoot);
+			int maxValue = Math.Min(maxArrayValue, primeBound);
+
+			Width = PrimeFactory.GetIndexFromValue(maxValue) + 1;
 
 			IEnumerable<int> distinctNonPrimeValues = array.Select(i => Math.Abs(i)).Distinct().Where(i => i > 1 && !PrimeFactory.IsPrime(i));
 			Rows = distinctNonPrimeValues.Select(i => new BitVector(i, maxValue)).ToArray();
 
-			IEnumerable<int> nonSquareColumsn = Enumerable.Range(0, Width).Where(i => ColumnSum(i) == 1).ToArray();
-			IEnumerable<BitVector> toRemove = nonSquareColumsn.SelectMany(col => Rows.Where(r => r.Elements[col] == true));
+			IEnumerable<int> nonSquareColumns = Enumerable.Range(0, Width).Where(i => ColumnSum(i) == 1).ToArray();
+			IEnumerable<BitVector> toRemove = nonSquareColumns.SelectMany(col => Rows.Where(r => r.Elements[col] == true));
 
-			Rows = Rows.Except(toRemove).ToArray();
+			Remove(toRemove);
 
 			SortRows();
+		}
+
+		public IEnumerable<int[]> GetSquareCombinations()
+		{
+			BitVector[] squareVectors = MatrixSolver.GetTrivialSquares(this); // Vectors who's RowSum is zero are already squares.
+			int[] squareNumbers = squareVectors.Select(r => r.Number).ToArray();
+			List<int[]> result = squareNumbers.Select(i => new int[] { i }).ToList(); // Add trivial squares to result
+																					  //result.AddRange(Combinatorics.GetCombination(squareNumbers)); 
+			Remove(squareVectors);
+			Rows = Rows.Reverse().ToArray(); // Reverse array
+
+			IEnumerable<BitVector> oneSums = Rows.Where(v => v.RowSum == 1); // Get vectors with only one odd factor exponents			
+			IEnumerable<IGrouping<int, BitVector>> singleFactorGroups = oneSums.GroupBy(v => v.IndexOfLeftmostElement()).Where(g => g.Count() > 1); // Group vectors by their factor exponents
+			IEnumerable<BitVector> toRemove = singleFactorGroups.SelectMany(g => g.Select(v => v));
+
+			Remove(toRemove); // Remove selected vectors from remaining vectors
+			
+			List<int[]> singleFactorResults = MatrixSolver.GetSingleFactors(this, singleFactorGroups);
+			List<int[]> simpleMatchResults = MatrixSolver.GetSimpleMatches(this);
+			List<int[]> chainedFactorResults = MatrixSolver.GetChainedFactors(this);
+			Remove(chainedFactorResults);
+
+			result.AddRange(singleFactorResults);
+			result.AddRange(simpleMatchResults);
+			result.AddRange(chainedFactorResults);
+
+			return result;
+		}
+
+		public void Remove(IEnumerable<int[]> nextNumbers)
+		{
+			foreach (int[] numbers in nextNumbers)
+			{
+				Remove(numbers);
+			}
+		}
+
+		public void Remove(IEnumerable<int> numbers)
+		{
+			IEnumerable<BitVector> matches = Rows.Where(v => numbers.Contains(v.Number));
+			Remove(matches);
+		}
+
+		public void Remove(IEnumerable<BitVector> vectors)
+		{
+			Rows = Rows.Except(vectors).ToArray();
 		}
 
 		private int ColumnSum(int index)
@@ -39,17 +89,11 @@ namespace GNFSCore.PrimeSignature
 			return Rows.Select(bv => bv[index] ? 1 : 0).Sum();
 		}
 
-		private int RowSum(int index)
-		{
-			int result = Rows[index].FactorCount();
-			return result;
-		}
-
 		private void SortRows()
 		{
 			Rows = Rows.OrderByDescending(bv => bv.IndexOfRightmostElement())
 						.ThenBy(bv => bv.IndexOfLeftmostElement())
-						.ThenByDescending(bv => bv.FactorCount())
+						.ThenByDescending(bv => bv.RowSum)
 						.ToArray();
 		}
 

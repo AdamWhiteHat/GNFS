@@ -37,6 +37,16 @@ namespace GNFSCore.IntegerMath
 			return false;
 		}
 
+		public static BigInteger Product(this IEnumerable<BigInteger> input)
+		{
+			BigInteger result = 1;
+			foreach (BigInteger bi in input)
+			{
+				result = BigInteger.Multiply(result, bi);
+			}
+			return result;
+		}
+
 		public static BigInteger Square(this BigInteger input)
 		{
 			return input * input;

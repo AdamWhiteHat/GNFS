@@ -10,7 +10,7 @@ namespace GNFSCore
 	{
 		/*  n take 2 : Combination with repetition
 		 quantity returned = (n + 1)! / 2 * (n - 1)!      */
-		public static IEnumerable<int[]> GetCombination(IEnumerable<int> input)
+		public static List<int[]> GetCombination(IEnumerable<int> input)
 		{
 			var listInner = input.Except(new int[] { 0, 1 }).Distinct().OrderBy(i => i).ToList();
 			var listOutter = listInner.ToList();
@@ -19,8 +19,8 @@ namespace GNFSCore
 
 			foreach (int a in listOutter)
 			{
-				result.AddRange(listInner/*.Except(new int[] { a })*/.Select(b => new int[] { a, b }));
 				listInner.Remove(a);
+				result.AddRange(listInner.Select(b => new int[] { a, b }));
 			}
 
 			return result;

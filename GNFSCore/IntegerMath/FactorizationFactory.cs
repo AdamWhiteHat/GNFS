@@ -98,6 +98,11 @@ namespace GNFSCore.IntegerMath
 			return factors;
 		}
 
+		public static int[] GetFactorizationExponents(BigInteger value, int maxValue)
+		{
+			return GetPrimeFactorizationTuple(value, maxValue).Select(tup => tup.Item2).OrderByDescending(i => i).ToArray();
+		}
+
 		public static class FormatString
 		{
 			public static string PrimeFactorization(IEnumerable<Tuple<int, int>> factorization)

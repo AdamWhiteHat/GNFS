@@ -8,32 +8,60 @@ namespace GNFSCore.PrimeSignature
 {
 	public class BitPattern
 	{
-		public BitPattern()
+		private BitPattern()
 		{
 		}
 
-		public static bool IsMatch(int[] oddParityIndicesPattern, BitVector tocheck)
+		public static bool IsPartialMatch(BitVector vector, int[] searchPattern)
 		{
-			if (oddParityIndicesPattern == null) return false;
-			return oddParityIndicesPattern.All(i => tocheck.Elements[i] == true);
+			if (searchPattern == null || searchPattern.Length < 1 || vector == null || vector.Elements.Length < 1) return false;
+			return searchPattern.All(i => vector.Elements[i] == true);
 		}
 
-		public static int[] GetPattern(BitVector a)
+		public static bool IsExactMatch(BitVector vector, int[] searchPattern)
 		{
-			return Enumerable.Range(0, a.Elements.Length).Where(i => a.Elements[i] == true).ToArray();
+			if (searchPattern == null || searchPattern.Length < 1 || vector == null || vector.Elements.Length < 1) return false;
+
+			int[] toCheckPattern = GetPattern(vector);
+			return searchPattern.SequenceEqual(toCheckPattern);
 		}
 
-		public static BitVector FindMatch(int[] oddParityIndicesPattern, BitMatrix tocheck)
+		public static int[] GetPattern(BitVector vector)
 		{
-			foreach (BitVector bitVector in tocheck.Rows)
+			return GetPattern(vector.Elements);
+		}
+
+		public static int[] GetPattern(bool[] elements)
+		{
+			return Enumerable.Range(0, elements.Length).Where(i => elements[i] == true).ToArray();
+		}
+
+		public static BitVector FindBestPartialMatch(int[] searchPattern, IEnumerable<BitVector> vectors)
+		{
+			List<int> pattern = searchPattern.OrderBy(i => i).ToList();
+			IEnumerable<BitVector> partialMatches = new BitVector[] { };
+
+			while (partialMatches.Count() < 1 && pattern.Count > 0)
 			{
-				if (IsMatch(oddParityIndicesPattern, bitVector))
+				partialMatches = FindPartialMatches(pattern.ToArray(), vectors).OrderBy(v => v.RowSum);
+
+				if (partialMatches.Count() < 1)
 				{
-					return bitVector;
+					pattern.Remove(pattern.Min());
 				}
 			}
 
-			return null;
+			return partialMatches.FirstOrDefault();
+		}
+
+		public static IEnumerable<BitVector> FindPartialMatches(int[] searchPattern, IEnumerable<BitVector> vectors)
+		{
+			return vectors.Where(v => IsPartialMatch(v, searchPattern));
+		}
+
+		public static IEnumerable<BitVector> FindExactMatches(int[] searchPattern, IEnumerable<BitVector> vectors)
+		{
+			return vectors.Where(v => IsExactMatch(v, searchPattern));
 		}
 	}
 }

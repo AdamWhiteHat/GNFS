@@ -64,8 +64,32 @@ namespace GNFSCore.Polynomial
 			while (d >= 0)
 			{
 				double placeValue = Math.Pow(baseM, d);
-				//BigInteger placeValue = BigInteger.Pow(baseM, d);
-				var addValue = Terms[d] * placeValue;
+				
+				double addValue = Terms[d] * placeValue;
+
+				result += addValue;
+
+				d--;
+			}
+
+			return result;
+		}
+
+		public double Derivative(double baseM)
+		{
+			double result = 0;
+
+			int d = Degree;
+			while (d >= 0)
+			{
+				double placeValue = 0;
+
+				if (d - 1 > -1)
+				{
+					placeValue = Math.Pow(baseM, d - 1);
+				}
+
+				double addValue = Terms[d] * d * placeValue;
 
 				result += addValue;
 

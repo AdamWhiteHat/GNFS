@@ -12,6 +12,7 @@ namespace GNFSCore.PrimeSignature
 	{
 		public int Number;
 		public bool[] Elements;
+		public int RowSum { get { return Elements.Count(b => b == true); } }
 
 		public bool this[int index] => Elements[index];
 
@@ -23,7 +24,7 @@ namespace GNFSCore.PrimeSignature
 		{
 			Number = number;
 
-			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue)];
+			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue)+1];
 			foreach (Tuple<int, int> factor in primeFactorization)
 			{
 				if (factor.Item1 > maxValue)
@@ -36,50 +37,36 @@ namespace GNFSCore.PrimeSignature
 			Elements = result;
 		}
 
-		public bool[] CombineVectors(BitVector vector)
+		public static bool[] CombineVectors(IEnumerable<BitVector> vectors)
 		{
-			if (vector == null || vector.Elements == null || vector.Elements.Count() < 1)
+			if (vectors == null || vectors.Count() < 2 || vectors.Any(v => v == null || v.Elements == null || v.Elements.Count() < 1))
 			{
-				throw new ArgumentException(nameof(vector)); // 
-			}
-			if (this.Number == vector.Number)
-			{
-				// The same numbers are of course going to match, so return a result here that will evaluate as a non-match.
-				return new bool[] { true }; // Or return an empty array and calling function checks return value by array.Any()
+				throw new ArgumentException($"Argument {nameof(vectors)} cannot be null, empty, contain null or empty vectors or contain less than two vectors.", nameof(vectors));
 			}
 
-			bool[] longArray;
-			bool[] shortArray;
-
-			// In most cases, the arrays will be the same length. For robustness, we handle arrays of different lengths.
-			if (this.Elements.Count() > vector.Elements.Count())
+			IEnumerable<int> vectorNumbers = vectors.Select(v => v.Number);
+			IEnumerable<int> distinctVectors = vectorNumbers.Distinct();
+			if (distinctVectors.Count() < vectorNumbers.Count())
 			{
-				longArray = this.Elements;
-				shortArray = vector.Elements;
-			}
-			else
-			{
-				longArray = vector.Elements;
-				shortArray = this.Elements;
+				throw new ArgumentException($"Argument {nameof(vectors)} cannot contain two vectors with the same value (Number)", nameof(vectors));
 			}
 
-			//int size = longArray.Count() - 1; // Or Math.Max(this.Elements.Count() - 1, vector.Elements.Count() - 1);
-			bool[] result = longArray.ToArray(); // Make a copy
-
-			int index = 0;
-			bool element2;
-			// Only iterate through the shorter array, any left over elements in the longer array have already been copied over to the result buffer
-			foreach (bool element1 in shortArray)
+			IEnumerable<int> vectorWidths = vectors.Select(v => v.Elements.Count()).Distinct();
+			if (vectorWidths.Count() > 1)
 			{
-				element2 = longArray[index];
-
-				// Just XOR the two elements. This one instruction should be faster than a conditional check and then an assignment statement
-				// TODO: Inspect IL code to check above complexity assumption
-				result[index] = element1 ^ element2;
-
-				index++;
+				throw new ArgumentException($"All vectors must have the Element count.", nameof(vectors));
 			}
 
+			int width = vectorWidths.Single();
+			int[] columnTotals = new int[width];
+
+			IEnumerable<int> columnIndices = Enumerable.Range(0, width);
+			foreach (int column in columnIndices)
+			{
+				columnTotals[column] = vectors.Count(v => v.Elements[column]); // Total each column
+			}
+
+			bool[] result = columnTotals.Select(i => i % 2 == 1).ToArray(); // Mod 2 each column total
 			return result;
 		}
 
@@ -91,11 +78,6 @@ namespace GNFSCore.PrimeSignature
 		internal int IndexOfLeftmostElement()
 		{
 			return Array.IndexOf(Elements, true);
-		}
-
-		internal int FactorCount()
-		{
-			return Elements.Count(b => b == true);
 		}
 
 		private int padLength = -1;

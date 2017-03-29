@@ -22,7 +22,7 @@ namespace GNFS_Winforms
 		public MainForm()
 		{
 			InitializeComponent();
-			tbN.Text = "3218147";//"45113";//"3218147"; //"3580430111"
+			tbN.Text = "3218147"; //"45113";//"3218147"; //"3580430111"
 			tbBase.Text = "117";//"31";"127";
 			tbDegree.Text = "3";
 			//tbBound.Text = "35";//"60";
@@ -99,11 +99,13 @@ namespace GNFS_Winforms
 
 			IEnumerable<Relation> smoothRelations = gnfs.GenerateRelations(200);
 
-			LogOutput($"Smooth relations:");
-			LogOutput($"Quantity: {(gnfs.RFB.Count() + gnfs.AFB.Count() + gnfs.QFB.Count() + 1).ToString()}");
+			LogOutput($"Smooth relations:");			
+			LogOutput("______________________________________________");
+			LogOutput($"| A | B | ALGEBRAIC_NORM | RATIONAL_NORM |    Quantity: {(gnfs.RFB.Count() + gnfs.AFB.Count() + gnfs.QFB.Count() + 1).ToString()}");
+			LogOutput("``````````````````````````````````````````````");
 			LogOutput(string.Join(Environment.NewLine, smoothRelations.Select(rel => rel.ToString())));
 			LogOutput();
-
+			
 			IEnumerable<int> factoringExample = smoothRelations.Select(rel => Math.Abs(rel.A)).Distinct().OrderBy(i => i);
 			factoringExample = factoringExample.Where(i => i > 1 && !PrimeFactory.IsPrime(i));
 
@@ -116,6 +118,90 @@ namespace GNFS_Winforms
 			LogOutput($"Prime signature binary matrix:");
 			LogOutput(primeSignatureMatrix.ToString());
 			LogOutput();
+
+
+			IEnumerable<int[]> squareCombos = primeSignatureMatrix.GetSquareCombinations();
+
+			LogOutput($"Perfect squares:");
+			LogOutput(string.Join(Environment.NewLine, squareCombos.Select(i => $"{string.Join("*", i)} = {i.Select(m => new BigInteger(m)).Product()}")));
+			LogOutput();
+
+			var algebraicNorms = smoothRelations.Where(rel => rel.B < 6).Select(rel => rel.AlgebraicNorm);
+			var rationalNorms = smoothRelations.Where(rel => rel.B < 6).Select(rel => rel.RationalNorm);
+
+			//string algebraicExponents = string.Join(Environment.NewLine, algebraicNorms.Select(i => FactorizationFactory.GetFactorizationExponents(i, gnfs.PrimeBound)).Select(arr => string.Join(",", arr)));
+			//string rationalExponents = string.Join(Environment.NewLine, rationalNorms.Select(i => FactorizationFactory.GetFactorizationExponents(i, gnfs.PrimeBound)).Select(arr => string.Join(",", arr)));
+			//string algebraicFactorization = string.Join(Environment.NewLine, algebraicNorms.Select(i => FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(i, gnfs.PrimeBound))));
+			//string rationalFactorization = string.Join(Environment.NewLine, rationalNorms.Select(i => FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(i, gnfs.PrimeBound))));
+
+			// Where every norm's exponent vector is even (i.e. a square number)
+			algebraicNorms = algebraicNorms.Where(i => (FactorizationFactory.GetFactorizationExponents(i, gnfs.PrimeBound).Sum() % 2 == 0));
+			rationalNorms = rationalNorms.Where(i => (FactorizationFactory.GetFactorizationExponents(i, gnfs.PrimeBound).Sum() % 2 == 0));
+
+			//LogOutput($"Algebraic norms factorization:");
+			//LogOutput(algebraicFactorization);
+			//LogOutput();
+
+			//LogOutput($"Rational norms factorization:");
+			//LogOutput(rationalExponents);
+			////LogOutput(string.Join(Environment.NewLine, rationalNorms.Select(i => $"{i}: ".PadRight(5) + FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(i, gnfs.PrimeBound)))));
+			//LogOutput();
+
+			int polyDerivative = (int)Math.Pow(gnfs.AlgebraicPolynomial.Derivative((int)gnfs.AlgebraicPolynomial.Base), 2);
+			int polyValue = (int)gnfs.AlgebraicPolynomial.Eval((int)gnfs.AlgebraicPolynomial.Base);
+			BigInteger algebraicProduct = algebraicNorms.Product();
+			BigInteger rationalProduct = rationalNorms.Product();
+
+			LogOutput("Polynomial value f(x):");
+			LogOutput(polyValue.ToString());
+			LogOutput();
+			LogOutput("Polynomial derivative f'(m)^2:");
+			LogOutput(polyDerivative.ToString());
+			LogOutput();
+
+
+			BigInteger rationalSquareRoot = BigInteger.Multiply(rationalProduct, polyDerivative).SquareRoot();
+			rationalSquareRoot = rationalSquareRoot % n;
+
+			BigInteger algebraicSquareRoot = BigInteger.Multiply(algebraicProduct, polyDerivative);//.SquareRoot();
+			algebraicSquareRoot = algebraicSquareRoot % n;
+
+			LogOutput($"Large rational number (product of sequence of rational norms):");
+			LogOutput(rationalProduct.ToString());
+			LogOutput($"IsSquare: {BigInteger.Abs(rationalProduct).IsSquare()}");
+			LogOutput();
+			LogOutput("mod n:");
+			LogOutput((rationalProduct % n).ToString());
+			LogOutput();
+
+			LogOutput($"Large algebraic number (product of sequence of algebraic norms):");
+			LogOutput(algebraicProduct.ToString());
+			LogOutput($"IsSquare: {BigInteger.Abs(algebraicProduct).IsSquare()}");
+			LogOutput();
+			LogOutput("mod n:");
+			LogOutput((algebraicProduct % n).ToString());
+			LogOutput();
+
+			LogOutput("Rational Square-Root:");
+			LogOutput(rationalSquareRoot.ToString());
+			LogOutput();
+
+			LogOutput("Algebraic Square-Root:");
+			LogOutput(algebraicSquareRoot.ToString());
+			LogOutput();
+
+
+
+
+
+			IEnumerable<string> rows = null;
+
+
+			
+
+
+
+
 		}
 	}
 }
