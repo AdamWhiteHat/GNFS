@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GNFSCore.IntegerMath
+namespace GNFSCore
 {
 	public static class BigIntegerExtensionMethods
 	{
@@ -52,11 +52,16 @@ namespace GNFSCore.IntegerMath
 			return input * input;
 		}
 
-		public static BigInteger SquareRoot(this BigInteger input)
+		public static BigInteger SquareRoot(this BigInteger number)
 		{
+			BigInteger input = number;
 			if (input.IsZero)
 			{
 				return new BigInteger(0);
+			}
+			if(input.Sign == -1)
+			{
+				input = -input;
 			}
 
 			BigInteger n = new BigInteger(0);

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GNFSCore
+namespace GNFSCore.IntegerMath
 {
 	public static class Combinatorics
 	{

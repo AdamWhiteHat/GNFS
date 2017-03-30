@@ -18,6 +18,7 @@ namespace GNFSCore
 		public IEnumerable<Tuple<int, int>> RFB { get; internal set; } = null;
 		public IEnumerable<Tuple<int, int>> AFB { get; internal set; } = null;
 		public IEnumerable<Tuple<int, int>> QFB { get; internal set; } = null;
+		public Relation[] Relations { get; private set; }
 
 		public GNFS(BigInteger n, BigInteger polynomialBase, int degree)
 		{
@@ -102,7 +103,8 @@ namespace GNFSCore
 				}
 			}
 
-			return result.OrderBy(rel => rel.B).ThenBy(rel => rel.A).ToArray();
+			Relations = result.OrderBy(rel => rel.B).ThenBy(rel => rel.A).ToArray();
+			return Relations;
 		}
 	}
 }

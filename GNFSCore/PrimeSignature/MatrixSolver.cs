@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace GNFSCore.PrimeSignature
 {
+	using IntegerMath;
+
 	public class MatrixSolver
 	{
 		public static BitVector[] GetTrivialSquares(BitMatrix matrix)

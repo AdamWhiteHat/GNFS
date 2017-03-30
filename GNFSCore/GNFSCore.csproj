@@ -48,12 +48,12 @@
     <Compile Include="PrimeSignature\BitMatrix.cs" />
     <Compile Include="PrimeSignature\BitPattern.cs" />
     <Compile Include="PrimeSignature\BitVector.cs" />
-    <Compile Include="Misc\Combinatorics.cs" />
+    <Compile Include="IntegerMath\Combinatorics.cs" />
     <Compile Include="FactorBase\Algebraic.cs" />
     <Compile Include="FactorBase\Quadradic.cs" />
     <Compile Include="Core\GNFS.cs" />
-    <Compile Include="Misc\IEnumerableExtensionMethods.cs" />
-    <Compile Include="Misc\BigIntegerExtensionMethods.cs" />
+    <Compile Include="Core\ExtensionMethods\IEnumerableExtensionMethods.cs" />
+    <Compile Include="Core\ExtensionMethods\BigIntegerExtensionMethods.cs" />
     <Compile Include="IntegerMath\CoPrime.cs" />
     <Compile Include="IntegerMath\Eratosthenes.cs" />
     <Compile Include="IntegerMath\GCD.cs" />
@@ -62,6 +62,10 @@
     <Compile Include="IntegerMath\FactorizationFactory.cs" />
     <Compile Include="PrimeSignature\MatrixSolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Core\GNFS\" />
+    <Folder Include="Misc\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
