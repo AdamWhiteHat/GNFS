@@ -17,5 +17,17 @@ namespace GNFSCore
 			}
 			return result;
 		}
+
+		public static string FormatString<T>(this IEnumerable<T> input)
+		{
+			if(input == null || input.Count() < 1)
+			{
+				return "{ }";
+			}
+			return
+				"{\n" +
+				string.Join(Environment.NewLine, input.Select(i => $"\t{i.ToString()}")) +
+				"\n}\n";
+		}
 	}
 }
