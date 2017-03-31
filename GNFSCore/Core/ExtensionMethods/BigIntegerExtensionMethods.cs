@@ -47,6 +47,20 @@ namespace GNFSCore
 			return result;
 		}
 
+		public static BigInteger ProductMod(this IEnumerable<BigInteger> input, BigInteger modulus)
+		{
+			BigInteger result = 1;
+			foreach (BigInteger bi in input)
+			{
+				result = BigInteger.Multiply(result, bi);
+				if(result>=modulus)
+				{
+					result = result % modulus;
+				}
+			}
+			return result;
+		}
+
 		public static BigInteger Square(this BigInteger input)
 		{
 			return input * input;
