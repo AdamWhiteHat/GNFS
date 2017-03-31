@@ -28,10 +28,15 @@ namespace GNFSCore
 			A = a;
 			B = b;
 			polyBase = poly.Base;
-			AlgebraicNorm = Algebraic.Norm(a, b, poly);
-			RationalNorm = Rational.Norm(a, b, polyBase);
+			AlgebraicNorm = Algebraic.Norm(a, b, poly); // b^deg * f( a/b )
+			RationalNorm = Rational.Norm(a, b, polyBase); // a + bm
 			AlgebraicQuotient = AlgebraicNorm;
 			RationalQuotient = RationalNorm;
+		}
+
+		public BigInteger GetContribution(BigInteger x, BigInteger modQ)
+		{
+			return GetContribution(x) % modQ;
 		}
 
 		public BigInteger GetContribution(BigInteger x)
@@ -41,36 +46,33 @@ namespace GNFSCore
 
 		public void RemoveAlgebraicFactors(IEnumerable<int> factors)
 		{
-			BigInteger sqrt = BigInteger.Abs(AlgebraicNorm).SquareRoot();
-
-			foreach (int factor in factors)
-			{
-				if (BigInteger.Abs(AlgebraicQuotient) == 1 || factor > sqrt)
-				{
-					break;
-				}
-				while (AlgebraicQuotient % factor == 0 && BigInteger.Abs(AlgebraicQuotient) != 1)
-				{
-					AlgebraicQuotient /= factor;
-				}
-			}
+			AlgebraicQuotient = RemoveFactors(factors, AlgebraicNorm, AlgebraicQuotient);
 		}
 
 		public void RemoveRationalFactors(IEnumerable<int> factors)
 		{
-			BigInteger sqrt = BigInteger.Abs(RationalNorm).SquareRoot();
+			RationalQuotient = RemoveFactors(factors, RationalNorm, RationalQuotient);
+		}
 
+		private static BigInteger RemoveFactors(IEnumerable<int> factors, BigInteger norm, BigInteger quotient)
+		{
+			BigInteger sqrt = BigInteger.Abs(norm).SquareRoot();
+			BigInteger absResult;
+
+			BigInteger result = quotient;
 			foreach (int factor in factors)
 			{
-				if (BigInteger.Abs(RationalQuotient) == 1 || factor > sqrt)
+				absResult = BigInteger.Abs(result);
+				if (absResult == 1 || factor > sqrt)
 				{
 					break;
 				}
-				while (RationalQuotient % factor == 0 && BigInteger.Abs(RationalQuotient) != 1)
+				while (result % factor == 0 && absResult != 1)
 				{
-					RationalQuotient /= factor;
+					result /= factor;
 				}
 			}
+			return result;
 		}
 
 		public override string ToString()
@@ -78,7 +80,8 @@ namespace GNFSCore
 			return
 			$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)}\t" +
 			$"Z:{AlgebraicNorm.ToString().PadLeft(10)},\ta+bm={RationalNorm.ToString().PadLeft(4)},\t" +
-			$"{BigInteger.Abs(A) % 4}{BigInteger.Abs(B) % 4}{BigInteger.Abs(AlgebraicNorm) % 4}{BigInteger.Abs(RationalNorm % 4)})";
+			$"{BigInteger.Abs(A) % 4 % 2}{BigInteger.Abs(B) % 4 % 2}{BigInteger.Abs(AlgebraicNorm) % 4 % 2}{BigInteger.Abs(RationalNorm) % 4 % 2})\t" +
+			$"[{QuadraticResidue.IsQuadraticResidue(A, B)}]";			
 		}
 	}
 }

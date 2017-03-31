@@ -14,6 +14,7 @@ namespace GNFSCore.Polynomial
 		public BigInteger N { get; private set; }
 		public BigInteger Base { get; private set; }
 		public int[] Terms { get; private set; }
+		public double BaseTotal { get; private set; }
 		public double FormalDerivative { get; private set; }
 
 		public Irreducible(BigInteger n, BigInteger polynomialBase, int degree)
@@ -24,13 +25,14 @@ namespace GNFSCore.Polynomial
 
 			SetPolynomialValue(n);
 
+			BaseTotal = Eval((double)Base);
 			FormalDerivative = Derivative((int)Base);
 		}
 
 		private void SetPolynomialValue(BigInteger value)
 		{
 			N = value;
-			int d = Degree + 1;
+			int d = Degree;
 			BigInteger toAdd = N;
 
 			// Build out Terms[]

@@ -103,7 +103,7 @@ namespace GNFS_Winforms
 			LogOutput("______________________________________________");
 			LogOutput($"| A | B | ALGEBRAIC_NORM | RATIONAL_NORM |    Quantity: {(gnfs.RFB.Count() + gnfs.AFB.Count() + gnfs.QFB.Count() + 1).ToString()}");
 			LogOutput("``````````````````````````````````````````````");
-			LogOutput(string.Join(Environment.NewLine, smoothRelations.Select(rel => rel.ToString())));
+			LogOutput(smoothRelations.FormatString());
 			LogOutput();
 
 			IEnumerable<int> factoringExample = smoothRelations.Select(rel => Math.Abs(rel.A)).Distinct().OrderBy(i => i);
@@ -136,27 +136,8 @@ namespace GNFS_Winforms
 			LogOutput(polyDerivative.ToString());
 			LogOutput();
 
-			SquareFinder sqFinder = new SquareFinder(gnfs);
-
-			sqFinder.CalculateRationalSide();
-
-
-			LogOutput("Square finder, rational:");
-			LogOutput($"√( {sqFinder.rationalSetProduct} * {sqFinder.polyDerivativeSquare} )");
-			LogOutput("=");
-			LogOutput(sqFinder.RationalSquareRoot.ToString());
-			LogOutput();
-
-			//LogOutput("Algebraic Square-Root:");
-			//LogOutput(algebraicSquareRoot.ToString());
-			//LogOutput();
-
-
-
-
-
 			Relation[] exampleFromBook = new Relation[]
-{
+			{
 				new Relation(-127, 1, gnfs.AlgebraicPolynomial),
 				new Relation(-2, 1, gnfs.AlgebraicPolynomial)  ,
 				new Relation(23, 1, gnfs.AlgebraicPolynomial)  ,
@@ -177,68 +158,33 @@ namespace GNFS_Winforms
 				new Relation(81, 1, gnfs.AlgebraicPolynomial)  ,
 				new Relation(181, 3, gnfs.AlgebraicPolynomial) ,
 				new Relation(31, 5, gnfs.AlgebraicPolynomial)
-};
+			};
 
-
-			string relsString = string.Join(Environment.NewLine, exampleFromBook.Select(r => r.ToString()));
+			string relsString = exampleFromBook.FormatString();
 			LogOutput("Example Relations (From book):");
 			LogOutput(relsString);
 			LogOutput();
 
+			SquareFinder sqFinder = new SquareFinder(gnfs, exampleFromBook);
+			sqFinder.CalculateRationalSide();
 
-			//var algebraicNorms = smoothRelations.Where(rel => rel.B < 6).Select(rel => rel.AlgebraicNorm);
-			//var rationalNorms = smoothRelations.Where(rel => rel.B < 6).Select(rel => rel.RationalNorm);
+			LogOutput("Square finder, rational:");
+			LogOutput($"√( {sqFinder.rationalSetProduct} * {sqFinder.SquarePolynomialDerivative} )");
+			LogOutput("=");
+			LogOutput(sqFinder.RationalSquareRoot.ToString());
+			LogOutput("" + sqFinder.IsRationalSquare.ToString());
+			LogOutput("" + sqFinder.IsRationalIrreducible.ToString());
+			LogOutput();
 
+			sqFinder.CalculateAlgebraicSide();
 
-
-			//// Where every norm's exponent vector is even (i.e. a square number)
-			//algebraicNorms = algebraicNorms.Where(i => (FactorizationFactory.GetFactorizationExponents(i, gnfs.PrimeBound).Sum() % 2 == 0));
-			//rationalNorms = rationalNorms.Where(i => (FactorizationFactory.GetFactorizationExponents(i, gnfs.PrimeBound).Sum() % 2 == 0));
-
-
-
-			//BigInteger algebraicProduct = algebraicNorms.Product();
-			//BigInteger rationalProduct = rationalNorms.Product();
-
-
-
-
-
-			//BigInteger rationalSquareRoot = BigInteger.Multiply(rationalProduct, polyDerivative).SquareRoot();
-			//rationalSquareRoot = rationalSquareRoot % n;
-
-			//BigInteger algebraicSquareRoot = BigInteger.Multiply(algebraicProduct, polyDerivative);//.SquareRoot();
-			//algebraicSquareRoot = algebraicSquareRoot % n;
-
-			//LogOutput($"Large rational number (product of sequence of rational norms):");
-			//LogOutput(rationalProduct.ToString());
-			//LogOutput($"IsSquare: {BigInteger.Abs(rationalProduct).IsSquare()}");
-			//LogOutput();
-			//LogOutput("mod n:");
-			//LogOutput((rationalProduct % n).ToString());
-			//LogOutput();
-
-			//LogOutput($"Large algebraic number (product of sequence of algebraic norms):");
-			//LogOutput(algebraicProduct.ToString());
-			//LogOutput($"IsSquare: {BigInteger.Abs(algebraicProduct).IsSquare()}");
-			//LogOutput();
-			//LogOutput("mod n:");
-			//LogOutput((algebraicProduct % n).ToString());
-			//LogOutput();
-
-			//LogOutput("Rational Square-Root:");
-			//LogOutput(rationalSquareRoot.ToString());
-			//LogOutput();
-
-			//LogOutput("Algebraic Square-Root:");
-			//LogOutput(algebraicSquareRoot.ToString());
-			//LogOutput();
-
-
-
-
-
-
+			LogOutput("Square finder, rational:");
+			LogOutput($"{sqFinder.algebraicSet}");
+			LogOutput("=");
+			LogOutput(sqFinder.AlgebraicSquareRoot.ToString());
+			LogOutput("" + sqFinder.IsAlgebraicSquare.ToString());
+			LogOutput("" + sqFinder.IsAlgebraicIrreducible.ToString());
+			LogOutput();
 
 		}
 	}
