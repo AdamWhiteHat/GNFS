@@ -2,18 +2,20 @@
 using System.Linq;
 using System.Text;
 using System.Numerics;
-using GNFSCore.FactorBase;
-using GNFSCore.Polynomial;
 using GNFSCore.IntegerMath;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace GNFSCore
 {
+	using FactorBase;
+	using Polynomial;
+	using IntegerMath;
+
 	public class Relation
 	{
 		public int A;
-		public int B;
+		public int B;		
 		public BigInteger AlgebraicNorm { get; private set; }
 		public BigInteger RationalNorm { get; private set; }
 		public BigInteger AlgebraicQuotient { get; private set; }
@@ -27,7 +29,7 @@ namespace GNFSCore
 		{
 			A = a;
 			B = b;
-			polyBase = poly.Base;
+			polyBase = poly.Base;			
 			AlgebraicNorm = Algebraic.Norm(a, b, poly); // b^deg * f( a/b )
 			RationalNorm = Rational.Norm(a, b, polyBase); // a + bm
 			AlgebraicQuotient = AlgebraicNorm;
@@ -78,10 +80,10 @@ namespace GNFSCore
 		public override string ToString()
 		{
 			return
-			$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)}\t" +
-			$"Z:{AlgebraicNorm.ToString().PadLeft(10)},\ta+bm={RationalNorm.ToString().PadLeft(4)},\t" +
-			$"{BigInteger.Abs(A) % 4 % 2}{BigInteger.Abs(B) % 4 % 2}{BigInteger.Abs(AlgebraicNorm) % 4 % 2}{BigInteger.Abs(RationalNorm) % 4 % 2})\t" +
-			$"[{QuadraticResidue.IsQuadraticResidue(A, B)}]";			
+			$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t" +
+			$"[Z:{AlgebraicNorm.ToString().PadLeft(10)},\ta+bm={RationalNorm.ToString().PadLeft(4)}]\t" +
+			$"{BigInteger.Abs(A) % 4 % 2}{BigInteger.Abs(B) % 4 % 2}{BigInteger.Abs(AlgebraicNorm) % 4 % 2}{BigInteger.Abs(RationalNorm) % 4 % 2}\t" +
+			$"IsAQuadraticB ? {QuadraticResidue.IsQuadraticResidue(A, B)}";
 		}
 	}
 }
