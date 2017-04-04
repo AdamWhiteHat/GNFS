@@ -23,7 +23,8 @@ namespace GNFSCore.Polynomial
 			Degree = degree;
 			Terms = Enumerable.Repeat(0, degree + 1).ToArray();
 
-			SetPolynomialValue(n);
+			N = n;
+			SetPolynomialValue(N);
 
 			BaseTotal = Eval((double)Base);
 			FormalDerivative = Derivative((int)Base);
