@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Numerics;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace GNFSCore.IntegerMath
 {
 	public static class Legendre
 	{
-		public static int Symbol(int a, int p)
+		public static int Symbol(BigInteger a, BigInteger p)
 		{
 			if (p < 2) throw new ArgumentOutOfRangeException("p", "p must not be < 2");
 			if (a == 0) return 0;
