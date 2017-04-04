@@ -37,6 +37,15 @@ namespace GNFSCore
 			return false;
 		}
 
+		public static BigInteger Sum(this IEnumerable<BigInteger> source)
+		{
+			BigInteger result = BigInteger.Zero;
+			foreach (BigInteger bi in source)
+				result = BigInteger.Add(result, bi);
+
+			return result;
+		}
+
 		public static BigInteger Product(this IEnumerable<BigInteger> input)
 		{
 			BigInteger result = 1;
@@ -53,7 +62,7 @@ namespace GNFSCore
 			foreach (BigInteger bi in input)
 			{
 				result = BigInteger.Multiply(result, bi);
-				if(result>=modulus)
+				if (result >= modulus)
 				{
 					result = result % modulus;
 				}
@@ -73,7 +82,7 @@ namespace GNFSCore
 			{
 				return new BigInteger(0);
 			}
-			if(input.Sign == -1)
+			if (input.Sign == -1)
 			{
 				input = -input;
 			}
