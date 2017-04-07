@@ -10,24 +10,24 @@ namespace GNFSCore.Polynomial
 {
 	public class Irreducible
 	{
-		public int Degree { get; private set; }
+		public int Degree { get; private set; }		
 		public BigInteger N { get; private set; }
 		public BigInteger Base { get; private set; }
-		public int[] Terms { get; private set; }
-		public double BaseTotal { get; private set; }
-		public double FormalDerivative { get; private set; }
+		public double[] Terms { get; private set; }
+		public BigInteger BaseTotal { get; private set; }
+		public BigInteger FormalDerivative { get; private set; }
 
 		public Irreducible(BigInteger n, BigInteger polynomialBase, int degree)
 		{
 			Base = polynomialBase;
 			Degree = degree;
-			Terms = Enumerable.Repeat(0, degree + 1).ToArray();
+			Terms = Enumerable.Repeat(0d, degree + 1).ToArray();
 
 			N = n;
 			SetPolynomialValue(N);
 
-			BaseTotal = Eval((double)Base);
-			FormalDerivative = Derivative((int)Base);
+			BaseTotal = Irreducible.Evaluate(this, Base);
+			FormalDerivative = Irreducible.Derivative(this, Base);
 		}
 
 		private void SetPolynomialValue(BigInteger value)
@@ -43,7 +43,7 @@ namespace GNFSCore.Polynomial
 
 				if (placeValue == 1)
 				{
-					Terms[d] = (int)toAdd;
+					Terms[d] = (double)toAdd;
 				}
 				else if (placeValue < toAdd)
 				{
@@ -53,7 +53,7 @@ namespace GNFSCore.Polynomial
 						quotient = Base;
 					}
 
-					Terms[d] = (int)quotient;
+					Terms[d] = (double)quotient;
 					BigInteger toSubtract = BigInteger.Multiply(quotient, placeValue);
 					toAdd -= toSubtract;
 				}
@@ -62,16 +62,16 @@ namespace GNFSCore.Polynomial
 			}
 		}
 
-		public double Eval(double baseM)
+		public static double Evaluate(Irreducible polynomial, double baseM)
 		{
 			double result = 0;
 
-			int d = Degree;
+			int d = polynomial.Degree;
 			while (d >= 0)
 			{
 				double placeValue = Math.Pow(baseM, d);
-				
-				double addValue = Terms[d] * placeValue;
+
+				double addValue = polynomial.Terms[d] * placeValue;
 
 				result += addValue;
 
@@ -81,21 +81,16 @@ namespace GNFSCore.Polynomial
 			return result;
 		}
 
-		public double Derivative(double baseM)
+		public static BigInteger Evaluate(Irreducible polynomial, BigInteger baseM)
 		{
-			double result = 0;
+			BigInteger result = 0;
 
-			int d = Degree;
+			int d = polynomial.Degree;
 			while (d >= 0)
 			{
-				double placeValue = 0;
+				BigInteger placeValue = BigInteger.Pow(baseM, d);
 
-				if (d - 1 > -1)
-				{
-					placeValue = Math.Pow(baseM, d - 1);
-				}
-
-				double addValue = Terms[d] * d * placeValue;
+				BigInteger addValue = (BigInteger)polynomial.Terms[d] * placeValue;
 
 				result += addValue;
 
@@ -105,43 +100,67 @@ namespace GNFSCore.Polynomial
 			return result;
 		}
 
-		public IEnumerable<int> GetRootsMod(double baseM, IEnumerable<int> modList)
+		public static BigInteger Derivative(Irreducible polynomial, BigInteger baseM)
 		{
-			double polyResult = Eval(baseM);
+			BigInteger result = 0;
+
+			int d = polynomial.Degree;
+			int d1 = d - 1;
+			while (d >= 0)
+			{
+				BigInteger placeValue = 0;
+
+				if (d1 > -1)
+				{
+					placeValue = BigInteger.Pow(baseM, d1);
+				}
+
+				BigInteger addValue = (BigInteger)polynomial.Terms[d] * d * placeValue;
+				result += addValue;
+
+				d--;
+			}
+
+			return result;
+		}
+
+		public static IEnumerable<int> GetRootsMod(Irreducible polynomial, BigInteger baseM, IEnumerable<int> modList)
+		{
+			BigInteger polyResult = Irreducible.Evaluate(polynomial, baseM);
 			IEnumerable<int> result = modList.Where(mod => (polyResult % mod) == 0);
 			return result;
 		}
 
 		public override string ToString()
 		{
-			return FormatString(this.Base, this.Terms);
+			return Irreducible.FormatString(this);
 		}
 
-		public static string FormatString(BigInteger polyBase, int[] terms)
+		public static string FormatString(Irreducible polynomial)
 		{
 			List<string> stringTerms = new List<string>();
 
-			int degree = terms.Length - 1;
+			int degree = polynomial.Terms.Length - 1;
 			while (degree >= 0)
 			{
 				if (degree > 1)
 				{
-					if (terms[degree] == 1)
+					if (polynomial.Terms[degree] == 1)
 					{
-						stringTerms.Add($"{polyBase}^{degree}");
+						stringTerms.Add($"{polynomial.Base}^{degree}");
 					}
 					else
 					{
-						stringTerms.Add($"{terms[degree]} * {polyBase}^{degree}");
+						stringTerms.Add($"{polynomial.Terms[degree]} * {polynomial.Base}^{degree}");
 					}
 				}
 				else if (degree == 1)
 				{
-					stringTerms.Add($"{terms[degree]} * {polyBase}");
+					stringTerms.Add($"{polynomial.Terms[degree]} * {polynomial.Base}");
 				}
 				else if (degree == 0)
 				{
-					stringTerms.Add($"{terms[degree]}");
+					stringTerms.Add($"{polynomial.Terms[degree]}");
 				}
 
 				degree--;

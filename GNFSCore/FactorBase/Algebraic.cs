@@ -30,12 +30,27 @@ namespace GNFSCore.FactorBase
 			// b^deg * f( a/b )
 
 			int bneg = -b;
-			var ab = (double)a / (double)bneg;
-			double right = poly.Eval(ab);
-			double left = Math.Pow(bneg, poly.Degree);
-			double norm = left * right;
-			int result = (int)Math.Round(norm);
+			double ab = (double)a / (double)bneg;
 
+			BigInteger remainder = new BigInteger();
+			BigInteger quotient = BigInteger.DivRem(a, bneg, out remainder);
+			double remaind = (double)remainder/(double)bneg;
+			
+			double right = Irreducible.Evaluate(poly, ab);
+			double left = Math.Pow(bneg, poly.Degree);
+			
+			double deci = right % 1;
+			double deciProduct = deci * left;
+			deciProduct = Math.Round(deciProduct, MidpointRounding.ToEven);
+
+			BigInteger result = BigInteger.Multiply((BigInteger)right, (BigInteger)left);
+			result += (BigInteger)deciProduct;
+
+			if(remainder>0)
+			{
+				int i = 0;
+			}
+			
 			return result;
 		}
 	}

@@ -13,25 +13,34 @@ namespace GNFSCore
 	public class SquareFinder
 	{
 		public Relation[] RelationsSet;
+		public BigInteger SquarePolynomialDerivative;
 
 		public bool IsRationalSquare;
 		public bool IsRationalIrreducible;
-		public BigInteger RationalSquareRoot;
+		public BigInteger RationalSum;
+		public BigInteger RationalNormSum;
+		public BigInteger RationalProductMod;
+		public BigInteger RationalInverseSquare;
+		public BigInteger RationalInverseSquareRoot;
+		public BigInteger RationalModPolynomial;
+		public BigInteger RationalProduct;
 
 		public bool IsAlgebraicSquare;
 		public bool IsAlgebraicIrreducible;
-		public BigInteger AlgebraicSquareRoot;
+		public BigInteger AlgebraicSum;
+		public BigInteger AlgebraicNormSum;
+		public BigInteger AlgebraicProductMod;
+		public BigInteger AlgebraicProduct;
 
-		public GNFS gnfs;
-		public BigInteger SquarePolynomialDerivative;
+		public BigInteger Y2;
+		public BigInteger Y2_S;
 
-		public IEnumerable<BigInteger> rationalSet;
-		public BigInteger rationalSetProduct;
-		public BigInteger rationalInverseSquare;
-		public BigInteger rationalInverseSquareRoot;
 
-		public IEnumerable<BigInteger> algebraicSet;
-		public BigInteger algebraicSetProduct;
+
+		private GNFS gnfs;
+		private IEnumerable<BigInteger> rationalSet;
+		private IEnumerable<BigInteger> algebraicSet;
+
 
 		public SquareFinder(GNFS sieve)
 			: this(sieve, sieve.Relations)
@@ -40,13 +49,17 @@ namespace GNFSCore
 
 		public SquareFinder(GNFS sieve, Relation[] relations)
 		{
-			RationalSquareRoot = -1;
+			RationalProductMod = -1;
 
 			gnfs = sieve;
 			RelationsSet = relations;
 			SquarePolynomialDerivative = (BigInteger)(gnfs.AlgebraicPolynomial.FormalDerivative * gnfs.AlgebraicPolynomial.FormalDerivative);
 		}
 
+		public static bool IsIrreducible(IEnumerable<BigInteger> coefficients)
+		{
+			return (GCD.FindGCD(coefficients) == 1);
+		}
 
 		//        ________________
 		// y = ( √  S(m) * f'(m)^2 ) mod N
@@ -61,33 +74,66 @@ namespace GNFSCore
 		public void CalculateRationalSide()
 		{
 			rationalSet = RelationsSet.Select(rel => rel.RationalNorm);
+			RationalProduct = rationalSet.Product();
+			RationalInverseSquare = BigInteger.Multiply(RationalProduct, (BigInteger)SquarePolynomialDerivative);
+			RationalInverseSquareRoot = RationalInverseSquare.SquareRoot();
+			var residue = RationalInverseSquareRoot % gnfs.N;
+
+			RationalSum = RelationsSet.Select(rel => rel.A).Sum();
+			RationalNormSum = rationalSet.Sum();
+			RationalProductMod = residue;
 			IsRationalIrreducible = IsIrreducible(rationalSet);
-			rationalSetProduct = rationalSet.Product();
-			rationalInverseSquare = BigInteger.Multiply(rationalSetProduct, (BigInteger)SquarePolynomialDerivative);
-			rationalInverseSquareRoot = rationalSetProduct.SquareRoot();
-			var residue = rationalInverseSquareRoot % gnfs.N;
-			RationalSquareRoot = residue;
-			IsRationalSquare = RationalSquareRoot.IsSquare();
+			IsRationalSquare = RationalProductMod.IsSquare();
+
+			Y2 = BigInteger.Multiply(RationalProductMod, RationalProductMod);
+			Y2_S = BigInteger.Subtract(Y2, RationalProduct);
+
 		}
-		
-		private static bool IsIrreducible(IEnumerable<BigInteger> coefficients)
+
+		public BigInteger CalculateRationalModPrime(BigInteger prime)
 		{
-			return (GCD.FindGCD(coefficients) == 1);
+			BigInteger mod = Irreducible.Evaluate(gnfs.AlgebraicPolynomial, prime);
+			return (RationalProduct % prime) % mod;
+		}
+
+		public void CalculateRationalModPolynomial()
+		{
+			// Should be the same as N
+			BigInteger mod = Irreducible.Evaluate(gnfs.AlgebraicPolynomial, gnfs.AlgebraicPolynomial.Base);
+
+			RationalModPolynomial = RationalProduct % mod;
+
 		}
 
 		public void CalculateAlgebraicSide()
 		{
-			AlgebraicSide(233);
+			AlgebraicSide(gnfs.AlgebraicPolynomial.Base);
 		}
 
 		private void AlgebraicSide(BigInteger prime)
 		{
-			algebraicSet = RelationsSet.Select(rel => rel.RationalNorm % prime);
-			algebraicSetProduct = algebraicSet.ProductMod(prime);
+			algebraicSet = RelationsSet.Select(rel => rel.AlgebraicNorm/* % prime*/);
 
-			AlgebraicSquareRoot = algebraicSetProduct;
+			AlgebraicProduct = algebraicSet.Product();
+			AlgebraicProductMod = AlgebraicProduct % prime;
+			AlgebraicSum = algebraicSet.Sum();
+			AlgebraicNormSum = RelationsSet.Select(rel => rel.AlgebraicNorm).Sum();
+
 			IsAlgebraicIrreducible = IsIrreducible(algebraicSet); // Irreducible check
-			IsAlgebraicSquare = AlgebraicSquareRoot.IsSquare();			
+			IsAlgebraicSquare = AlgebraicProductMod.IsSquare();
+
+			//Irreducible g;
+			//if (IsAlgebraicIrreducible)
+			//{
+			//	g = new Irreducible(gnfs.N, prime, gnfs.AlgebraicPolynomial.Degree - 1);
+			//	double gm = g.BaseTotal;
+			//
+			//	string termsString = g.Terms.FormatString();
+			//	double gDerivative = g.FormalDerivative;
+			//	int h = 0;
+			//}
+			//
+			//int i = 0;
 		}
 	}
 }

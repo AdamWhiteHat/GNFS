@@ -22,10 +22,9 @@ namespace GNFS_Winforms
 		public MainForm()
 		{
 			InitializeComponent();
-			tbN.Text = "3218147"; //"45113";//"3218147"; //"3580430111"
-			tbBase.Text = "117";//"31";"127";
-			tbDegree.Text = "3";
-			//tbBound.Text = "35";//"60";
+			tbN.Text = "3218147"; //"1001193673991790373"; //"45113";//"3218147"; //"3580430111"
+			tbBase.Text = "117"; //"11875";//"117";//"31";"127";
+			tbDegree.Text = "3"; // "5";
 		}
 
 		public void LogOutput(string message = "")
@@ -98,37 +97,81 @@ namespace GNFS_Winforms
 			LogOutput();
 
 			IEnumerable<Relation> smoothRelations = gnfs.GenerateRelations(200);
+			smoothRelations = smoothRelations.OrderBy(rel => QuadraticResidue.IsQuadraticResidue(rel.A, rel.B));
 
 			LogOutput($"Smooth relations:");
-			LogOutput("______________________________________________");
-			LogOutput($"| A | B | ALGEBRAIC_NORM | RATIONAL_NORM |    Quantity: {(gnfs.RFB.Count() + gnfs.AFB.Count() + gnfs.QFB.Count() + 1).ToString()}");
-			LogOutput("``````````````````````````````````````````````");
+			LogOutput("\t_______________________________________________");
+			LogOutput($"\t|   A   |  B | ALGEBRAIC_NORM | RATIONAL_NORM | \t\tQuantity: {(gnfs.RFB.Count() + gnfs.AFB.Count() + gnfs.QFB.Count() + 1).ToString()}");
+			LogOutput("\t```````````````````````````````````````````````");
 			LogOutput(smoothRelations.FormatString());
 			LogOutput();
 
-			IEnumerable<int> factoringExample = smoothRelations.Select(rel => Math.Abs(rel.A)).Distinct().OrderBy(i => i);
+			Relation[] exampleFromThesis = new Relation[]
+			{
+				new Relation(-127, 1,       gnfs.AlgebraicPolynomial),
+				new Relation(-2, 1,         gnfs.AlgebraicPolynomial)  ,
+				new Relation(23, 1,         gnfs.AlgebraicPolynomial)  ,
+				new Relation(-65, 3,        gnfs.AlgebraicPolynomial) ,
+				new Relation(-137, 5,       gnfs.AlgebraicPolynomial),
+				new Relation(-126, 1,       gnfs.AlgebraicPolynomial),
+				new Relation(0, 1,          gnfs.AlgebraicPolynomial)   ,
+				new Relation(24, 1,         gnfs.AlgebraicPolynomial)  ,
+				new Relation(-62, 3,        gnfs.AlgebraicPolynomial) ,
+				new Relation(-68, 5,        gnfs.AlgebraicPolynomial) ,
+				new Relation(-12, 1,        gnfs.AlgebraicPolynomial) ,
+				new Relation(2, 1,          gnfs.AlgebraicPolynomial)   ,
+				new Relation(37, 1,         gnfs.AlgebraicPolynomial)  ,
+				new Relation(86, 3,         gnfs.AlgebraicPolynomial)  ,
+				new Relation(-46, 5,        gnfs.AlgebraicPolynomial) ,
+				new Relation(-5, 1,         gnfs.AlgebraicPolynomial)  ,
+				new Relation(19, 1,         gnfs.AlgebraicPolynomial)  ,
+				new Relation(81, 1,         gnfs.AlgebraicPolynomial)  ,
+				new Relation(181, 3,        gnfs.AlgebraicPolynomial) ,
+				new Relation(31, 5,         gnfs.AlgebraicPolynomial)
+			};
+
+			exampleFromThesis = smoothRelations.ToArray();
+
+			IEnumerable<int> factoringExample = exampleFromThesis.Select(rel => (int)BigInteger.Abs(rel.RationalNorm)); //smoothRelations.Select(rel => Math.Abs(rel.A)).Distinct().OrderBy(i => i);
 			factoringExample = factoringExample.Where(i => i > 1 && !PrimeFactory.IsPrime(i));
 
 			LogOutput($"Prime factorization example:");
 			LogOutput(string.Join(Environment.NewLine, factoringExample.Select(i => $"{i}: ".PadRight(5) + FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(i, gnfs.PrimeBound)))));
 			LogOutput();
 
-			BitMatrix primeSignatureMatrix = new BitMatrix(factoringExample, gnfs.PrimeBound);
+
+			var signatureMatrix = smoothRelations.Select(rel => (int)BigInteger.Abs(rel.RationalNorm));
+			BitMatrix primeSignatureMatrix = new BitMatrix(signatureMatrix, gnfs.PrimeBound);
 
 			LogOutput($"Prime signature binary matrix:");
 			LogOutput(primeSignatureMatrix.ToString());
 			LogOutput();
 
-
+			/*
 			IEnumerable<int[]> squareCombos = primeSignatureMatrix.GetSquareCombinations();
-
 			LogOutput($"Perfect squares:");
 			LogOutput(string.Join(Environment.NewLine, squareCombos.Select(i => $"{string.Join("*", i)} = {i.Select(m => new BigInteger(m)).Product()}")));
 			LogOutput();
+			*/
+
+			LogOutput("Example Relations (From thesis):");
+			LogOutput(exampleFromThesis.FormatString());
+			LogOutput();
+
+			var algebraicNormQuadraticCharacter = exampleFromThesis.Select(rel => Legendre.Symbol(BigInteger.Abs(rel.AlgebraicNorm), n));
+			var rationalNormQuadraticCharacter = exampleFromThesis.Select(rel => Legendre.Symbol(BigInteger.Abs(rel.RationalNorm), n));
+
+			LogOutput("Algebraic Norm (From thesis) Quadratic Character:");
+			LogOutput(algebraicNormQuadraticCharacter.FormatString());
+			LogOutput();
+
+			LogOutput("Rational Norm (From thesis) Quadratic Character:");
+			LogOutput(rationalNormQuadraticCharacter.FormatString());
+			LogOutput();
 
 
-			int polyDerivative = (int)Math.Pow(gnfs.AlgebraicPolynomial.FormalDerivative, 2.0f);
-			int polyValue = (int)gnfs.AlgebraicPolynomial.Eval((int)gnfs.AlgebraicPolynomial.Base);
+			BigInteger polyDerivative = BigInteger.Multiply((BigInteger)gnfs.AlgebraicPolynomial.FormalDerivative, (BigInteger)gnfs.AlgebraicPolynomial.FormalDerivative);
+			BigInteger polyValue = Irreducible.Evaluate(gnfs.AlgebraicPolynomial, gnfs.AlgebraicPolynomial.Base);
 			LogOutput("Polynomial value f(x):");
 			LogOutput(polyValue.ToString());
 			LogOutput();
@@ -136,54 +179,61 @@ namespace GNFS_Winforms
 			LogOutput(polyDerivative.ToString());
 			LogOutput();
 
-			Relation[] exampleFromBook = new Relation[]
-			{
-				new Relation(-127, 1, gnfs.AlgebraicPolynomial),
-				new Relation(-2, 1, gnfs.AlgebraicPolynomial)  ,
-				new Relation(23, 1, gnfs.AlgebraicPolynomial)  ,
-				new Relation(-65, 3, gnfs.AlgebraicPolynomial) ,
-				new Relation(-137, 5, gnfs.AlgebraicPolynomial),
-				new Relation(-126, 1, gnfs.AlgebraicPolynomial),
-				new Relation(0, 1, gnfs.AlgebraicPolynomial)   ,
-				new Relation(24, 1, gnfs.AlgebraicPolynomial)  ,
-				new Relation(-62, 3, gnfs.AlgebraicPolynomial) ,
-				new Relation(-68, 5, gnfs.AlgebraicPolynomial) ,
-				new Relation(-12, 1, gnfs.AlgebraicPolynomial) ,
-				new Relation(2, 1, gnfs.AlgebraicPolynomial)   ,
-				new Relation(37, 1, gnfs.AlgebraicPolynomial)  ,
-				new Relation(86, 3, gnfs.AlgebraicPolynomial)  ,
-				new Relation(-46, 5, gnfs.AlgebraicPolynomial) ,
-				new Relation(-5, 1, gnfs.AlgebraicPolynomial)  ,
-				new Relation(19, 1, gnfs.AlgebraicPolynomial)  ,
-				new Relation(81, 1, gnfs.AlgebraicPolynomial)  ,
-				new Relation(181, 3, gnfs.AlgebraicPolynomial) ,
-				new Relation(31, 5, gnfs.AlgebraicPolynomial)
-			};
-
-			string relsString = exampleFromBook.FormatString();
-			LogOutput("Example Relations (From book):");
-			LogOutput(relsString);
+			LogOutput("Prime Bound:");
+			LogOutput(gnfs.PrimeBound.ToString());
 			LogOutput();
 
-			SquareFinder sqFinder = new SquareFinder(gnfs, exampleFromBook);
+			SquareFinder sqFinder = new SquareFinder(gnfs, exampleFromThesis);
 			sqFinder.CalculateRationalSide();
-
-			LogOutput("Square finder, rational:");
-			LogOutput($"√( {sqFinder.rationalSetProduct} * {sqFinder.SquarePolynomialDerivative} )");
-			LogOutput("=");
-			LogOutput(sqFinder.RationalSquareRoot.ToString());
-			LogOutput("" + sqFinder.IsRationalSquare.ToString());
-			LogOutput("" + sqFinder.IsRationalIrreducible.ToString());
-			LogOutput();
-
+			sqFinder.CalculateRationalModPolynomial();
 			sqFinder.CalculateAlgebraicSide();
 
+			LogOutput("IsIrreducible:");
+			LogOutput((sqFinder.IsAlgebraicIrreducible && sqFinder.IsRationalIrreducible).ToString());
+			LogOutput();
+			
+			BigInteger productC = exampleFromThesis.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
+			BigInteger gcd = GCD.FindGCD(n, productC);
+
+			LogOutput();
+			LogOutput("GCD(N, relations.Select(rel => f(rel.A)).Product() ):");
+			LogOutput($"Product: {productC}");
+			LogOutput();
+			LogOutput($"Product%N: {productC%n}");
+			LogOutput();
+			LogOutput($"GCD(N,Product): {gcd}");
+			LogOutput();
+		}
+
+		private void PrintSquareResults(SquareFinder sqFinder)
+		{
+
 			LogOutput("Square finder, rational:");
-			LogOutput($"{sqFinder.algebraicSet}");
-			LogOutput("=");
-			LogOutput(sqFinder.AlgebraicSquareRoot.ToString());
-			LogOutput("" + sqFinder.IsAlgebraicSquare.ToString());
-			LogOutput("" + sqFinder.IsAlgebraicIrreducible.ToString());
+			LogOutput($"  √( {sqFinder.RationalProduct} * {sqFinder.SquarePolynomialDerivative} )");
+			LogOutput($"= √( {sqFinder.RationalInverseSquare} )");
+			LogOutput($"=    {sqFinder.RationalInverseSquareRoot}\n");
+			LogOutput($"Product: {sqFinder.RationalProduct}");
+			LogOutput($"ProductMod: {sqFinder.RationalProductMod}");
+			LogOutput($"*InverseSquare: {sqFinder.RationalInverseSquare}");
+			LogOutput($"Sum: {sqFinder.RationalSum}");
+			LogOutput($"SumOfNorms: {sqFinder.RationalNormSum}");
+			LogOutput($"IsRationalSquare ? {sqFinder.IsRationalSquare}");
+			LogOutput($"IsRationalIrreducible ? {sqFinder.IsRationalIrreducible}");
+
+			LogOutput();
+			LogOutput($"RationalModPolynomial: {sqFinder.RationalModPolynomial}");
+			LogOutput();
+
+
+
+			LogOutput("Square finder, algebraic:");
+			LogOutput($"Product: {sqFinder.AlgebraicProduct}");
+			LogOutput($"ProductMod: {sqFinder.AlgebraicProductMod}");
+			LogOutput($"Sum: {sqFinder.AlgebraicSum}");
+			LogOutput($"SumOfNorms: {sqFinder.AlgebraicNormSum}");
+			LogOutput($"IsAlgebraicSquare ? {sqFinder.IsAlgebraicSquare}");
+			LogOutput($"IsAlgebraicIrreducible ? {sqFinder.IsAlgebraicIrreducible}");
+			LogOutput();
 			LogOutput();
 
 		}

@@ -95,7 +95,7 @@ namespace GNFSCore.PrimeSignature
 			int skip = 0;
 			bool done = false;
 
-			BitVector[] input = bitMatrix.Rows;
+			BitVector[] input = bitMatrix.Rows.ToArray();
 			List<int[]> result = new List<int[]>();
 			do
 			{

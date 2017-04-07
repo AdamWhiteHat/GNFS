@@ -25,7 +25,7 @@ namespace GNFSCore
 			N = n;
 			//degree = 3; // or 4
 			BigInteger remainder = new BigInteger();
-			PrimeBound = (int)((int)n.NthRoot(degree, ref remainder) * 1.5); // 60;
+			PrimeBound = (int)((int)n.NthRoot(degree, ref remainder) /* * 1.5 */); // 60;
 
 			ConstructPolynomial(polynomialBase, degree);
 			ConstructFactorBase();
@@ -50,7 +50,7 @@ namespace GNFSCore
 			foreach (int r in integers)
 			{
 				var modList = primes.Where(p => p > r);
-				var roots = poly.GetRootsMod(r, modList);
+				var roots = Irreducible.GetRootsMod(poly, r, modList);
 				if (roots.Any())
 				{
 					result.AddRange(roots.Select(p => new Tuple<int, int>(p, r)));

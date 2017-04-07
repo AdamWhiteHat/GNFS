@@ -14,7 +14,7 @@ namespace GNFSCore.PrimeSignature
 	public class BitMatrix
 	{
 		public int Width;
-		public BitVector[] Rows;
+		public List<BitVector> Rows;
 
 		public int[] RowSums { get { return Rows.Select(r => r.RowSum).ToArray(); } }
 		public int[] ColumnSums { get { return Enumerable.Range(0, Width).Select(i => ColumnSum(i)).ToArray(); } }
@@ -28,14 +28,14 @@ namespace GNFSCore.PrimeSignature
 			Width = PrimeFactory.GetIndexFromValue(maxValue) + 1;
 
 			IEnumerable<int> distinctNonPrimeValues = array.Select(i => Math.Abs(i)).Distinct().Where(i => i > 1 && !PrimeFactory.IsPrime(i));
-			Rows = distinctNonPrimeValues.Select(i => new BitVector(i, maxValue)).ToArray();
+			Rows = distinctNonPrimeValues.Select(i => new BitVector(i, maxValue)).ToList();
 
 			IEnumerable<int> nonSquareColumns = Enumerable.Range(0, Width).Where(i => ColumnSum(i) == 1).ToArray();
 			IEnumerable<BitVector> toRemove = nonSquareColumns.SelectMany(col => Rows.Where(r => r.Elements[col] == true));
 
 			Remove(toRemove);
 
-			SortRows();
+			SortRows2();
 		}
 
 		public IEnumerable<int[]> GetSquareCombinations()
@@ -45,7 +45,7 @@ namespace GNFSCore.PrimeSignature
 			List<int[]> result = squareNumbers.Select(i => new int[] { i }).ToList(); // Add trivial squares to result
 																					  //result.AddRange(Combinatorics.GetCombination(squareNumbers)); 
 			Remove(squareVectors);
-			Rows = Rows.Reverse().ToArray(); // Reverse array
+			Rows.Reverse(); // Reverse array
 
 			IEnumerable<BitVector> oneSums = Rows.Where(v => v.RowSum == 1); // Get vectors with only one odd factor exponents			
 			IEnumerable<IGrouping<int, BitVector>> singleFactorGroups = oneSums.GroupBy(v => v.IndexOfLeftmostElement()).Where(g => g.Count() > 1); // Group vectors by their factor exponents
@@ -81,7 +81,7 @@ namespace GNFSCore.PrimeSignature
 
 		public void Remove(IEnumerable<BitVector> vectors)
 		{
-			Rows = Rows.Except(vectors).ToArray();
+			Rows = Rows.Except(vectors).ToList();
 		}
 
 		private int ColumnSum(int index)
@@ -89,12 +89,32 @@ namespace GNFSCore.PrimeSignature
 			return Rows.Select(bv => bv[index] ? 1 : 0).Sum();
 		}
 
+		private void SortRows2()
+		{
+			List<BitVector> result = new List<BitVector>();
+			int counter = 0;
+			while (counter < Width)
+			{
+				var toExtract = Rows.Where(row => row.Elements[counter] == true).ToList();
+				result.AddRange(toExtract);
+
+				foreach (var bv in toExtract)
+				{
+					Rows.Remove(bv);
+				}
+
+				counter++;
+			}
+			Rows.Clear();
+			Rows = result.ToList();
+		}
+
 		private void SortRows()
 		{
 			Rows = Rows.OrderByDescending(bv => bv.IndexOfRightmostElement())
 						.ThenBy(bv => bv.IndexOfLeftmostElement())
 						.ThenByDescending(bv => bv.RowSum)
-						.ToArray();
+						.ToList();
 		}
 
 		private bool[] GetColumn(int index)
@@ -104,7 +124,7 @@ namespace GNFSCore.PrimeSignature
 
 		public override string ToString()
 		{
-			SortRows();
+			SortRows2();
 
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine(string.Join(",", ColumnSums));
