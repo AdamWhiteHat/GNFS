@@ -147,28 +147,9 @@ namespace GNFS_Winforms
 			LogOutput(primeSignatureMatrix.ToString());
 			LogOutput();
 
-			/*
-			IEnumerable<int[]> squareCombos = primeSignatureMatrix.GetSquareCombinations();
-			LogOutput($"Perfect squares:");
-			LogOutput(string.Join(Environment.NewLine, squareCombos.Select(i => $"{string.Join("*", i)} = {i.Select(m => new BigInteger(m)).Product()}")));
-			LogOutput();
-			*/
-
 			LogOutput("Example Relations (From thesis):");
 			LogOutput(exampleFromThesis.FormatString());
 			LogOutput();
-
-			var algebraicNormQuadraticCharacter = exampleFromThesis.Select(rel => Legendre.Symbol(BigInteger.Abs(rel.AlgebraicNorm), n));
-			var rationalNormQuadraticCharacter = exampleFromThesis.Select(rel => Legendre.Symbol(BigInteger.Abs(rel.RationalNorm), n));
-
-			LogOutput("Algebraic Norm (From thesis) Quadratic Character:");
-			LogOutput(algebraicNormQuadraticCharacter.FormatString());
-			LogOutput();
-
-			LogOutput("Rational Norm (From thesis) Quadratic Character:");
-			LogOutput(rationalNormQuadraticCharacter.FormatString());
-			LogOutput();
-
 
 			BigInteger polyDerivative = BigInteger.Multiply((BigInteger)gnfs.AlgebraicPolynomial.FormalDerivative, (BigInteger)gnfs.AlgebraicPolynomial.FormalDerivative);
 			BigInteger polyValue = Irreducible.Evaluate(gnfs.AlgebraicPolynomial, gnfs.AlgebraicPolynomial.Base);
@@ -183,57 +164,15 @@ namespace GNFS_Winforms
 			LogOutput(gnfs.PrimeBound.ToString());
 			LogOutput();
 
-			SquareFinder sqFinder = new SquareFinder(gnfs, exampleFromThesis);
-			sqFinder.CalculateRationalSide();
-			sqFinder.CalculateRationalModPolynomial();
-			sqFinder.CalculateAlgebraicSide();
-
-			LogOutput("IsIrreducible:");
-			LogOutput((sqFinder.IsAlgebraicIrreducible && sqFinder.IsRationalIrreducible).ToString());
-			LogOutput();
-			
 			BigInteger productC = exampleFromThesis.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
-			BigInteger gcd = GCD.FindGCD(n, productC);
+			BigInteger gcd = GCD.FindGCD(n, productC % n);
 
 			LogOutput();
-			LogOutput("GCD(N, relations.Select(rel => f(rel.A)).Product() ):");
-			LogOutput($"Product: {productC}");
+			LogOutput($"relations.Select(rel => f(rel.C)).Product(): {productC}");
 			LogOutput();
-			LogOutput($"Product%N: {productC%n}");
+			LogOutput($"Product%N: {productC % n}");
 			LogOutput();
 			LogOutput($"GCD(N,Product): {gcd}");
-			LogOutput();
-		}
-
-		private void PrintSquareResults(SquareFinder sqFinder)
-		{
-
-			LogOutput("Square finder, rational:");
-			LogOutput($"  √( {sqFinder.RationalProduct} * {sqFinder.SquarePolynomialDerivative} )");
-			LogOutput($"= √( {sqFinder.RationalInverseSquare} )");
-			LogOutput($"=    {sqFinder.RationalInverseSquareRoot}\n");
-			LogOutput($"Product: {sqFinder.RationalProduct}");
-			LogOutput($"ProductMod: {sqFinder.RationalProductMod}");
-			LogOutput($"*InverseSquare: {sqFinder.RationalInverseSquare}");
-			LogOutput($"Sum: {sqFinder.RationalSum}");
-			LogOutput($"SumOfNorms: {sqFinder.RationalNormSum}");
-			LogOutput($"IsRationalSquare ? {sqFinder.IsRationalSquare}");
-			LogOutput($"IsRationalIrreducible ? {sqFinder.IsRationalIrreducible}");
-
-			LogOutput();
-			LogOutput($"RationalModPolynomial: {sqFinder.RationalModPolynomial}");
-			LogOutput();
-
-
-
-			LogOutput("Square finder, algebraic:");
-			LogOutput($"Product: {sqFinder.AlgebraicProduct}");
-			LogOutput($"ProductMod: {sqFinder.AlgebraicProductMod}");
-			LogOutput($"Sum: {sqFinder.AlgebraicSum}");
-			LogOutput($"SumOfNorms: {sqFinder.AlgebraicNormSum}");
-			LogOutput($"IsAlgebraicSquare ? {sqFinder.IsAlgebraicSquare}");
-			LogOutput($"IsAlgebraicIrreducible ? {sqFinder.IsAlgebraicIrreducible}");
-			LogOutput();
 			LogOutput();
 
 		}

@@ -15,6 +15,8 @@ namespace GNFSCore
 		public Relation[] RelationsSet;
 		public BigInteger SquarePolynomialDerivative;
 
+		public bool IsIrreducible { get { return IsRationalIrreducible && IsAlgebraicIrreducible; } }
+
 		public bool IsRationalSquare;
 		public bool IsRationalIrreducible;
 		public BigInteger RationalSum;
@@ -56,7 +58,7 @@ namespace GNFSCore
 			SquarePolynomialDerivative = (BigInteger)(gnfs.AlgebraicPolynomial.FormalDerivative * gnfs.AlgebraicPolynomial.FormalDerivative);
 		}
 
-		public static bool IsIrreducible(IEnumerable<BigInteger> coefficients)
+		private static bool _isIrreducible(IEnumerable<BigInteger> coefficients)
 		{
 			return (GCD.FindGCD(coefficients) == 1);
 		}
@@ -82,7 +84,7 @@ namespace GNFSCore
 			RationalSum = RelationsSet.Select(rel => rel.A).Sum();
 			RationalNormSum = rationalSet.Sum();
 			RationalProductMod = residue;
-			IsRationalIrreducible = IsIrreducible(rationalSet);
+			IsRationalIrreducible = _isIrreducible(rationalSet);
 			IsRationalSquare = RationalProductMod.IsSquare();
 
 			Y2 = BigInteger.Multiply(RationalProductMod, RationalProductMod);
@@ -119,21 +121,32 @@ namespace GNFSCore
 			AlgebraicSum = algebraicSet.Sum();
 			AlgebraicNormSum = RelationsSet.Select(rel => rel.AlgebraicNorm).Sum();
 
-			IsAlgebraicIrreducible = IsIrreducible(algebraicSet); // Irreducible check
+			IsAlgebraicIrreducible = _isIrreducible(algebraicSet); // Irreducible check
 			IsAlgebraicSquare = AlgebraicProductMod.IsSquare();
+		}
 
-			//Irreducible g;
-			//if (IsAlgebraicIrreducible)
-			//{
-			//	g = new Irreducible(gnfs.N, prime, gnfs.AlgebraicPolynomial.Degree - 1);
-			//	double gm = g.BaseTotal;
-			//
-			//	string termsString = g.Terms.FormatString();
-			//	double gDerivative = g.FormalDerivative;
-			//	int h = 0;
-			//}
-			//
-			//int i = 0;
+		public override string ToString()
+		{
+			return
+				"Square finder, rational:\n" +
+				$"  √( {this.RationalProduct} * {this.SquarePolynomialDerivative} )\n" +
+				$"= √( {this.RationalInverseSquare} )\n" +
+				$"=    {this.RationalInverseSquareRoot}\n\n" +
+				$"Product: {this.RationalProduct}\n" +
+				$"ProductMod: {this.RationalProductMod}\n" +
+				$"*InverseSquare: {this.RationalInverseSquare}\n" +
+				$"Sum: {this.RationalSum}\n" +
+				$"SumOfNorms: {this.RationalNormSum}\n" +
+				$"IsRationalSquare ? {this.IsRationalSquare}\n" +
+				$"IsRationalIrreducible ? {this.IsRationalIrreducible}\n\n" +
+				$"RationalModPolynomial: {this.RationalModPolynomial}\n\n" +
+				"Square finder, algebraic:\n" +
+				$"Product: {this.AlgebraicProduct}\n" +
+				$"ProductMod: {this.AlgebraicProductMod}\n" +
+				$"Sum: {this.AlgebraicSum}\n" +
+				$"SumOfNorms: {this.AlgebraicNormSum}\n" +
+				$"IsAlgebraicSquare ? {this.IsAlgebraicSquare}\n" +
+				$"IsAlgebraicIrreducible ? {this.IsAlgebraicIrreducible}\n\n\n";
 		}
 	}
 }

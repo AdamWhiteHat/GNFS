@@ -17,11 +17,6 @@ namespace GNFSCore
 		public int A;
 		public int B;
 		public BigInteger C;
-		//public double D;
-		//public double E;
-		//public double F;
-		//public double G;
-		//public double H;
 		public BigInteger AlgebraicNorm { get; private set; }
 		public BigInteger RationalNorm { get; private set; }
 		public BigInteger AlgebraicQuotient { get; private set; }
@@ -35,16 +30,11 @@ namespace GNFSCore
 		{
 			A = a;
 			B = b;
-			polyBase = poly.Base;			
+			polyBase = poly.Base;
 			AlgebraicNorm = Algebraic.Norm(a, b, poly); // b^deg * f( a/b )
 			RationalNorm = Rational.Norm(a, b, polyBase); // a + bm
 			C = Irreducible.Evaluate(poly, RationalNorm) % poly.N;
-			//D = Irreducible.Evaluate(poly, (double)a) % (double)poly.N;
-			//E = Irreducible.Evaluate(poly, (double)AlgebraicNorm) % (double)poly.N;
 
-			//F = Irreducible.Derivative(poly, (double)a) % (double)poly.N;
-			//G = Irreducible.Derivative(poly, (double)RationalNorm) % (double)poly.N;
-			//H = Irreducible.Derivative(poly, (double)AlgebraicNorm) % (double)poly.N;
 			AlgebraicQuotient = AlgebraicNorm;
 			RationalQuotient = RationalNorm;
 		}
@@ -93,16 +83,9 @@ namespace GNFSCore
 		public override string ToString()
 		{
 			return
-			$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t" +
-			$"f({RationalNorm})%N".PadLeft(10) + $" = {C.ToString().PadLeft(10)}\t" +
-			//$"f({RationalNorm})%N".PadLeft(10) + $" = {D.ToString().PadLeft(10)}\t" +
-			//$"f({AlgebraicNorm})%N".PadLeft(10) + $" = {E.ToString().PadLeft(10)}\t" +
-			//$"f'({A})%N".PadLeft(10) + $" = {F.ToString().PadLeft(10)}\t" +
-			//$"f'({RationalNorm})%N".PadLeft(10) + $" = {G.ToString().PadLeft(10)}\t" +
-			//$"f'({AlgebraicNorm})%N".PadLeft(10) + $" = {H.ToString().PadLeft(10)}\t" +
-			$"[f(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)},\ta+bm={RationalNorm.ToString().PadLeft(4)}]\t" +
-			$"{BigInteger.Abs(A) % 4 % 2}{BigInteger.Abs(B) % 4 % 2}{BigInteger.Abs(AlgebraicNorm) % 4 % 2}{BigInteger.Abs(RationalNorm) % 4 % 2}\t" +
-			$"IsAQuadraticB ? {QuadraticResidue.IsQuadraticResidue(A, B)}";
+				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t" +
+				$"[f(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)},\ta+bm={RationalNorm.ToString().PadLeft(4)}]\t" +
+				$"f({RationalNorm})%N".PadLeft(10) + $" = {C.ToString().PadLeft(10)}\t";
 		}
 	}
 }
