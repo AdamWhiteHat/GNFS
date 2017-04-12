@@ -96,8 +96,8 @@ namespace GNFS_Winforms
 			LogOutput(FormatTupleCollection(gnfs.QFB));
 			LogOutput();
 
-			IEnumerable<Relation> smoothRelations = gnfs.GenerateRelations(200);
-			smoothRelations = smoothRelations.OrderBy(rel => QuadraticResidue.IsQuadraticResidue(rel.A, rel.B));
+			Relation[] smoothRelations = gnfs.GenerateRelations(200);
+			smoothRelations = smoothRelations.OrderBy(rel => QuadraticResidue.IsQuadraticResidue(rel.A, rel.B)).ToArray();
 
 			LogOutput($"Smooth relations:");
 			LogOutput("\t_______________________________________________");
@@ -130,17 +130,18 @@ namespace GNFS_Winforms
 				new Relation(31, 5,         gnfs.AlgebraicPolynomial)
 			};
 
-			exampleFromThesis = smoothRelations.ToArray();
+			//exampleFromThesis = smoothRelations.ToArray();
+			smoothRelations = exampleFromThesis;
 
-			IEnumerable<int> factoringExample = exampleFromThesis.Select(rel => (int)BigInteger.Abs(rel.RationalNorm)); //smoothRelations.Select(rel => Math.Abs(rel.A)).Distinct().OrderBy(i => i);
-			factoringExample = factoringExample.Where(i => i > 1 && !PrimeFactory.IsPrime(i));
+			IEnumerable<int> factoringExample = exampleFromThesis.Select(rel => (int)rel.RationalNorm);
+			factoringExample = factoringExample.Where(i => !PrimeFactory.IsPrime(i));
 
 			LogOutput($"Prime factorization example:");
 			LogOutput(string.Join(Environment.NewLine, factoringExample.Select(i => $"{i}: ".PadRight(5) + FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(i, gnfs.PrimeBound)))));
 			LogOutput();
 
 
-			var signatureMatrix = smoothRelations.Select(rel => (int)BigInteger.Abs(rel.RationalNorm));
+			var signatureMatrix = smoothRelations.Select(rel => (int)rel.RationalNorm);
 			BitMatrix primeSignatureMatrix = new BitMatrix(signatureMatrix, gnfs.PrimeBound);
 
 			LogOutput($"Prime signature binary matrix:");
@@ -164,7 +165,7 @@ namespace GNFS_Winforms
 			LogOutput(gnfs.PrimeBound.ToString());
 			LogOutput();
 
-			BigInteger productC = exampleFromThesis.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
+			BigInteger productC = smoothRelations.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
 			BigInteger gcd = GCD.FindGCD(n, productC % n);
 
 			LogOutput();

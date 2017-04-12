@@ -24,14 +24,14 @@ namespace GNFSCore.PrimeSignature
 		{
 			Number = number;
 
-			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue) + 1];
+			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue) + 2];
 			foreach (Tuple<int, int> factor in primeFactorization)
 			{
 				if (factor.Item1 > maxValue)
 				{
 					break;
 				}
-				result[PrimeFactory.GetIndexFromValue(factor.Item1)] = ((factor.Item2 % 2) == 1);
+				result[PrimeFactory.GetIndexFromValue(factor.Item1)+1] = ((factor.Item2 % 2) == 1);
 			}
 
 			Elements = result;

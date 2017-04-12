@@ -33,6 +33,10 @@ namespace GNFSCore.IntegerMath
 
 		public static int GetIndexFromValue(int value)
 		{
+			if(value == -1)
+			{
+				return -1;
+			}
 			while (primes.Last() < value)
 			{
 				IncreaseMaxValue();

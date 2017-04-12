@@ -27,7 +27,7 @@ namespace GNFSCore.PrimeSignature
 
 			Width = PrimeFactory.GetIndexFromValue(maxValue) + 1;
 
-			IEnumerable<int> distinctNonPrimeValues = array.Select(i => Math.Abs(i)).Distinct().Where(i => i > 1 && !PrimeFactory.IsPrime(i));
+			IEnumerable<int> distinctNonPrimeValues = array.Distinct().Where(i => !PrimeFactory.IsPrime(i));
 			Rows = distinctNonPrimeValues.Select(i => new BitVector(i, maxValue)).ToList();
 
 			IEnumerable<int> nonSquareColumns = Enumerable.Range(0, Width).Where(i => ColumnSum(i) == 1).ToArray();

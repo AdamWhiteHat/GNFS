@@ -19,17 +19,24 @@ namespace GNFSCore.IntegerMath
 
 		public static IEnumerable<Tuple<int, int>> GetPrimeFactorizationTuple(BigInteger value, int maxValue)
 		{
-			int lastPrime = -1;
-			int primeCounter = 1;
+			if (value == 0)
+			{
+				return new Tuple<int, int>[] { new Tuple<int, int>(0, 0) };
+			}
+
 			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
-			var factorization = GetPrimeFactorization(value, maxValue);
+			BigInteger toFactor = value;
+
+			int lastPrime = int.MinValue;
+			int primeCounter = 1;
+			IEnumerable<int> factorization = GetPrimeFactorization(toFactor, maxValue);
 			foreach (int prime in factorization)
 			{
 				if (prime == lastPrime)
 				{
 					primeCounter += 1;
 				}
-				else if (lastPrime != -1)
+				else if (lastPrime != int.MinValue)
 				{
 					result.Add(new Tuple<int, int>(lastPrime, primeCounter));
 					primeCounter = 1;
@@ -50,18 +57,26 @@ namespace GNFSCore.IntegerMath
 
 		public static IEnumerable<int> GetPrimeFactorization(BigInteger value, int maxValue)
 		{
-			value = BigInteger.Abs(value);
-
 			if (value == 0)
 			{
 				return new int[] { 0 };
 			}
 
-			if (value < 10)
+			List<int> factors = new List<int>();
+
+			BigInteger toFactor = value;
+			if (toFactor < 0)
 			{
-				if (value == 0 || value == 1 || value == 2 || value == 3 || value == 5 || value == 7)
+				factors.Add(-1);
+				toFactor = BigInteger.Abs(toFactor);
+			}
+
+			if (toFactor < 10)
+			{
+				if (toFactor == 1 || toFactor == 2 || toFactor == 3 || toFactor == 5 || toFactor == 7)
 				{
-					return new List<int>() { (int)value };
+					factors.Add((int)toFactor);
+					return factors;
 				}
 			}
 
@@ -70,29 +85,29 @@ namespace GNFSCore.IntegerMath
 				primes = PrimeFactory.GetPrimes(maxValue + 1);
 			}
 
-			if (primes.Contains((int)value))
+			if (primes.Contains((int)toFactor))
 			{
-				return new List<int>() { (int)value };
+				factors.Add((int)toFactor);
+				return factors;
 			}
-
-			List<int> factors = new List<int>();
+						
 			foreach (int prime in primes)
 			{
-				while (value % prime == 0)
+				while (toFactor % prime == 0)
 				{
-					value /= prime;
+					toFactor /= prime;
 					factors.Add(prime);
 				}
 
-				if (value == 1)
+				if (toFactor == 1)
 				{
 					break;
 				}
 			}
 
-			if (value != 1)
+			if (toFactor != 1)
 			{
-				factors.Add((int)value);
+				factors.Add((int)toFactor);
 			}
 
 			return factors;
