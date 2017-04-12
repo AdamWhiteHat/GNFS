@@ -35,7 +35,7 @@ namespace GNFSCore.PrimeSignature
 
 			Remove(toRemove);
 
-			SortRows2();
+			SortRows();
 		}
 
 		public IEnumerable<int[]> GetSquareCombinations()
@@ -52,7 +52,7 @@ namespace GNFSCore.PrimeSignature
 			IEnumerable<BitVector> toRemove = singleFactorGroups.SelectMany(g => g.Select(v => v));
 
 			Remove(toRemove); // Remove selected vectors from remaining vectors
-			
+
 			List<int[]> singleFactorResults = MatrixSolver.GetSingleFactors(this, singleFactorGroups);
 			List<int[]> simpleMatchResults = MatrixSolver.GetSimpleMatches(this);
 			List<int[]> chainedFactorResults = MatrixSolver.GetChainedFactors(this);
@@ -89,26 +89,6 @@ namespace GNFSCore.PrimeSignature
 			return Rows.Select(bv => bv[index] ? 1 : 0).Sum();
 		}
 
-		private void SortRows2()
-		{
-			List<BitVector> result = new List<BitVector>();
-			int counter = 0;
-			while (counter < Width)
-			{
-				var toExtract = Rows.Where(row => row.Elements[counter] == true).ToList();
-				result.AddRange(toExtract);
-
-				foreach (var bv in toExtract)
-				{
-					Rows.Remove(bv);
-				}
-
-				counter++;
-			}
-			Rows.Clear();
-			Rows = result.ToList();
-		}
-
 		private void SortRows()
 		{
 			Rows = Rows.OrderByDescending(bv => bv.IndexOfRightmostElement())
@@ -124,12 +104,15 @@ namespace GNFSCore.PrimeSignature
 
 		public override string ToString()
 		{
-			SortRows2();
+			SortRows();
+
+			int maxValue = Rows.Select(row => row.Number).Max();
+			int padLength = maxValue.ToString().Length + 3;
 
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Join(",", ColumnSums));
+			sb.AppendLine(string.Join(",", ColumnSums).PadLeft(padLength));
 			sb.AppendLine();
-			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(i => i.ToString())));
+			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(i => i.ToString(padLength))));
 			return sb.ToString();
 		}
 	}

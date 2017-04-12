@@ -24,7 +24,7 @@ namespace GNFSCore.PrimeSignature
 		{
 			Number = number;
 
-			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue)+1];
+			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue) + 1];
 			foreach (Tuple<int, int> factor in primeFactorization)
 			{
 				if (factor.Item1 > maxValue)
@@ -80,16 +80,17 @@ namespace GNFSCore.PrimeSignature
 			return Array.IndexOf(Elements, true);
 		}
 
-		private int padLength = -1;
 		public override string ToString()
 		{
-			if (padLength == -1)
-			{
-				int maxValue = PrimeFactory.GetValueFromIndex(Elements.Length - 1);
-				string maxValueString = maxValue.ToString();
-				padLength = maxValueString.Length + 3;
-			}
+			int maxValue = PrimeFactory.GetValueFromIndex(Elements.Length - 1);
+			string maxValueString = maxValue.ToString();
+			int padLength = maxValueString.Length + 3;
 
+			return ToString(padLength);
+		}
+
+		public string ToString(int padLength)
+		{
 			string numberString = $"{Number}:".PadRight(padLength);
 			return numberString + string.Join(",", Elements.Select(b => b ? '1' : '0'));
 		}
