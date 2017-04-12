@@ -23,7 +23,8 @@ namespace GNFSCore
 		public GNFS(BigInteger n, BigInteger polynomialBase, int degree)
 		{
 			N = n;
-			//degree = 3; // or 4
+			// degree = 3 when n <= 10 ^ 60
+			// degree = 5 when 10 ^ 60 < n < 10 ^ 180
 			BigInteger remainder = new BigInteger();
 			PrimeBound = (int)((int)n.NthRoot(degree, ref remainder) /* * 1.5 */); // 60;
 
