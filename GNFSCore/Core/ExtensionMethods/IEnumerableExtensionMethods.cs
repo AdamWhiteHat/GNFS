@@ -22,12 +22,12 @@ namespace GNFSCore
 		{
 			if(input == null || input.Count() < 1)
 			{
-				return "{ }";
+				return $"{{{Environment.NewLine}}}{Environment.NewLine}";
 			}
 			return
-				"{\n" +
+				$"{{{Environment.NewLine}" +
 				string.Join(Environment.NewLine, input.Select(i => $"\t{i.ToString()}")) +
-				"\n}\n";
+				$"{Environment.NewLine}}}{Environment.NewLine}";
 		}
 	}
 }
