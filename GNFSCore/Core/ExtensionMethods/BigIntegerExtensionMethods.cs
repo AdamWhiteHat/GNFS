@@ -62,7 +62,7 @@ namespace GNFSCore
 			foreach (BigInteger bi in input)
 			{
 				result = BigInteger.Multiply(result, bi);
-				if (result >= modulus)
+				if (result >= modulus || result <= -modulus)
 				{
 					result = result % modulus;
 				}
