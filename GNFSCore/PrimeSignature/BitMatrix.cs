@@ -108,9 +108,12 @@ namespace GNFSCore.PrimeSignature
 
 			int maxValue = Rows.Select(row => row.Number).Max();
 			int padLength = maxValue.ToString().Length + 3;
+			string padString = new string(Enumerable.Repeat(' ', padLength).ToArray());
 
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Join(",", ColumnSums).PadLeft(padLength));
+			sb.Append(padString);
+			sb.Append(string.Join(",", ColumnSums));
+			sb.AppendLine();
 			sb.AppendLine();
 			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(i => i.ToString(padLength))));
 			return sb.ToString();
