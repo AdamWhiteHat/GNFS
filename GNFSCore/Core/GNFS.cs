@@ -14,7 +14,7 @@ namespace GNFSCore
 	{
 		public BigInteger N { get; private set; }
 		public int PrimeBound { get; private set; }
-		public Irreducible AlgebraicPolynomial { get; private set; }
+		public AlgebraicPolynomial Algebraic { get; private set; }
 		public IEnumerable<Tuple<int, int>> RFB { get; internal set; } = null;
 		public IEnumerable<Tuple<int, int>> AFB { get; internal set; } = null;
 		public IEnumerable<Tuple<int, int>> QFB { get; internal set; } = null;
@@ -34,24 +34,24 @@ namespace GNFSCore
 
 		private void ConstructPolynomial(BigInteger polynomialBase, int degree)
 		{
-			AlgebraicPolynomial = new Irreducible(N, polynomialBase, degree);
+			Algebraic = new AlgebraicPolynomial(N, polynomialBase, degree);
 		}
 
 		private void ConstructFactorBase()
 		{
 			RFB = Rational.Factory.BuildRationalFactorBase(this);
-			AFB = Algebraic.Factory.GetAlgebraicFactorBase(this);
+			AFB = FactorBase.Algebraic.Factory.GetAlgebraicFactorBase(this);
 			QFB = Quadradic.Factory.GetQuadradicFactorBase(this);
 		}
 
-		internal static IEnumerable<Tuple<int, int>> PolynomialModP(Irreducible poly, IEnumerable<int> primes, IEnumerable<int> integers)
+		internal static IEnumerable<Tuple<int, int>> PolynomialModP(AlgebraicPolynomial poly, IEnumerable<int> primes, IEnumerable<int> integers)
 		{
 			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
 
 			foreach (int r in integers)
 			{
 				var modList = primes.Where(p => p > r);
-				var roots = Irreducible.GetRootsMod(poly, r, modList);
+				var roots = AlgebraicPolynomial.GetRootsMod(poly, r, modList);
 				if (roots.Any())
 				{
 					result.AddRange(roots.Select(p => new Tuple<int, int>(p, r)));
@@ -66,7 +66,7 @@ namespace GNFSCore
 			List<Relation> result = new List<Relation>();
 
 			int b = -1;
-			BigInteger m = AlgebraicPolynomial.Base;
+			BigInteger m = Algebraic.Base;
 			int quantity = RFB.Count() + AFB.Count() + QFB.Count() + 1;
 			IEnumerable<int> A = Enumerable.Range(-valueRange, valueRange * 2);
 
@@ -78,14 +78,14 @@ namespace GNFSCore
 				b += 2;
 
 				IEnumerable<int> coprimes = A.Where(a => CoPrime.IsCoprime(a, b));
-				IEnumerable<Relation> unfactored = coprimes.Select(a => new Relation(a, b, AlgebraicPolynomial));
+				IEnumerable<Relation> unfactored = coprimes.Select(a => new Relation(a, b, Algebraic));
 
 				List<Relation> smooth = new List<Relation>();
 
 				foreach (Relation rel in unfactored)
 				{
-					rel.RemoveRationalFactors(pRational);
-					rel.RemoveAlgebraicFactors(pAlgebraic);
+					rel.FactorRationalSide(pRational);
+					rel.FactorAlgebraicSide(pAlgebraic);
 					bool smth = rel.IsSmooth;
 					if (smth)
 					{

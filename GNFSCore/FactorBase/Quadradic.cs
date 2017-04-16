@@ -23,7 +23,7 @@ namespace GNFSCore.FactorBase
 				int maxValue = minValue + gnfs.PrimeBound;
 				List<int> primes = PrimeFactory.GetPrimes(maxValue).Except(Enumerable.Range(0, minValue)).ToList();
 				List<int> integers = Enumerable.Range(2, minValue).ToList();
-				return GNFS.PolynomialModP(gnfs.AlgebraicPolynomial, primes, integers);
+				return GNFS.PolynomialModP(gnfs.Algebraic, primes, integers);
 			}
 		}		
 	}

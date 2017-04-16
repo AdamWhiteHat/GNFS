@@ -26,17 +26,19 @@ namespace GNFSCore
 
 		private BigInteger polyBase;
 
-		public Relation(int a, int b, Irreducible poly)
+		public Relation(int a, int b, AlgebraicPolynomial poly)
 		{
 			A = a;
 			B = b;
 			polyBase = poly.Base;
 			AlgebraicNorm = Algebraic.Norm(a, b, poly); // b^deg * f( a/b )
 			RationalNorm = Rational.Norm(a, b, polyBase); // a + bm
-			C = Irreducible.Evaluate(poly, RationalNorm) % poly.N;
-
 			AlgebraicQuotient = AlgebraicNorm;
 			RationalQuotient = RationalNorm;
+
+			double dC = poly.Evaluate((double)RationalNorm);
+			BigInteger biC = (BigInteger)Math.Round(dC);
+			C = biC % poly.N;
 		}
 
 		public BigInteger GetContribution(BigInteger x, BigInteger modQ)
@@ -49,17 +51,17 @@ namespace GNFSCore
 			return BigInteger.Add(A, BigInteger.Multiply(B, x));
 		}
 
-		public void RemoveAlgebraicFactors(IEnumerable<int> factors)
+		public void FactorAlgebraicSide(IEnumerable<int> factors)
 		{
-			AlgebraicQuotient = RemoveFactors(factors, AlgebraicNorm, AlgebraicQuotient);
+			AlgebraicQuotient = Factor(factors, AlgebraicNorm, AlgebraicQuotient);
 		}
 
-		public void RemoveRationalFactors(IEnumerable<int> factors)
+		public void FactorRationalSide(IEnumerable<int> factors)
 		{
-			RationalQuotient = RemoveFactors(factors, RationalNorm, RationalQuotient);
+			RationalQuotient = Factor(factors, RationalNorm, RationalQuotient);
 		}
 
-		private static BigInteger RemoveFactors(IEnumerable<int> factors, BigInteger norm, BigInteger quotient)
+		private BigInteger Factor(IEnumerable<int> factors, BigInteger norm, BigInteger quotient)
 		{
 			BigInteger sqrt = BigInteger.Abs(norm).SquareRoot();
 			BigInteger absResult;

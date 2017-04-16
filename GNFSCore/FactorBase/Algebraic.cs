@@ -21,11 +21,11 @@ namespace GNFSCore.FactorBase
 				int algebraicBound = (int)(gnfs.PrimeBound * 3.3);
 				IEnumerable<int> primes = PrimeFactory.GetPrimes(algebraicBound);
 				IEnumerable<int> integers = Enumerable.Range(0, primes.Last());
-				return GNFS.PolynomialModP(gnfs.AlgebraicPolynomial, primes, integers);
+				return GNFS.PolynomialModP(gnfs.Algebraic, primes, integers);
 			}
 		}
 
-		public static BigInteger Norm(int a, int b, Irreducible poly)
+		public static BigInteger Norm(int a, int b, AlgebraicPolynomial poly)
 		{
 			// b^deg * f( a/b )
 
@@ -36,7 +36,7 @@ namespace GNFSCore.FactorBase
 			BigInteger quotient = BigInteger.DivRem(a, bneg, out remainder);
 			double remaind = (double)remainder/(double)bneg;
 			
-			double right = Irreducible.Evaluate(poly, ab);
+			double right = poly.Evaluate(ab);
 			double left = Math.Pow(bneg, poly.Degree);
 			
 			double deci = right % 1;

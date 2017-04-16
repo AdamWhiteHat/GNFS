@@ -81,7 +81,7 @@ namespace GNFS_Winforms
 			LogOutput();
 
 			LogOutput($"Polynomial(degree: {degree}, base: {polyBase}):");
-			LogOutput(gnfs.AlgebraicPolynomial.ToString());
+			LogOutput(gnfs.Algebraic.ToString());
 			LogOutput();
 
 			LogOutput($"Rational Factor Base (RFB; Smoothness-bound: {gnfs.PrimeBound}):");
@@ -108,32 +108,35 @@ namespace GNFS_Winforms
 
 			Relation[] exampleFromThesis = new Relation[]
 			{
-				new Relation(-127, 1,       gnfs.AlgebraicPolynomial),
-				new Relation(-2, 1,         gnfs.AlgebraicPolynomial)  ,
-				new Relation(23, 1,         gnfs.AlgebraicPolynomial)  ,
-				new Relation(-65, 3,        gnfs.AlgebraicPolynomial) ,
-				new Relation(-137, 5,       gnfs.AlgebraicPolynomial),
-				new Relation(-126, 1,       gnfs.AlgebraicPolynomial),
-				new Relation(0, 1,          gnfs.AlgebraicPolynomial)   ,
-				new Relation(24, 1,         gnfs.AlgebraicPolynomial)  ,
-				new Relation(-62, 3,        gnfs.AlgebraicPolynomial) ,
-				new Relation(-68, 5,        gnfs.AlgebraicPolynomial) ,
-				new Relation(-12, 1,        gnfs.AlgebraicPolynomial) ,
-				new Relation(2, 1,          gnfs.AlgebraicPolynomial)   ,
-				new Relation(37, 1,         gnfs.AlgebraicPolynomial)  ,
-				new Relation(86, 3,         gnfs.AlgebraicPolynomial)  ,
-				new Relation(-46, 5,        gnfs.AlgebraicPolynomial) ,
-				new Relation(-5, 1,         gnfs.AlgebraicPolynomial)  ,
-				new Relation(19, 1,         gnfs.AlgebraicPolynomial)  ,
-				new Relation(81, 1,         gnfs.AlgebraicPolynomial)  ,
-				new Relation(181, 3,        gnfs.AlgebraicPolynomial) ,
-				new Relation(31, 5,         gnfs.AlgebraicPolynomial)
+				new Relation(-127, 1,       gnfs.Algebraic),
+				new Relation(-126, 1,       gnfs.Algebraic),
+				new Relation(-12, 1,        gnfs.Algebraic),
+				new Relation(-5, 1,         gnfs.Algebraic),
+				new Relation(-2, 1,         gnfs.Algebraic),
+				new Relation(0, 1,          gnfs.Algebraic),
+				new Relation(2, 1,          gnfs.Algebraic),
+				new Relation(19, 1,         gnfs.Algebraic),
+				new Relation(23, 1,         gnfs.Algebraic),
+				new Relation(24, 1,         gnfs.Algebraic),
+				new Relation(37, 1,         gnfs.Algebraic),
+				new Relation(81, 1,         gnfs.Algebraic),
+				new Relation(-65, 3,        gnfs.Algebraic),
+				new Relation(-62, 3,        gnfs.Algebraic),
+				new Relation(86, 3,         gnfs.Algebraic),
+				new Relation(181, 3,        gnfs.Algebraic),
+				new Relation(-137, 5,       gnfs.Algebraic),
+				new Relation(-68, 5,        gnfs.Algebraic),
+				new Relation(-46, 5,        gnfs.Algebraic),
+				new Relation(31, 5,         gnfs.Algebraic)
 			};
 
 			//exampleFromThesis = smoothRelations.ToArray();
 			smoothRelations = exampleFromThesis;
 
-			IEnumerable<int> factoringExample = exampleFromThesis.Select(rel => (int)rel.RationalNorm);
+			//var cCollection = exampleFromThesis.Select(rel => new Tuple<int,int>(rel.A, rel.B));
+			//smoothRelations = smoothRelations.Where(rel => cCollection.Contains(new Tuple<int,int>(rel.A, rel.B)) ).ToArray();
+
+			IEnumerable<int> factoringExample = smoothRelations.Select(rel => (int)rel.RationalNorm);
 			factoringExample = factoringExample.Where(i => !PrimeFactory.IsPrime(i));
 
 			LogOutput($"Prime factorization example:");
@@ -149,16 +152,18 @@ namespace GNFS_Winforms
 			LogOutput();
 
 			LogOutput("Example Relations (From thesis):");
-			LogOutput(exampleFromThesis.FormatString());
+			LogOutput(smoothRelations.FormatString());
 			LogOutput();
 
-			BigInteger polyDerivative = BigInteger.Multiply((BigInteger)gnfs.AlgebraicPolynomial.FormalDerivative, (BigInteger)gnfs.AlgebraicPolynomial.FormalDerivative);
-			BigInteger polyValue = Irreducible.Evaluate(gnfs.AlgebraicPolynomial, gnfs.AlgebraicPolynomial.Base);
+			BigInteger polyDerivative = BigInteger.Multiply((BigInteger)gnfs.Algebraic.FormalDerivative, (BigInteger)gnfs.Algebraic.FormalDerivative);
+			BigInteger polyValue = AlgebraicPolynomial.Evaluate(gnfs.Algebraic, gnfs.Algebraic.Base);
 			LogOutput("Polynomial value f(x):");
 			LogOutput(polyValue.ToString());
 			LogOutput();
 			LogOutput("Polynomial derivative f'(m)^2:");
 			LogOutput(polyDerivative.ToString());
+			LogOutput();
+			LogOutput(gnfs.Algebraic.FormalDerivative.ToString());
 			LogOutput();
 
 			LogOutput("Prime Bound:");
@@ -171,11 +176,71 @@ namespace GNFS_Winforms
 			LogOutput();
 			LogOutput($"relations.Select(rel => f(rel.C)).Product(): {productC}");
 			LogOutput();
-			LogOutput($"Product%N: {productC % n}");
+			LogOutput($"Product(C)%N: {productC % n}");
 			LogOutput();
-			LogOutput($"GCD(N,Product): {gcd}");
+			LogOutput($"GCD(N,ProductC): {gcd}");
 			LogOutput();
 
+
+
+			SquareFinder sqFinder = new SquareFinder(gnfs, smoothRelations);
+			sqFinder.CalculateRationalSide();
+			sqFinder.CalculateRationalModPolynomial();
+			sqFinder.CalculateAlgebraicSide();
+
+			LogOutput("SquareFinder.ToString():");
+			LogOutput(sqFinder.ToString());
+			LogOutput();
+
+			LogOutput("Rational Square Root:");
+			LogOutput(sqFinder.RationalProductMod.ToString());
+			LogOutput();
+
+			LogOutput("Algebraic Square Root:");
+			LogOutput(sqFinder.AlgebraicProductMod.ToString());
+			LogOutput();
+
+			BigInteger x = (sqFinder.RationalProduct * (BigInteger)gnfs.Algebraic.FormalDerivative) % n;
+
+			BigInteger S2lessS = (sqFinder.RationalProductMod * sqFinder.RationalProductMod) - sqFinder.RationalProduct;
+
+			LogOutput($"{sqFinder.RationalProduct} /");
+			LogOutput($"γ^2-S: {S2lessS}");
+			LogOutput();
+			LogOutput($"s(m) * f'(m) % n = {x}");
+			LogOutput();
+			/*
+
+			List<BigInteger> terms = new List<BigInteger>();
+			terms.Add(BigInteger.Parse("33707643386048967064886978071322595680303104670451605589553615208517742239145583274137"));
+			terms.Add(BigInteger.Parse("1012438783385021395408772861725005923451102945520342680286858174520561778089965352712171"));
+			terms.Add(BigInteger.Parse("1484280452534851932191188732252856860031306910058907052137946073002617221365360609425453"));
+
+
+			BigInteger p = BigInteger.Parse("42000000000000000000000000000000000000000043");
+
+			RationalPolynomial ratPoly = new RationalPolynomial(n, degree - 1, terms.ToArray());//new RationalPolynomial(n, degree - 1, p, polyBase);
+
+			//
+
+			LogOutput("Rational Polynomial:");
+			LogOutput(ratPoly.ToString());
+			LogOutput();
+			LogOutput("Terms(Alg): " + string.Join(", ", gnfs.Algebraic.Terms.Select(d => d.ToString())));
+			LogOutput();
+
+
+
+
+
+
+
+
+						LogOutput();
+						LogOutput();
+						LogOutput();
+						LogOutput();
+						*/
 		}
 	}
 }

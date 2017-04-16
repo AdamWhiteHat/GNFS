@@ -46,6 +46,7 @@
     <Compile Include="Core\SquareFinder.cs" />
     <Compile Include="IntegerMath\Legendre.cs" />
     <Compile Include="IntegerMath\PrimeFactory.cs" />
+    <Compile Include="Polynomial\RationalPolynomial.cs" />
     <Compile Include="PrimeSignature\BitMatrix.cs" />
     <Compile Include="PrimeSignature\BitPattern.cs" />
     <Compile Include="PrimeSignature\BitVector.cs" />
@@ -58,7 +59,7 @@
     <Compile Include="IntegerMath\CoPrime.cs" />
     <Compile Include="IntegerMath\Eratosthenes.cs" />
     <Compile Include="IntegerMath\GCD.cs" />
-    <Compile Include="Polynomial\Irreducible.cs" />
+    <Compile Include="Polynomial\AlgebraicPolynomial.cs" />
     <Compile Include="FactorBase\Rational.cs" />
     <Compile Include="IntegerMath\FactorizationFactory.cs" />
     <Compile Include="PrimeSignature\MatrixSolver.cs" />

@@ -8,29 +8,31 @@ using GNFSCore.IntegerMath;
 
 namespace GNFSCore.Polynomial
 {
-	public class Irreducible
+	public class RationalPolynomial
 	{
-		public int Degree { get; private set; }		
+		public int Degree { get; private set; }
 		public BigInteger N { get; private set; }
 		public BigInteger Base { get; private set; }
-		public double[] Terms { get; private set; }
-		public BigInteger BaseTotal { get; private set; }
-		public BigInteger FormalDerivative { get; private set; }
+		public BigInteger[] Terms { get; private set; }
 
-		public Irreducible(BigInteger n, BigInteger polynomialBase, int degree)
+
+		public RationalPolynomial(BigInteger n, int degree, BigInteger fromValue, BigInteger polyBase)
 		{
-			Base = polynomialBase;
-			Degree = degree;
-			Terms = Enumerable.Repeat(0d, degree + 1).ToArray();
-
 			N = n;
-			SetPolynomialValue(N);
-
-			BaseTotal = Irreducible.Evaluate(this, Base);
-			FormalDerivative = Irreducible.Derivative(this, Base);
+			Degree = degree;
+			Base = polyBase;
+			Terms = Enumerable.Repeat(BigInteger.Zero, degree + 1).ToArray();
+			SetPolynomialFromValue(fromValue, polyBase);
 		}
 
-		private void SetPolynomialValue(BigInteger value)
+		public RationalPolynomial(BigInteger n, int degree, BigInteger[] terms)
+		{
+			N = n;
+			Degree = degree;
+			Terms = terms;
+		}
+
+		private void SetPolynomialFromValue(BigInteger value, BigInteger polyBase)
 		{
 			N = value;
 			int d = Degree;
@@ -39,21 +41,22 @@ namespace GNFSCore.Polynomial
 			// Build out Terms[]
 			while (d >= 0)
 			{
-				BigInteger placeValue = BigInteger.Pow(Base, d);
+				BigInteger placeValue = BigInteger.Pow(polyBase, d);
 
 				if (placeValue == 1)
 				{
-					Terms[d] = (double)toAdd;
+					Terms[d] = toAdd;
 				}
 				else if (placeValue < toAdd)
 				{
 					BigInteger quotient = BigInteger.Divide(toAdd, placeValue);
-					if (quotient > Base)
+
+					if (quotient > 10)
 					{
-						quotient = Base;
+						quotient = BigInteger.Divide(quotient, d - 1);
 					}
 
-					Terms[d] = (double)quotient;
+					Terms[d] = quotient;
 					BigInteger toSubtract = BigInteger.Multiply(quotient, placeValue);
 					toAdd -= toSubtract;
 				}
@@ -62,26 +65,7 @@ namespace GNFSCore.Polynomial
 			}
 		}
 
-		public static double Evaluate(Irreducible polynomial, double baseM)
-		{
-			double result = 0;
-
-			int d = polynomial.Degree;
-			while (d >= 0)
-			{
-				double placeValue = Math.Pow(baseM, d);
-
-				double addValue = polynomial.Terms[d] * placeValue;
-
-				result += addValue;
-
-				d--;
-			}
-
-			return result;
-		}
-
-		public static BigInteger Evaluate(Irreducible polynomial, BigInteger baseM)
+		public static BigInteger Evaluate(RationalPolynomial polynomial, BigInteger baseM)
 		{
 			BigInteger result = 0;
 
@@ -100,7 +84,7 @@ namespace GNFSCore.Polynomial
 			return result;
 		}
 
-		public static BigInteger Derivative(Irreducible polynomial, BigInteger baseM)
+		public static BigInteger Derivative(RationalPolynomial polynomial, BigInteger baseM)
 		{
 			BigInteger result = 0;
 
@@ -124,19 +108,20 @@ namespace GNFSCore.Polynomial
 			return result;
 		}
 
-		public static IEnumerable<int> GetRootsMod(Irreducible polynomial, BigInteger baseM, IEnumerable<int> modList)
+		public static IEnumerable<int> GetRootsMod(RationalPolynomial polynomial, BigInteger baseM, IEnumerable<int> modList)
 		{
-			BigInteger polyResult = Irreducible.Evaluate(polynomial, baseM);
+			BigInteger polyResult = RationalPolynomial.Evaluate(polynomial, baseM);
 			IEnumerable<int> result = modList.Where(mod => (polyResult % mod) == 0);
 			return result;
 		}
 
+
 		public override string ToString()
 		{
-			return Irreducible.FormatString(this);
+			return RationalPolynomial.FormatString(this);
 		}
 
-		public static string FormatString(Irreducible polynomial)
+		public static string FormatString(RationalPolynomial polynomial)
 		{
 			List<string> stringTerms = new List<string>();
 

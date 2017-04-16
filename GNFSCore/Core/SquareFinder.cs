@@ -37,9 +37,8 @@ namespace GNFSCore
 		public BigInteger Y2;
 		public BigInteger Y2_S;
 
-
-
 		private GNFS gnfs;
+		private BigInteger polyBase;
 		private IEnumerable<BigInteger> rationalSet;
 		private IEnumerable<BigInteger> algebraicSet;
 
@@ -54,8 +53,9 @@ namespace GNFSCore
 			RationalProductMod = -1;
 
 			gnfs = sieve;
+			polyBase = gnfs.Algebraic.Base;
 			RelationsSet = relations;
-			SquarePolynomialDerivative = (BigInteger)(gnfs.AlgebraicPolynomial.FormalDerivative * gnfs.AlgebraicPolynomial.FormalDerivative);
+			SquarePolynomialDerivative = (BigInteger)(gnfs.Algebraic.FormalDerivative * gnfs.Algebraic.FormalDerivative);
 		}
 
 		private static bool _isIrreducible(IEnumerable<BigInteger> coefficients)
@@ -94,32 +94,33 @@ namespace GNFSCore
 
 		public BigInteger CalculateRationalModPrime(BigInteger prime)
 		{
-			BigInteger mod = Irreducible.Evaluate(gnfs.AlgebraicPolynomial, prime);
+			BigInteger mod = AlgebraicPolynomial.Evaluate(gnfs.Algebraic, prime);
 			return (RationalProduct % prime) % mod;
 		}
 
 		public void CalculateRationalModPolynomial()
 		{
 			// Should be the same as N
-			BigInteger mod = Irreducible.Evaluate(gnfs.AlgebraicPolynomial, gnfs.AlgebraicPolynomial.Base);
+			BigInteger mod = AlgebraicPolynomial.Evaluate(gnfs.Algebraic, polyBase);
 
 			RationalModPolynomial = RationalProduct % mod;
 
 		}
-
+		
 		public void CalculateAlgebraicSide()
 		{
-			AlgebraicSide(gnfs.AlgebraicPolynomial.Base);
+			AlgebraicSide(polyBase);
 		}
 
 		private void AlgebraicSide(BigInteger prime)
 		{
-			algebraicSet = RelationsSet.Select(rel => rel.AlgebraicNorm/* % prime*/);
+			AlgebraicNormSum = RelationsSet.Select(rel => rel.AlgebraicNorm).Sum();
+
+			algebraicSet = RelationsSet.Select(rel => rel.AlgebraicNorm % prime);
 
 			AlgebraicProduct = algebraicSet.Product();
 			AlgebraicProductMod = AlgebraicProduct % prime;
 			AlgebraicSum = algebraicSet.Sum();
-			AlgebraicNormSum = RelationsSet.Select(rel => rel.AlgebraicNorm).Sum();
 
 			IsAlgebraicIrreducible = _isIrreducible(algebraicSet); // Irreducible check
 			IsAlgebraicSquare = AlgebraicProductMod.IsSquare();
@@ -127,26 +128,34 @@ namespace GNFSCore
 
 		public override string ToString()
 		{
-			return
-				"Square finder, rational:\n" +
-				$"  √( {this.RationalProduct} * {this.SquarePolynomialDerivative} )\n" +
-				$"= √( {this.RationalInverseSquare} )\n" +
-				$"=    {this.RationalInverseSquareRoot}\n\n" +
-				$"Product: {this.RationalProduct}\n" +
-				$"ProductMod: {this.RationalProductMod}\n" +
-				$"*InverseSquare: {this.RationalInverseSquare}\n" +
-				$"Sum: {this.RationalSum}\n" +
-				$"SumOfNorms: {this.RationalNormSum}\n" +
-				$"IsRationalSquare ? {this.IsRationalSquare}\n" +
-				$"IsRationalIrreducible ? {this.IsRationalIrreducible}\n\n" +
-				$"RationalModPolynomial: {this.RationalModPolynomial}\n\n" +
-				"Square finder, algebraic:\n" +
-				$"Product: {this.AlgebraicProduct}\n" +
-				$"ProductMod: {this.AlgebraicProductMod}\n" +
-				$"Sum: {this.AlgebraicSum}\n" +
-				$"SumOfNorms: {this.AlgebraicNormSum}\n" +
-				$"IsAlgebraicSquare ? {this.IsAlgebraicSquare}\n" +
-				$"IsAlgebraicIrreducible ? {this.IsAlgebraicIrreducible}\n\n\n";
+			StringBuilder result = new StringBuilder();
+
+			result.AppendLine("Square finder, rational:");
+			result.AppendLine($"  √( {this.RationalProduct} * {this.SquarePolynomialDerivative} )");
+			result.AppendLine($"= √( {this.RationalInverseSquare} )");
+			result.AppendLine($"=    {this.RationalInverseSquareRoot}");
+			result.AppendLine();
+			result.AppendLine($"Product(R) = {this.RationalProduct}");
+			result.AppendLine($"Product(R) mod N = γ = {this.RationalProductMod}");
+			result.AppendLine($"*InverseSquare: {this.RationalInverseSquare}");
+			result.AppendLine($"Sum: {this.RationalSum}");
+			result.AppendLine($"SumOfNorms: {this.RationalNormSum}");
+			result.AppendLine($"IsRationalSquare ? {this.IsRationalSquare}");
+			result.AppendLine($"IsRationalIrreducible ? {this.IsRationalIrreducible}");
+			result.AppendLine($"RationalModPolynomial: {this.RationalModPolynomial}");
+			result.AppendLine();
+			result.AppendLine();
+			result.AppendLine("Square finder, algebraic:");
+			result.AppendLine($"Product: {this.AlgebraicProduct}");
+			result.AppendLine($"ProductMod: {this.AlgebraicProductMod}");
+			result.AppendLine($"Sum: {this.AlgebraicSum}");
+			result.AppendLine($"SumOfNorms: {this.AlgebraicNormSum}");
+			result.AppendLine($"IsAlgebraicSquare ? {this.IsAlgebraicSquare}");
+			result.AppendLine($"IsAlgebraicIrreducible ? {this.IsAlgebraicIrreducible}");
+			result.AppendLine();
+			result.AppendLine();
+
+			return result.ToString();
 		}
 	}
 }
