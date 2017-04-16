@@ -18,6 +18,16 @@ namespace GNFSCore
 			return result;
 		}
 
+		public static double Product(this IEnumerable<double> input)
+		{
+			double result = 1;
+			foreach (double i in input)
+			{
+				result *= i;
+			}
+			return result;
+		}
+
 		public static string FormatString<T>(this IEnumerable<T> input)
 		{
 			if(input == null || input.Count() < 1)
