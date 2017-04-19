@@ -5,6 +5,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using GNFSCore.IntegerMath;
+using ExtendedNumerics;
 
 namespace GNFSCore.Polynomial
 {
@@ -13,21 +14,21 @@ namespace GNFSCore.Polynomial
 		public int Degree { get; private set; }
 		public BigInteger N { get; private set; }
 		public BigInteger Base { get; private set; }
-		public double[] Terms { get; private set; }
+		public BigInteger[] Terms { get; private set; }
 		public BigInteger BaseTotal { get; private set; }
-		public double FormalDerivative { get; private set; }
+		public BigInteger FormalDerivative { get; private set; }
 
 		public AlgebraicPolynomial(BigInteger n, BigInteger polynomialBase, int degree)
 		{
 			Base = polynomialBase;
 			Degree = degree;
-			Terms = Enumerable.Repeat(0d, degree + 1).ToArray();
+			Terms = Enumerable.Repeat(BigInteger.Zero, degree + 1).ToArray();
 
 			N = n;
 			SetPolynomialValue(N);
 
 			BaseTotal = AlgebraicPolynomial.Evaluate(this, Base);
-			FormalDerivative = Derivative((double)Base);
+			FormalDerivative = Derivative(this, Base);
 		}
 
 		private void SetPolynomialValue(BigInteger value)
@@ -43,7 +44,7 @@ namespace GNFSCore.Polynomial
 
 				if (placeValue == 1)
 				{
-					Terms[d] = (double)toAdd;
+					Terms[d] = toAdd;
 				}
 				else if (placeValue < toAdd)
 				{
@@ -53,7 +54,7 @@ namespace GNFSCore.Polynomial
 						quotient = Base;
 					}
 
-					Terms[d] = (double)quotient;
+					Terms[d] = quotient;
 					BigInteger toSubtract = BigInteger.Multiply(quotient, placeValue);
 					toAdd -= toSubtract;
 				}
@@ -62,39 +63,58 @@ namespace GNFSCore.Polynomial
 			}
 		}
 
-		public double Evaluate(double baseM)
+		//public double Evaluate(double baseM)
+		//{
+		//	double result = 0;
+
+		//	int d = this.Degree;
+		//	while (d >= 0)
+		//	{
+		//		double placeValue = Math.Pow(baseM, d);
+
+		//		double addValue = this.Terms[d] * placeValue;
+
+		//		result += addValue;
+
+		//		d--;
+		//	}
+
+		//	return result;
+		//}
+
+		//public double EvaluateMod(double baseM, double mod)
+		//{
+		//	double result = 0;
+
+		//	int d = this.Degree;
+		//	while (d >= 0)
+		//	{
+		//		double placeValue = Math.Pow(baseM, d);
+
+		//		double addValue = this.Terms[d] * placeValue;
+
+		//		result += addValue;
+
+		//		result %= mod;
+
+		//		d--;
+		//	}
+
+		//	return result;
+		//}
+
+		public BigRational Evaluate(BigRational baseM)
 		{
-			double result = 0;
+			BigRational result = new BigRational(0);
 
 			int d = this.Degree;
 			while (d >= 0)
 			{
-				double placeValue = Math.Pow(baseM, d);
+				BigRational placeValue = BigRational.Pow(baseM, d);
 
-				double addValue = this.Terms[d] * placeValue;
+				BigRational addValue = BigRational.Multiply(new BigRational(this.Terms[d]), placeValue);
 
-				result += addValue;
-
-				d--;
-			}
-
-			return result;
-		}
-
-		public double EvaluateMod(double baseM, double mod)
-		{
-			double result = 0;
-
-			int d = this.Degree;
-			while (d >= 0)
-			{
-				double placeValue = Math.Pow(baseM, d);
-
-				double addValue = this.Terms[d] * placeValue;
-
-				result += addValue;
-
-				result %= mod;
+				result = BigRational.Add(result, addValue);
 
 				d--;
 			}
@@ -111,7 +131,7 @@ namespace GNFSCore.Polynomial
 			{
 				BigInteger placeValue = BigInteger.Pow(baseM, d);
 
-				BigInteger addValue = (BigInteger)polynomial.Terms[d] * placeValue;
+				BigInteger addValue = BigInteger.Multiply((BigInteger)polynomial.Terms[d], placeValue);
 
 				result += addValue;
 
@@ -123,8 +143,8 @@ namespace GNFSCore.Polynomial
 
 		public static BigInteger Derivative(AlgebraicPolynomial polynomial, BigInteger baseM)
 		{
-			BigInteger result = 0;
-
+			BigInteger result = new BigInteger(0);
+			BigInteger m = baseM;
 			int d = polynomial.Degree;
 			int d1 = d - 1;
 			while (d >= 0)
@@ -133,10 +153,10 @@ namespace GNFSCore.Polynomial
 
 				if (d1 > -1)
 				{
-					placeValue = BigInteger.Pow(baseM, d1);
+					placeValue = BigInteger.Pow(m, d1);
 				}
 
-				BigInteger addValue = (BigInteger)polynomial.Terms[d] * d * placeValue;
+				BigInteger addValue = BigInteger.Multiply(BigInteger.Multiply(d, placeValue), (BigInteger)polynomial.Terms[d]);
 				result += addValue;
 
 				d--;
@@ -145,29 +165,29 @@ namespace GNFSCore.Polynomial
 			return result;
 		}
 
-		public double Derivative(double baseM)
-		{
-			double result = 0;
+		//public double Derivative(double baseM)
+		//{
+		//	double result = 0;
 
-			int d = this.Degree;
-			while (d >= 0)
-			{
-				double placeValue = 0;
+		//	int d = this.Degree;
+		//	while (d >= 0)
+		//	{
+		//		double placeValue = 0;
 
-				if (d - 1 > -1)
-				{
-					placeValue = Math.Pow(baseM, d - 1);
-				}
+		//		if (d - 1 > -1)
+		//		{
+		//			placeValue = Math.Pow(baseM, d - 1);
+		//		}
 
-				double addValue = this.Terms[d] * d * placeValue;
+		//		double addValue = this.Terms[d] * d * placeValue;
 
-				result += addValue;
+		//		result += addValue;
 
-				d--;
-			}
+		//		d--;
+		//	}
 
-			return result;
-		}
+		//	return result;
+		//}
 
 		public static IEnumerable<int> GetRootsMod(AlgebraicPolynomial polynomial, BigInteger baseM, IEnumerable<int> modList)
 		{

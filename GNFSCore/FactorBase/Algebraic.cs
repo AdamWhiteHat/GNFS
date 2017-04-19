@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using GNFSCore.IntegerMath;
 using GNFSCore.Polynomial;
+using ExtendedNumerics;
 
 namespace GNFSCore.FactorBase
 {
@@ -25,32 +26,16 @@ namespace GNFSCore.FactorBase
 			}
 		}
 
-		public static BigInteger Norm(int a, int b, AlgebraicPolynomial poly)
+		public static BigRational Norm(int a, int b, AlgebraicPolynomial poly)
 		{
-			// b^deg * f( a/b )
+			Fraction ratA = new Fraction(a);
+			Fraction negB = new Fraction(-b);
+			BigRational aOverB = BigRational.Divide(ratA, negB);
 
-			int bneg = -b;
-			double ab = (double)a / (double)bneg;
+			BigRational left = poly.Evaluate(aOverB);
+			BigRational right = BigRational.Pow(new BigRational(negB), poly.Degree);
 
-			BigInteger remainder = new BigInteger();
-			BigInteger quotient = BigInteger.DivRem(a, bneg, out remainder);
-			double remaind = (double)remainder/(double)bneg;
-			
-			double right = poly.Evaluate(ab);
-			double left = Math.Pow(bneg, poly.Degree);
-			
-			double deci = right % 1;
-			double deciProduct = deci * left;
-			deciProduct = Math.Round(deciProduct, MidpointRounding.ToEven);
-
-			BigInteger result = BigInteger.Multiply((BigInteger)right, (BigInteger)left);
-			result += (BigInteger)deciProduct;
-
-			if(remainder>0)
-			{
-				int i = 0;
-			}
-			
+			BigRational result = BigRational.Multiply(left, right);
 			return result;
 		}
 	}

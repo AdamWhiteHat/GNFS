@@ -16,7 +16,7 @@ namespace GNFSCore.Polynomial
 		public BigInteger[] Terms { get; private set; }
 
 
-		public RationalPolynomial(BigInteger n, int degree, BigInteger fromValue, BigInteger polyBase)
+		public RationalPolynomial(BigInteger n, int degree, BigInteger polyBase, BigInteger fromValue)
 		{
 			N = n;
 			Degree = degree;

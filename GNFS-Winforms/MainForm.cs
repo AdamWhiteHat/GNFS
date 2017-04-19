@@ -186,7 +186,7 @@ namespace GNFS_Winforms
 			SquareFinder sqFinder = new SquareFinder(gnfs, smoothRelations);
 			sqFinder.CalculateRationalSide();
 			sqFinder.CalculateRationalModPolynomial();
-			sqFinder.CalculateAlgebraicSide();
+			//sqFinder.CalculateAlgebraicSide();
 
 			LogOutput("SquareFinder.ToString():");
 			LogOutput(sqFinder.ToString());
@@ -209,7 +209,35 @@ namespace GNFS_Winforms
 			LogOutput();
 			LogOutput($"s(m) * f'(m) % n = {x}");
 			LogOutput();
-		
+
+
+			/*
+
+			List<BigInteger> terms = new List<BigInteger>();
+			terms.Add(BigInteger.Parse("33707643386048967064886978071322595680303104670451605589553615208517742239145583274137"));
+			terms.Add(BigInteger.Parse("1012438783385021395408772861725005923451102945520342680286858174520561778089965352712171"));
+			terms.Add(BigInteger.Parse("1484280452534851932191188732252856860031306910058907052137946073002617221365360609425453"));
+
+
+			BigInteger p = BigInteger.Parse("42000000000000000000000000000000000000000043");
+
+			RationalPolynomial ratPoly = new RationalPolynomial(n, degree - 1, terms.ToArray());//new RationalPolynomial(n, degree - 1, p, polyBase);
+
+			//
+
+			LogOutput("Rational Polynomial:");
+			LogOutput(ratPoly.ToString());
+			LogOutput();
+			LogOutput("Terms(Alg): " + string.Join(", ", gnfs.Algebraic.Terms.Select(d => d.ToString())));
+			LogOutput();
+
+			
+
+						LogOutput();
+						LogOutput();
+						LogOutput();
+						LogOutput();
+						*/
 		}
 	}
 }

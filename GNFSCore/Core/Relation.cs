@@ -11,13 +11,14 @@ namespace GNFSCore
 	using FactorBase;
 	using Polynomial;
 	using IntegerMath;
+	using ExtendedNumerics;
 
 	public class Relation
 	{
 		public int A;
 		public int B;
 		public BigInteger C;
-		public BigInteger AlgebraicNorm { get; private set; }
+		public BigRational AlgebraicNorm { get; private set; }
 		public BigInteger RationalNorm { get; private set; }
 		public BigInteger AlgebraicQuotient { get; private set; }
 		public BigInteger RationalQuotient { get; private set; }
@@ -31,14 +32,14 @@ namespace GNFSCore
 			A = a;
 			B = b;
 			polyBase = poly.Base;
+
 			AlgebraicNorm = Algebraic.Norm(a, b, poly); // b^deg * f( a/b )
 			RationalNorm = Rational.Norm(a, b, polyBase); // a + bm
-			AlgebraicQuotient = AlgebraicNorm;
+
+			AlgebraicQuotient = AlgebraicNorm.WholePart;
 			RationalQuotient = RationalNorm;
 
-			double dC = poly.Evaluate((double)RationalNorm);
-			BigInteger biC = (BigInteger)Math.Round(dC);
-			C = biC % poly.N;
+			C = AlgebraicPolynomial.Evaluate(poly, RationalNorm) % poly.N;
 		}
 
 		public BigInteger GetContribution(BigInteger x, BigInteger modQ)
@@ -53,7 +54,7 @@ namespace GNFSCore
 
 		public void FactorAlgebraicSide(IEnumerable<int> factors)
 		{
-			AlgebraicQuotient = Factor(factors, AlgebraicNorm, AlgebraicQuotient);
+			AlgebraicQuotient = /*new BigRational(*/Factor(factors, AlgebraicNorm.WholePart, AlgebraicQuotient);
 		}
 
 		public void FactorRationalSide(IEnumerable<int> factors)
@@ -61,7 +62,8 @@ namespace GNFSCore
 			RationalQuotient = Factor(factors, RationalNorm, RationalQuotient);
 		}
 
-		private BigInteger Factor(IEnumerable<int> factors, BigInteger norm, BigInteger quotient)
+
+		private static BigInteger Factor(IEnumerable<int> factors, BigInteger norm, BigInteger quotient)
 		{
 			BigInteger sqrt = BigInteger.Abs(norm).SquareRoot();
 			BigInteger absResult;

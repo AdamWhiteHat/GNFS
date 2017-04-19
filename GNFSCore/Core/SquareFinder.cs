@@ -107,24 +107,24 @@ namespace GNFSCore
 
 		}
 		
-		public void CalculateAlgebraicSide()
-		{
-			AlgebraicSide(polyBase);
-		}
+		//public void CalculateAlgebraicSide()
+		//{
+		//	AlgebraicSide(polyBase);
+		//}
 
-		private void AlgebraicSide(BigInteger prime)
-		{
-			AlgebraicNormSum = RelationsSet.Select(rel => rel.AlgebraicNorm).Sum();
+		//private void AlgebraicSide(BigInteger prime)
+		//{
+		//	//AlgebraicNormSum = RelationsSet.Select(rel => rel.AlgebraicNorm).Sum();
 
-			algebraicSet = RelationsSet.Select(rel => rel.AlgebraicNorm % prime);
+		//	//algebraicSet = RelationsSet.Select(rel => rel.AlgebraicNorm % prime);
 
-			AlgebraicProduct = algebraicSet.Product();
-			AlgebraicProductMod = AlgebraicProduct % prime;
-			AlgebraicSum = algebraicSet.Sum();
+		//	AlgebraicProduct = algebraicSet.Product();
+		//	AlgebraicProductMod = AlgebraicProduct % prime;
+		//	AlgebraicSum = algebraicSet.Sum();
 
-			IsAlgebraicIrreducible = _isIrreducible(algebraicSet); // Irreducible check
-			IsAlgebraicSquare = AlgebraicProductMod.IsSquare();
-		}
+		//	IsAlgebraicIrreducible = _isIrreducible(algebraicSet); // Irreducible check
+		//	IsAlgebraicSquare = AlgebraicProductMod.IsSquare();
+		//}
 
 		public override string ToString()
 		{
