@@ -22,8 +22,8 @@ namespace GNFS_Winforms
 		public MainForm()
 		{
 			InitializeComponent();
-			tbN.Text = "3218147"; //"1001193673991790373"; //"45113";//"3218147"; //"3580430111"
-			tbBase.Text = "117"; //"11875";//"117";//"31";"127";
+			tbN.Text = "3218147";//"1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139"; //"1001193673991790373"; //"45113";//"3218147"; //"3580430111"
+			tbBase.Text = "117";//"29668737024"; //"11875";//"117";//"31";"127";
 			tbDegree.Text = "3"; // "5";
 		}
 
@@ -144,7 +144,7 @@ namespace GNFS_Winforms
 			LogOutput();
 
 
-			var signatureMatrix = smoothRelations.Select(rel => (int)rel.RationalNorm);
+			var signatureMatrix = smoothRelations.Select(rel => (int)rel.AlgebraicNorm);
 			BitMatrix primeSignatureMatrix = new BitMatrix(signatureMatrix, gnfs.PrimeBound);
 
 			LogOutput($"Prime signature binary matrix:");

@@ -19,7 +19,7 @@ namespace GNFSCore.FactorBase
 		{
 			public static IEnumerable<Tuple<int, int>> GetAlgebraicFactorBase(GNFS gnfs)
 			{
-				int algebraicBound = (int)(gnfs.PrimeBound * 3.3);
+				int algebraicBound = (int)(gnfs.PrimeBound/* * 3.3*/);
 				IEnumerable<int> primes = PrimeFactory.GetPrimes(algebraicBound);
 				IEnumerable<int> integers = Enumerable.Range(0, primes.Last());
 				return GNFS.PolynomialModP(gnfs.Algebraic, primes, integers);

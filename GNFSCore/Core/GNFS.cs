@@ -26,7 +26,29 @@ namespace GNFSCore
 			// degree = 3 when n <= 10 ^ 60
 			// degree = 5 when 10 ^ 60 < n < 10 ^ 180
 			BigInteger remainder = new BigInteger();
-			PrimeBound = (int)((int)n.NthRoot(degree, ref remainder) /* * 1.5 */); // 60;
+
+			var base10 = n.NthRoot(10, ref remainder);
+
+			if (base10 <= 18)
+			{
+				PrimeBound = (int)((int)n.NthRoot(degree, ref remainder) /* * 1.5 */); // 60;
+			}
+			else if (base10 < 100)
+			{
+				PrimeBound = 100000;
+			}
+			else if (base10 > 100 && base10 < 150)
+			{
+				PrimeBound = 250000;
+			}
+			else if (base10 > 150 && base10 < 200)
+			{
+				PrimeBound = 125000000;
+			}
+			else if (base10 > 200)
+			{
+				PrimeBound = 250000000;
+			}
 
 			ConstructPolynomial(polynomialBase, degree);
 			ConstructFactorBase();

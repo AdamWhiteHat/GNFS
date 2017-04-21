@@ -135,8 +135,8 @@ namespace GNFSCore
 			result.AppendLine($"= √( {this.RationalInverseSquare} )");
 			result.AppendLine($"=    {this.RationalInverseSquareRoot}");
 			result.AppendLine();
-			result.AppendLine($"Product(R) = {this.RationalProduct}");
-			result.AppendLine($"Product(R) mod N = γ = {this.RationalProductMod}");
+			result.AppendLine($"Rational Product (δ) = {this.RationalProduct}");
+			result.AppendLine($"γ = δ mod N = {this.RationalProductMod}");
 			result.AppendLine($"*InverseSquare: {this.RationalInverseSquare}");
 			result.AppendLine($"Sum: {this.RationalSum}");
 			result.AppendLine($"SumOfNorms: {this.RationalNormSum}");
