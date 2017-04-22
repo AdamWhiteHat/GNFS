@@ -9,7 +9,9 @@ using ExtendedNumerics;
 
 namespace GNFSCore.Polynomial
 {
-	public class AlgebraicPolynomial
+	using Internal;
+
+	public class AlgebraicPolynomial : IPolynomial
 	{
 		public int Degree { get; private set; }
 		public BigInteger N { get; private set; }
@@ -27,8 +29,8 @@ namespace GNFSCore.Polynomial
 			N = n;
 			SetPolynomialValue(N);
 
-			BaseTotal = AlgebraicPolynomial.Evaluate(this, Base);
-			FormalDerivative = Derivative(this, Base);
+			BaseTotal = PolynomialCommon.Evaluate(this, Base);
+			FormalDerivative = PolynomialCommon.Derivative(this, Base);
 		}
 
 		private void SetPolynomialValue(BigInteger value)
@@ -63,175 +65,34 @@ namespace GNFSCore.Polynomial
 			}
 		}
 
-		//public double Evaluate(double baseM)
-		//{
-		//	double result = 0;
-
-		//	int d = this.Degree;
-		//	while (d >= 0)
-		//	{
-		//		double placeValue = Math.Pow(baseM, d);
-
-		//		double addValue = this.Terms[d] * placeValue;
-
-		//		result += addValue;
-
-		//		d--;
-		//	}
-
-		//	return result;
-		//}
-
-		//public double EvaluateMod(double baseM, double mod)
-		//{
-		//	double result = 0;
-
-		//	int d = this.Degree;
-		//	while (d >= 0)
-		//	{
-		//		double placeValue = Math.Pow(baseM, d);
-
-		//		double addValue = this.Terms[d] * placeValue;
-
-		//		result += addValue;
-
-		//		result %= mod;
-
-		//		d--;
-		//	}
-
-		//	return result;
-		//}
+		public BigInteger Evaluate(BigInteger baseM)
+		{
+			return PolynomialCommon.Evaluate(this, baseM);
+		}
 
 		public BigRational Evaluate(BigRational baseM)
 		{
-			BigRational result = new BigRational(0);
-
-			int d = this.Degree;
-			while (d >= 0)
-			{
-				BigRational placeValue = BigRational.Pow(baseM, d);
-
-				BigRational addValue = BigRational.Multiply(new BigRational(this.Terms[d]), placeValue);
-
-				result = BigRational.Add(result, addValue);
-
-				d--;
-			}
-
-			return result;
+			return PolynomialCommon.Evaluate(this, baseM);
 		}
 
-		public static BigInteger Evaluate(AlgebraicPolynomial polynomial, BigInteger baseM)
+		public BigInteger Derivative(BigInteger baseM)
 		{
-			BigInteger result = 0;
-
-			int d = polynomial.Degree;
-			while (d >= 0)
-			{
-				BigInteger placeValue = BigInteger.Pow(baseM, d);
-
-				BigInteger addValue = BigInteger.Multiply((BigInteger)polynomial.Terms[d], placeValue);
-
-				result += addValue;
-
-				d--;
-			}
-
-			return result;
+			return PolynomialCommon.Derivative(this, baseM);
 		}
 
-		public static BigInteger Derivative(AlgebraicPolynomial polynomial, BigInteger baseM)
+		public BigInteger g(BigInteger x, int p)
 		{
-			BigInteger result = new BigInteger(0);
-			BigInteger m = baseM;
-			int d = polynomial.Degree;
-			int d1 = d - 1;
-			while (d >= 0)
-			{
-				BigInteger placeValue = 0;
-
-				if (d1 > -1)
-				{
-					placeValue = BigInteger.Pow(m, d1);
-				}
-
-				BigInteger addValue = BigInteger.Multiply(BigInteger.Multiply(d, placeValue), (BigInteger)polynomial.Terms[d]);
-				result += addValue;
-
-				d--;
-			}
-
-			return result;
+			return BigInteger.Subtract(BigInteger.Pow(x, p), x);
 		}
 
-		//public double Derivative(double baseM)
-		//{
-		//	double result = 0;
-
-		//	int d = this.Degree;
-		//	while (d >= 0)
-		//	{
-		//		double placeValue = 0;
-
-		//		if (d - 1 > -1)
-		//		{
-		//			placeValue = Math.Pow(baseM, d - 1);
-		//		}
-
-		//		double addValue = this.Terms[d] * d * placeValue;
-
-		//		result += addValue;
-
-		//		d--;
-		//	}
-
-		//	return result;
-		//}
-
-		public static IEnumerable<int> GetRootsMod(AlgebraicPolynomial polynomial, BigInteger baseM, IEnumerable<int> modList)
+		public IEnumerable<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
 		{
-			BigInteger polyResult = AlgebraicPolynomial.Evaluate(polynomial, baseM);
-			IEnumerable<int> result = modList.Where(mod => (polyResult % mod) == 0);
-			return result;
+			return PolynomialCommon.GetRootsMod(this, baseM, modList);
 		}
 
 		public override string ToString()
 		{
-			return AlgebraicPolynomial.FormatString(this);
-		}
-
-		public static string FormatString(AlgebraicPolynomial polynomial)
-		{
-			List<string> stringTerms = new List<string>();
-
-			int degree = polynomial.Terms.Length - 1;
-			while (degree >= 0)
-			{
-				if (degree > 1)
-				{
-					if (polynomial.Terms[degree] == 1)
-					{
-						stringTerms.Add($"{polynomial.Base}^{degree}");
-					}
-					else
-					{
-						stringTerms.Add($"{polynomial.Terms[degree]} * {polynomial.Base}^{degree}");
-					}
-				}
-				else if (degree == 1)
-				{
-					stringTerms.Add($"{polynomial.Terms[degree]} * {polynomial.Base}");
-				}
-				else if (degree == 0)
-				{
-					stringTerms.Add($"{polynomial.Terms[degree]}");
-				}
-
-				degree--;
-			}
-
-			return string.Join(" + ", stringTerms);
+			return PolynomialCommon.FormatString(this);
 		}
 	}
 }

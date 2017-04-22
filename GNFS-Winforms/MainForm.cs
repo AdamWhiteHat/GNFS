@@ -156,7 +156,7 @@ namespace GNFS_Winforms
 			LogOutput();
 
 			BigInteger polyDerivative = BigInteger.Multiply((BigInteger)gnfs.Algebraic.FormalDerivative, (BigInteger)gnfs.Algebraic.FormalDerivative);
-			BigInteger polyValue = AlgebraicPolynomial.Evaluate(gnfs.Algebraic, gnfs.Algebraic.Base);
+			BigInteger polyValue = gnfs.Algebraic.Evaluate(gnfs.Algebraic.Base);
 			LogOutput("Polynomial value f(x):");
 			LogOutput(polyValue.ToString());
 			LogOutput();

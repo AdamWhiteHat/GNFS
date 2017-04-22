@@ -48,6 +48,7 @@
     <Compile Include="IntegerMath\Fraction.cs" />
     <Compile Include="IntegerMath\Legendre.cs" />
     <Compile Include="IntegerMath\PrimeFactory.cs" />
+    <Compile Include="Polynomial\PolynomialCommon.cs" />
     <Compile Include="Polynomial\RationalPolynomial.cs" />
     <Compile Include="PrimeSignature\BitMatrix.cs" />
     <Compile Include="PrimeSignature\BitPattern.cs" />

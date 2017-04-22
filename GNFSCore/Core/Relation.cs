@@ -27,19 +27,19 @@ namespace GNFSCore
 
 		private BigInteger polyBase;
 
-		public Relation(int a, int b, AlgebraicPolynomial poly)
+		public Relation(int a, int b, AlgebraicPolynomial polynomial)
 		{
 			A = a;
 			B = b;
-			polyBase = poly.Base;
+			polyBase = polynomial.Base;
 
-			AlgebraicNorm = Algebraic.Norm(a, b, poly); // b^deg * f( a/b )
+			AlgebraicNorm = Algebraic.Norm(a, b, polynomial); // b^deg * f( a/b )
 			RationalNorm = Rational.Norm(a, b, polyBase); // a + bm
 
 			AlgebraicQuotient = AlgebraicNorm.WholePart;
 			RationalQuotient = RationalNorm;
 
-			C = AlgebraicPolynomial.Evaluate(poly, RationalNorm) % poly.N;
+			C = polynomial.Evaluate(RationalNorm) % polynomial.N;
 		}
 
 		public BigInteger GetContribution(BigInteger x, BigInteger modQ)
@@ -61,7 +61,6 @@ namespace GNFSCore
 		{
 			RationalQuotient = Factor(factors, RationalNorm, RationalQuotient);
 		}
-
 
 		private static BigInteger Factor(IEnumerable<int> factors, BigInteger norm, BigInteger quotient)
 		{

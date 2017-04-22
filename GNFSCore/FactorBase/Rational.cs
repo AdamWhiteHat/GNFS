@@ -25,9 +25,9 @@ namespace GNFSCore.FactorBase
 			}
 		}
 
-		public static BigInteger Norm(int a, int b, BigInteger polynomialBaseM)
+		public static BigInteger Norm(int a, int b, BigInteger polynomialBase)
 		{
-			return BigInteger.Add(a, BigInteger.Multiply(b, polynomialBaseM));
+			return BigInteger.Add(a, BigInteger.Multiply(b, polynomialBase));
 		}
 	}
 }

@@ -26,14 +26,14 @@ namespace GNFSCore.FactorBase
 			}
 		}
 
-		public static BigRational Norm(int a, int b, AlgebraicPolynomial poly)
+		public static BigRational Norm(int a, int b, AlgebraicPolynomial polynomial)
 		{
 			Fraction ratA = new Fraction(a);
 			Fraction negB = new Fraction(-b);
 			BigRational aOverB = BigRational.Divide(ratA, negB);
 
-			BigRational left = poly.Evaluate(aOverB);
-			BigRational right = BigRational.Pow(new BigRational(negB), poly.Degree);
+			BigRational left = polynomial.Evaluate(aOverB);
+			BigRational right = BigRational.Pow(new BigRational(negB), polynomial.Degree);
 
 			BigRational result = BigRational.Multiply(left, right);
 			return result;

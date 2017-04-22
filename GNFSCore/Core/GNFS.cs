@@ -66,14 +66,14 @@ namespace GNFSCore
 			QFB = Quadradic.Factory.GetQuadradicFactorBase(this);
 		}
 
-		internal static IEnumerable<Tuple<int, int>> PolynomialModP(AlgebraicPolynomial poly, IEnumerable<int> primes, IEnumerable<int> integers)
+		internal static IEnumerable<Tuple<int, int>> PolynomialModP(AlgebraicPolynomial polynomial, IEnumerable<int> primes, IEnumerable<int> integers)
 		{
 			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
 
 			foreach (int r in integers)
 			{
 				var modList = primes.Where(p => p > r);
-				var roots = AlgebraicPolynomial.GetRootsMod(poly, r, modList);
+				var roots = polynomial.GetRootsMod(r, modList);
 				if (roots.Any())
 				{
 					result.AddRange(roots.Select(p => new Tuple<int, int>(p, r)));

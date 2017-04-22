@@ -8,13 +8,14 @@ using GNFSCore.IntegerMath;
 
 namespace GNFSCore.Polynomial
 {
-	public class RationalPolynomial
+	using Internal;
+
+	public class RationalPolynomial : IPolynomial
 	{
 		public int Degree { get; private set; }
 		public BigInteger N { get; private set; }
 		public BigInteger Base { get; private set; }
 		public BigInteger[] Terms { get; private set; }
-
 
 		public RationalPolynomial(BigInteger n, int degree, BigInteger polyBase, BigInteger fromValue)
 		{
@@ -65,93 +66,24 @@ namespace GNFSCore.Polynomial
 			}
 		}
 
-		public static BigInteger Evaluate(RationalPolynomial polynomial, BigInteger baseM)
+		public BigInteger Evaluate(RationalPolynomial polynomial, BigInteger baseM)
 		{
-			BigInteger result = 0;
-
-			int d = polynomial.Degree;
-			while (d >= 0)
-			{
-				BigInteger placeValue = BigInteger.Pow(baseM, d);
-
-				BigInteger addValue = (BigInteger)polynomial.Terms[d] * placeValue;
-
-				result += addValue;
-
-				d--;
-			}
-
-			return result;
+			return PolynomialCommon.Evaluate(this, baseM);
 		}
 
-		public static BigInteger Derivative(RationalPolynomial polynomial, BigInteger baseM)
+		public BigInteger Derivative(RationalPolynomial polynomial, BigInteger baseM)
 		{
-			BigInteger result = 0;
-
-			int d = polynomial.Degree;
-			int d1 = d - 1;
-			while (d >= 0)
-			{
-				BigInteger placeValue = 0;
-
-				if (d1 > -1)
-				{
-					placeValue = BigInteger.Pow(baseM, d1);
-				}
-
-				BigInteger addValue = (BigInteger)polynomial.Terms[d] * d * placeValue;
-				result += addValue;
-
-				d--;
-			}
-
-			return result;
+			return	PolynomialCommon.Derivative(this, baseM);
 		}
 
-		public static IEnumerable<int> GetRootsMod(RationalPolynomial polynomial, BigInteger baseM, IEnumerable<int> modList)
+		public IEnumerable<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
 		{
-			BigInteger polyResult = RationalPolynomial.Evaluate(polynomial, baseM);
-			IEnumerable<int> result = modList.Where(mod => (polyResult % mod) == 0);
-			return result;
+			return PolynomialCommon.GetRootsMod(this, baseM, modList);
 		}
-
 
 		public override string ToString()
 		{
-			return RationalPolynomial.FormatString(this);
-		}
-
-		public static string FormatString(RationalPolynomial polynomial)
-		{
-			List<string> stringTerms = new List<string>();
-
-			int degree = polynomial.Terms.Length - 1;
-			while (degree >= 0)
-			{
-				if (degree > 1)
-				{
-					if (polynomial.Terms[degree] == 1)
-					{
-						stringTerms.Add($"{polynomial.Base}^{degree}");
-					}
-					else
-					{
-						stringTerms.Add($"{polynomial.Terms[degree]} * {polynomial.Base}^{degree}");
-					}
-				}
-				else if (degree == 1)
-				{
-					stringTerms.Add($"{polynomial.Terms[degree]} * {polynomial.Base}");
-				}
-				else if (degree == 0)
-				{
-					stringTerms.Add($"{polynomial.Terms[degree]}");
-				}
-
-				degree--;
-			}
-
-			return string.Join(" + ", stringTerms);
+			return PolynomialCommon.FormatString(this);
 		}
 	}
 }
