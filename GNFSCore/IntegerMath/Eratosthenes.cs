@@ -37,7 +37,7 @@ namespace GNFSCore.IntegerMath.Internal
 			int sqrt = 3;
 
 			int ceil = maxValue > Int32.MaxValue ? Int32.MaxValue - 2 : (int)maxValue;
-			bool[] primeMembershipArray = new bool[ceil + 1];
+			bool[] primeMembershipArray = new bool[ceil + 2];
 
 			primeMembershipArray[2] = true;
 
@@ -69,7 +69,7 @@ namespace GNFSCore.IntegerMath.Internal
 				}
 			}
 
-			List<int> result = Enumerable.Range(2, (int)maxValue - 2).Where(l => primeMembershipArray[l]).ToList();
+			List<int> result = Enumerable.Range(2, (int)maxValue).Where(l => primeMembershipArray[l]).ToList();
 
 			return result;
 		}

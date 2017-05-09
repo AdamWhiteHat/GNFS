@@ -138,6 +138,11 @@ namespace ExtendedNumerics
 			return new BigRational(fractPow);
 		}
 
+		public static double Log(BigRational rational)
+		{
+			return Fraction.Log(rational.GetImproperFraction());
+		}
+
 		public static BigRational Mod(BigRational number, BigRational mod)
 		{
 			Fraction num = number.GetImproperFraction();

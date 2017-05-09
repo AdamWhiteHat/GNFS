@@ -12,6 +12,7 @@ namespace GNFSCore
 	using Polynomial;
 	using IntegerMath;
 	using ExtendedNumerics;
+	using PrimeSignature;
 
 	public class Relation
 	{
@@ -23,23 +24,30 @@ namespace GNFSCore
 		public BigInteger AlgebraicQuotient { get; private set; }
 		public BigInteger RationalQuotient { get; private set; }
 
-		public bool IsSmooth { get { return BigInteger.Abs(AlgebraicQuotient) == 1 && BigInteger.Abs(RationalQuotient) == 1; } }
+		public bool IsSmooth
+		{
+			get
+			{
+				return BigInteger.Abs(AlgebraicQuotient) == 1 && BigInteger.Abs(RationalQuotient) == 1;
+			}
+		}
 
-		private BigInteger polyBase;
 
-		public Relation(int a, int b, AlgebraicPolynomial polynomial)
+		private GNFS _gnfs;
+
+		public Relation(int a, int b, GNFS gnfs)
 		{
 			A = a;
 			B = b;
-			polyBase = polynomial.Base;
+			_gnfs = gnfs;
 
-			AlgebraicNorm = Algebraic.Norm(a, b, polynomial); // b^deg * f( a/b )
-			RationalNorm = Rational.Norm(a, b, polyBase); // a + bm
+			AlgebraicNorm = Normal.AlgebraicRational(a, b, _gnfs.Algebraic); // b^deg * f( a/b )
+			RationalNorm = Normal.Rational(a, b, _gnfs.Algebraic.Base); // a + bm
 
 			AlgebraicQuotient = AlgebraicNorm.WholePart;
 			RationalQuotient = RationalNorm;
 
-			C = polynomial.Evaluate(RationalNorm) % polynomial.N;
+			C = _gnfs.Algebraic.Evaluate(RationalNorm) % _gnfs.N;
 		}
 
 		public BigInteger GetContribution(BigInteger x, BigInteger modQ)
@@ -52,35 +60,48 @@ namespace GNFSCore
 			return BigInteger.Add(A, BigInteger.Multiply(B, x));
 		}
 
-		public void FactorAlgebraicSide(IEnumerable<int> factors)
+		public void Sieve()
 		{
-			AlgebraicQuotient = /*new BigRational(*/Factor(factors, AlgebraicNorm.WholePart, AlgebraicQuotient);
-		}
-
-		public void FactorRationalSide(IEnumerable<int> factors)
-		{
-			RationalQuotient = Factor(factors, RationalNorm, RationalQuotient);
+			AlgebraicQuotient = Factor(_gnfs.AlgebraicPrimeBase, AlgebraicNorm.WholePart, AlgebraicQuotient);
+			RationalQuotient = Factor(_gnfs.RationalPrimeBase, RationalNorm, RationalQuotient);
 		}
 
 		private static BigInteger Factor(IEnumerable<int> factors, BigInteger norm, BigInteger quotient)
 		{
-			BigInteger sqrt = BigInteger.Abs(norm).SquareRoot();
-			BigInteger absResult;
+			//BigInteger sqrt = BigInteger.Abs(norm).SquareRoot();
 
 			BigInteger result = quotient;
 			foreach (int factor in factors)
 			{
-				absResult = BigInteger.Abs(result);
-				if (absResult == 1 || factor > sqrt)
+				if (result == 0 || result == -1 || result == 1 /*|| factor > sqrt*/)
 				{
 					break;
 				}
-				while (result % factor == 0 && absResult != 1)
+				while (result % factor == 0 && result != 1 && result != -1)
 				{
 					result /= factor;
+
+					BigInteger absResult = BigInteger.Abs(result);
+					if (absResult > 1 && absResult < int.MaxValue - 1)
+					{
+						int intValue = (int)absResult;
+						if (factors.Contains(intValue))
+						{
+							result = 1;
+						}
+					}
 				}
 			}
 			return result;
+		}
+
+		public BitVector GetMatrixRowVector()
+		{
+			BitVector rationalBitVector = new BitVector(RationalNorm, _gnfs.RationalFactorBase);
+			BitVector algebraicBitVector = new BitVector(BigInteger.Abs(AlgebraicNorm.WholePart), _gnfs.AlgebraicFactorBase);
+			bool[] quadraticBitVector = QuadraticResidue.GetQuadraticCharacters(this, _gnfs.QFB);
+
+			return new BitVector(rationalBitVector.Elements.Concat(algebraicBitVector.Elements).Concat(quadraticBitVector).ToArray());
 		}
 
 		public override string ToString()
@@ -89,6 +110,8 @@ namespace GNFSCore
 				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t" +
 				$"[f(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)},\ta+bm={RationalNorm.ToString().PadLeft(4)}]\t" +
 				$"f({RationalNorm})%N".PadLeft(10) + $" = {C.ToString().PadLeft(10)}\t";
+
+			//+"\t QUOTIENT(Alg): {AlgebraicQuotient} \t QUOTIENT(Rat): {RationalQuotient}";
 		}
 	}
 }

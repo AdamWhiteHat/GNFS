@@ -14,7 +14,7 @@ namespace GNFSCore.IntegerMath
 
 		static FactorizationFactory()
 		{
-			primes = PrimeFactory.GetPrimes(1000);
+			primes = new int[] { 2, 3, 5, 7, 11 };
 		}
 
 		public static IEnumerable<Tuple<int, int>> GetPrimeFactorizationTuple(BigInteger value, int maxValue)
@@ -90,7 +90,7 @@ namespace GNFSCore.IntegerMath
 				factors.Add((int)toFactor);
 				return factors;
 			}
-						
+
 			foreach (int prime in primes)
 			{
 				while (toFactor % prime == 0)

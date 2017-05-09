@@ -112,16 +112,20 @@ namespace ExtendedNumerics
 		public Int32 Sign { get { return Fraction.Simplify(this).Numerator.Sign; } }
 
 		public bool IsZero { get { return (this == Fraction.Zero); } }
-		
+
+		public bool IsOne { get { return (this == Fraction.One); } }
+
 		#region Static Properties
 
 		public static Fraction Zero { get { return _zero; } }
 		public static Fraction One { get { return _one; } }
 		public static Fraction MinusOne { get { return _minusOne; } }
+		public static Fraction OneHalf { get { return _oneHalf; } }
 
 		private static readonly Fraction _zero = new Fraction(BigInteger.Zero, BigInteger.One);
 		private static readonly Fraction _one = new Fraction(BigInteger.One, BigInteger.One);
 		private static readonly Fraction _minusOne = new Fraction(BigInteger.MinusOne, BigInteger.One);
+		private static readonly Fraction _oneHalf = new Fraction(new BigInteger(1), new BigInteger(2));
 
 		#endregion
 
@@ -244,6 +248,13 @@ namespace ExtendedNumerics
 			}
 
 			return result;
+		}
+
+		public static double Log(Fraction fraction)
+		{
+			double a = BigInteger.Log(fraction.Numerator);
+			double b = BigInteger.Log(fraction.Denominator);
+			return (a - b);
 		}
 
 		public static Fraction Reciprocal(Fraction fraction)

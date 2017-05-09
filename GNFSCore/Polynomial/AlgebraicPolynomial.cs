@@ -48,9 +48,21 @@ namespace GNFSCore.Polynomial
 				{
 					Terms[d] = toAdd;
 				}
-				else if (placeValue < toAdd)
+				else if (placeValue < BigInteger.Abs(toAdd))
 				{
-					BigInteger quotient = BigInteger.Divide(toAdd, placeValue);
+					BigInteger remainder = 0;
+					BigInteger quotient = BigInteger.DivRem(toAdd, placeValue, out remainder);
+
+					Fraction fractionRemainder = new Fraction(remainder, placeValue);
+
+					//bool roundUp = (Fraction.Abs(fractionRemainder) > Fraction.OneHalf);
+
+					//if (roundUp)
+					//{
+					//	int adjustment = fractionRemainder.Sign;
+					//	quotient += adjustment;
+					//}
+
 					if (quotient > Base)
 					{
 						quotient = Base;
@@ -63,6 +75,11 @@ namespace GNFSCore.Polynomial
 
 				d--;
 			}
+		}
+
+		public double Evaluate(double baseM)
+		{
+			return PolynomialCommon.Evaluate(this, baseM);
 		}
 
 		public BigInteger Evaluate(BigInteger baseM)
@@ -85,7 +102,7 @@ namespace GNFSCore.Polynomial
 			return BigInteger.Subtract(BigInteger.Pow(x, p), x);
 		}
 
-		public IEnumerable<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
+		public List<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
 		{
 			return PolynomialCommon.GetRootsMod(this, baseM, modList);
 		}

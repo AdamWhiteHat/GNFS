@@ -19,10 +19,29 @@ namespace GNFSCore.Polynomial
 	{
 		internal static class PolynomialCommon
 		{
-			public static IEnumerable<int> GetRootsMod(IPolynomial polynomial, BigInteger baseM, IEnumerable<int> modList)
+			public static List<int> GetRootsMod(IPolynomial polynomial, BigInteger baseM, IEnumerable<int> modList)
 			{
 				BigInteger polyResult = Evaluate(polynomial, baseM);
 				IEnumerable<int> result = modList.Where(mod => (polyResult % mod) == 0);
+				return result.ToList();
+			}
+
+			public static double Evaluate(IPolynomial polynomial, double baseM)
+			{
+				double result = 0;
+
+				int d = polynomial.Degree;
+				while (d >= 0)
+				{
+					double placeValue = Math.Pow(baseM, d);
+
+					double addValue = (double)(polynomial.Terms[d]) * placeValue;
+
+					result += addValue;
+
+					d--;
+				}
+
 				return result;
 			}
 

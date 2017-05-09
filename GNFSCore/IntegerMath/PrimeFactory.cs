@@ -12,34 +12,36 @@ namespace GNFSCore.IntegerMath
 	{
 		private static int MaxValue;
 		private static int[] primes;
+		private static int lastPrime;
 
 		static PrimeFactory()
 		{
-			MaxValue = 2000;
+			MaxValue = 1000;
 			SetPrimes();
 		}
 
 		private static void SetPrimes()
 		{
 			primes = Eratosthenes.Sieve(MaxValue).ToArray();
+			lastPrime = primes.Last();
 		}
 
 		private static void IncreaseMaxValue(int newMaxValue = 0)
 		{
 			// Increase bound
-			MaxValue = Math.Max(newMaxValue + 1, MaxValue + MaxValue);
+			MaxValue = Math.Max(newMaxValue + 1000, MaxValue + 100000 /*MaxValue*/);
 			SetPrimes();
 		}
 
 		public static int GetIndexFromValue(int value)
 		{
-			if(value == -1)
+			if (value == -1)
 			{
 				return -1;
 			}
 			while (primes.Last() < value)
 			{
-				IncreaseMaxValue();
+				IncreaseMaxValue(value);
 			}
 			int primeValue = primes.First(p => p >= value);
 			int index = Array.IndexOf<int>(primes, primeValue);
@@ -58,7 +60,7 @@ namespace GNFSCore.IntegerMath
 
 		public static int[] GetPrimes(int maxValue)
 		{
-			if (maxValue > MaxValue)
+			while (maxValue > MaxValue)
 			{
 				IncreaseMaxValue(maxValue);
 			}

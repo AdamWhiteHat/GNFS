@@ -73,10 +73,10 @@ namespace GNFSCore.Polynomial
 
 		public BigInteger Derivative(RationalPolynomial polynomial, BigInteger baseM)
 		{
-			return	PolynomialCommon.Derivative(this, baseM);
+			return PolynomialCommon.Derivative(this, baseM);
 		}
 
-		public IEnumerable<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
+		public List<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
 		{
 			return PolynomialCommon.GetRootsMod(this, baseM, modList);
 		}

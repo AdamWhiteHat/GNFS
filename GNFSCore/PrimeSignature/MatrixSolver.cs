@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace GNFSCore.PrimeSignature
 {
 	using IntegerMath;
+	using System.Numerics;
 
 	public class MatrixSolver
 	{
@@ -15,20 +16,20 @@ namespace GNFSCore.PrimeSignature
 			return matrix.Rows.Where(r => r.RowSum == 0).ToArray();
 		}
 
-		public static List<int[]> GetSingleFactors( BitMatrix bitMatrix, IEnumerable<IGrouping<int, BitVector>> input)
+		public static List<BigInteger[]> GetSingleFactors(BitMatrix bitMatrix, IEnumerable<IGrouping<int, BitVector>> input)
 		{
 			if (input == null)
 			{
 				throw new ArgumentException(nameof(input));
 			}
 
-			List<int[]> results = new List<int[]>();
+			List<BigInteger[]> results = new List<BigInteger[]>();
 			// Single factors
 			foreach (var group in input)
 			{
 				if (group.Count() > 1)
 				{
-					int[] groupNumbers = group.Select(v => v.Number).ToArray();
+					BigInteger[] groupNumbers = group.Select(v => v.Number).ToArray();
 
 					bitMatrix.Remove(groupNumbers);
 					results.AddRange(Combinatorics.GetCombination(groupNumbers));
@@ -42,7 +43,7 @@ namespace GNFSCore.PrimeSignature
 			return results;
 		}
 
-		public static List<int[]> GetSimpleMatches(BitMatrix bitMatrix)
+		public static List<BigInteger[]> GetSimpleMatches(BitMatrix bitMatrix)
 		{
 			if (bitMatrix == null)
 			{
@@ -54,7 +55,7 @@ namespace GNFSCore.PrimeSignature
 			bool done = false;
 
 			BitVector[] input = bitMatrix.Rows.ToArray();
-			List<int[]> results = new List<int[]>();
+			List<BigInteger[]> results = new List<BigInteger[]>();
 			do
 			{
 				if (skip >= input.Length)
@@ -70,7 +71,7 @@ namespace GNFSCore.PrimeSignature
 				if (matches.Count() > 1)
 				{
 					input = input.Except(matches).ToArray();
-					int[] matchNumbers = matches.Select(v => v.Number).ToArray();
+					BigInteger[] matchNumbers = matches.Select(v => v.Number).ToArray();
 					bitMatrix.Remove(matchNumbers);
 					results.AddRange(Combinatorics.GetCombination(matchNumbers));
 				}
@@ -84,7 +85,7 @@ namespace GNFSCore.PrimeSignature
 			return results;
 		}
 
-		public static List<int[]> GetChainedFactors(BitMatrix bitMatrix)
+		public static List<BigInteger[]> GetChainedFactors(BitMatrix bitMatrix)
 		{
 			if (bitMatrix == null)
 			{
@@ -96,7 +97,7 @@ namespace GNFSCore.PrimeSignature
 			bool done = false;
 
 			BitVector[] input = bitMatrix.Rows.ToArray();
-			List<int[]> result = new List<int[]>();
+			List<BigInteger[]> result = new List<BigInteger[]>();
 			do
 			{
 				if (skip >= input.Length)
@@ -136,7 +137,7 @@ namespace GNFSCore.PrimeSignature
 				if (combinedVector.All(b => !b))
 				{
 					input = input.Except(matchCollection).ToArray();
-					int[] matchNumbers = matchCollection.Select(v => v.Number).ToArray();
+					BigInteger[] matchNumbers = matchCollection.Select(v => v.Number).ToArray();
 					result.Add(matchNumbers);
 				}
 				else

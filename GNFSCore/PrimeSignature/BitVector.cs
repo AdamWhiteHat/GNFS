@@ -7,20 +7,23 @@ using System.Collections.Generic;
 namespace GNFSCore.PrimeSignature
 {
 	using IntegerMath;
+	using System.Numerics;
 
 	public class BitVector
 	{
-		public int Number;
+		public BigInteger Number;
 		public bool[] Elements;
 		public int RowSum { get { return Elements.Count(b => b == true); } }
 
+		public int Length { get { return Elements.Length; } }
+
 		public bool this[int index] => Elements[index];
 
-		public BitVector(int number, int maxValue)
+		public BitVector(BigInteger number, int maxValue)
 			: this(number, maxValue, FactorizationFactory.GetPrimeFactorizationTuple(number, maxValue))
 		{ }
 
-		public BitVector(int number, int maxValue, IEnumerable<Tuple<int, int>> primeFactorization)
+		public BitVector(BigInteger number, int maxValue, IEnumerable<Tuple<int, int>> primeFactorization)
 		{
 			Number = number;
 
@@ -31,11 +34,17 @@ namespace GNFSCore.PrimeSignature
 				{
 					break;
 				}
-				result[PrimeFactory.GetIndexFromValue(factor.Item1)+1] = ((factor.Item2 % 2) == 1);
+				result[PrimeFactory.GetIndexFromValue(factor.Item1) + 1] = ((factor.Item2 % 2) == 1);
 			}
 
 			Elements = result;
 		}
+
+		internal BitVector(bool[] elements)
+		{
+			Elements = elements;
+			Number = RowSum;
+		}	
 
 		public static bool[] CombineVectors(IEnumerable<BitVector> vectors)
 		{
@@ -44,8 +53,8 @@ namespace GNFSCore.PrimeSignature
 				throw new ArgumentException($"Argument {nameof(vectors)} cannot be null, empty, contain null or empty vectors or contain less than two vectors.", nameof(vectors));
 			}
 
-			IEnumerable<int> vectorNumbers = vectors.Select(v => v.Number);
-			IEnumerable<int> distinctVectors = vectorNumbers.Distinct();
+			IEnumerable<BigInteger> vectorNumbers = vectors.Select(v => v.Number);
+			IEnumerable<BigInteger> distinctVectors = vectorNumbers.Distinct();
 			if (distinctVectors.Count() < vectorNumbers.Count())
 			{
 				throw new ArgumentException($"Argument {nameof(vectors)} cannot contain two vectors with the same value (Number)", nameof(vectors));

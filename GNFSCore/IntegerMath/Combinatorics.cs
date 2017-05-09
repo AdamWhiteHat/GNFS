@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,17 +11,17 @@ namespace GNFSCore.IntegerMath
 	{
 		/*  n take 2 : Combination with repetition
 		 quantity returned = (n + 1)! / 2 * (n - 1)!      */
-		public static List<int[]> GetCombination(IEnumerable<int> input)
+		public static List<BigInteger[]> GetCombination(IEnumerable<BigInteger> input)
 		{
-			var listInner = input.Except(new int[] { 0, 1 }).Distinct().OrderBy(i => i).ToList();
+			var listInner = input.Except(new BigInteger[] { 0, 1 }).Distinct().OrderBy(i => i).ToList();
 			var listOutter = listInner.ToList();
 
-			List<int[]> result = new List<int[]>();
+			List<BigInteger[]> result = new List<BigInteger[]>();
 
-			foreach (int a in listOutter)
+			foreach (BigInteger a in listOutter)
 			{
 				listInner.Remove(a);
-				result.AddRange(listInner.Select(b => new int[] { a, b }));
+				result.AddRange(listInner.Select(b => new BigInteger[] { a, b }));
 			}
 
 			return result;

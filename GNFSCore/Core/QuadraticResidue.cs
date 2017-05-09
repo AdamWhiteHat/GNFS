@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace GNFSCore
 {
+	using FactorBase;
 	using IntegerMath;
 
 	public class QuadraticResidue
@@ -20,28 +21,27 @@ namespace GNFSCore
 			return modPow.IsOne;
 		}
 
-		public static int GetQuadraticCharacter(Relation rel, Tuple<int,int> quadraticFactor)
+		public static bool GetQuadraticCharacter(Relation rel, IFactorPair quadraticFactor)
 		{
 			BigInteger ab = rel.A + rel.B;
-			BigInteger abp = BigInteger.Abs(BigInteger.Multiply(ab, quadraticFactor.Item1));
+			BigInteger abp = BigInteger.Abs(BigInteger.Multiply(ab, quadraticFactor.P));
 
-			int legendreSymbol = Legendre.Symbol(abp, quadraticFactor.Item2);
+			int legendreSymbol = Legendre.Symbol(abp, quadraticFactor.R);
 
-			if(legendreSymbol != 1)
+			if (legendreSymbol != 1)
 			{
-				return 1;
+				return true;
 			}
 			else
 			{
-				return 0;
+				return false;
 			}
 		}
 
-		public static string GetQuadraticCharacters(Relation rel, IEnumerable<Tuple<int, int>> quadraticCharacterBase)
+		public static bool[] GetQuadraticCharacters(Relation rel, IEnumerable<IFactorPair> quadraticCharacterBase)
 		{
-			IEnumerable<int> results = quadraticCharacterBase.Select(tup => GetQuadraticCharacter(rel, tup));
-			
-			return string.Join("", results.Select(i => i.ToString()));
+			IEnumerable<bool> results = quadraticCharacterBase.Select(pair => GetQuadraticCharacter(rel, pair));
+			return results.ToArray();
 		}
 	}
 }

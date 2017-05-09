@@ -92,20 +92,20 @@ namespace GNFSCore
 
 		}
 
-		public BigInteger CalculateRationalModPrime(BigInteger prime)
-		{
-			BigInteger mod = gnfs.Algebraic.Evaluate(prime);
-			return (RationalProduct % prime) % mod;
-		}
+		//public BigInteger CalculateRationalModPrime(BigInteger prime)
+		//{
+		//	BigInteger mod = gnfs.Algebraic.Evaluate(prime);
+		//	return (RationalProduct % prime) % mod;
+		//}
 
-		public void CalculateRationalModPolynomial()
-		{
-			// Should be the same as N
-			BigInteger mod = gnfs.Algebraic.Evaluate(polyBase);
+		//public void CalculateRationalModPolynomial()
+		//{
+		//	// Should be the same as N
+		//	BigInteger mod = gnfs.Algebraic.Evaluate(polyBase);
 
-			RationalModPolynomial = RationalProduct % mod;
+		//	RationalModPolynomial = RationalProduct % mod;
 
-		}
+		//}
 
 		//public void CalculateAlgebraicSide()
 		//{
