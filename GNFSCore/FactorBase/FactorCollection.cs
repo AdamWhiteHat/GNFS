@@ -43,7 +43,7 @@ namespace GNFSCore.FactorBase
 
 		public override string ToString()
 		{
-			return string.Join("\t", this.Select(factr => $"({factr.P},{factr.R})"));
+			return string.Join("\t", this.Select(factr => factr.ToString()));
 		}
 	}
 }
