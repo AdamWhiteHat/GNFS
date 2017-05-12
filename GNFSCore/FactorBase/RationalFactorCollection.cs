@@ -12,7 +12,7 @@ namespace GNFSCore.FactorBase
 {
 	public class RationalFactorCollection : FactorCollection
 	{
-		public RationalFactorCollection(List<IFactorPair> collection)
+		public RationalFactorCollection(List<FactorPair> collection)
 			: base(collection)
 		{
 		}
@@ -22,7 +22,7 @@ namespace GNFSCore.FactorBase
 		{
 			public static RationalFactorCollection BuildRationalFactorBase(GNFS gnfs)
 			{
-				IEnumerable<IFactorPair> result = gnfs.RationalPrimeBase.Select(p => new RationalFactorPair(p, (int)(gnfs.Algebraic.Base % p))).Distinct();
+				IEnumerable<FactorPair> result = gnfs.RationalPrimeBase.Select(p => new FactorPair(p, (int)(gnfs.Algebraic.Base % p))).Distinct();
 				return new RationalFactorCollection(result.ToList());
 			}
 		}

@@ -60,8 +60,6 @@
     <Compile Include="PrimeSignature\BitPattern.cs" />
     <Compile Include="PrimeSignature\BitVector.cs" />
     <Compile Include="IntegerMath\Combinatorics.cs" />
-    <Compile Include="FactorBase\AlgebraicFactorPair.cs" />
-    <Compile Include="FactorBase\QuadradicFactorPair.cs" />
     <Compile Include="Core\GNFS.cs" />
     <Compile Include="Core\ExtensionMethods\IEnumerableExtensionMethods.cs" />
     <Compile Include="Core\ExtensionMethods\BigIntegerExtensionMethods.cs" />
@@ -69,7 +67,6 @@
     <Compile Include="IntegerMath\Eratosthenes.cs" />
     <Compile Include="IntegerMath\GCD.cs" />
     <Compile Include="Polynomial\AlgebraicPolynomial.cs" />
-    <Compile Include="FactorBase\RationalFactorPair.cs" />
     <Compile Include="IntegerMath\FactorizationFactory.cs" />
     <Compile Include="PrimeSignature\MatrixSolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

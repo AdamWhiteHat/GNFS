@@ -12,7 +12,7 @@ namespace GNFSCore.FactorBase
 {
 	public class AlgebraicFactorCollection : FactorCollection
 	{
-		public AlgebraicFactorCollection(List<IFactorPair> collection)
+		public AlgebraicFactorCollection(List<FactorPair> collection)
 			: base(collection)
 		{
 		}

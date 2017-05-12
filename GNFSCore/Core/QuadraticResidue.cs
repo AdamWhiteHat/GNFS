@@ -21,7 +21,7 @@ namespace GNFSCore
 			return modPow.IsOne;
 		}
 
-		public static bool GetQuadraticCharacter(Relation rel, IFactorPair quadraticFactor)
+		public static bool GetQuadraticCharacter(Relation rel, FactorPair quadraticFactor)
 		{
 			BigInteger ab = rel.A + rel.B;
 			BigInteger abp = BigInteger.Abs(BigInteger.Multiply(ab, quadraticFactor.P));
@@ -38,7 +38,7 @@ namespace GNFSCore
 			}
 		}
 
-		public static bool[] GetQuadraticCharacters(Relation rel, IEnumerable<IFactorPair> quadraticCharacterBase)
+		public static bool[] GetQuadraticCharacters(Relation rel, IEnumerable<FactorPair> quadraticCharacterBase)
 		{
 			IEnumerable<bool> results = quadraticCharacterBase.Select(pair => GetQuadraticCharacter(rel, pair));
 			return results.ToArray();

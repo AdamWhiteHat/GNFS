@@ -10,16 +10,10 @@ using GNFSCore.IntegerMath;
 
 namespace GNFSCore.FactorBase
 {
-	public interface IFactorPair
+	public struct FactorPair
 	{
-		int P { get; }
-		int R { get; }
-	}
-
-	public class FactorPair : IFactorPair
-	{
-		public int P { get; private set; }
-		public int R { get; private set; }
+		public int P;
+		public int R;
 
 		public FactorPair(int p, int r)
 		{
