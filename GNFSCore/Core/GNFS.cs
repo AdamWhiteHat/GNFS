@@ -17,20 +17,20 @@ namespace GNFSCore
 		public AlgebraicPolynomial Algebraic { get; private set; }
 
 		public int PrimeBound { get; private set; }
-		public int MaxPrimeBound { get { return Math.Max(Math.Max(RationalFactorBase, AlgebraicFactorBase), PrimeFactory.GetValueFromIndex(QuadraticFactorBaseIndexMax)); } }
+		public int MaxPrimeBound { get { return Math.Max(Math.Max(RationalFactorBase, AlgebraicFactorBase), PrimeFactory.GetValueFromIndex(QuadraticFactorBaseMax)); } }
 
 		public int RationalFactorBase { get; private set; }
 		public int AlgebraicFactorBase { get; private set; }
-		public int QuadraticFactorBaseIndexMin { get; private set; }
-		public int QuadraticFactorBaseIndexMax { get; private set; }
+		public int QuadraticFactorBaseMin { get; private set; }
+		public int QuadraticFactorBaseMax { get; private set; }
 
 		public IEnumerable<int> RationalPrimeBase;
 		public IEnumerable<int> AlgebraicPrimeBase;
 		public IEnumerable<int> QuadraticPrimeBase;
 
-		public RationalFactorCollection RFB { get; internal set; } = null;
-		public AlgebraicFactorCollection AFB { get; internal set; } = null;
-		public QuadraticFactorCollection QFB { get; internal set; } = null;
+		public FactorCollection RFB { get; internal set; } = null;
+		public FactorCollection AFB { get; internal set; } = null;
+		public FactorCollection QFB { get; internal set; } = null;
 
 
 		private int[] _primes;
@@ -54,12 +54,6 @@ namespace GNFSCore
 		public bool IsFactor(BigInteger toCheck)
 		{
 			return (N % toCheck == 0);
-		}
-
-		public IEnumerable<int> GetPrimes(int maxValue)
-		{
-			int index = PrimeFactory.GetIndexFromValue(maxValue);
-			return _primes.Take(index);
 		}
 
 		private void CaclulatePrimeBounds()
@@ -94,18 +88,18 @@ namespace GNFSCore
 
 			_primes = PrimeFactory.GetPrimes(RationalFactorBase * 3);
 
-			RationalPrimeBase = GetPrimes(RationalFactorBase);
+			RationalPrimeBase = PrimeFactory.GetPrimeRangeTo(RationalFactorBase);
 
 			int algebraicQuantity = RationalPrimeBase.Count() * 3;
 
 			AlgebraicFactorBase = PrimeFactory.GetValueFromIndex(algebraicQuantity); //(int)(PrimeBound * 1.1);
-			QuadraticFactorBaseIndexMin = PrimeFactory.GetIndexFromValue(AlgebraicFactorBase) + 1;
-			QuadraticFactorBaseIndexMax = QuadraticFactorBaseIndexMin + base10;
+			QuadraticFactorBaseMin = AlgebraicFactorBase + 2;
+			QuadraticFactorBaseMax = QuadraticFactorBaseMin + base10;
 
 			_primes = PrimeFactory.GetPrimes(MaxPrimeBound);
 
-			AlgebraicPrimeBase = GetPrimes(AlgebraicFactorBase);
-			QuadraticPrimeBase = _primes.Skip(QuadraticFactorBaseIndexMin);
+			AlgebraicPrimeBase = PrimeFactory.GetPrimeRangeTo(AlgebraicFactorBase);
+			QuadraticPrimeBase = PrimeFactory.GetPrimeRange(QuadraticFactorBaseMin,QuadraticFactorBaseMax);
 		}
 
 		private void ConstructPolynomial(BigInteger polynomialBase, int degree)
@@ -115,9 +109,9 @@ namespace GNFSCore
 
 		private void ConstructFactorBase()
 		{
-			RFB = RationalFactorCollection.Factory.BuildRationalFactorBase(this);
-			AFB = AlgebraicFactorCollection.Factory.GetAlgebraicFactorBase(this);
-			QFB = QuadraticFactorCollection.Factory.GetQuadradicFactorBase(this);
+			RFB = FactorCollection.Factory.BuildRationalFactorBase(this);
+			AFB = FactorCollection.Factory.GetAlgebraicFactorBase(this);
+			QFB = FactorCollection.Factory.GetQuadradicFactorBase(this);
 		}
 
 		public Relation[] GenerateRelations(int valueRange, int quantity = -1)

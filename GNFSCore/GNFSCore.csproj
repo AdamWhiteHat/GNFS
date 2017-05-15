@@ -44,12 +44,10 @@
     <Compile Include="Core\QuadraticResidue.cs" />
     <Compile Include="Core\Relation.cs" />
     <Compile Include="Core\SquareFinder.cs" />
-    <Compile Include="FactorBase\AlgebraicFactorCollection.cs" />
     <Compile Include="FactorBase\FactorCollection.cs" />
+    <Compile Include="FactorBase\FactorFactory.cs" />
     <Compile Include="FactorBase\FactorPair.cs" />
     <Compile Include="FactorBase\Normal.cs" />
-    <Compile Include="FactorBase\QuadraticFactorCollection.cs" />
-    <Compile Include="FactorBase\RationalFactorCollection.cs" />
     <Compile Include="IntegerMath\BigRational.cs" />
     <Compile Include="IntegerMath\Fraction.cs" />
     <Compile Include="IntegerMath\Legendre.cs" />

@@ -107,6 +107,22 @@ namespace GNFSCore.Polynomial
 			return PolynomialCommon.GetRootsMod(this, baseM, modList);
 		}
 
+		public IEnumerable<int> GetRootsModEnumerable(BigInteger baseM, IEnumerable<int> modList)
+		{
+			BigInteger polyResult = Evaluate(baseM);
+			IEnumerable<int> primeList = modList;
+
+			foreach (int mod in primeList)
+			{
+				if ((polyResult % mod) == 0)
+				{
+					yield return mod;
+				}
+			}
+
+			yield break;
+		}
+
 		public override string ToString()
 		{
 			return PolynomialCommon.FormatString(this);
