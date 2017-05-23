@@ -39,7 +39,7 @@ namespace GNFSCore.IntegerMath
 			{
 				return -1;
 			}
-			while (primes.Last() < value)
+			if (primes.Last() < value)
 			{
 				IncreaseMaxValue(value);
 			}
@@ -60,7 +60,7 @@ namespace GNFSCore.IntegerMath
 
 		public static int[] GetPrimes(int maxValue)
 		{
-			while (maxValue > MaxValue)
+			if (maxValue > MaxValue)
 			{
 				IncreaseMaxValue(maxValue);
 			}
@@ -71,28 +71,32 @@ namespace GNFSCore.IntegerMath
 		{
 			int index = GetIndexFromValue(startValue);
 			int stopIndex = primes.Length - 1;
-			
+
 			while (index < stopIndex)
 			{
 				yield return primes[index];
 				index++;
 			}
-			
+
 			yield break;
 		}
 
-		public static IEnumerable<int> GetPrimeRangeFrom(int minValue)
+		public static IEnumerable<int> GetPrimesFrom(int minValue)
 		{
 			return primes.SkipWhile(p => p < minValue);
 		}
 
-		public static IEnumerable<int> GetPrimeRangeTo(int maxValue)
+		public static IEnumerable<int> GetPrimesTo(int maxValue)
 		{
-			return primes.TakeWhile(p => p < maxValue);
+			return GetPrimesRange(0, maxValue);
 		}
 
-		public static IEnumerable<int> GetPrimeRange(int minValue, int maxValue)
+		public static IEnumerable<int> GetPrimesRange(int minValue, int maxValue)
 		{
+			if (primes.Last() < maxValue)
+			{
+				IncreaseMaxValue(maxValue);
+			}
 			return primes.SkipWhile(p => p < minValue).TakeWhile(p => p < maxValue);
 		}
 

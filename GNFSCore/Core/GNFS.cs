@@ -88,7 +88,7 @@ namespace GNFSCore
 
 			_primes = PrimeFactory.GetPrimes(RationalFactorBase * 3);
 
-			RationalPrimeBase = PrimeFactory.GetPrimeRangeTo(RationalFactorBase);
+			RationalPrimeBase = PrimeFactory.GetPrimesTo(RationalFactorBase);
 
 			int algebraicQuantity = RationalPrimeBase.Count() * 3;
 
@@ -98,8 +98,8 @@ namespace GNFSCore
 
 			_primes = PrimeFactory.GetPrimes(MaxPrimeBound);
 
-			AlgebraicPrimeBase = PrimeFactory.GetPrimeRangeTo(AlgebraicFactorBase);
-			QuadraticPrimeBase = PrimeFactory.GetPrimeRange(QuadraticFactorBaseMin,QuadraticFactorBaseMax);
+			AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(AlgebraicFactorBase);
+			QuadraticPrimeBase = PrimeFactory.GetPrimeRange(QuadraticFactorBaseMin);
 		}
 
 		private void ConstructPolynomial(BigInteger polynomialBase, int degree)
