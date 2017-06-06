@@ -28,7 +28,7 @@ namespace GNFSCore.FactorBase
 			// quantity = 2-3 times RFB.quantity
 			public static FactorCollection GetAlgebraicFactorBase(GNFS gnfs)
 			{
-				return new FactorCollection(FactorCollection.PolynomialModP(gnfs.Algebraic, gnfs.AlgebraicPrimeBase, 0, gnfs.AlgebraicFactorBase, 2000));
+				return new FactorCollection(FactorCollection.GetPolynomialRootsInRange(gnfs.Algebraic, gnfs.AlgebraicPrimeBase, 0, gnfs.AlgebraicFactorBase, 2000));
 			}
 
 			// array of (p, p mod m) up to bound
@@ -44,11 +44,11 @@ namespace GNFSCore.FactorBase
 			// magnitude p > AFB.Last().p
 			public static FactorCollection GetQuadradicFactorBase(GNFS gnfs)
 			{
-				return new FactorCollection(FactorCollection.PolynomialModP(gnfs.Algebraic, gnfs.QuadraticPrimeBase, 2, gnfs.QuadraticFactorBaseMin, 2000));
+				return new FactorCollection(FactorCollection.GetPolynomialRootsInRange(gnfs.Algebraic, gnfs.QuadraticPrimeBase, 2, gnfs.QuadraticFactorBaseMin, 2000));
 			}
 		}
 
-		public static List<FactorPair> PolynomialModP(AlgebraicPolynomial polynomial, IEnumerable<int> primes, int rangeFrom, int rangeTo, int totalFactorPairs)
+		public static List<FactorPair> GetPolynomialRootsInRange(AlgebraicPolynomial polynomial, IEnumerable<int> primes, int rangeFrom, int rangeTo, int totalFactorPairs)
 		{
 			List<FactorPair> result = new List<FactorPair>();
 

@@ -19,7 +19,11 @@ namespace GNFSCore
 		public int A;
 		public int B;
 		public BigInteger C;
-		public BigRational AlgebraicNorm { get; private set; }
+		public BigInteger D;
+		public BigInteger E;
+		public BigInteger F;
+		public BigInteger G;
+		public BigInteger AlgebraicNorm { get; private set; }
 		public BigInteger RationalNorm { get; private set; }
 		public BigInteger AlgebraicQuotient { get; private set; }
 		public BigInteger RationalQuotient { get; private set; }
@@ -41,13 +45,17 @@ namespace GNFSCore
 			B = b;
 			_gnfs = gnfs;
 
-			AlgebraicNorm = Normal.AlgebraicRational(a, b, _gnfs.Algebraic); // b^deg * f( a/b )
+			AlgebraicNorm = Normal.Algebraic(a, b, _gnfs.Algebraic); // b^deg * f( a/b )
 			RationalNorm = Normal.Rational(a, b, _gnfs.Algebraic.Base); // a + bm
 
-			AlgebraicQuotient = AlgebraicNorm.WholePart;
+			AlgebraicQuotient = AlgebraicNorm;
 			RationalQuotient = RationalNorm;
 
 			C = _gnfs.Algebraic.Evaluate(RationalNorm) % _gnfs.N;
+			D = _gnfs.Algebraic.Evaluate(RationalNorm) % B;
+			E = _gnfs.Algebraic.Evaluate(AlgebraicNorm);
+			F = _gnfs.Algebraic.Evaluate(AlgebraicNorm) % _gnfs.N;
+			G = _gnfs.Algebraic.Evaluate(AlgebraicNorm) % B;
 		}
 
 		public BigInteger GetContribution(BigInteger x, BigInteger modQ)
@@ -62,7 +70,7 @@ namespace GNFSCore
 
 		public void Sieve()
 		{
-			AlgebraicQuotient = Factor(_gnfs.AlgebraicPrimeBase, AlgebraicNorm.WholePart, AlgebraicQuotient);
+			AlgebraicQuotient = Factor(_gnfs.AlgebraicPrimeBase, AlgebraicNorm, AlgebraicQuotient);
 			RationalQuotient = Factor(_gnfs.RationalPrimeBase, RationalNorm, RationalQuotient);
 		}
 
@@ -98,7 +106,7 @@ namespace GNFSCore
 		public BitVector GetMatrixRowVector()
 		{
 			BitVector rationalBitVector = new BitVector(RationalNorm, _gnfs.RationalFactorBase);
-			BitVector algebraicBitVector = new BitVector(BigInteger.Abs(AlgebraicNorm.WholePart), _gnfs.AlgebraicFactorBase);
+			BitVector algebraicBitVector = new BitVector(BigInteger.Abs(AlgebraicNorm), _gnfs.AlgebraicFactorBase);
 			bool[] quadraticBitVector = QuadraticResidue.GetQuadraticCharacters(this, _gnfs.QFB);
 
 			return new BitVector(rationalBitVector.Elements.Concat(algebraicBitVector.Elements).Concat(quadraticBitVector).ToArray());
@@ -108,8 +116,9 @@ namespace GNFSCore
 		{
 			return
 				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t" +
-				$"[f(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)},\ta+bm={RationalNorm.ToString().PadLeft(4)}]\t" +
-				$"f({RationalNorm})%N".PadLeft(10) + $" = {C.ToString().PadLeft(10)}\t";
+				$"[ƒ(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)} ({AlgebraicNorm.IsSquare()}),\ta+b*m={RationalNorm.ToString().PadLeft(4)} ({RationalNorm.IsSquare()})]\t" +
+				$"ƒ({RationalNorm}) =".PadRight(8) + $"{C.ToString().PadLeft(6)}" + $"% B = ".PadLeft(16).PadRight(26) + $"{D.ToString().PadLeft(6).PadRight(12)}" +
+				$"ƒ({AlgebraicNorm}) =".PadLeft(6).PadRight(14) + $" {E.ToString().PadLeft(6)} % N =".PadRight(62) + $"{F.ToString().PadLeft(12)} % B =".PadRight(12) + $"{G.ToString().PadLeft(6)}";
 
 			//+"\t QUOTIENT(Alg): {AlgebraicQuotient} \t QUOTIENT(Rat): {RationalQuotient}";
 		}

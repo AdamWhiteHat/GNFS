@@ -110,22 +110,20 @@ namespace GNFS_Winforms
 			// valueRange & quantity 
 			Relation[] smoothRelations = gnfs.GenerateRelations(valueRange, quantity);
 
-			string xyPairs = string.Join(Environment.NewLine, smoothRelations.Select(rel => $"{rel.A},{rel.B}"));
-
 			LogOutput($"Smooth relations:");
 			LogOutput("\t_______________________________________________");
 			LogOutput($"\t|   A   |  B | ALGEBRAIC_NORM | RATIONAL_NORM | \t\tQuantity: {smoothRelations.Count()} Target quantity: {(gnfs.RFB.Count() + gnfs.AFB.Count() + gnfs.QFB.Count() + 1).ToString()}"/* Search range: -{relationsRange} to {relationsRange}"*/);
 			LogOutput("\t```````````````````````````````````````````````");
-			LogOutput(xyPairs);
-			//LogOutput(smoothRelations.FormatString());
+			//LogOutput( string.Join(Environment.NewLine, smoothRelations.Select(rel => $"{rel.A},{rel.B}")));
+			LogOutput(smoothRelations.FormatString());
 			LogOutput();
 
-			var matrixVectors = smoothRelations.Select(rel => rel.GetMatrixRowVector());
-			BitMatrix smoothRelationsMatrix = new BitMatrix(matrixVectors.ToList());
-
-			LogOutput($"Smooth relations binary matrix:");
-			LogOutput(smoothRelationsMatrix.ToString());
-			LogOutput();
+			//var matrixVectors = smoothRelations.Select(rel => rel.GetMatrixRowVector());
+			//BitMatrix smoothRelationsMatrix = new BitMatrix(matrixVectors.ToList());
+			//
+			//LogOutput($"Smooth relations binary matrix:");
+			//LogOutput(smoothRelationsMatrix.ToString());
+			//LogOutput();
 
 			BigInteger productC = smoothRelations.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
 			BigInteger gcd = GCD.FindGCD(n, productC % n);

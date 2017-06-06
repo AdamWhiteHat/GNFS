@@ -37,13 +37,18 @@ namespace GNFSCore
 		private int _degree;
 
 
-		public GNFS(BigInteger n, BigInteger polynomialBase, int degree)
+		public GNFS(BigInteger n, BigInteger polynomialBase, int degree = -1)
 		{
 			N = n;
 
 			// degree = 3 when n <= 10 ^ 60
 			// degree = 5 when 10 ^ 60 < n < 10 ^ 180
 			_degree = degree;
+
+			if (_degree == -1)
+			{
+				_degree = CalculateDegree(n);
+			}
 
 			CaclulatePrimeBounds();
 
@@ -54,6 +59,67 @@ namespace GNFSCore
 		public bool IsFactor(BigInteger toCheck)
 		{
 			return (N % toCheck == 0);
+		}
+
+		// Values were obtained from the paper:
+		// "Polynomial Selection for the Number Field Sieve Integer Factorisation Algorithm"
+		// by Brian Antony Murphy
+		// Table 3.1, page 44
+		private int CalculateDegree(BigInteger n)
+		{
+			int result = 2;
+			int base10 = N.ToString().Count();
+
+			if (base10 < 65)
+			{
+				result = 3;
+			}
+			else if (base10 >= 65 && base10 < 125)
+			{
+				result = 4;
+			}
+			else if (base10 >= 125 && base10 < 225)
+			{
+				result = 5;
+			}
+			else if (base10 >= 225 && base10 < 315)
+			{
+				result = 6;
+			}
+			else if (base10 >= 315)
+			{
+				result = 7;
+			}
+
+			return result;
+		}
+
+		private int CalculateQuadraticBaseSize(int degree)
+		{
+			int result = -1;
+
+			if (degree < 3)
+			{
+				result = 10;
+			}
+			else if (degree == 3 || degree == 4)
+			{
+				result = 20;
+			}
+			else if (degree == 5 || degree == 6)
+			{
+				result = 40;
+			}
+			else if (degree == 7)
+			{
+				result = 80;
+			}
+			else if (degree >= 8)
+			{
+				result = 100;
+			}
+
+			return result;
 		}
 
 		private void CaclulatePrimeBounds()
@@ -99,7 +165,10 @@ namespace GNFSCore
 			_primes = PrimeFactory.GetPrimes(MaxPrimeBound);
 
 			AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(AlgebraicFactorBase);
-			QuadraticPrimeBase = PrimeFactory.GetPrimeRange(QuadraticFactorBaseMin);
+
+			int quadraticBaseSize = CalculateQuadraticBaseSize(_degree);
+
+			QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(QuadraticFactorBaseMin).Take(quadraticBaseSize);
 		}
 
 		private void ConstructPolynomial(BigInteger polynomialBase, int degree)
@@ -116,21 +185,19 @@ namespace GNFSCore
 
 		public Relation[] GenerateRelations(int valueRange, int quantity = -1)
 		{
-			List<Relation> result = new List<Relation>();
-
-			int b = -1;
-			BigInteger m = Algebraic.Base;
 			if (quantity == -1)
 			{
 				quantity = RFB.Count + AFB.Count + QFB.Count + 1;
 			}
-			IEnumerable<int> A = Enumerable.Range(2, valueRange * 2);
 
-			IEnumerable<int> pRational = RFB.Select(tupl => tupl.P).OrderBy(i => i);
-			IEnumerable<int> pAlgebraic = AFB.Select(tupl => tupl.P).OrderBy(i => i).Distinct();
+			int b = -1;
+			BigInteger m = Algebraic.Base;
 
-			int maxB = Math.Max(valueRange, quantity) + 2;
+			int adjustedRange = valueRange % 2 == 0 ? valueRange + 1 : valueRange;
+			IEnumerable<int> A = Enumerable.Range(-adjustedRange, adjustedRange);
+			int maxB = Math.Max(adjustedRange, quantity) + 2;
 
+			List<Relation> result = new List<Relation>();
 			while (result.Count() < quantity)
 			{
 				b += 2;
@@ -138,7 +205,7 @@ namespace GNFSCore
 				IEnumerable<int> coprimes = A.Where(a => CoPrime.IsCoprime(a, b));
 				IEnumerable<Relation> unfactored = coprimes.Select(a => new Relation(a, b, this));
 
-				List<Relation> smooth = SieveRelations(unfactored, pRational, pAlgebraic);
+				List<Relation> smooth = SieveRelations(unfactored);
 
 				if (smooth.Any())
 				{
@@ -155,7 +222,7 @@ namespace GNFSCore
 			return Relations;
 		}
 
-		public static List<Relation> SieveRelations(IEnumerable<Relation> unfactored, IEnumerable<int> pRational, IEnumerable<int> pAlgebraic)
+		public static List<Relation> SieveRelations(IEnumerable<Relation> unfactored)
 		{
 			List<Relation> results = new List<Relation>();
 
