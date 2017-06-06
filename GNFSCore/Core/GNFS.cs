@@ -190,13 +190,14 @@ namespace GNFSCore
 				quantity = RFB.Count + AFB.Count + QFB.Count + 1;
 			}
 
-			int b = -1;
+			
 			BigInteger m = Algebraic.Base;
 
 			int adjustedRange = valueRange % 2 == 0 ? valueRange + 1 : valueRange;
-			IEnumerable<int> A = Enumerable.Range(-adjustedRange, adjustedRange);
+			IEnumerable<int> A =  Enumerable.Range(-adjustedRange, adjustedRange*2);
 			int maxB = Math.Max(adjustedRange, quantity) + 2;
 
+			int b = -1;
 			List<Relation> result = new List<Relation>();
 			while (result.Count() < quantity)
 			{
