@@ -39,39 +39,12 @@ namespace GNFSCore.PrimeSignature
 			SortRows();
 		}
 
-		public BitMatrix(List<BitVector> vectors)
+		public BitMatrix(IEnumerable<BitVector> vectors)
 		{
-			Rows = vectors;
+			Rows = vectors.ToList();
 			Width = Rows.First().Length;
 
 			SortRows();
-		}
-
-		public IEnumerable<BigInteger[]> GetSquareCombinations()
-		{
-			BitVector[] squareVectors = MatrixSolver.GetTrivialSquares(this); // Vectors who's RowSum is zero are already squares.
-			BigInteger[] squareNumbers = squareVectors.Select(r => r.Number).ToArray();
-			List<BigInteger[]> result = squareNumbers.Select(i => new BigInteger[] { i }).ToList(); // Add trivial squares to result
-																									//result.AddRange(Combinatorics.GetCombination(squareNumbers)); 
-			Remove(squareVectors);
-			Rows.Reverse(); // Reverse array
-
-			IEnumerable<BitVector> oneSums = Rows.Where(v => v.RowSum == 1); // Get vectors with only one odd factor exponents			
-			IEnumerable<IGrouping<int, BitVector>> singleFactorGroups = oneSums.GroupBy(v => v.IndexOfLeftmostElement()).Where(g => g.Count() > 1); // Group vectors by their factor exponents
-			IEnumerable<BitVector> toRemove = singleFactorGroups.SelectMany(g => g.Select(v => v));
-
-			Remove(toRemove); // Remove selected vectors from remaining vectors
-
-			List<BigInteger[]> singleFactorResults = MatrixSolver.GetSingleFactors(this, singleFactorGroups);
-			List<BigInteger[]> simpleMatchResults = MatrixSolver.GetSimpleMatches(this);
-			List<BigInteger[]> chainedFactorResults = MatrixSolver.GetChainedFactors(this);
-			Remove(chainedFactorResults);
-
-			result.AddRange(singleFactorResults);
-			result.AddRange(simpleMatchResults);
-			result.AddRange(chainedFactorResults);
-
-			return result;
 		}
 
 		public void Remove(IEnumerable<BigInteger[]> nextNumbers)
@@ -115,16 +88,14 @@ namespace GNFSCore.PrimeSignature
 		{
 			SortRows();
 
-			BigInteger maxValue = Rows.Select(row => row.Number).Max();
-			int padLength = maxValue.ToString().Length + 3;
-			string padString = new string(Enumerable.Repeat(' ', padLength).ToArray());
+			//BigInteger maxValue = Rows.Select(row => row.Number).Max();
+			//int padLength = maxValue.ToString().Length + 3;
+			//string padString = new string(Enumerable.Repeat(' ', padLength).ToArray());
 
 			StringBuilder sb = new StringBuilder();
-			sb.Append(padString);
+			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(i => i.ToString())));
+			sb.AppendLine();
 			sb.Append(string.Join(",", ColumnSums));
-			sb.AppendLine();
-			sb.AppendLine();
-			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(i => i.ToString(padLength))));
 			return sb.ToString();
 		}
 	}

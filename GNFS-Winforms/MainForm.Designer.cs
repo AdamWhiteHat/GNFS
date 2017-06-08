@@ -35,9 +35,11 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.btnGetFactorBases = new System.Windows.Forms.Button();
+			this.btnCreateGnfs = new System.Windows.Forms.Button();
 			this.label4 = new System.Windows.Forms.Label();
 			this.tbDegree = new System.Windows.Forms.TextBox();
+			this.btnFindRelations = new System.Windows.Forms.Button();
+			this.btnFindSquares = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// tbOutput
@@ -111,16 +113,16 @@
 			this.label3.Text = "Smoothness Bound";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// btnGetFactorBases
+			// btnCreateGnfs
 			// 
-			this.btnGetFactorBases.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnGetFactorBases.Location = new System.Drawing.Point(631, 100);
-			this.btnGetFactorBases.Name = "btnGetFactorBases";
-			this.btnGetFactorBases.Size = new System.Drawing.Size(75, 23);
-			this.btnGetFactorBases.TabIndex = 7;
-			this.btnGetFactorBases.Text = "Step 1";
-			this.btnGetFactorBases.UseVisualStyleBackColor = true;
-			this.btnGetFactorBases.Click += new System.EventHandler(this.btnGetFactorBases_Click);
+			this.btnCreateGnfs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnCreateGnfs.Location = new System.Drawing.Point(348, 100);
+			this.btnCreateGnfs.Name = "btnCreateGnfs";
+			this.btnCreateGnfs.Size = new System.Drawing.Size(96, 23);
+			this.btnCreateGnfs.TabIndex = 7;
+			this.btnCreateGnfs.Text = "Create/Load";
+			this.btnCreateGnfs.UseVisualStyleBackColor = true;
+			this.btnCreateGnfs.Click += new System.EventHandler(this.btnCreateGnfs_Click);
 			// 
 			// label4
 			// 
@@ -141,14 +143,40 @@
 			this.tbDegree.Size = new System.Drawing.Size(359, 20);
 			this.tbDegree.TabIndex = 8;
 			// 
+			// btnFindRelations
+			// 
+			this.btnFindRelations.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnFindRelations.Enabled = false;
+			this.btnFindRelations.Location = new System.Drawing.Point(444, 100);
+			this.btnFindRelations.Name = "btnFindRelations";
+			this.btnFindRelations.Size = new System.Drawing.Size(96, 23);
+			this.btnFindRelations.TabIndex = 10;
+			this.btnFindRelations.Text = "Find Relations";
+			this.btnFindRelations.UseVisualStyleBackColor = true;
+			this.btnFindRelations.Click += new System.EventHandler(this.btnFindRelations_Click);
+			// 
+			// btnFindSquares
+			// 
+			this.btnFindSquares.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnFindSquares.Enabled = false;
+			this.btnFindSquares.Location = new System.Drawing.Point(544, 100);
+			this.btnFindSquares.Name = "btnFindSquares";
+			this.btnFindSquares.Size = new System.Drawing.Size(96, 23);
+			this.btnFindSquares.TabIndex = 11;
+			this.btnFindSquares.Text = "Find Squares";
+			this.btnFindSquares.UseVisualStyleBackColor = true;
+			this.btnFindSquares.Click += new System.EventHandler(this.btnFindSquares_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(710, 482);
+			this.Controls.Add(this.btnFindSquares);
+			this.Controls.Add(this.btnFindRelations);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.tbDegree);
-			this.Controls.Add(this.btnGetFactorBases);
+			this.Controls.Add(this.btnCreateGnfs);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
@@ -173,9 +201,11 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Button btnGetFactorBases;
+		private System.Windows.Forms.Button btnCreateGnfs;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.TextBox tbDegree;
+		private System.Windows.Forms.Button btnFindRelations;
+		private System.Windows.Forms.Button btnFindSquares;
 	}
 }
 

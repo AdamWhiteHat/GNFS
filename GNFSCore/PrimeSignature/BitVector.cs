@@ -40,11 +40,11 @@ namespace GNFSCore.PrimeSignature
 			Elements = result;
 		}
 
-		internal BitVector(bool[] elements)
+		internal BitVector(BigInteger number, bool[] elements)
 		{
 			Elements = elements;
-			Number = RowSum;
-		}	
+			Number = number;
+		}
 
 		public static bool[] CombineVectors(IEnumerable<BitVector> vectors)
 		{
@@ -55,7 +55,11 @@ namespace GNFSCore.PrimeSignature
 
 			IEnumerable<BigInteger> vectorNumbers = vectors.Select(v => v.Number);
 			IEnumerable<BigInteger> distinctVectors = vectorNumbers.Distinct();
-			if (distinctVectors.Count() < vectorNumbers.Count())
+
+			int distinctVectorCount = distinctVectors.Count();
+			int vectorCount = vectorNumbers.Count();
+
+			if (distinctVectorCount < vectorCount)
 			{
 				throw new ArgumentException($"Argument {nameof(vectors)} cannot contain two vectors with the same value (Number)", nameof(vectors));
 			}
@@ -89,19 +93,15 @@ namespace GNFSCore.PrimeSignature
 			return Array.IndexOf(Elements, true);
 		}
 
-		public override string ToString()
+		public static string FormatElements(bool[] elements)
 		{
-			int maxValue = PrimeFactory.GetValueFromIndex(Elements.Length - 1);
-			string maxValueString = maxValue.ToString();
-			int padLength = maxValueString.Length + 3;
-
-			return ToString(padLength);
+			return string.Join(",", elements.Select(b => b ? '1' : '0'));
 		}
 
-		public string ToString(int padLength)
+		public override string ToString()
 		{
-			string numberString = $"{Number}:".PadRight(padLength);
-			return numberString + string.Join(",", Elements.Select(b => b ? '1' : '0'));
+			//  augmented matrix style
+			return $"{Number} | {FormatElements(Elements)}";
 		}
 	}
 }

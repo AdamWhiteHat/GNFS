@@ -5,10 +5,10 @@ using System.Collections;
 using System.Threading.Tasks;
 using GNFSCore.Polynomial;
 using GNFSCore.IntegerMath;
+using System.Runtime.Serialization;
 
 namespace GNFSCore.FactorBase
 {
-	[Serializable]
 	public struct FactorPair : IEquatable<FactorPair>
 	{
 		public int P { get; }
@@ -53,6 +53,24 @@ namespace GNFSCore.FactorBase
 		public override string ToString()
 		{
 			return $"({P},{R})";
+		}
+
+		internal string Serialize()
+		{
+			return $"{P},{R}";
+		}
+
+		private static readonly char[] delimiter = new char[] { ',' };
+		internal static FactorPair Deserialize(string serializedString)
+		{
+			int commaIndex = serializedString.IndexOf(',');
+
+			string pString = serializedString.Substring(0, commaIndex);
+			string rString = serializedString.Substring(commaIndex+1);
+			int p = int.Parse(pString);
+			int r = int.Parse(rString);
+
+			return new FactorPair(p,r);
 		}
 	}
 }

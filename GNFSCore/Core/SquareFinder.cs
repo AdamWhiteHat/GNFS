@@ -48,14 +48,14 @@ namespace GNFSCore
 		{
 		}
 
-		public SquareFinder(GNFS sieve, Relation[] relations)
+		public SquareFinder(GNFS sieve, List<Relation> relations)
 		{
 			RationalProductMod = -1;
 
 			gnfs = sieve;
-			polyBase = gnfs.Algebraic.Base;
-			RelationsSet = relations;
-			SquarePolynomialDerivative = (BigInteger)(gnfs.Algebraic.FormalDerivative * gnfs.Algebraic.FormalDerivative);
+			polyBase = gnfs.CurrentPolynomial.Base;
+			RelationsSet = relations.ToArray();
+			SquarePolynomialDerivative = (BigInteger)(gnfs.CurrentPolynomial.FormalDerivative * gnfs.CurrentPolynomial.FormalDerivative);
 		}
 
 		private static bool _isIrreducible(IEnumerable<BigInteger> coefficients)

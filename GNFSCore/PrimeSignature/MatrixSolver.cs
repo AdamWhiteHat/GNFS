@@ -11,9 +11,9 @@ namespace GNFSCore.PrimeSignature
 
 	public class MatrixSolver
 	{
-		public static BitVector[] GetTrivialSquares(BitMatrix matrix)
+		public static List<BigInteger[]> GetTrivialSquares(BitMatrix matrix)
 		{
-			return matrix.Rows.Where(r => r.RowSum == 0).ToArray();
+			return matrix.Rows.Where(r => r.RowSum == 0).Select(r => r.Number).Select(i => new BigInteger[] { i }).ToList();
 		}
 
 		public static List<BigInteger[]> GetSingleFactors(BitMatrix bitMatrix, IEnumerable<IGrouping<int, BitVector>> input)
@@ -148,6 +148,42 @@ namespace GNFSCore.PrimeSignature
 			while (!done);
 
 			return result;
+		}
+
+		public static IEnumerable<BigInteger[]> GetSquareCombinations(BitMatrix matrix)
+		{
+			List<BigInteger[]> squareVectors = MatrixSolver.GetTrivialSquares(matrix); // Vectors who's RowSum is zero are already squares.
+			List<BigInteger[]> result = squareVectors;  // Add trivial squares to result
+														//result.AddRange(Combinatorics.GetCombination(squareNumbers)); 
+			matrix.Remove(squareVectors);
+			matrix.Rows.Reverse(); // Reverse array
+
+			IEnumerable<BitVector> oneSums = matrix.Rows.Where(v => v.RowSum == 1); // Get vectors with only one odd factor exponents			
+			IEnumerable<IGrouping<int, BitVector>> singleFactorGroups = oneSums.GroupBy(v => v.IndexOfLeftmostElement()).Where(g => g.Count() > 1); // Group vectors by their factor exponents
+			IEnumerable<BitVector> toRemove = singleFactorGroups.SelectMany(g => g.Select(v => v));
+
+			matrix.Remove(toRemove); // Remove selected vectors from remaining vectors
+
+			List<BigInteger[]> singleFactorResults = MatrixSolver.GetSingleFactors(matrix, singleFactorGroups);
+			List<BigInteger[]> simpleMatchResults = MatrixSolver.GetSimpleMatches(matrix);
+			List<BigInteger[]> chainedFactorResults = MatrixSolver.GetChainedFactors(matrix);
+			matrix.Remove(chainedFactorResults);
+
+			result.AddRange(singleFactorResults);
+			result.AddRange(simpleMatchResults);
+			result.AddRange(chainedFactorResults);
+
+			return result;
+		}
+
+		public static List<BigInteger> GetCombinationsProduct(IEnumerable<BigInteger[]> squareCombinations)
+		{
+			return squareCombinations.Select(arr => arr.Product()).ToList();
+		}
+
+		public static string FormatCombinations(IEnumerable<BigInteger[]> squareCombinations)
+		{
+			return string.Join(Environment.NewLine, squareCombinations.Select(arr => { BigInteger product = arr.Product(); return $"({product.IsSquare()})\t:\t{product}\t=>\t{{{string.Join(",", arr.Select(bi => bi.ToString()))}}}"; }));
 		}
 	}
 }

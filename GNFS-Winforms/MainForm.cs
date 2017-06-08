@@ -16,74 +16,143 @@ namespace GNFS_Winforms
 	using GNFSCore.FactorBase;
 	using GNFSCore.IntegerMath;
 	using GNFSCore.PrimeSignature;
+	using System.Threading;
 
 	public partial class MainForm : Form
 	{
 		public MainForm()
 		{
 			InitializeComponent();
-			tbN.Text = "3218147";// "1807082088687404805951656164405905566278102516769401349170127021450056662540244048387341127590812303371781887966563182013214880557";//"45113"; //"3218147";//"1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139"; //"1001193673991790373"; //"45113";//"3218147"; //"3580430111"
-			tbBase.Text = "117";//"12574411168418005980468";//"31";//"29668737024"; //"11875";//"117";//"31";"127";
-			tbDegree.Text = "3"; // "5"; //"7";
+			cancellationSource = new CancellationTokenSource();
+			cancellationSource.Cancel();
+			tbN.Text = "1807082088687404805951656164405905566278102516769401349170127021450056662540244048387341127590812303371781887966563182013214880557"; // "40815183453689876308460096333405025830273709373822334818010625964698700067207";// "3218147";//"45113"; ////"1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139"; //"1001193673991790373"; //"45113";//"3218147"; //"3580430111"
+			tbBase.Text = "3845520700308425278140";//"3845520700308425278207"; // <- prime //"5867732301053";//"12574411168418005980468";//"31";//"29668737024"; //"11875";//"117";//"31";"127";
+			tbDegree.Text = "5"; //"6"; //"7" //"3";
 		}
 
-		public void LogOutput(string message = "")
+		private GNFS gnfs;
+		private int degree;
+		private BigInteger n;
+		private BigInteger polyBase;
+		private CancellationTokenSource cancellationSource;
+
+		private static string FindSquaresButtonText = "Find Squares";
+		private static string FindRelationsButtonText = "Find Relations";
+		private static string CreateGnfsButtonText = "Create/Load";
+		private static string CancelButtonText = "Cancel";
+
+		private void HaultAllProcessing()
 		{
-			if (tbOutput.InvokeRequired)
+			if (!cancellationSource.IsCancellationRequested)
 			{
-				tbOutput.Invoke(new MethodInvoker(() => LogOutput(message)));
+				cancellationSource.Cancel();
+				RestoreAllButtons();
+			}
+		}
+
+		private void RestoreAllButtons()
+		{
+			if (btnCreateGnfs.InvokeRequired)
+			{
+				btnCreateGnfs.Invoke(new MethodInvoker(() => RestoreAllButtons()));
 			}
 			else
 			{
-				tbOutput.AppendText(message + Environment.NewLine);
+				btnCreateGnfs.Text = CreateGnfsButtonText;
+				btnFindRelations.Text = FindRelationsButtonText;
+				btnFindSquares.Text = FindSquaresButtonText;
 			}
 		}
 
-		private void tbOutput_KeyUp(object sender, KeyEventArgs e)
+		private void btnFindSquares_Click(object sender, EventArgs e)
 		{
-			if (e.Control)
+			if (cancellationSource.IsCancellationRequested)
 			{
-				if (e.KeyCode == Keys.A)
+				cancellationSource = new CancellationTokenSource();
+				btnFindSquares.Text = CancelButtonText;
+
+				CancellationToken token = cancellationSource.Token;
+				new Thread(() =>
 				{
-					tbOutput.SelectAll();
-				}
+					FindSquares(token);
+					HaultAllProcessing();
+
+				}).Start();
+			}
+			else
+			{
+				HaultAllProcessing();
 			}
 		}
 
-		private static string FormatTupleCollection(IEnumerable<Tuple<int, int>> tuples)
+		private void btnFindRelations_Click(object sender, EventArgs e)
 		{
-			return string.Join("\t", tuples.Select(tup => $"({tup.Item1},{tup.Item2})"));
+			if (cancellationSource.IsCancellationRequested)
+			{
+				cancellationSource = new CancellationTokenSource();
+				btnFindRelations.Text = CancelButtonText;
+
+				CancellationToken token = cancellationSource.Token;
+				new Thread(() =>
+				{
+					IEnumerable<Relation> relations = gnfs.GenerateRelations(token);
+					LogOutput($"Generated relations:");
+					LogOutput(relations.FormatString());
+					HaultAllProcessing();
+
+				}).Start();
+			}
+			else
+			{
+				HaultAllProcessing();
+			}
 		}
 
-		private static string FormatArrayList(IEnumerable<int[]> array)
+		private void btnCreateGnfs_Click(object sender, EventArgs e)
 		{
-			return string.Join("\t", array.Select(tup => $"({string.Join(",", tup.Select(i => i.ToString()))})"));
+			if (cancellationSource.IsCancellationRequested)
+			{
+				cancellationSource = new CancellationTokenSource();
+				btnCreateGnfs.Text = CancelButtonText;
+
+				n = BigInteger.Parse(tbN.Text);
+				polyBase = BigInteger.Parse(tbBase.Text);
+				degree = int.Parse(tbDegree.Text);
+
+				CancellationToken token = cancellationSource.Token;
+				new Thread(() =>
+				{
+					CreateGnfs(token);
+					HaultAllProcessing();
+
+				}).Start();
+			}
+			else
+			{
+				HaultAllProcessing();
+			}
 		}
 
-		private static string FormatList(IEnumerable<int> array)
+		private void CreateGnfs(CancellationToken cancelToken)
 		{
-			return $"({string.Join(",", array.Select(i => i.ToString()))})";
+			gnfs = new GNFS(cancelToken, n, polyBase, degree);
 
-		}
+			if (cancelToken.IsCancellationRequested)
+			{
+				return;
+			}
 
-		private void btnGetFactorBases_Click(object sender, EventArgs e)
-		{
-			BigInteger n = BigInteger.Parse(tbN.Text);
-			BigInteger polyBase = BigInteger.Parse(tbBase.Text);
-			int degree = int.Parse(tbDegree.Text);
-
-			int valueRange = 300;
-			int quantity = 300;
-
-			GNFS gnfs = new GNFS(n, polyBase, degree);
-
-			tbBound.Text = gnfs.PrimeBound.ToString();
+			tbBound.Invoke(new MethodInvoker(() =>
+			{
+				tbBound.Text = gnfs.PrimeBound.ToString();
+				//btnCreateGnfs.Enabled = false;
+			}));
 
 			LogOutput($"N = {gnfs.N}");
 			LogOutput();
 
 			LogOutput($"Polynomial(degree: {degree}, base: {polyBase}):");
-			LogOutput(gnfs.Algebraic.ToString());
+			LogOutput(gnfs.CurrentPolynomial.ToString());
 			LogOutput();
 
 
@@ -107,8 +176,24 @@ namespace GNFS_Winforms
 			LogOutput(gnfs.QFB.ToString());
 			LogOutput();
 
+			btnFindRelations.Invoke(new MethodInvoker(() =>
+			{
+				btnFindRelations.Enabled = true;
+				btnFindRelations.Text = CancelButtonText;
+				btnCreateGnfs.Enabled = false;
+			}));
+
 			// valueRange & quantity 
-			Relation[] smoothRelations = gnfs.GenerateRelations(valueRange, quantity);
+			IEnumerable<Relation> smoothRelations = gnfs.GenerateRelations(cancelToken);//, quantity);
+
+
+			if (cancelToken.IsCancellationRequested)
+			{
+				return;
+			}
+
+			//IEnumerable<Relation> zeroRelations = smoothRelations.Where(r => r.D == 0);
+			//zeroRelations = zeroRelations.Where(r => r.G == 0);
 
 			LogOutput($"Smooth relations:");
 			LogOutput("\t_______________________________________________");
@@ -119,11 +204,29 @@ namespace GNFS_Winforms
 			LogOutput();
 
 			//var matrixVectors = smoothRelations.Select(rel => rel.GetMatrixRowVector());
-			//BitMatrix smoothRelationsMatrix = new BitMatrix(matrixVectors.ToList());
-			//
-			//LogOutput($"Smooth relations binary matrix:");
-			//LogOutput(smoothRelationsMatrix.ToString());
+			//var rationalVectors = matrixVectors.Select(tup => tup.Item1);
+			//var algebraicVectors = matrixVectors.Select(tup => tup.Item1);
+
+			//BitMatrix rationalVectorsMatrix = new BitMatrix(rationalVectors);
+			//BitMatrix algebraicVectorsMatrix = new BitMatrix(algebraicVectors);
+
+			//IEnumerable<BigInteger[]> rationalCombinations = MatrixSolver.GetSquareCombinations(rationalVectorsMatrix);
+			//IEnumerable<BigInteger[]> algebraicCombinations = MatrixSolver.GetSquareCombinations(rationalVectorsMatrix);
+
+			//LogOutput($"*** BINARY MATRIX ***");
 			//LogOutput();
+			//LogOutput("Rational matrix:");
+			//LogOutput(MatrixSolver.FormatCombinations(rationalCombinations));
+			//LogOutput();
+			//LogOutput();
+			//LogOutput("Algebraic matrix:");
+			//LogOutput(MatrixSolver.FormatCombinations(algebraicCombinations));
+			//LogOutput();
+			//LogOutput();
+
+			//List<BigInteger> squares = MatrixSolver.GetCombinationsProduct(rationalCombinations);
+			//squares.AddRange(MatrixSolver.GetCombinationsProduct(algebraicCombinations));
+
 
 			BigInteger productC = smoothRelations.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
 			BigInteger gcd = GCD.FindGCD(n, productC % n);
@@ -137,7 +240,7 @@ namespace GNFS_Winforms
 			LogOutput();
 
 
-			if (gnfs.IsFactor(gcd))
+			if (gcd > 1)
 			{
 				LogOutput(
 					$@"
@@ -149,7 +252,113 @@ namespace GNFS_Winforms
 					");
 				LogOutput();
 			}
+		}
 
+		private void FindSquares(CancellationToken cancelToken)
+		{
+			List<BigInteger> norms = new List<BigInteger>();
+			norms.AddRange(gnfs.Relations.Select(rel => rel.AlgebraicNorm));
+			norms.AddRange(gnfs.Relations.Select(rel => rel.RationalNorm));
+
+			IEnumerable<BigInteger> squares = norms.Distinct();
+			squares = squares.Where(bi => bi.IsSquare());
+
+			if (squares.Any())
+			{
+				//BigInteger squaresProduct = squares.Product();
+				//squares.Insert(0, squaresProduct);
+
+				LogOutput();
+				LogOutput("SQUARES FOUND:");
+				LogOutput(squares.FormatString());
+				LogOutput();
+
+				SquaresMethod squaresMethod = new SquaresMethod(n, squares);
+
+				int maxSteps = 5;
+				int counter = 0;
+				BigInteger[] factors = new BigInteger[0];
+				do
+				{
+					if (cancelToken.IsCancellationRequested)
+					{
+						break;
+					}
+
+					factors = squaresMethod.Step();
+
+					counter++;
+				}
+				while (!factors.Any() && counter < maxSteps);
+
+				//IEnumerable<BigInteger> squaresGCDs = squares.Select(bi => GCD.FindGCD(n, bi));
+				//IEnumerable<BigInteger> factors = squaresGCDs.Where(bi => bi > 1);
+
+				if (factors.Any())
+				{
+					LogOutput();
+					LogOutput("**************** FACTORS FOUND ****************");
+					LogOutput(factors.FormatString());
+					LogOutput("**************** FACTORS FOUND ****************");
+				}
+			}
+			else
+			{
+				MessageBox.Show("No squares found in relations!\nSieve more relations.");
+				//List<int> fbSquares = new List<int>();
+				//fbSquares.AddRange(gnfs.AFB.Select(pair => pair.R));
+				//fbSquares.AddRange(gnfs.RFB.Select(pair => pair.R));
+				//fbSquares.AddRange(gnfs.QFB.Select(pair => pair.R));
+
+				//fbSquares = fbSquares.Where(i => Math.Sqrt(i) % 1 == 0).ToList();
+
+				//if (fbSquares.Any())
+				//{
+
+				//}
+			}
+		}
+
+		private static string FormatTupleCollection(IEnumerable<Tuple<int, int>> tuples)
+		{
+			return string.Join("\t", tuples.Select(tup => $"({tup.Item1},{tup.Item2})"));
+		}
+
+		private static string FormatArrayList(IEnumerable<int[]> array)
+		{
+			return string.Join("\t", array.Select(tup => $"({string.Join(",", tup.Select(i => i.ToString()))})"));
+		}
+
+		private static string FormatList(IEnumerable<int> array)
+		{
+			return $"({string.Join(",", array.Select(i => i.ToString()))})";
+
+		}
+
+		private void tbOutput_KeyUp(object sender, KeyEventArgs e)
+		{
+			if (e.Control)
+			{
+				if (e.KeyCode == Keys.A)
+				{
+					tbOutput.SelectAll();
+				}
+			}
+		}
+
+		public void LogOutput(string message = "")
+		{
+			if (tbOutput.InvokeRequired)
+			{
+				tbOutput.Invoke(new MethodInvoker(() => LogOutput(message)));
+			}
+			else
+			{
+				if (!this.IsDisposed)
+				{
+					tbOutput.AppendText(message + Environment.NewLine);
+				}
+			}
 		}
 	}
 }
