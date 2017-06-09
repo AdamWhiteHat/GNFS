@@ -48,20 +48,20 @@ namespace GNFS_Winforms
 				cancellationSource.Cancel();
 				RestoreAllButtons();
 			}
+
+			if (gnfs != null && gnfs.Relations.Any())
+			{
+				SetControlEnabledState(btnFindSquares, true);
+			}
 		}
 
 		private void RestoreAllButtons()
 		{
-			if (btnCreateGnfs.InvokeRequired)
-			{
-				btnCreateGnfs.Invoke(new MethodInvoker(() => RestoreAllButtons()));
-			}
-			else
-			{
-				btnCreateGnfs.Text = CreateGnfsButtonText;
-				btnFindRelations.Text = FindRelationsButtonText;
-				btnFindSquares.Text = FindSquaresButtonText;
-			}
+			SetControlText(btnCreateGnfs, CreateGnfsButtonText);
+			SetControlText(btnFindRelations, FindRelationsButtonText);
+			SetControlText(btnFindSquares, FindSquaresButtonText);
+
+
 		}
 
 		private void btnFindSquares_Click(object sender, EventArgs e)
@@ -76,7 +76,6 @@ namespace GNFS_Winforms
 				{
 					FindSquares(token);
 					HaultAllProcessing();
-
 				}).Start();
 			}
 			else
@@ -95,9 +94,12 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationSource.Token;
 				new Thread(() =>
 				{
-					IEnumerable<Relation> relations = gnfs.GenerateRelations(token);
-					LogOutput($"Generated relations:");
-					LogOutput(relations.FormatString());
+					while (!token.IsCancellationRequested)
+					{
+						IEnumerable<Relation> relations = gnfs.GenerateRelations(token);
+						LogOutput($"Generated relations:");
+						LogOutput(relations.FormatString());
+					}
 					HaultAllProcessing();
 
 				}).Start();
@@ -142,11 +144,12 @@ namespace GNFS_Winforms
 				return;
 			}
 
-			tbBound.Invoke(new MethodInvoker(() =>
+			if (gnfs.Relations.Any())
 			{
-				tbBound.Text = gnfs.PrimeBound.ToString();
-				//btnCreateGnfs.Enabled = false;
-			}));
+				SetControlEnabledState(btnFindSquares, true);
+			}
+
+			SetControlText(tbBound, gnfs.PrimeBound.ToString());
 
 			LogOutput($"N = {gnfs.N}");
 			LogOutput();
@@ -176,21 +179,20 @@ namespace GNFS_Winforms
 			LogOutput(gnfs.QFB.ToString());
 			LogOutput();
 
-			btnFindRelations.Invoke(new MethodInvoker(() =>
-			{
-				btnFindRelations.Enabled = true;
-				btnFindRelations.Text = CancelButtonText;
-				btnCreateGnfs.Enabled = false;
-			}));
+			SetControlEnabledState(btnFindRelations, true);
+			SetControlText(btnFindRelations, CancelButtonText);
+			SetControlEnabledState(btnCreateGnfs, false);
+
 
 			// valueRange & quantity 
 			IEnumerable<Relation> smoothRelations = gnfs.GenerateRelations(cancelToken);//, quantity);
-
 
 			if (cancelToken.IsCancellationRequested)
 			{
 				return;
 			}
+
+			SetControlEnabledState(btnFindSquares, true);
 
 			//IEnumerable<Relation> zeroRelations = smoothRelations.Where(r => r.D == 0);
 			//zeroRelations = zeroRelations.Where(r => r.G == 0);
@@ -260,6 +262,15 @@ namespace GNFS_Winforms
 			norms.AddRange(gnfs.Relations.Select(rel => rel.AlgebraicNorm));
 			norms.AddRange(gnfs.Relations.Select(rel => rel.RationalNorm));
 
+			norms.AddRange(gnfs.Relations.Select(rel => (BigInteger)rel.A));
+			norms.AddRange(gnfs.Relations.Select(rel => (BigInteger)rel.B));
+			norms.AddRange(gnfs.Relations.Select(rel => rel.C));
+			norms.AddRange(gnfs.Relations.Select(rel => rel.D));
+			norms.AddRange(gnfs.Relations.Select(rel => rel.E));
+			norms.AddRange(gnfs.Relations.Select(rel => rel.F));
+			norms.AddRange(gnfs.Relations.Select(rel => rel.G));
+
+
 			IEnumerable<BigInteger> squares = norms.Distinct();
 			squares = squares.Where(bi => bi.IsSquare());
 
@@ -274,6 +285,8 @@ namespace GNFS_Winforms
 				LogOutput();
 
 				SquaresMethod squaresMethod = new SquaresMethod(n, squares);
+
+				squaresMethod.ScaleToSize();
 
 				int maxSteps = 5;
 				int counter = 0;
@@ -343,6 +356,35 @@ namespace GNFS_Winforms
 				{
 					tbOutput.SelectAll();
 				}
+			}
+		}
+
+		private static void SetControlEnabledState(Control control, bool enabled)
+		{
+			if (control.InvokeRequired)
+			{
+				control.Invoke(new MethodInvoker(() =>
+					SetControlEnabledState(control, enabled)
+				));
+			}
+			else
+			{
+				control.Enabled = enabled;
+			}
+		}
+
+
+		private static void SetControlText(Control control, string text)
+		{
+			if (control.InvokeRequired)
+			{
+				control.Invoke(new MethodInvoker(() =>
+					SetControlText(control, text)
+				));
+			}
+			else
+			{
+				control.Text = text;
 			}
 		}
 

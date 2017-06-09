@@ -10,43 +10,71 @@ namespace GNFSCore
 {
 	public class SquaresMethod
 	{
-		BigInteger n;
-		List<BigInteger> squares;
-		List<BigInteger> combinations;
+		public BigInteger N = BigInteger.MinusOne;
+		public BigInteger[] squares = new BigInteger[0];
+		public List<BigInteger> combinations = new List<BigInteger>();
 
-		public SquaresMethod(BigInteger N, IEnumerable<BigInteger> smoothSquares)
+		public BigInteger Scale { get { return combinations.Max(); } }
+
+		public SquaresMethod(BigInteger n, IEnumerable<BigInteger> smoothSquares)
 		{
-			n = N;
-			squares = smoothSquares.ToList();
-			combinations = squares;
+			combinations = new List<BigInteger>();
+
+			N = n;
+			squares = smoothSquares.ToArray();
+			combinations.AddRange(squares);
+		}
+
+		public void ScaleToSize()
+		{
+			do
+			{
+				Permute();
+			}
+			while (N >= Scale);
+		}
+
+		private void Permute()
+		{
+			IEnumerable<BigInteger> cumulate = Combinatorics.GetCombination(combinations).Select(arr => arr.Product()).Distinct();
+			combinations.AddRange(cumulate);
+
+			//Remove duplicates
+			Dedupe();
+		}
+
+		private void Dedupe()
+		{
+			List<BigInteger> distinct = combinations.Distinct().ToList();
+			if (combinations.Count != distinct.Count)
+			{
+				combinations = distinct;
+			}
 		}
 
 		public BigInteger[] Step()
 		{
-			List<BigInteger[]> combos = Combinatorics.GetCombination(combinations);
+			Permute();
 
-			combinations.Clear();
-			combinations.AddRange(combos.Select(arr => arr.Product()));
-			combinations.AddRange(squares);
-			combinations = combinations.Distinct()/*.OrderByDescending(bi => bi)*/.ToList();
-
-			var congruentSquares = combinations.Select(bi => new Tuple<BigInteger, BigInteger>(bi, bi % n));
+			var congruentSquares = combinations.Select(bi => new Tuple<BigInteger, BigInteger>(bi, bi % N));
 			congruentSquares = congruentSquares.Where(tup => tup.Item1 != tup.Item2);
 			congruentSquares = congruentSquares.Where(tup => tup.Item2.IsSquare());
 
 			if (congruentSquares.Any())
 			{
 				//congruentSquares = congruentSquares.OrderBy(tup => tup.Item1);
-				var roots = congruentSquares.Select(tup => new Tuple<BigInteger, BigInteger>(tup.Item1.SquareRoot(), tup.Item2.SquareRoot()));
+				IEnumerable<Tuple<BigInteger, BigInteger>> roots = congruentSquares.Select(tup => new Tuple<BigInteger, BigInteger>(tup.Item1.SquareRoot(), tup.Item2.SquareRoot()));
 
 				List<BigInteger> plusminusRoots = new List<BigInteger>();
 				plusminusRoots.AddRange(roots.Select(tup => BigInteger.Add(tup.Item1, tup.Item2)));
 				plusminusRoots.AddRange(roots.Select(tup => BigInteger.Subtract(tup.Item1, tup.Item2)));
 
-				IEnumerable<BigInteger> factors = plusminusRoots.Select(bi => GCD.FindGCD(n, bi)).Where(gcd => (gcd > 1) && (gcd != n));
+				IEnumerable<BigInteger> factors = plusminusRoots.Select(bi => GCD.FindGCD(N, bi)).Where(gcd => (gcd > 1) && (gcd != N));
+				factors = factors.Distinct().OrderByDescending(bi => bi);
+
 				if (factors.Any())
 				{
-					return factors/*.Distinct().OrderByDescending(bi => bi)*/.ToArray();
+					return factors.ToArray();
 				}
 			}
 

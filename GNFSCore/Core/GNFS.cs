@@ -56,7 +56,7 @@ namespace GNFSCore
 		private int b = 1;
 		private int valueRange = 200;
 		private int quantity = 200;
-		private int degree;
+		private int degree = 2;
 
 		private int[] _primes;
 
@@ -65,7 +65,7 @@ namespace GNFSCore
 			CancelToken = CancellationToken.None;
 		}
 
-		public GNFS(CancellationToken cancelToken, BigInteger n, BigInteger polynomialBase, int degree = -1)
+		public GNFS(CancellationToken cancelToken, BigInteger n, BigInteger polynomialBase, int polyDegree = -1)
 			: this()
 		{
 			CancelToken = cancelToken;
@@ -77,22 +77,24 @@ namespace GNFSCore
 			{
 				Directory.CreateDirectory(GNFS_SaveDirectory);
 
-
-				this.degree = degree;
-				if (this.degree == -1)
+				if (polyDegree == -1)
 				{
 					this.degree = CalculateDegree(n);
 				}
+				else
+				{
+					this.degree = polyDegree;
+				}
+
 
 				CaclulatePrimeBounds();
-				ConstructNewPolynomial(polynomialBase, degree);
+				ConstructNewPolynomial(polynomialBase, this.degree);
 				Directory.CreateDirectory(Relations_SaveDirectory);
 
 				m = polynomialBase;
 
 				// Save GNFS settings
 				SaveGnfsProgress();
-
 
 				LoadFactorBases();
 			}
@@ -104,7 +106,7 @@ namespace GNFSCore
 				N = gnfs.N;
 				m = gnfs.m;
 				b = gnfs.b;
-				degree = gnfs.degree;
+				polyDegree = gnfs.degree;
 				quantity = gnfs.quantity;
 				valueRange = gnfs.valueRange;
 				PrimeBound = gnfs.PrimeBound;
@@ -130,7 +132,7 @@ namespace GNFSCore
 				}
 
 				int base10 = N.ToString().Count();
-				int quadraticBaseSize = CalculateQuadraticBaseSize(degree);
+				int quadraticBaseSize = CalculateQuadraticBaseSize(polyDegree);
 
 				_primes = PrimeFactory.GetPrimes((RationalFactorBase * 3) + 2 + base10);
 				RationalPrimeBase = PrimeFactory.GetPrimesTo(RationalFactorBase);
@@ -272,27 +274,27 @@ namespace GNFSCore
 			QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(QuadraticFactorBaseMin).Take(quadraticBaseSize);
 		}
 
-		private static int CalculateQuadraticBaseSize(int degree)
+		private static int CalculateQuadraticBaseSize(int polyDegree)
 		{
 			int result = -1;
 
-			if (degree < 3)
+			if (polyDegree < 3)
 			{
 				result = 10;
 			}
-			else if (degree == 3 || degree == 4)
+			else if (polyDegree == 3 || polyDegree == 4)
 			{
 				result = 20;
 			}
-			else if (degree == 5 || degree == 6)
+			else if (polyDegree == 5 || polyDegree == 6)
 			{
 				result = 40;
 			}
-			else if (degree == 7)
+			else if (polyDegree == 7)
 			{
 				result = 80;
 			}
-			else if (degree >= 8)
+			else if (polyDegree >= 8)
 			{
 				result = 100;
 			}
@@ -300,9 +302,9 @@ namespace GNFSCore
 			return result;
 		}
 
-		private void ConstructNewPolynomial(BigInteger polynomialBase, int degree)
+		private void ConstructNewPolynomial(BigInteger polynomialBase, int polyDegree)
 		{
-			CurrentPolynomial = new AlgebraicPolynomial(N, polynomialBase, degree);
+			CurrentPolynomial = new AlgebraicPolynomial(N, polynomialBase, polyDegree);
 			PolynomialCollection.Add(CurrentPolynomial);
 			SavePolynomial(CurrentPolynomial);
 		}
@@ -367,7 +369,12 @@ namespace GNFSCore
 			}
 			else if (Relations.Count() >= quantity)
 			{
-				quantity += 100;
+				quantity += 200;
+			}
+
+			if (b >= valueRange)
+			{
+				valueRange += 200;
 			}
 
 			int adjustedRange = valueRange % 2 == 0 ? valueRange + 1 : valueRange;
@@ -417,7 +424,7 @@ namespace GNFSCore
 			writer.WriteElementString("N", N.ToString());
 			writer.WriteElementString("M", m.ToString());
 			writer.WriteElementString("B", b.ToString());
-			writer.WriteElementString("Degree", degree.ToString());
+			writer.WriteElementString("Degree", this.degree.ToString());
 			writer.WriteElementString("Quantity", quantity.ToString());
 			writer.WriteElementString("ValueRange", valueRange.ToString());
 			writer.WriteElementString("PrimeBound", PrimeBound.ToString());
@@ -449,7 +456,7 @@ namespace GNFSCore
 			N = BigInteger.Parse(nString);
 			m = BigInteger.Parse(mString);
 			b = int.Parse(bString);
-			degree = int.Parse(degreeString);
+			this.degree = int.Parse(degreeString);
 			quantity = int.Parse(quantityString);
 			valueRange = int.Parse(valueRangeString);
 			PrimeBound = int.Parse(primeBoundString);
