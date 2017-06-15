@@ -87,6 +87,11 @@ namespace GNFSCore.FactorBase
 			return string.Join("\t", this.Select(factr => factr.ToString()));
 		}
 
+		public string ToString(int take)
+		{
+			return string.Join("\t", this.Take(take).Select(factr => factr.ToString()));
+		}
+
 		public static void Serialize(string filePath, FactorCollection factorCollection)
 		{
 			File.WriteAllLines(filePath, factorCollection.Select(fp => fp.Serialize()));

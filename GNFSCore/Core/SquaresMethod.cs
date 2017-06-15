@@ -13,6 +13,8 @@ namespace GNFSCore
 		public BigInteger N = BigInteger.MinusOne;
 		public BigInteger[] squares = new BigInteger[0];
 		public List<BigInteger> combinations = new List<BigInteger>();
+		public IEnumerable<BigInteger> lifted = null;
+
 
 		public BigInteger Scale { get { return combinations.Max(); } }
 
@@ -25,16 +27,37 @@ namespace GNFSCore
 			combinations.AddRange(squares);
 		}
 
-		public void ScaleToSize()
+		public BigInteger[] Attempt(int permutations = 2)
 		{
-			do
+			if (lifted == null)
 			{
-				Permute();
+				Permute(permutations);
+
+				int toRaise = (int)BigInteger.Log(N, (double)Scale);
+
+				lifted = combinations.Select(bi => BigInteger.Pow(bi, toRaise));
+
+
 			}
-			while (N >= Scale);
+			else
+			{
+				lifted = lifted.Select(bi => BigInteger.Pow(bi, 2));
+			}
+
+			return SiftFactors(lifted);
 		}
 
-		private void Permute()
+		public void Permute(int permutations)
+		{
+			int counter = permutations;
+			while (counter > 0)
+			{
+				Permute();
+				counter--;
+			}
+		}
+
+		public void Permute()
 		{
 			IEnumerable<BigInteger> cumulate = Combinatorics.GetCombination(combinations).Select(arr => arr.Product()).Distinct();
 			combinations.AddRange(cumulate);
@@ -52,11 +75,9 @@ namespace GNFSCore
 			}
 		}
 
-		public BigInteger[] Step()
+		public BigInteger[] SiftFactors(IEnumerable<BigInteger> squares)
 		{
-			Permute();
-
-			var congruentSquares = combinations.Select(bi => new Tuple<BigInteger, BigInteger>(bi, bi % N));
+			IEnumerable<Tuple<BigInteger, BigInteger>> congruentSquares = squares.Select(bi => new Tuple<BigInteger, BigInteger>(bi, bi % N));
 			congruentSquares = congruentSquares.Where(tup => tup.Item1 != tup.Item2);
 			congruentSquares = congruentSquares.Where(tup => tup.Item2.IsSquare());
 

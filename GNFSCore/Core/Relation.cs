@@ -22,10 +22,6 @@ namespace GNFSCore
 		public int A { get; set; }
 		public int B { get; set; }
 		public BigInteger C;
-		public BigInteger D;
-		public BigInteger E;
-		public BigInteger F;
-		public BigInteger G;
 		public BigInteger AlgebraicNorm { get; set; }
 		public BigInteger RationalNorm { get; set; }
 
@@ -59,10 +55,6 @@ namespace GNFSCore
 
 			BigInteger rationalEval = _gnfs.CurrentPolynomial.Evaluate(RationalNorm);
 			C = rationalEval % _gnfs.N;
-			D = rationalEval % B;
-			E = _gnfs.CurrentPolynomial.Evaluate(AlgebraicNorm);
-			F = E % _gnfs.N;
-			G = E % B;
 		}
 
 		public void Sieve()
@@ -118,10 +110,7 @@ namespace GNFSCore
 			return
 				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t" +
 				$"[ƒ(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)} ({AlgebraicNorm.IsSquare()}),\ta+b*m={RationalNorm.ToString().PadLeft(4)} ({RationalNorm.IsSquare()})]\t" +
-				$"ƒ({RationalNorm}) =".PadRight(8) + $"{C.ToString().PadLeft(6)}" + $"% B = ".PadLeft(16).PadRight(26) + $"{D.ToString().PadLeft(6).PadRight(12)}" +
-				$"ƒ({AlgebraicNorm}) =".PadLeft(6).PadRight(14) + $" {E.ToString().PadLeft(6)} % N =".PadRight(62) + $"{F.ToString().PadLeft(12)} % B =".PadRight(12) + $"{G.ToString().PadLeft(6)}";
-
-			//+"\t QUOTIENT(Alg): {AlgebraicQuotient} \t QUOTIENT(Rat): {RationalQuotient}";
+				$"ƒ({RationalNorm}) =".PadRight(8) + $"{C.ToString().PadLeft(6)}";
 		}
 
 		public static void Serialize(string filePath, Relation relation)
@@ -134,10 +123,6 @@ namespace GNFSCore
 			writer.WriteElementString("A", A.ToString());
 			writer.WriteElementString("B", B.ToString());
 			writer.WriteElementString("C", C.ToString());
-			writer.WriteElementString("D", D.ToString());
-			writer.WriteElementString("E", E.ToString());
-			writer.WriteElementString("F", F.ToString());
-			writer.WriteElementString("G", G.ToString());
 			writer.WriteElementString("AlgebraicNorm", AlgebraicNorm.ToString());
 			writer.WriteElementString("RationalNorm", RationalNorm.ToString());
 		}
@@ -149,10 +134,6 @@ namespace GNFSCore
 			A = int.Parse(reader.ReadElementString("A"));
 			B = int.Parse(reader.ReadElementString("B"));
 			C = BigInteger.Parse(reader.ReadElementString("C"));
-			D = BigInteger.Parse(reader.ReadElementString("D"));
-			E = BigInteger.Parse(reader.ReadElementString("E"));
-			F = BigInteger.Parse(reader.ReadElementString("F"));
-			G = BigInteger.Parse(reader.ReadElementString("G"));
 			AlgebraicNorm = BigInteger.Parse(reader.ReadElementString("AlgebraicNorm"));
 			RationalNorm = BigInteger.Parse(reader.ReadElementString("RationalNorm"));
 			reader.ReadEndElement();

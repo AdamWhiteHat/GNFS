@@ -44,10 +44,10 @@ namespace GNFSCore
 		internal string GNFS_SaveDirectory { get { return Path.Combine("C:\\GNFS", GetNumberFilename()); } }
 		internal string GnfsParameters_SaveFile { get { return Path.Combine(GNFS_SaveDirectory, "_GNFS.Parameters"); } }
 
+		internal string Polynomial_Filename { get { return "_Polynomial.Parameters"; } }
 		internal string Polynomial_SaveDirectory { get { return GetPolynomialPath(CurrentPolynomial); } }
 		internal string Relations_SaveDirectory { get { return Path.Combine(Polynomial_SaveDirectory, "SmoothRelations"); } }
 
-		internal string Polynomial_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "_Polynomial.Parameters"); } }
 		internal string RationalFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Rational.FactorBase"); } }
 		internal string AlgebraicFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Algebraic.FactorBase"); } }
 		internal string QuadradicFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Quadradic.FactorBase"); } }
@@ -117,7 +117,7 @@ namespace GNFSCore
 
 				if (Directory.Exists(GNFS_SaveDirectory))
 				{
-					IEnumerable<string> polynomialFiles = Directory.EnumerateFiles(GNFS_SaveDirectory, "_Polynomial.Parameters", SearchOption.AllDirectories);
+					IEnumerable<string> polynomialFiles = Directory.EnumerateFiles(GNFS_SaveDirectory, Polynomial_Filename, SearchOption.AllDirectories);
 					if (polynomialFiles.Any())
 					{
 						foreach (string file in polynomialFiles)
@@ -143,19 +143,13 @@ namespace GNFSCore
 				LoadFactorBases();
 
 				// Load Relations
-				if (Directory.Exists(Relations_SaveDirectory))
-				{
-					IEnumerable<string> relationFiles = Directory.EnumerateFiles(Relations_SaveDirectory, "*.relation");
-					if (relationFiles.Any())
-					{
-						foreach (string file in relationFiles)
-						{
-							Relation relation = (Relation)Serializer.Deserialize(file, typeof(Relation));
-							Relations.Add(relation);
-						}
-					}
-				}
+				Relations = LoadRelations(Relations_SaveDirectory);
 			}
+		}
+
+		public bool IsFactor(BigInteger toCheck)
+		{
+			return (N % toCheck == 0);
 		}
 
 		public void SaveGnfsProgress()
@@ -190,18 +184,16 @@ namespace GNFSCore
 			{
 				Directory.CreateDirectory(polynomialDirectory);
 			}
-
-			Serializer.Serialize(Path.Combine(polynomialDirectory, "_Polynomial.Parameters"), poly);
+			Serializer.Serialize(Path.Combine(polynomialDirectory, Polynomial_Filename), poly);
 		}
 
 		// Values were obtained from the paper:
-		// "Polynomial Selection for the Number Field Sieve Integer Factorisation Algorithm"
-		// by Brian Antony Murphy
+		// "Polynomial Selection for the Number Field Sieve Integer Factorisation Algorithm" - by Brian Antony Murphy
 		// Table 3.1, page 44
-		private int CalculateDegree(BigInteger n)
+		private static int CalculateDegree(BigInteger n)
 		{
 			int result = 2;
-			int base10 = N.ToString().Count();
+			int base10 = n.ToString().Count();
 
 			if (base10 < 65)
 			{
@@ -348,18 +340,30 @@ namespace GNFSCore
 			if (CancelToken.IsCancellationRequested) { return; }
 		}
 
-		public bool IsFactor(BigInteger toCheck)
+		private static List<Relation> LoadRelations(string saveDirectory)
 		{
-			return (N % toCheck == 0);
+			List<Relation> result = new List<Relation>();
+			// Load Relations
+			if (Directory.Exists(saveDirectory))
+			{
+				IEnumerable<string> relationFiles = Directory.EnumerateFiles(saveDirectory, "*.relation");
+				if (relationFiles.Any())
+				{
+					foreach (string file in relationFiles)
+					{
+						Relation relation = (Relation)Serializer.Deserialize(file, typeof(Relation));
+						result.Add(relation);
+					}
+				}
+			}
+			return result;
 		}
-
 
 		public List<Relation> GenerateRelations()
 		{
 			CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
 			return GenerateRelations(cancelTokenSource.Token);
 		}
-
 
 		public List<Relation> GenerateRelations(CancellationToken cancelToken)
 		{
