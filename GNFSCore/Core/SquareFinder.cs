@@ -46,6 +46,7 @@ namespace GNFSCore
 		public SquareFinder(GNFS sieve)
 			: this(sieve, sieve.Relations)
 		{
+			throw new ArithmeticException();
 		}
 
 		public SquareFinder(GNFS sieve, List<Relation> relations)

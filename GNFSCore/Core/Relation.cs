@@ -27,8 +27,8 @@ namespace GNFSCore
 
 		[NonSerialized]
 		private GNFS _gnfs;
-		private BigInteger AlgebraicQuotient { get; set; }
-		private BigInteger RationalQuotient { get; set; }
+		internal BigInteger AlgebraicQuotient { get; set; }
+		internal BigInteger RationalQuotient { get; set; }
 
 		public bool IsSmooth
 		{
@@ -36,6 +36,11 @@ namespace GNFSCore
 			{
 				return BigInteger.Abs(AlgebraicQuotient) == 1 && BigInteger.Abs(RationalQuotient) == 1;
 			}
+		}
+
+		public Tuple<BigInteger, BigInteger> GetRoughRemainders()
+		{
+			return new Tuple<BigInteger, BigInteger>(AlgebraicQuotient, RationalQuotient);
 		}
 
 		public Relation()

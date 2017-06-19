@@ -11,7 +11,7 @@ namespace GNFSCore
 		public static int Product(this IEnumerable<int> input)
 		{
 			int result = 1;
-			foreach(int i in input)
+			foreach (int i in input)
 			{
 				result *= i;
 			}
@@ -28,9 +28,21 @@ namespace GNFSCore
 			return result;
 		}
 
+		public static string FormatString<T>(this IEnumerable<T[]> input)
+		{
+			if (input == null || input.Count() < 1)
+			{
+				return $"{{{Environment.NewLine}}}{Environment.NewLine}";
+			}
+			return
+				$"{{{Environment.NewLine}" +
+				string.Join("," + Environment.NewLine, input.Select(i => $"\t({string.Join("; ", i)})")) +
+				$"{Environment.NewLine}}}{Environment.NewLine}";
+		}
+
 		public static string FormatString<T>(this IEnumerable<T> input)
 		{
-			if(input == null || input.Count() < 1)
+			if (input == null || input.Count() < 1)
 			{
 				return $"{{{Environment.NewLine}}}{Environment.NewLine}";
 			}

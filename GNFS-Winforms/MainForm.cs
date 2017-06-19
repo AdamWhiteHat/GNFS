@@ -23,35 +23,64 @@ namespace GNFS_Winforms
 		public MainForm()
 		{
 			InitializeComponent();
-			cancellationSource = new CancellationTokenSource();
-			cancellationSource.Cancel();
-			tbN.Text = "1807082088687404805951656164405905566278102516769401349170127021450056662540244048387341127590812303371781887966563182013214880557";//"9035410443437024029758280822029527831390512583847006745850635107250283312701220241936705637954061516858909439832815910066074402785";   // "40815183453689876308460096333405025830273709373822334818010625964698700067207"; // "3218147"; //"45113"; //"1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139"; //"1001193673991790373"; //"45113";//"3218147"; //"3580430111"
-			tbBase.Text = "3845520700308425278140"; //"12574411168418005980468"; //"3845520700308425278207"; // <- prime //"5867732301053"; //"12574411168418005980468"; //"31";//"29668737024"; //"11875";//"117";//"31";"127";
-			tbDegree.Text = "5"; //"6"; //"7" //"3";
+			IsWorking = false;
+
+			//"45113";
+			//"3218147";
+			//"3580430111"
+			//"1001193673991790373";
+			//"40815183453689876308460096333405025830273709373822334818010625964698700067207"; 	
+			//"1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139";
+			//"1807082088687404805951656164405905566278102516769401349170127021450056662540244048387341127590812303371781887966563182013214880557";
+			//"9035410443437024029758280822029527831390512583847006745850635107250283312701220241936705637954061516858909439832815910066074402785";  			
+			tbN.Text = "3218147";
+
+			//"31";
+			//"127";
+			//"11875";
+			//"29668737024"; 
+			//"5867732301053";
+			//"3845520700308425278140";
+			//"3845520700308425278207"; 
+			//"12574411168418005980468";
+			tbBase.Text = "117";
+
+			tbDegree.Text = "3"; //"5"; //"6"; //"7"
 		}
 
 		private GNFS gnfs;
 		private int degree;
 		private BigInteger n;
 		private BigInteger polyBase;
-		private CancellationTokenSource cancellationSource;
+
+		private bool IsWorking = false;
+		private CancellationToken cancellationToken;
+		private CancellationTokenSource cancellationTokenSource;
 
 		private static string FindSquaresButtonText = "Find Squares";
 		private static string FindRelationsButtonText = "Find Relations";
 		private static string CreateGnfsButtonText = "Create/Load";
 		private static string CancelButtonText = "Cancel";
 
+
+
+
+
+		private void SetAsProcessing()
+		{
+			cancellationTokenSource = new CancellationTokenSource();
+			cancellationToken = cancellationTokenSource.Token;
+			cancellationToken.Register(new Action(() => RestoreAllButtons()));
+			IsWorking = true;
+		}
+
 		private void HaultAllProcessing()
 		{
-			if (!cancellationSource.IsCancellationRequested)
+			if (cancellationTokenSource != null && IsWorking)//(!cancellationTokenSource.IsCancellationRequested)
 			{
-				cancellationSource.Cancel();
-				RestoreAllButtons();
-			}
-
-			if (gnfs != null && gnfs.Relations.Any())
-			{
-				SetControlEnabledState(btnFindSquares, true);
+				cancellationToken = cancellationTokenSource.Token;
+				cancellationToken.Register(new Action(() => RestoreAllButtons()));
+				cancellationTokenSource.Cancel();
 			}
 		}
 
@@ -60,69 +89,34 @@ namespace GNFS_Winforms
 			SetControlText(btnCreateGnfs, CreateGnfsButtonText);
 			SetControlText(btnFindRelations, FindRelationsButtonText);
 			SetControlText(btnFindSquares, FindSquaresButtonText);
-
-
+			SetControlEnabledState(btnFindSquares, true);
+			IsWorking = false;
 		}
 
-		private void btnFindSquares_Click(object sender, EventArgs e)
-		{
-			if (cancellationSource.IsCancellationRequested)
-			{
-				cancellationSource = new CancellationTokenSource();
-				btnFindSquares.Text = CancelButtonText;
 
-				CancellationToken token = cancellationSource.Token;
-				new Thread(() =>
-				{
-					FindSquares(token);
-					HaultAllProcessing();
-				}).Start();
-			}
-			else
-			{
-				HaultAllProcessing();
-			}
-		}
 
-		private void btnFindRelations_Click(object sender, EventArgs e)
-		{
-			if (cancellationSource.IsCancellationRequested)
-			{
-				cancellationSource = new CancellationTokenSource();
-				btnFindRelations.Text = CancelButtonText;
 
-				CancellationToken token = cancellationSource.Token;
-				new Thread(() =>
-				{
-					while (!token.IsCancellationRequested)
-					{
-						IEnumerable<Relation> relations = gnfs.GenerateRelations(token);
-						LogOutput($"Generated relations:");
-						LogOutput(relations.Take(5).FormatString());
-						LogOutput("(restricted result set to top 5)");
-					}
-					HaultAllProcessing();
 
-				}).Start();
-			}
-			else
-			{
-				HaultAllProcessing();
-			}
-		}
+
+
+
 
 		private void btnCreateGnfs_Click(object sender, EventArgs e)
 		{
-			if (cancellationSource.IsCancellationRequested)
+			if (IsWorking)
 			{
-				cancellationSource = new CancellationTokenSource();
-				btnCreateGnfs.Text = CancelButtonText;
-
+				HaultAllProcessing();
+			}
+			else
+			{
+				SetAsProcessing();
+				SetControlText(btnCreateGnfs, CancelButtonText);
+				
 				n = BigInteger.Parse(tbN.Text);
 				polyBase = BigInteger.Parse(tbBase.Text);
 				degree = int.Parse(tbDegree.Text);
 
-				CancellationToken token = cancellationSource.Token;
+				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
 					CreateGnfs(token);
@@ -130,19 +124,81 @@ namespace GNFS_Winforms
 
 				}).Start();
 			}
-			else
+		}
+
+		private void btnFindRelations_Click(object sender, EventArgs e)
+		{
+			if (IsWorking)
 			{
 				HaultAllProcessing();
 			}
+			else
+			{
+				SetAsProcessing();
+				SetControlText(btnFindRelations, CancelButtonText);
+
+				CancellationToken token = cancellationTokenSource.Token;
+				new Thread(() =>
+				{
+					new List<RoughPair>();
+					while (!token.IsCancellationRequested)
+					{
+						List<RoughPair> knownRough = gnfs.RoughNumbers;
+
+						IEnumerable<Relation> relations = gnfs.GenerateRelations(token);
+						LogOutput($"Generated relations:");
+						LogOutput(relations/*.Skip(relations.Count()-5)*/.FormatString());
+						//LogOutput("(restricted result set to top 5)");
+						LogOutput();
+						LogOutput();
+						LogOutput($"Rough numbers (Relations with remainders, i.e. not fully factored):");
+						LogOutput(gnfs.RoughNumbers.Except(knownRough)/*.Skip(gnfs.RoughNumbers.Count()-5)*/.FormatString());
+						//LogOutput("(restricted result set to top 5)");
+						LogOutput();
+					}
+					HaultAllProcessing();
+
+				}).Start();
+			}
 		}
+
+		private void btnFindSquares_Click(object sender, EventArgs e)
+		{
+			if (IsWorking)
+			{
+				HaultAllProcessing();
+			}
+			else
+			{
+				SetAsProcessing();
+				SetControlText(btnFindSquares, CancelButtonText);
+
+				CancellationToken token = cancellationTokenSource.Token;
+				new Thread(() =>
+				{
+					FindSquares(token);
+					HaultAllProcessing();
+				}).Start();
+			}
+		}
+
+
+
+
+
+
+
 
 		private void CreateGnfs(CancellationToken cancelToken)
 		{
-			gnfs = new GNFS(cancelToken, n, polyBase, degree);
-
 			if (cancelToken.IsCancellationRequested)
 			{
 				return;
+			}
+
+			if (gnfs == null)
+			{
+				gnfs = new GNFS(cancelToken, n, polyBase, degree);
 			}
 
 			if (gnfs.Relations.Any())
@@ -184,7 +240,6 @@ namespace GNFS_Winforms
 			SetControlText(btnFindRelations, CancelButtonText);
 			SetControlEnabledState(btnCreateGnfs, false);
 
-
 			// valueRange & quantity 
 			IEnumerable<Relation> smoothRelations = gnfs.GenerateRelations(cancelToken);//, quantity);
 
@@ -205,6 +260,13 @@ namespace GNFS_Winforms
 			//LogOutput( string.Join(Environment.NewLine, smoothRelations.Select(rel => $"{rel.A},{rel.B}")));
 			LogOutput(smoothRelations.OrderByDescending(rel => rel.A * rel.B).Take(5).FormatString());
 			LogOutput("(restricted result set to top 5)");
+			LogOutput();
+
+			var roughGroups = GNFS.GroupRoughNumbers(gnfs.RoughNumbers);
+
+			LogOutput($"Rough numbers (Relations with remainders, i.e. not fully factored)");
+			LogOutput($"Count: {roughGroups.Count}");
+			LogOutput(roughGroups.FormatString());
 			LogOutput();
 
 			//var matrixVectors = smoothRelations.Select(rel => rel.GetMatrixRowVector());
@@ -257,9 +319,14 @@ namespace GNFS_Winforms
 				LogOutput();
 			}
 		}
-
+		
 		private void FindSquares(CancellationToken cancelToken)
 		{
+			if (cancelToken.IsCancellationRequested)
+			{
+				return;
+			}
+
 			List<BigInteger> norms = new List<BigInteger>();
 			norms.AddRange(gnfs.Relations.Select(rel => BigInteger.Abs(rel.AlgebraicNorm)));
 			norms.AddRange(gnfs.Relations.Select(rel => BigInteger.Abs(rel.RationalNorm)));
@@ -367,7 +434,6 @@ namespace GNFS_Winforms
 				control.Enabled = enabled;
 			}
 		}
-
 
 		private static void SetControlText(Control control, string text)
 		{

@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Core\QuadraticResidue.cs" />
     <Compile Include="Core\Relation.cs" />
+    <Compile Include="Core\RoughPair.cs" />
     <Compile Include="Core\Serializer.cs" />
     <Compile Include="Core\SquareFinder.cs" />
     <Compile Include="Core\SquaresMethod.cs" />

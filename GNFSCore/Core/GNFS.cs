@@ -19,6 +19,7 @@ namespace GNFSCore
 	{
 		public BigInteger N { get; set; }
 		public List<Relation> Relations { get; private set; }
+		public List<RoughPair> RoughNumbers { get; private set; }
 		public AlgebraicPolynomial CurrentPolynomial { get; private set; }
 		public List<AlgebraicPolynomial> PolynomialCollection;
 
@@ -58,6 +59,8 @@ namespace GNFSCore
 		private int quantity = 200;
 		private int degree = 2;
 
+		private List<Relation> newestRelations;
+
 		private int[] _primes;
 
 		public GNFS()
@@ -71,6 +74,7 @@ namespace GNFSCore
 			CancelToken = cancelToken;
 			N = n;
 			Relations = new List<Relation>();
+			RoughNumbers = new List<RoughPair>();
 			PolynomialCollection = new List<AlgebraicPolynomial>();
 
 			if (!Directory.Exists(GNFS_SaveDirectory))
@@ -385,6 +389,8 @@ namespace GNFSCore
 			IEnumerable<int> A = Enumerable.Range(-adjustedRange, adjustedRange * 2);
 			int maxB = Math.Max(adjustedRange, quantity) + 2;
 
+			newestRelations = new List<Relation>();
+
 			while (Relations.Count() < quantity)
 			{
 				if (cancelToken.IsCancellationRequested)
@@ -395,7 +401,7 @@ namespace GNFSCore
 				IEnumerable<int> coprimes = A.Where(a => CoPrime.IsCoprime(a, b));
 				IEnumerable<Relation> unfactored = coprimes.Select(a => new Relation(a, b, this));
 
-				SieveRelations(unfactored);
+				RoughNumbers.AddRange(SieveRelations(unfactored));
 
 				if (b > maxB)
 				{
@@ -406,11 +412,12 @@ namespace GNFSCore
 			}
 
 			SaveGnfsProgress();
-			return Relations;
+			return newestRelations;
 		}
 
-		private void SieveRelations(IEnumerable<Relation> unfactored)
+		private List<RoughPair> SieveRelations(IEnumerable<Relation> unfactored)
 		{
+			List<RoughPair> roughNumbers = new List<RoughPair>();
 			foreach (Relation rel in unfactored)
 			{
 				rel.Sieve();
@@ -418,9 +425,42 @@ namespace GNFSCore
 				if (smooth)
 				{
 					Relations.Add(rel);
+					newestRelations.Add(rel);
 					Relation.Serialize(Relations_SaveDirectory, rel);
 				}
+				else
+				{
+					roughNumbers.Add(new RoughPair(rel));
+				}
 			}
+			return roughNumbers;
+		}
+
+		public static List<RoughPair[]> GroupRoughNumbers(List<RoughPair> roughNumbers)
+		{
+			IEnumerable<RoughPair> input1 = roughNumbers.OrderBy(rp => rp.AlgebraicQuotient).ThenBy(rp => rp.RationalQuotient);
+			IEnumerable<RoughPair> input2 = roughNumbers.OrderBy(rp => rp.RationalQuotient).ThenBy(rp => rp.AlgebraicQuotient);
+
+			RoughPair lastItem = null;
+			List<RoughPair[]> results = new List<RoughPair[]>();
+			foreach (RoughPair pair in input1)
+			{
+				if (lastItem == null)
+				{
+					lastItem = pair;
+				}
+				else if (pair.AlgebraicQuotient == lastItem.AlgebraicQuotient && pair.RationalQuotient == lastItem.RationalQuotient)
+				{
+					results.Add(new RoughPair[] { pair, lastItem });
+					lastItem = null;
+				}
+				else
+				{
+					lastItem = pair;
+				}							
+			}
+
+			return results;
 		}
 
 		public void WriteXml(XmlWriter writer)
