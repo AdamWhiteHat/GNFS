@@ -36,15 +36,15 @@ namespace GNFSCore.Polynomial
 			Base = polynomialBase;
 			Degree = degree;
 
-			Initialize();
+			Initialize(); 
 		}
 
 		private void Initialize()
 		{
 			Terms = Enumerable.Repeat(BigInteger.Zero, Degree + 1).ToArray();
 			SetPolynomialValue(N);
-			BaseTotal = PolynomialCommon.Evaluate(this, Base);
-			FormalDerivative = PolynomialCommon.Derivative(this, Base);
+			BaseTotal = CommonPolynomial.Evaluate(this, Base);
+			FormalDerivative = CommonPolynomial.Derivative(this, Base);
 		}
 
 		private void SetPolynomialValue(BigInteger value)
@@ -93,22 +93,22 @@ namespace GNFSCore.Polynomial
 
 		public double Evaluate(double baseM)
 		{
-			return PolynomialCommon.Evaluate(this, baseM);
+			return CommonPolynomial.Evaluate(this, baseM);
 		}
 
 		public BigInteger Evaluate(BigInteger baseM)
 		{
-			return PolynomialCommon.Evaluate(this, baseM);
+			return CommonPolynomial.Evaluate(this, baseM);
 		}
 
 		public BigRational Evaluate(BigRational baseM)
 		{
-			return PolynomialCommon.Evaluate(this, baseM);
+			return CommonPolynomial.Evaluate(this, baseM);
 		}
 
 		public BigInteger Derivative(BigInteger baseM)
 		{
-			return PolynomialCommon.Derivative(this, baseM);
+			return CommonPolynomial.Derivative(this, baseM);
 		}
 
 		public BigInteger g(BigInteger x, int p)
@@ -118,7 +118,7 @@ namespace GNFSCore.Polynomial
 
 		public List<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
 		{
-			return PolynomialCommon.GetRootsMod(this, baseM, modList);
+			return CommonPolynomial.GetRootsMod(this, baseM, modList);
 		}
 
 		public IEnumerable<int> GetRootsModEnumerable(BigInteger baseM, IEnumerable<int> modList)
@@ -139,7 +139,7 @@ namespace GNFSCore.Polynomial
 
 		public override string ToString()
 		{
-			return PolynomialCommon.FormatString(this);
+			return CommonPolynomial.FormatString(this);
 		}
 
 		public void WriteXml(XmlWriter writer)
@@ -177,8 +177,8 @@ namespace GNFSCore.Polynomial
 			if (terms.Any())
 			{
 				Terms = terms.Select(s => BigInteger.Parse(s)).ToArray();
-				BaseTotal = PolynomialCommon.Evaluate(this, Base);
-				FormalDerivative = PolynomialCommon.Derivative(this, Base);
+				BaseTotal = CommonPolynomial.Evaluate(this, Base);
+				FormalDerivative = CommonPolynomial.Derivative(this, Base);
 			}
 			else
 			{

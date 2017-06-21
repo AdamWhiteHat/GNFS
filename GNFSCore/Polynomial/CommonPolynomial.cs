@@ -17,8 +17,13 @@ namespace GNFSCore.Polynomial
 
 	namespace Internal
 	{
-		internal static class PolynomialCommon
+		public static class CommonPolynomial
 		{
+			public static BigInteger SuggestPolynomialBase(BigInteger n, int degree)
+			{
+				return n.NthRoot(degree);
+			}
+
 			public static List<int> GetRootsMod(IPolynomial polynomial, BigInteger baseM, IEnumerable<int> modList)
 			{
 				BigInteger polyResult = Evaluate(polynomial, baseM);
@@ -105,6 +110,29 @@ namespace GNFSCore.Polynomial
 				}
 
 				return result;
+			}
+
+			public static void MakeCoefficientsSmaller(IPolynomial polynomial)
+			{
+				int pos = 0;
+				int deg = polynomial.Degree;
+
+				while (pos < deg)
+				{
+					if (pos + 1 > deg - 1)
+					{
+						return;
+					}
+
+					if (polynomial.Terms[pos] > polynomial.Base &&
+						polynomial.Terms[pos] > polynomial.Terms[pos + 1])
+					{
+						polynomial.Terms[pos] -= polynomial.Base;
+						polynomial.Terms[pos + 1] += 1;
+					}
+
+					pos++;
+				}
 			}
 
 			public static string FormatString(IPolynomial polynomial)

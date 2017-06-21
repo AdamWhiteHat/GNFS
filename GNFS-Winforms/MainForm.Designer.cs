@@ -40,6 +40,7 @@
 			this.tbDegree = new System.Windows.Forms.TextBox();
 			this.btnFindRelations = new System.Windows.Forms.Button();
 			this.btnFindSquares = new System.Windows.Forms.Button();
+			this.btnConstructPoly = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// tbOutput
@@ -47,11 +48,11 @@
 			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbOutput.Location = new System.Drawing.Point(4, 128);
+			this.tbOutput.Location = new System.Drawing.Point(4, 124);
 			this.tbOutput.Multiline = true;
 			this.tbOutput.Name = "tbOutput";
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.tbOutput.Size = new System.Drawing.Size(703, 352);
+			this.tbOutput.Size = new System.Drawing.Size(703, 356);
 			this.tbOutput.TabIndex = 0;
 			this.tbOutput.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbOutput_KeyUp);
 			// 
@@ -68,9 +69,9 @@
 			// 
 			this.tbBase.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbBase.Location = new System.Drawing.Point(348, 28);
+			this.tbBase.Location = new System.Drawing.Point(100, 24);
 			this.tbBase.Name = "tbBase";
-			this.tbBase.Size = new System.Drawing.Size(359, 20);
+			this.tbBase.Size = new System.Drawing.Size(608, 20);
 			this.tbBase.TabIndex = 2;
 			// 
 			// tbBound
@@ -78,9 +79,9 @@
 			this.tbBound.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbBound.Enabled = false;
-			this.tbBound.Location = new System.Drawing.Point(348, 76);
+			this.tbBound.Location = new System.Drawing.Point(100, 80);
 			this.tbBound.Name = "tbBound";
-			this.tbBound.Size = new System.Drawing.Size(359, 20);
+			this.tbBound.Size = new System.Drawing.Size(180, 20);
 			this.tbBound.TabIndex = 3;
 			// 
 			// label1
@@ -96,7 +97,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(264, 32);
+			this.label2.Location = new System.Drawing.Point(16, 28);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(83, 13);
 			this.label2.TabIndex = 5;
@@ -106,7 +107,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(248, 80);
+			this.label3.Location = new System.Drawing.Point(0, 84);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(99, 13);
 			this.label3.TabIndex = 6;
@@ -116,9 +117,9 @@
 			// btnCreateGnfs
 			// 
 			this.btnCreateGnfs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCreateGnfs.Location = new System.Drawing.Point(348, 100);
+			this.btnCreateGnfs.Location = new System.Drawing.Point(348, 48);
 			this.btnCreateGnfs.Name = "btnCreateGnfs";
-			this.btnCreateGnfs.Size = new System.Drawing.Size(96, 23);
+			this.btnCreateGnfs.Size = new System.Drawing.Size(288, 20);
 			this.btnCreateGnfs.TabIndex = 7;
 			this.btnCreateGnfs.Text = "Create/Load";
 			this.btnCreateGnfs.UseVisualStyleBackColor = true;
@@ -127,7 +128,7 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(252, 56);
+			this.label4.Location = new System.Drawing.Point(4, 56);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(93, 13);
 			this.label4.TabIndex = 9;
@@ -138,16 +139,16 @@
 			// 
 			this.tbDegree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbDegree.Location = new System.Drawing.Point(348, 52);
+			this.tbDegree.Location = new System.Drawing.Point(100, 52);
 			this.tbDegree.Name = "tbDegree";
-			this.tbDegree.Size = new System.Drawing.Size(359, 20);
+			this.tbDegree.Size = new System.Drawing.Size(180, 20);
 			this.tbDegree.TabIndex = 8;
 			// 
 			// btnFindRelations
 			// 
 			this.btnFindRelations.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnFindRelations.Enabled = false;
-			this.btnFindRelations.Location = new System.Drawing.Point(444, 100);
+			this.btnFindRelations.Location = new System.Drawing.Point(396, 92);
 			this.btnFindRelations.Name = "btnFindRelations";
 			this.btnFindRelations.Size = new System.Drawing.Size(96, 23);
 			this.btnFindRelations.TabIndex = 10;
@@ -159,7 +160,7 @@
 			// 
 			this.btnFindSquares.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnFindSquares.Enabled = false;
-			this.btnFindSquares.Location = new System.Drawing.Point(544, 100);
+			this.btnFindSquares.Location = new System.Drawing.Point(492, 92);
 			this.btnFindSquares.Name = "btnFindSquares";
 			this.btnFindSquares.Size = new System.Drawing.Size(96, 23);
 			this.btnFindSquares.TabIndex = 11;
@@ -167,11 +168,24 @@
 			this.btnFindSquares.UseVisualStyleBackColor = true;
 			this.btnFindSquares.Click += new System.EventHandler(this.btnFindSquares_Click);
 			// 
+			// btnConstructPoly
+			// 
+			this.btnConstructPoly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnConstructPoly.Enabled = false;
+			this.btnConstructPoly.Location = new System.Drawing.Point(380, 68);
+			this.btnConstructPoly.Name = "btnConstructPoly";
+			this.btnConstructPoly.Size = new System.Drawing.Size(224, 23);
+			this.btnConstructPoly.TabIndex = 12;
+			this.btnConstructPoly.Text = "Construct Polynomials";
+			this.btnConstructPoly.UseVisualStyleBackColor = true;
+			this.btnConstructPoly.Click += new System.EventHandler(this.btnConstructPoly_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(710, 482);
+			this.Controls.Add(this.btnConstructPoly);
 			this.Controls.Add(this.btnFindSquares);
 			this.Controls.Add(this.btnFindRelations);
 			this.Controls.Add(this.label4);
@@ -206,6 +220,7 @@
 		private System.Windows.Forms.TextBox tbDegree;
 		private System.Windows.Forms.Button btnFindRelations;
 		private System.Windows.Forms.Button btnFindSquares;
+		private System.Windows.Forms.Button btnConstructPoly;
 	}
 }
 

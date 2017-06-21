@@ -68,22 +68,22 @@ namespace GNFSCore.Polynomial
 
 		public BigInteger Evaluate(RationalPolynomial polynomial, BigInteger baseM)
 		{
-			return PolynomialCommon.Evaluate(this, baseM);
+			return CommonPolynomial.Evaluate(this, baseM);
 		}
 
 		public BigInteger Derivative(RationalPolynomial polynomial, BigInteger baseM)
 		{
-			return PolynomialCommon.Derivative(this, baseM);
+			return CommonPolynomial.Derivative(this, baseM);
 		}
 
 		public List<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
 		{
-			return PolynomialCommon.GetRootsMod(this, baseM, modList);
+			return CommonPolynomial.GetRootsMod(this, baseM, modList);
 		}
 
 		public override string ToString()
 		{
-			return PolynomialCommon.FormatString(this);
+			return CommonPolynomial.FormatString(this);
 		}
 	}
 }

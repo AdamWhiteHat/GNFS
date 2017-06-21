@@ -43,17 +43,16 @@ namespace GNFSCore
 			return new Tuple<BigInteger, BigInteger>(AlgebraicQuotient, RationalQuotient);
 		}
 
-		public Relation()
-		{ }
+		public Relation() { }
 
-		public Relation(int a, int b, GNFS gnfs)
+		public Relation(GNFS gnfs, int a, int b)
 		{
 			A = a;
 			B = b;
 			_gnfs = gnfs;
 
-			AlgebraicNorm = Normal.Algebraic(a, b, _gnfs.CurrentPolynomial); // b^deg * f( a/b )
-			RationalNorm = Normal.Rational(a, b, _gnfs.CurrentPolynomial.Base); // a + bm
+			AlgebraicNorm = Normal.Algebraic(A, B, _gnfs.CurrentPolynomial); // b^deg * f( a/b )
+			RationalNorm = Normal.Rational(A, B, _gnfs.CurrentPolynomial.Base); // a + bm
 
 			AlgebraicQuotient = AlgebraicNorm;
 			RationalQuotient = RationalNorm;

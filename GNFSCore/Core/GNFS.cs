@@ -18,8 +18,8 @@ namespace GNFSCore
 	public partial class GNFS : IXmlSerializable
 	{
 		public BigInteger N { get; set; }
-		public List<Relation> Relations { get; private set; }
-		public List<RoughPair> RoughNumbers { get; private set; }
+		public List<Relation> SmoothRelations { get; private set; }
+		public List<RoughPair> RoughRelations { get; private set; }
 		public AlgebraicPolynomial CurrentPolynomial { get; private set; }
 		public List<AlgebraicPolynomial> PolynomialCollection;
 
@@ -59,8 +59,6 @@ namespace GNFSCore
 		private int quantity = 200;
 		private int degree = 2;
 
-		private List<Relation> newestRelations;
-
 		private int[] _primes;
 
 		public GNFS()
@@ -73,8 +71,8 @@ namespace GNFSCore
 		{
 			CancelToken = cancelToken;
 			N = n;
-			Relations = new List<Relation>();
-			RoughNumbers = new List<RoughPair>();
+			SmoothRelations = new List<Relation>();
+			RoughRelations = new List<RoughPair>();
 			PolynomialCollection = new List<AlgebraicPolynomial>();
 
 			if (!Directory.Exists(GNFS_SaveDirectory))
@@ -147,7 +145,7 @@ namespace GNFSCore
 				LoadFactorBases();
 
 				// Load Relations
-				Relations = LoadRelations(Relations_SaveDirectory);
+				SmoothRelations = LoadRelations(Relations_SaveDirectory);
 			}
 		}
 
@@ -375,7 +373,7 @@ namespace GNFSCore
 			{
 				quantity = RFB.Count + AFB.Count + QFB.Count + 1;
 			}
-			else if (Relations.Count() >= quantity)
+			else if (SmoothRelations.Count() >= quantity)
 			{
 				quantity += 200;
 			}
@@ -389,9 +387,9 @@ namespace GNFSCore
 			IEnumerable<int> A = Enumerable.Range(-adjustedRange, adjustedRange * 2);
 			int maxB = Math.Max(adjustedRange, quantity) + 2;
 
-			newestRelations = new List<Relation>();
+			List<Relation> newestRelations = new List<Relation>();
 
-			while (Relations.Count() < quantity)
+			while (SmoothRelations.Count() < quantity)
 			{
 				if (cancelToken.IsCancellationRequested)
 				{
@@ -399,9 +397,9 @@ namespace GNFSCore
 				}
 
 				IEnumerable<int> coprimes = A.Where(a => CoPrime.IsCoprime(a, b));
-				IEnumerable<Relation> unfactored = coprimes.Select(a => new Relation(a, b, this));
+				IEnumerable<Relation> unfactored = coprimes.Select(a => new Relation(this, a, b));
 
-				RoughNumbers.AddRange(SieveRelations(unfactored));
+				newestRelations.AddRange(SieveRelations(unfactored));
 
 				if (b > maxB)
 				{
@@ -415,25 +413,42 @@ namespace GNFSCore
 			return newestRelations;
 		}
 
-		private List<RoughPair> SieveRelations(IEnumerable<Relation> unfactored)
+		public List<Relation> SieveRelations(IEnumerable<Relation> unfactored)
 		{
-			List<RoughPair> roughNumbers = new List<RoughPair>();
+			Tuple<List<Relation>, List<RoughPair>> result = SieveRelations(this, unfactored);
+
+			if (result.Item1.Any())
+			{
+				this.SmoothRelations.AddRange(result.Item1);
+			}
+			if (result.Item2.Any())
+			{
+				this.RoughRelations.AddRange(result.Item2);
+			}
+
+			return result.Item1;
+		}
+
+		// Tuple<SmoothRelations, RoughRelations>
+		public static Tuple<List<Relation>, List<RoughPair>> SieveRelations(GNFS gnfs, IEnumerable<Relation> unfactored)
+		{
+			List<Relation> smoothRelations = new List<Relation>();
+			List<RoughPair> roughRelations = new List<RoughPair>();
 			foreach (Relation rel in unfactored)
 			{
 				rel.Sieve();
 				bool smooth = rel.IsSmooth;
 				if (smooth)
 				{
-					Relations.Add(rel);
-					newestRelations.Add(rel);
-					Relation.Serialize(Relations_SaveDirectory, rel);
+					smoothRelations.Add(rel);
+					Relation.Serialize(gnfs.Relations_SaveDirectory, rel);
 				}
 				else
 				{
-					roughNumbers.Add(new RoughPair(rel));
+					roughRelations.Add(new RoughPair(rel));
 				}
 			}
-			return roughNumbers;
+			return new Tuple<List<Relation>, List<RoughPair>>(smoothRelations, roughRelations);
 		}
 
 		public static List<RoughPair[]> GroupRoughNumbers(List<RoughPair> roughNumbers)
@@ -457,10 +472,31 @@ namespace GNFSCore
 				else
 				{
 					lastItem = pair;
-				}							
+				}
 			}
 
 			return results;
+		}
+
+		public static List<Relation> MultiplyLikeRoughNumbers(GNFS gnfs, List<RoughPair[]> likeRoughNumbersGroups)
+		{
+			List<Relation> result = new List<Relation>();
+
+			foreach (RoughPair[] likePair in likeRoughNumbersGroups)
+			{
+				var As = likePair.Select(lp => lp.A).ToList();
+				var Bs = likePair.Select(lp => lp.B).ToList();
+
+				int a = (As[0] + Bs[0]) * (As[0] - Bs[0]);//(int)Math.Round(Math.Sqrt(As.Sum()));
+				int b = (As[1] + Bs[1]) * (As[1] - Bs[1]);//(int)Math.Round(Math.Sqrt(Bs.Sum()));
+
+				if (a > 0 && b > 0)
+				{
+					result.Add(new Relation(gnfs, a, b));
+				}
+			}
+
+			return result;
 		}
 
 		public void WriteXml(XmlWriter writer)

@@ -30,7 +30,7 @@ namespace GNFSCore
 			if (base16 != 2 && base16 != 3 && base16 != 5 && base16 != 6 && base16 != 7 && base16 != 8)
 			{
 				BigInteger remainder = new BigInteger();
-				BigInteger sqrt = input.NthRoot(2, ref remainder);
+				BigInteger sqrt = input.NthRoot(2, out remainder);
 
 				return (remainder == 0);
 				// - OR -
@@ -116,8 +116,14 @@ namespace GNFSCore
 
 		// Returns the NTHs root of a BigInteger with Remainder.
 		// The root must be greater than or equal to 1 or value must be a positive integer.
+		public static BigInteger NthRoot(this BigInteger value, int root)
+		{
+			BigInteger remainder = new BigInteger();
+			return NthRoot(value, root, out remainder);
+		}
+
 		// NthRoot function acquired from http://mjs5.com/2016/01/20/c-biginteger-helper-constructors
-		public static BigInteger NthRoot(this BigInteger value, int root, ref BigInteger remainder)
+		public static BigInteger NthRoot(this BigInteger value, int root, out BigInteger remainder)
 		{
 			if (root < 1)
 			{

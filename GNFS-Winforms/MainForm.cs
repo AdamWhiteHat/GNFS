@@ -13,6 +13,7 @@ namespace GNFS_Winforms
 {
 	using GNFSCore;
 	using GNFSCore.Polynomial;
+	using GNFSCore.Polynomial.Internal;
 	using GNFSCore.FactorBase;
 	using GNFSCore.IntegerMath;
 	using GNFSCore.PrimeSignature;
@@ -25,6 +26,8 @@ namespace GNFS_Winforms
 			InitializeComponent();
 			IsWorking = false;
 
+			tbDegree.Text = "5"; //"5"; //"6"; //"7"
+
 			//"45113";
 			//"3218147";
 			//"3580430111"
@@ -33,7 +36,7 @@ namespace GNFS_Winforms
 			//"1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139";
 			//"1807082088687404805951656164405905566278102516769401349170127021450056662540244048387341127590812303371781887966563182013214880557";
 			//"9035410443437024029758280822029527831390512583847006745850635107250283312701220241936705637954061516858909439832815910066074402785";  			
-			tbN.Text = "3218147";
+			tbN.Text = "1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139";
 
 			//"31";
 			//"127";
@@ -43,9 +46,15 @@ namespace GNFS_Winforms
 			//"3845520700308425278140";
 			//"3845520700308425278207"; 
 			//"12574411168418005980468";
-			tbBase.Text = "117";
 
-			tbDegree.Text = "3"; //"5"; //"6"; //"7"
+			n = BigInteger.Parse(tbN.Text);
+			degree = int.Parse(tbDegree.Text);
+
+			BigInteger baseM = CommonPolynomial.SuggestPolynomialBase(n, degree);
+
+			tbBase.Text = baseM.ToString();
+
+
 		}
 
 		private GNFS gnfs;
@@ -111,10 +120,11 @@ namespace GNFS_Winforms
 			{
 				SetAsProcessing();
 				SetControlText(btnCreateGnfs, CancelButtonText);
-				
+				SetControlEnabledState(btnConstructPoly, true); // Enable Construct Polynomials Button Control
+
 				n = BigInteger.Parse(tbN.Text);
-				polyBase = BigInteger.Parse(tbBase.Text);
 				degree = int.Parse(tbDegree.Text);
+				polyBase = BigInteger.Parse(tbBase.Text);
 
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
@@ -143,7 +153,7 @@ namespace GNFS_Winforms
 					new List<RoughPair>();
 					while (!token.IsCancellationRequested)
 					{
-						List<RoughPair> knownRough = gnfs.RoughNumbers;
+						List<RoughPair> knownRough = gnfs.RoughRelations;
 
 						IEnumerable<Relation> relations = gnfs.GenerateRelations(token);
 						LogOutput($"Generated relations:");
@@ -152,7 +162,7 @@ namespace GNFS_Winforms
 						LogOutput();
 						LogOutput();
 						LogOutput($"Rough numbers (Relations with remainders, i.e. not fully factored):");
-						LogOutput(gnfs.RoughNumbers.Except(knownRough)/*.Skip(gnfs.RoughNumbers.Count()-5)*/.FormatString());
+						LogOutput(gnfs.RoughRelations.Except(knownRough)/*.Skip(gnfs.RoughNumbers.Count()-5)*/.FormatString());
 						//LogOutput("(restricted result set to top 5)");
 						LogOutput();
 					}
@@ -188,7 +198,6 @@ namespace GNFS_Winforms
 
 
 
-
 		private void CreateGnfs(CancellationToken cancelToken)
 		{
 			if (cancelToken.IsCancellationRequested)
@@ -201,7 +210,7 @@ namespace GNFS_Winforms
 				gnfs = new GNFS(cancelToken, n, polyBase, degree);
 			}
 
-			if (gnfs.Relations.Any())
+			if (gnfs.SmoothRelations.Any())
 			{
 				SetControlEnabledState(btnFindSquares, true);
 			}
@@ -262,12 +271,66 @@ namespace GNFS_Winforms
 			LogOutput("(restricted result set to top 5)");
 			LogOutput();
 
-			var roughGroups = GNFS.GroupRoughNumbers(gnfs.RoughNumbers);
+			var roughGroups = GNFS.GroupRoughNumbers(gnfs.RoughRelations);
+			if (roughGroups.Any())
+			{
+				List<Relation> newRelations = GNFS.MultiplyLikeRoughNumbers(gnfs, roughGroups);
+				Tuple<List<Relation>, List<RoughPair>> newSievedRelations = GNFS.SieveRelations(gnfs, newRelations);
 
-			LogOutput($"Rough numbers (Relations with remainders, i.e. not fully factored)");
-			LogOutput($"Count: {roughGroups.Count}");
-			LogOutput(roughGroups.FormatString());
+				var stillRough = newSievedRelations.Item2;
+				var newSmooth = newSievedRelations.Item1;
+
+				int max = roughGroups.Count;
+				int c2 = newRelations.Count;
+				int c3 = stillRough.Count();
+
+				max = Math.Min(max, Math.Min(c2, c3));
+
+				LogOutput($"COUNT: {roughGroups.Count} ({newSmooth.Count}) / {roughGroups.Count} / {gnfs.RoughRelations.Count}");
+				LogOutput();
+
+				max = 4;
+
+				int counter = 0;
+				while (counter < max)
+				{
+					LogOutput(
+						$"{string.Join(" ; ", roughGroups[counter].Select(rg => rg.ToString()))}" + Environment.NewLine +
+						$"{newRelations[counter]}" + Environment.NewLine +
+						$"{stillRough[counter]}" + Environment.NewLine + Environment.NewLine
+					);
+					counter++;
+				}
+
+				//LogOutput($"Rough numbers (Relations with remainders, i.e. not fully factored)");
+				//LogOutput($"Count: {roughGroups.Count}");
+				//LogOutput(roughGroups.FormatString());
+				//LogOutput();
+
+				//LogOutput($"New relations (Like rough relations multiplied together)");
+				//LogOutput($"Count: {newRelations.Count}");
+				//LogOutput(newRelations.FormatString());
+				//LogOutput();
+
+				LogOutput($"New smooth relations (from sieving rough relations)");
+				LogOutput($"Count: {newSmooth.Count}");
+				LogOutput(newSmooth.Take(5).FormatString());
+				LogOutput();
+			}
+			//LogOutput($"Still rough relations (from sieving rough relations)");
+			//LogOutput($"Count: {newSievedRelations.Item2.Count}");
+			//LogOutput(newSievedRelations.Item2.FormatString());
 			LogOutput();
+			LogOutput();
+
+			/*
+
+FactorCollection gFactors = FactorCollection.Factory.BuildGFactorBase(gnfs);
+
+LogOutput($"g(x) factors: {gFactors.Count}");
+LogOutput(gFactors.FormatString());
+LogOutput();
+*/
 
 			//var matrixVectors = smoothRelations.Select(rel => rel.GetMatrixRowVector());
 			//var rationalVectors = matrixVectors.Select(tup => tup.Item1);
@@ -319,7 +382,7 @@ namespace GNFS_Winforms
 				LogOutput();
 			}
 		}
-		
+
 		private void FindSquares(CancellationToken cancelToken)
 		{
 			if (cancelToken.IsCancellationRequested)
@@ -328,12 +391,12 @@ namespace GNFS_Winforms
 			}
 
 			List<BigInteger> norms = new List<BigInteger>();
-			norms.AddRange(gnfs.Relations.Select(rel => BigInteger.Abs(rel.AlgebraicNorm)));
-			norms.AddRange(gnfs.Relations.Select(rel => BigInteger.Abs(rel.RationalNorm)));
+			norms.AddRange(gnfs.SmoothRelations.Select(rel => BigInteger.Abs(rel.AlgebraicNorm)));
+			norms.AddRange(gnfs.SmoothRelations.Select(rel => BigInteger.Abs(rel.RationalNorm)));
 
-			norms.AddRange(gnfs.Relations.Select(rel => BigInteger.Abs((BigInteger)rel.A)));
-			norms.AddRange(gnfs.Relations.Select(rel => BigInteger.Abs((BigInteger)rel.B)));
-			norms.AddRange(gnfs.Relations.Select(rel => BigInteger.Abs(rel.C)));
+			norms.AddRange(gnfs.SmoothRelations.Select(rel => BigInteger.Abs((BigInteger)rel.A)));
+			norms.AddRange(gnfs.SmoothRelations.Select(rel => BigInteger.Abs((BigInteger)rel.B)));
+			norms.AddRange(gnfs.SmoothRelations.Select(rel => BigInteger.Abs(rel.C)));
 
 			IEnumerable<BigInteger> squares = norms.Select(bi => BigInteger.Abs(bi)).Distinct();
 			squares = squares.Where(bi => bi.IsSquare()).Distinct();
@@ -392,6 +455,15 @@ namespace GNFS_Winforms
 
 				//}
 			}
+		}
+
+		private void btnConstructPoly_Click(object sender, EventArgs e)
+		{
+			SkewSymmetricPolynomial skewPoly = new SkewSymmetricPolynomial(n, degree);
+
+			LogOutput("Skew Polynomial:");
+			LogOutput($"{ skewPoly}");
+			LogOutput();
 		}
 
 		private static string FormatTupleCollection(IEnumerable<Tuple<int, int>> tuples)
