@@ -118,6 +118,34 @@ namespace GNFSCore.IntegerMath
 			return GetPrimeFactorizationTuple(value, maxValue).Select(tup => tup.Item2).OrderByDescending(i => i).ToArray();
 		}
 
+		public static bool IsSmoothOverFactorBase(BigInteger n, IEnumerable<int> factorBase)
+		{
+			BigInteger result = BigInteger.Abs(n);
+			BigInteger sqrt = result.SquareRoot();
+
+			foreach (int factor in factorBase)
+			{
+				while (result % factor == 0 && result != 1)
+				{
+					result /= factor;
+				}
+
+				if (result == 0 || result == 1 || factor > sqrt)
+				{
+					break;
+				}
+				else if (result > 1 && result < (int.MaxValue - 1))
+				{
+					if (factorBase.Contains((int)result))
+					{
+						return true;
+					}
+				}
+			}
+
+			return (result == 1);
+		}
+
 		public static class FormatString
 		{
 			public static string PrimeFactorization(IEnumerable<Tuple<int, int>> factorization)

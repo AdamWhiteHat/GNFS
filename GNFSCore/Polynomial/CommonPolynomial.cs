@@ -1,4 +1,5 @@
 ﻿using ExtendedNumerics;
+using GNFSCore.IntegerMath;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +16,49 @@ namespace GNFSCore.Polynomial
 		BigInteger[] Terms { get; }
 	}
 
+	public enum SearchDirection
+	{
+		Increment,
+		Decrement
+	}
+
 	namespace Internal
 	{
 		public static class CommonPolynomial
 		{
-			public static BigInteger SuggestPolynomialBase(BigInteger n, int degree)
+			public static BigInteger SuggestPolynomialBase(BigInteger n, int degree, IEnumerable<int> primeFactorBase, SearchDirection searchDirection = SearchDirection.Increment)
 			{
-				return n.NthRoot(degree);
+				BigInteger polyBaseA = n.NthRoot(degree + 1);
+
+				BigInteger result = FindNextSmooth(polyBaseA, primeFactorBase, searchDirection);
+				return result;
+			}
+
+			public static BigInteger FindNextSmooth(BigInteger n, IEnumerable<int> primeFactorBase, SearchDirection searchDirection = SearchDirection.Increment, int maxRounds = 10000000)
+			{
+				BigInteger incrementValue = 2;
+
+				if (searchDirection == SearchDirection.Decrement)
+				{
+					incrementValue = BigInteger.Negate(incrementValue);
+				}
+
+				if (n % 2 != 0)
+				{
+					n += 1;
+				}
+
+				int counter = maxRounds;
+				bool isSmooth = false;
+				do
+				{
+					n += incrementValue;
+					isSmooth = FactorizationFactory.IsSmoothOverFactorBase(n, primeFactorBase);
+					counter -= 1;
+				}
+				while (!isSmooth && counter > 0);
+
+				return n;
 			}
 
 			public static List<int> GetRootsMod(IPolynomial polynomial, BigInteger baseM, IEnumerable<int> modList)

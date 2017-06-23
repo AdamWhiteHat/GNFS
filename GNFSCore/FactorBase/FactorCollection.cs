@@ -56,6 +56,20 @@ namespace GNFSCore.FactorBase
 			{
 				return new FactorCollection(gnfs, GetPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.QuadraticPrimeBase, 2, gnfs.QuadraticFactorBaseMin, 2000));
 			}
+
+			private delegate BigInteger BigIntegerEvaluateDelegate(BigInteger x);
+			private delegate double DoubleEvaluateDelegate(double x);
+
+			public static FactorCollection BuildGFactorBase(GNFS gnfs)
+			{
+				double Cd = (double)(gnfs.CurrentPolynomial.Terms.Last());
+				double Cdd = Math.Pow(Cd, (double)gnfs.CurrentPolynomial.Degree - 1);
+				DoubleEvaluateDelegate evalDelegate = gnfs.CurrentPolynomial.Evaluate;
+
+				IEnumerable<int> primes = gnfs.RationalPrimeBase;
+				IEnumerable<FactorPair> results = primes.Select(p => new FactorPair(p, (int)(evalDelegate(p / Cd) * Cdd))).Distinct();
+				return new FactorCollection(gnfs, results.ToList());
+			}
 		}
 
 		public static List<FactorPair> GetPolynomialRootsInRange(CancellationToken cancelToken, AlgebraicPolynomial polynomial, IEnumerable<int> primes, int rangeFrom, int rangeTo, int totalFactorPairs)

@@ -26,7 +26,7 @@ namespace GNFS_Winforms
 			InitializeComponent();
 			IsWorking = false;
 
-			tbDegree.Text = "5"; //"5"; //"6"; //"7"
+			tbDegree.Text = "5"; //"3"; //"6"; //"7"
 
 			//"45113";
 			//"3218147";
@@ -50,11 +50,10 @@ namespace GNFS_Winforms
 			n = BigInteger.Parse(tbN.Text);
 			degree = int.Parse(tbDegree.Text);
 
-			BigInteger baseM = CommonPolynomial.SuggestPolynomialBase(n, degree);
+			IEnumerable<int> primes = PrimeFactory.GetPrimes(10000);
+			BigInteger baseM = CommonPolynomial.SuggestPolynomialBase(n, degree, primes);
 
 			tbBase.Text = baseM.ToString();
-
-
 		}
 
 		private GNFS gnfs;
@@ -270,7 +269,7 @@ namespace GNFS_Winforms
 			LogOutput(smoothRelations.OrderByDescending(rel => rel.A * rel.B).Take(5).FormatString());
 			LogOutput("(restricted result set to top 5)");
 			LogOutput();
-
+			/*
 			var roughGroups = GNFS.GroupRoughNumbers(gnfs.RoughRelations);
 			if (roughGroups.Any())
 			{
@@ -322,7 +321,7 @@ namespace GNFS_Winforms
 			//LogOutput(newSievedRelations.Item2.FormatString());
 			LogOutput();
 			LogOutput();
-
+			*/
 			/*
 
 FactorCollection gFactors = FactorCollection.Factory.BuildGFactorBase(gnfs);
@@ -331,35 +330,44 @@ LogOutput($"g(x) factors: {gFactors.Count}");
 LogOutput(gFactors.FormatString());
 LogOutput();
 */
-
-			//var matrixVectors = smoothRelations.Select(rel => rel.GetMatrixRowVector());
-			//var rationalVectors = matrixVectors.Select(tup => tup.Item1);
-			//var algebraicVectors = matrixVectors.Select(tup => tup.Item1);
-
-			//BitMatrix rationalVectorsMatrix = new BitMatrix(rationalVectors);
-			//BitMatrix algebraicVectorsMatrix = new BitMatrix(algebraicVectors);
-
-			//IEnumerable<BigInteger[]> rationalCombinations = MatrixSolver.GetSquareCombinations(rationalVectorsMatrix);
-			//IEnumerable<BigInteger[]> algebraicCombinations = MatrixSolver.GetSquareCombinations(rationalVectorsMatrix);
-
-			//LogOutput($"*** BINARY MATRIX ***");
-			//LogOutput();
-			//LogOutput("Rational matrix:");
-			//LogOutput(MatrixSolver.FormatCombinations(rationalCombinations));
-			//LogOutput();
-			//LogOutput();
-			//LogOutput("Algebraic matrix:");
-			//LogOutput(MatrixSolver.FormatCombinations(algebraicCombinations));
-			//LogOutput();
-			//LogOutput();
+			/*
+			var matrixVectors = smoothRelations.Select(rel => rel.GetMatrixRowVector());
+			var rationalVectors = matrixVectors.Select(tup => tup.Item1);
+			var algebraicVectors = matrixVectors.Select(tup => tup.Item2);
+			
+			BitMatrix rationalVectorsMatrix = new BitMatrix(rationalVectors);
+			BitMatrix algebraicVectorsMatrix = new BitMatrix(algebraicVectors);
+			
+			IEnumerable<BigInteger[]> rationalCombinations = MatrixSolver.GetSquareCombinations(rationalVectorsMatrix);
+			IEnumerable<BigInteger[]> algebraicCombinations = MatrixSolver.GetSquareCombinations(rationalVectorsMatrix);
+			
+			LogOutput($"*** BINARY MATRIX ***");
+			LogOutput();
+			LogOutput("Rational matrix:");
+			LogOutput(rationalVectorsMatrix.ToString());
+			LogOutput();
+			LogOutput();
+			LogOutput("Algebraic matrix:");
+			LogOutput(algebraicVectorsMatrix.ToString());
+			LogOutput();
+			LogOutput();
+			LogOutput();
+			LogOutput("Rational squares:");
+			LogOutput(MatrixSolver.FormatCombinations(rationalCombinations));
+			LogOutput();
+			LogOutput();
+			LogOutput("Algebraic squares:");
+			LogOutput(MatrixSolver.FormatCombinations(algebraicCombinations));
+			LogOutput();
+			LogOutput();
 
 			//List<BigInteger> squares = MatrixSolver.GetCombinationsProduct(rationalCombinations);
 			//squares.AddRange(MatrixSolver.GetCombinationsProduct(algebraicCombinations));
 
-
+	*/
 			BigInteger productC = smoothRelations.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
 			BigInteger gcd = GCD.FindGCD(n, productC % n);
-
+		
 			LogOutput();
 			LogOutput($"relations.Select(rel => f(rel.C)).Product(): {productC}");
 			LogOutput();
@@ -459,7 +467,7 @@ LogOutput();
 
 		private void btnConstructPoly_Click(object sender, EventArgs e)
 		{
-			SkewSymmetricPolynomial skewPoly = new SkewSymmetricPolynomial(n, degree);
+			SkewSymmetricPolynomial skewPoly = new SkewSymmetricPolynomial(gnfs, degree);
 
 			LogOutput("Skew Polynomial:");
 			LogOutput($"{ skewPoly}");

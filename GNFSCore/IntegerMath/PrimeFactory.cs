@@ -58,6 +58,11 @@ namespace GNFSCore.IntegerMath
 			return value;
 		}
 
+		public static int[] GetPrimes()
+		{
+			return primes;
+		}
+
 		public static int[] GetPrimes(int maxValue)
 		{
 			if (maxValue > MaxValue)

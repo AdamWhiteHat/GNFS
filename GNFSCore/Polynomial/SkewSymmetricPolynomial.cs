@@ -19,20 +19,24 @@ namespace GNFSCore.Polynomial
 		public BigInteger[] Terms { get; private set; }
 
 
-		public SkewSymmetricPolynomial(BigInteger n, int degree)
+		public SkewSymmetricPolynomial(GNFS gnfs, int degree)
 		{
-			if (n.ToString().Count() < 10)
+			N = gnfs.N;
+			Degree = degree;
+
+			if (N.ToString().Count() < 10)
 			{
 				throw new Exception("Call the other constructor overloads if log10(N) < 10");
 			}
 
-			BigInteger polyBaseA = n.NthRoot(degree);
+			IEnumerable<int> primes = PrimeFactory.GetPrimes(10000);
+
+			BigInteger polyBaseA = N.NthRoot(Degree + 1);
 			BigInteger polyBaseB = polyBaseA.NthRoot(3);
 
-			polyBaseA = BigInteger.Multiply(polyBaseB, polyBaseB);
+			polyBaseA = CommonPolynomial.SuggestPolynomialBase(N, degree, primes, SearchDirection.Decrement);
+			polyBaseB = CommonPolynomial.FindNextSmooth(polyBaseB, primes);
 
-			N = n;
-			Degree = degree;
 			BaseA = polyBaseA;
 			BaseB = polyBaseB;
 			Terms = Enumerable.Repeat(BigInteger.Zero, degree + 1).ToArray();
@@ -62,10 +66,10 @@ namespace GNFSCore.Polynomial
 			int d = this.Degree;
 			BigInteger toAdd = N;
 
-			BigInteger DthRoot = N.NthRoot(d+1) + 1;
+			BigInteger DthRoot = N.NthRoot(d + 1) + 1;
 
-			// Build out Terms[]
-			while (d >= 0)
+			d = d + 1;
+			while (--d >= 0) // Build out Terms[]
 			{
 				BigInteger placeValue = CalculatePlaceValue(this, d);
 
@@ -95,11 +99,30 @@ namespace GNFSCore.Polynomial
 
 					if (placeValue < toAdd)
 					{
-						BigInteger maxContribution = BigInteger.Multiply(DthRoot, placeValue);
+						BigInteger maxTermValue = DthRoot;
 
-						if (toAdd > maxContribution)
+						if (d == this.Degree)
 						{
-							Terms[d] = DthRoot;
+							int counter = d + 1;
+							List<BigInteger> coefficients = new List<BigInteger>();
+							while (counter-- > 0)
+							{
+								coefficients.Add(CalculatePlaceValue(this, counter));
+							}
+
+							BigInteger sum = coefficients.Sum();
+							BigInteger leadingCoefficientValue = BigInteger.Divide(N, sum) + 1;
+
+							Terms[d] = leadingCoefficientValue; // Make monic
+							toAdd -= BigInteger.Multiply(leadingCoefficientValue, placeValue);
+							continue;
+						}
+
+						BigInteger maxContribution = BigInteger.Multiply(maxTermValue, placeValue);
+
+						if (toAdd >= maxContribution)
+						{
+							Terms[d] = maxTermValue;
 							toAdd -= maxContribution;
 						}
 						else
@@ -115,8 +138,8 @@ namespace GNFSCore.Polynomial
 						throw new Exception("Failed to correct for condition: PlaceValue > ToAdd!");
 					}
 				}
-
-				d--;
+				// Taken care of during the while loop check...
+				//d--;
 			}
 		}
 
@@ -170,7 +193,7 @@ namespace GNFSCore.Polynomial
 			IEnumerable<int> result = modList.Where(mod => (polyResult % mod) == 0);
 			return result.ToList();
 		}
-		
+
 		public static BigInteger CalculatePlaceValue(SkewSymmetricPolynomial poly, int positionD)
 		{
 			if (positionD == 0)
@@ -247,7 +270,7 @@ namespace GNFSCore.Polynomial
 				degree--;
 			}
 
-			return string.Join(" + ", stringTerms);
+			return "   " + string.Join($"{Environment.NewLine} + ", stringTerms);
 		}
 	}
 }
