@@ -230,15 +230,15 @@ namespace GNFSCore
 			{
 				PrimeBound = base10 * 10;//(int)((int)N.NthRoot(_degree, ref remainder) * 1.5); // 60;
 			}
-			else if (base10 < 100)
+			else if (base10 <= 100)
 			{
 				PrimeBound = 100000;
 			}
-			else if (base10 > 100 && base10 < 150)
+			else if (base10 > 100 && base10 <= 150)
 			{
 				PrimeBound = 250000;
 			}
-			else if (base10 > 150 && base10 < 200)
+			else if (base10 > 150 && base10 <= 200)
 			{
 				PrimeBound = 125000000;
 			}
