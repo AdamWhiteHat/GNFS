@@ -46,6 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreateGnfs.cs" />
+    <Compile Include="ControlBridge.cs" />
+    <Compile Include="FindSquares.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
