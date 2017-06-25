@@ -36,7 +36,7 @@ namespace GNFSCore.Polynomial
 			Base = polynomialBase;
 			Degree = degree;
 
-			Initialize(); 
+			Initialize();
 		}
 
 		private void Initialize()
@@ -116,17 +116,17 @@ namespace GNFSCore.Polynomial
 			return BigInteger.Subtract(BigInteger.Pow(x, p), x);
 		}
 
-		public List<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
+		public List<BigInteger> GetRootsMod(BigInteger baseM, IEnumerable<BigInteger> modList)
 		{
 			return CommonPolynomial.GetRootsMod(this, baseM, modList);
 		}
 
-		public IEnumerable<int> GetRootsModEnumerable(BigInteger baseM, IEnumerable<int> modList)
+		public IEnumerable<BigInteger> GetRootsModEnumerable(BigInteger baseM, IEnumerable<BigInteger> modList)
 		{
 			BigInteger polyResult = Evaluate(baseM);
-			IEnumerable<int> primeList = modList;
+			IEnumerable<BigInteger> primeList = modList;
 
-			foreach (int mod in primeList)
+			foreach (BigInteger mod in primeList)
 			{
 				if ((polyResult % mod) == 0)
 				{

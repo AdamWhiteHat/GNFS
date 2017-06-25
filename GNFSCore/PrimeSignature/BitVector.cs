@@ -19,16 +19,16 @@ namespace GNFSCore.PrimeSignature
 
 		public bool this[int index] => Elements[index];
 
-		public BitVector(BigInteger number, int maxValue)
+		public BitVector(BigInteger number, BigInteger maxValue)
 			: this(number, maxValue, FactorizationFactory.GetPrimeFactorizationTuple(number, maxValue))
 		{ }
 
-		public BitVector(BigInteger number, int maxValue, IEnumerable<Tuple<int, int>> primeFactorization)
+		public BitVector(BigInteger number, BigInteger maxValue, IEnumerable<Tuple<BigInteger, BigInteger>> primeFactorization)
 		{
 			Number = number;
 
 			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue) + 2];
-			foreach (Tuple<int, int> factor in primeFactorization)
+			foreach (Tuple<BigInteger, BigInteger> factor in primeFactorization)
 			{
 				if (factor.Item1 > maxValue)
 				{

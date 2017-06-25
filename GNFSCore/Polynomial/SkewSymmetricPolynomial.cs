@@ -29,7 +29,7 @@ namespace GNFSCore.Polynomial
 				throw new Exception("Call the other constructor overloads if log10(N) < 10");
 			}
 
-			IEnumerable<int> primes = PrimeFactory.GetPrimes(10000);
+			IEnumerable<BigInteger> primes = PrimeFactory.GetPrimes(10000);
 
 			BigInteger polyBaseA = N.NthRoot(Degree + 1);
 			BigInteger polyBaseB = polyBaseA.NthRoot(3);

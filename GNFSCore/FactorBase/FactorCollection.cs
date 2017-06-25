@@ -38,7 +38,7 @@ namespace GNFSCore.FactorBase
 			// quantity = phi(bound)
 			public static FactorCollection BuildRationalFactorBase(GNFS gnfs)
 			{
-				IEnumerable<FactorPair> result = gnfs.RationalPrimeBase.Select(p => new FactorPair(p, (int)(gnfs.CurrentPolynomial.Base % p))).Distinct();
+				IEnumerable<FactorPair> result = gnfs.RationalPrimeBase.Select(p => new FactorPair(p, (gnfs.CurrentPolynomial.Base % p))).Distinct();
 				return new FactorCollection(gnfs, result.ToList());
 			}
 
@@ -58,25 +58,25 @@ namespace GNFSCore.FactorBase
 			}
 
 			private delegate BigInteger BigIntegerEvaluateDelegate(BigInteger x);
-			private delegate double DoubleEvaluateDelegate(double x);
+			private delegate BigInteger DoubleEvaluateDelegate(BigInteger x);
 
 			public static FactorCollection BuildGFactorBase(GNFS gnfs)
 			{
-				double Cd = (double)(gnfs.CurrentPolynomial.Terms.Last());
-				double Cdd = Math.Pow(Cd, (double)gnfs.CurrentPolynomial.Degree - 1);
+				BigInteger Cd = (gnfs.CurrentPolynomial.Terms.Last());
+				BigInteger Cdd = BigInteger.Pow(Cd, (gnfs.CurrentPolynomial.Degree - 1));
 				DoubleEvaluateDelegate evalDelegate = gnfs.CurrentPolynomial.Evaluate;
 
-				IEnumerable<int> primes = gnfs.RationalPrimeBase;
-				IEnumerable<FactorPair> results = primes.Select(p => new FactorPair(p, (int)(evalDelegate(p / Cd) * Cdd))).Distinct();
+				IEnumerable<BigInteger> primes = gnfs.RationalPrimeBase;
+				IEnumerable<FactorPair> results = primes.Select(p => new FactorPair(p, BigInteger.Multiply(evalDelegate(BigInteger.Divide(p, Cd)), Cdd))).Distinct();
 				return new FactorCollection(gnfs, results.ToList());
 			}
 		}
 
-		public static List<FactorPair> GetPolynomialRootsInRange(CancellationToken cancelToken, AlgebraicPolynomial polynomial, IEnumerable<int> primes, int rangeFrom, int rangeTo, int totalFactorPairs)
+		public static List<FactorPair> GetPolynomialRootsInRange(CancellationToken cancelToken, AlgebraicPolynomial polynomial, IEnumerable<BigInteger> primes, BigInteger rangeFrom, BigInteger rangeTo, int totalFactorPairs)
 		{
 			List<FactorPair> result = new List<FactorPair>();
 
-			int r = rangeFrom;
+			BigInteger r = rangeFrom;
 			while (r < rangeTo && result.Count < totalFactorPairs)
 			{
 				if (cancelToken.IsCancellationRequested)
@@ -84,8 +84,8 @@ namespace GNFSCore.FactorBase
 					break;
 				}
 
-				IEnumerable<int> modList = primes.Where(p => p > r);
-				List<int> roots = polynomial.GetRootsMod(r, modList);
+				IEnumerable<BigInteger> modList = primes.Where(p => p > r);
+				List<BigInteger> roots = polynomial.GetRootsMod(r, modList);
 				if (roots.Any())
 				{
 					result.AddRange(roots.Select(p => new FactorPair(p, r)));

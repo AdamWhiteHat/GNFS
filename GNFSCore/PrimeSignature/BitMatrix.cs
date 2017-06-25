@@ -22,9 +22,9 @@ namespace GNFSCore.PrimeSignature
 
 		public BitMatrix(IEnumerable<BigInteger> array, int primeBound)
 		{
-			int maxArraySquareRoot = (int)Math.Ceiling(Math.Sqrt((double)array.Max())) + 1;
-			int maxArrayValue = PrimeFactory.GetValueFromIndex(maxArraySquareRoot);
-			int maxValue = Math.Min(maxArrayValue, primeBound);
+			long maxArraySquareRoot = (long)(array.Max().SquareRoot() + 1);
+			BigInteger maxArrayValue = PrimeFactory.GetValueFromIndex(maxArraySquareRoot);
+			BigInteger maxValue = BigInteger.Min(maxArrayValue, primeBound);
 
 			Width = PrimeFactory.GetIndexFromValue(maxValue) + 1;
 
@@ -66,9 +66,9 @@ namespace GNFSCore.PrimeSignature
 			Rows = Rows.Except(vectors).ToList();
 		}
 
-		private int ColumnSum(int index)
+		private int ColumnSum(int columnIndex)
 		{
-			return Rows.Select(bv => bv[index] ? 1 : 0).Sum();
+			return Rows.Select(bv => bv[columnIndex] ? 1 : 0).Sum();
 		}
 
 		private void SortRows()
@@ -79,9 +79,9 @@ namespace GNFSCore.PrimeSignature
 						.ToList();
 		}
 
-		private bool[] GetColumn(int index)
+		private bool[] GetColumn(int columnIndex)
 		{
-			return Rows.Select(bv => bv[index]).ToArray();
+			return Rows.Select(bv => bv[columnIndex]).ToArray();
 		}
 
 		public override string ToString()
@@ -89,8 +89,10 @@ namespace GNFSCore.PrimeSignature
 			SortRows();
 
 			//BigInteger maxValue = Rows.Select(row => row.Number).Max();
-			//int padLength = maxValue.ToString().Length + 3;
-			//string padString = new string(Enumerable.Repeat(' ', padLength).ToArray());
+			//int numberLength = maxValue.ToString().Length + 3;
+			//string padString = new string(Enumerable.Repeat(' ', numberLength).ToArray());
+			//int vectorLength = Rows.First().ToString().Length;
+			//int padLength = numberLength + vectorLength + 4;
 
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine(string.Join(Environment.NewLine, Rows.Select(i => i.ToString())));

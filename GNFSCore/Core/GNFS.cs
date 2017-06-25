@@ -25,17 +25,17 @@ namespace GNFSCore
 
 		public CancellationToken CancelToken { get; set; }
 
-		public int PrimeBound { get; set; }
-		public int MaxPrimeBound { get { return Math.Max(Math.Max(RationalFactorBase, AlgebraicFactorBase), QuadraticFactorBaseMax); } }
+		public BigInteger PrimeBound { get; set; }
+		public BigInteger MaxPrimeBound { get { return BigInteger.Max(BigInteger.Max(RationalFactorBase, AlgebraicFactorBase), QuadraticFactorBaseMax); } }
 
-		public int RationalFactorBase { get; set; }
-		public int AlgebraicFactorBase { get; set; }
-		public int QuadraticFactorBaseMin { get; set; }
-		public int QuadraticFactorBaseMax { get; set; }
+		public BigInteger RationalFactorBase { get; set; }
+		public BigInteger AlgebraicFactorBase { get; set; }
+		public BigInteger QuadraticFactorBaseMin { get; set; }
+		public BigInteger QuadraticFactorBaseMax { get; set; }
 
-		public IEnumerable<int> RationalPrimeBase;
-		public IEnumerable<int> AlgebraicPrimeBase;
-		public IEnumerable<int> QuadraticPrimeBase;
+		public IEnumerable<BigInteger> RationalPrimeBase;
+		public IEnumerable<BigInteger> AlgebraicPrimeBase;
+		public IEnumerable<BigInteger> QuadraticPrimeBase;
 
 		public FactorCollection RFB { get; set; } = null;
 		public FactorCollection AFB { get; set; } = null;
@@ -59,7 +59,7 @@ namespace GNFSCore
 		private int quantity = 200;
 		private int degree = 2;
 
-		private int[] _primes;
+		private BigInteger[] _primes;
 
 		public GNFS()
 		{

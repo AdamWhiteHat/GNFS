@@ -26,7 +26,7 @@ namespace GNFSCore.Polynomial
 	{
 		public static class CommonPolynomial
 		{
-			public static BigInteger SuggestPolynomialBase(BigInteger n, int degree, IEnumerable<int> primeFactorBase, SearchDirection searchDirection = SearchDirection.Increment)
+			public static BigInteger SuggestPolynomialBase(BigInteger n, int degree, IEnumerable<BigInteger> primeFactorBase, SearchDirection searchDirection = SearchDirection.Increment)
 			{
 				BigInteger polyBaseA = n.NthRoot(degree + 1);
 
@@ -34,7 +34,7 @@ namespace GNFSCore.Polynomial
 				return result;
 			}
 
-			public static BigInteger FindNextSmooth(BigInteger n, IEnumerable<int> primeFactorBase, SearchDirection searchDirection = SearchDirection.Increment, int maxRounds = 10000000)
+			public static BigInteger FindNextSmooth(BigInteger n, IEnumerable<BigInteger> primeFactorBase, SearchDirection searchDirection = SearchDirection.Increment, int maxRounds = 10000000)
 			{
 				BigInteger incrementValue = 2;
 
@@ -61,10 +61,10 @@ namespace GNFSCore.Polynomial
 				return n;
 			}
 
-			public static List<int> GetRootsMod(IPolynomial polynomial, BigInteger baseM, IEnumerable<int> modList)
+			public static List<BigInteger> GetRootsMod(IPolynomial polynomial, BigInteger baseM, IEnumerable<BigInteger> modList)
 			{
 				BigInteger polyResult = Evaluate(polynomial, baseM);
-				IEnumerable<int> result = modList.Where(mod => (polyResult % mod) == 0);
+				IEnumerable<BigInteger> result = modList.Where(mod => (polyResult % mod) == 0);
 				return result.ToList();
 			}
 

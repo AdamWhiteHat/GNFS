@@ -10,27 +10,27 @@ namespace GNFSCore.IntegerMath
 {
 	public static partial class FactorizationFactory
 	{
-		private static int[] primes;
+		private static BigInteger[] primes;
 
 		static FactorizationFactory()
 		{
-			primes = new int[] { 2, 3, 5, 7, 11 };
+			primes = new BigInteger[] { 2, 3, 5, 7, 11 };
 		}
 
-		public static IEnumerable<Tuple<int, int>> GetPrimeFactorizationTuple(BigInteger value, int maxValue)
+		public static IEnumerable<Tuple<BigInteger, BigInteger>> GetPrimeFactorizationTuple(BigInteger value, BigInteger maxValue)
 		{
 			if (value == 0)
 			{
-				return new Tuple<int, int>[] { new Tuple<int, int>(0, 0) };
+				return new Tuple<BigInteger, BigInteger>[] { new Tuple<BigInteger, BigInteger>(0, 0) };
 			}
 
-			List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+			List<Tuple<BigInteger, BigInteger>> result = new List<Tuple<BigInteger, BigInteger>>();
 			BigInteger toFactor = value;
 
-			int lastPrime = int.MinValue;
-			int primeCounter = 1;
-			IEnumerable<int> factorization = GetPrimeFactorization(toFactor, maxValue);
-			foreach (int prime in factorization)
+			BigInteger lastPrime = int.MinValue;
+			BigInteger primeCounter = 1;
+			IEnumerable<BigInteger> factorization = GetPrimeFactorization(toFactor, maxValue);
+			foreach (BigInteger prime in factorization)
 			{
 				if (prime == lastPrime)
 				{
@@ -38,14 +38,14 @@ namespace GNFSCore.IntegerMath
 				}
 				else if (lastPrime != int.MinValue)
 				{
-					result.Add(new Tuple<int, int>(lastPrime, primeCounter));
+					result.Add(new Tuple<BigInteger, BigInteger>(lastPrime, primeCounter));
 					primeCounter = 1;
 				}
 
 				lastPrime = prime;
 			}
 
-			result.Add(new Tuple<int, int>(lastPrime, primeCounter));
+			result.Add(new Tuple<BigInteger, BigInteger>(lastPrime, primeCounter));
 
 			if (factorization.Distinct().Count() != result.Count)
 			{
@@ -55,14 +55,14 @@ namespace GNFSCore.IntegerMath
 			return result;
 		}
 
-		public static IEnumerable<int> GetPrimeFactorization(BigInteger value, int maxValue)
+		public static IEnumerable<BigInteger> GetPrimeFactorization(BigInteger value, BigInteger maxValue)
 		{
 			if (value == 0)
 			{
-				return new int[] { 0 };
+				return new BigInteger[] { 0 };
 			}
 
-			List<int> factors = new List<int>();
+			List<BigInteger> factors = new List<BigInteger>();
 
 			BigInteger toFactor = value;
 			if (toFactor < 0)
@@ -75,7 +75,7 @@ namespace GNFSCore.IntegerMath
 			{
 				if (toFactor == 1 || toFactor == 2 || toFactor == 3 || toFactor == 5 || toFactor == 7)
 				{
-					factors.Add((int)toFactor);
+					factors.Add(toFactor);
 					return factors;
 				}
 			}
@@ -85,13 +85,13 @@ namespace GNFSCore.IntegerMath
 				primes = PrimeFactory.GetPrimes(maxValue + 1);
 			}
 
-			if (primes.Contains((int)toFactor))
+			if (primes.Contains(toFactor))
 			{
-				factors.Add((int)toFactor);
+				factors.Add(toFactor);
 				return factors;
 			}
 
-			foreach (int prime in primes)
+			foreach (BigInteger prime in primes)
 			{
 				while (toFactor % prime == 0)
 				{
@@ -107,23 +107,23 @@ namespace GNFSCore.IntegerMath
 
 			if (toFactor != 1)
 			{
-				factors.Add((int)toFactor);
+				factors.Add(toFactor);
 			}
 
 			return factors;
 		}
 
-		public static int[] GetFactorizationExponents(BigInteger value, int maxValue)
+		public static BigInteger[] GetFactorizationExponents(BigInteger value, BigInteger maxValue)
 		{
 			return GetPrimeFactorizationTuple(value, maxValue).Select(tup => tup.Item2).OrderByDescending(i => i).ToArray();
 		}
 
-		public static bool IsSmoothOverFactorBase(BigInteger n, IEnumerable<int> factorBase)
+		public static bool IsSmoothOverFactorBase(BigInteger n, IEnumerable<BigInteger> factorBase)
 		{
 			BigInteger result = BigInteger.Abs(n);
 			BigInteger sqrt = result.SquareRoot();
 
-			foreach (int factor in factorBase)
+			foreach (BigInteger factor in factorBase)
 			{
 				while (result % factor == 0 && result != 1)
 				{
@@ -134,9 +134,9 @@ namespace GNFSCore.IntegerMath
 				{
 					break;
 				}
-				else if (result > 1 && result < (int.MaxValue - 1))
+				else if (result > 1)
 				{
-					if (factorBase.Contains((int)result))
+					if (factorBase.Contains(result))
 					{
 						return true;
 					}

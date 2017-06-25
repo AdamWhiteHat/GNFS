@@ -14,6 +14,12 @@ namespace GNFSCore.FactorBase
 		public int P { get; }
 		public int R { get; }
 
+		public FactorPair(BigInteger p, BigInteger r)
+		{
+			P = (int)p;
+			R = (int)r;
+		}
+
 		public FactorPair(int p, int r)
 		{
 			P = p;
@@ -66,11 +72,11 @@ namespace GNFSCore.FactorBase
 			int commaIndex = serializedString.IndexOf(',');
 
 			string pString = serializedString.Substring(0, commaIndex);
-			string rString = serializedString.Substring(commaIndex+1);
+			string rString = serializedString.Substring(commaIndex + 1);
 			int p = int.Parse(pString);
 			int r = int.Parse(rString);
 
-			return new FactorPair(p,r);
+			return new FactorPair(p, r);
 		}
 	}
 }

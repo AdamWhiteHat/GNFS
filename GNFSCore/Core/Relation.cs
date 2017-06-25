@@ -67,12 +67,12 @@ namespace GNFSCore
 			RationalQuotient = Factor(_gnfs.RationalPrimeBase, RationalNorm, RationalQuotient);
 		}
 
-		private static BigInteger Factor(IEnumerable<int> factors, BigInteger norm, BigInteger quotient)
+		private static BigInteger Factor(IEnumerable<BigInteger> factors, BigInteger norm, BigInteger quotient)
 		{
 			BigInteger sqrt = BigInteger.Abs(norm).SquareRoot();
 
 			BigInteger result = quotient;
-			foreach (int factor in factors)
+			foreach (BigInteger factor in factors)
 			{
 				if (result == 0 || result == -1 || result == 1 || factor > sqrt)
 				{
@@ -83,10 +83,10 @@ namespace GNFSCore
 					result /= factor;
 
 					BigInteger absResult = BigInteger.Abs(result);
-					if (absResult > 1 && absResult < int.MaxValue - 1)
+					if (absResult > 1 /*&& absResult < int.MaxValue - 1*/)
 					{
-						int intValue = (int)absResult;
-						if (factors.Contains(intValue))
+						//int intValue = (int)absResult;
+						if (factors.Contains(absResult))
 						{
 							result = 1;
 						}

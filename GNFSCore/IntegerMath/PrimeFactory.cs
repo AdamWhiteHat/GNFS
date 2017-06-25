@@ -7,12 +7,13 @@ using System.Collections.Generic;
 namespace GNFSCore.IntegerMath
 {
 	using Internal;
+	using System.Numerics;
 
 	public static class PrimeFactory
 	{
-		private static int MaxValue;
-		private static int[] primes;
-		private static int lastPrime;
+		private static BigInteger MaxValue;
+		private static BigInteger[] primes;
+		private static BigInteger lastPrime;
 
 		static PrimeFactory()
 		{
@@ -26,14 +27,19 @@ namespace GNFSCore.IntegerMath
 			lastPrime = primes.Last();
 		}
 
-		private static void IncreaseMaxValue(int newMaxValue = 0)
+		private static void IncreaseMaxValue()
+		{
+			IncreaseMaxValue(BigInteger.Zero);
+		}
+
+		private static void IncreaseMaxValue(BigInteger newMaxValue)
 		{
 			// Increase bound
-			MaxValue = Math.Max(newMaxValue + 1000, MaxValue + 100000 /*MaxValue*/);
+			MaxValue = BigInteger.Max(newMaxValue + 1000, MaxValue + 100000 /*MaxValue*/);
 			SetPrimes();
 		}
 
-		public static int GetIndexFromValue(int value)
+		public static int GetIndexFromValue(BigInteger value)
 		{
 			if (value == -1)
 			{
@@ -43,27 +49,26 @@ namespace GNFSCore.IntegerMath
 			{
 				IncreaseMaxValue(value);
 			}
-			int primeValue = primes.First(p => p >= value);
-			int index = Array.IndexOf<int>(primes, primeValue);
+			BigInteger primeValue = primes.First(p => p >= value);
+			int index = Array.IndexOf<BigInteger>(primes, primeValue);
 			return index;
 		}
 
-		public static int GetValueFromIndex(int index)
+		public static BigInteger GetValueFromIndex(long index)
 		{
-			while ((primes.Length - 1) < index)
+			while ((primes.LongLength - 1) < index)
 			{
 				IncreaseMaxValue();
 			}
-			int value = primes[index];
-			return value;
+			return (BigInteger)primes.GetValue(index);
 		}
 
-		public static int[] GetPrimes()
+		public static BigInteger[] GetPrimes()
 		{
 			return primes;
 		}
 
-		public static int[] GetPrimes(int maxValue)
+		public static BigInteger[] GetPrimes(BigInteger maxValue)
 		{
 			if (maxValue > MaxValue)
 			{
@@ -72,10 +77,10 @@ namespace GNFSCore.IntegerMath
 			return primes.Take(GetIndexFromValue(maxValue)).ToArray();
 		}
 
-		public static IEnumerable<int> GetPrimeEnumerator(int startValue)
+		public static IEnumerable<BigInteger> GetPrimeEnumerator(BigInteger startValue)
 		{
 			int index = GetIndexFromValue(startValue);
-			int stopIndex = primes.Length - 1;
+			BigInteger stopIndex = primes.Length - 1;
 
 			while (index < stopIndex)
 			{
@@ -86,17 +91,17 @@ namespace GNFSCore.IntegerMath
 			yield break;
 		}
 
-		public static IEnumerable<int> GetPrimesFrom(int minValue)
+		public static IEnumerable<BigInteger> GetPrimesFrom(BigInteger minValue)
 		{
 			return primes.SkipWhile(p => p < minValue);
 		}
 
-		public static IEnumerable<int> GetPrimesTo(int maxValue)
+		public static IEnumerable<BigInteger> GetPrimesTo(BigInteger maxValue)
 		{
 			return GetPrimesRange(0, maxValue);
 		}
 
-		public static IEnumerable<int> GetPrimesRange(int minValue, int maxValue)
+		public static IEnumerable<BigInteger> GetPrimesRange(BigInteger minValue, BigInteger maxValue)
 		{
 			if (primes.Last() < maxValue)
 			{
@@ -105,9 +110,9 @@ namespace GNFSCore.IntegerMath
 			return primes.SkipWhile(p => p < minValue).TakeWhile(p => p < maxValue);
 		}
 
-		public static bool IsPrime(int value)
+		public static bool IsPrime(BigInteger value)
 		{
-			return primes.Contains(Math.Abs(value));
+			return primes.Contains(BigInteger.Abs(value));
 		}
 	}
 }

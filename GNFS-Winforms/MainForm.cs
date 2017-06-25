@@ -55,7 +55,7 @@ namespace GNFS_Winforms
 			n = BigInteger.Parse(tbN.Text);
 			degree = int.Parse(tbDegree.Text);
 
-			IEnumerable<int> primes = PrimeFactory.GetPrimes(10000);
+			IEnumerable<BigInteger> primes = PrimeFactory.GetPrimes(10000);
 			BigInteger baseM = CommonPolynomial.SuggestPolynomialBase(n, degree, primes);
 
 			tbBase.Text = baseM.ToString();

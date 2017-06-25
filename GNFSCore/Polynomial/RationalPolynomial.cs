@@ -76,7 +76,7 @@ namespace GNFSCore.Polynomial
 			return CommonPolynomial.Derivative(this, baseM);
 		}
 
-		public List<int> GetRootsMod(BigInteger baseM, IEnumerable<int> modList)
+		public List<BigInteger> GetRootsMod(BigInteger baseM, IEnumerable<BigInteger> modList)
 		{
 			return CommonPolynomial.GetRootsMod(this, baseM, modList);
 		}
