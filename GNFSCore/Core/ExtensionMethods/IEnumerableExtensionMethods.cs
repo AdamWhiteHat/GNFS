@@ -28,6 +28,11 @@ namespace GNFSCore
 			return result;
 		}
 
+		public static string FormatString<U, V>(this IEnumerable<Tuple<U, V>> tuples)
+		{
+			return string.Join("\t", tuples.Select(tup => $"({tup.Item1},{tup.Item2})"));
+		}
+
 		public static string FormatString<T>(this IEnumerable<T[]> input)
 		{
 			if (input == null || input.Count() < 1)
@@ -36,7 +41,7 @@ namespace GNFSCore
 			}
 			return
 				$"{{{Environment.NewLine}" +
-				string.Join("," + Environment.NewLine, input.Select(i => $"\t({string.Join("; ", i)})")) +
+				string.Join("," + Environment.NewLine, input.Select(i => $"\t({string.Join("; ", i.ToString())})")) +
 				$"{Environment.NewLine}}}{Environment.NewLine}";
 		}
 
