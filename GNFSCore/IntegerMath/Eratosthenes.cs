@@ -9,7 +9,7 @@ namespace GNFSCore.IntegerMath.Internal
 {
 	public static class Eratosthenes
 	{
-		public static List<BigInteger> Sieve(BigInteger maxValue)
+		public static IEnumerable<BigInteger> Sieve(Int32 maxValue)
 		{
 			if (maxValue < 10)
 			{
@@ -31,22 +31,22 @@ namespace GNFSCore.IntegerMath.Internal
 				}
 			}
 
-			Int64 counter = 0;
-			Int64 counterStart = 3;
-			Int64 inc;
-			Int64 sqrt = 3;
+			Int32 counter = 0;
+			Int32 counterStart = 3;
+			Int32 inc;
+			Int32 sqrt = 3;
 
-			Int64 ceil = maxValue >= Int64.MaxValue ? Int64.MaxValue - 2 : (Int64)maxValue;
-
-			Array primeMembershipArray = Array.CreateInstance(typeof(bool), ceil);
-			primeMembershipArray.SetValue(true, 2);
+			Int32 ceil = maxValue >= Int32.MaxValue - 2 ? Int32.MaxValue - 2 : (Int32)maxValue;
+			bool[] primeMembershipArray = new bool[ceil + 2];
+			
+			primeMembershipArray[2] = true;
 
 			// Set all odds as true
 			for (counter = counterStart; counter <= maxValue; counter += 2)
 			{
 				if ((counter & 1) == 1) // Check if odd. &1 is the same as: %2
 				{
-					primeMembershipArray.SetValue(true, counter);
+					primeMembershipArray[counter] = true;
 				}
 			}
 
@@ -57,20 +57,20 @@ namespace GNFSCore.IntegerMath.Internal
 
 				while (counter <= maxValue)
 				{
-					primeMembershipArray.SetValue(false, counter);
+					primeMembershipArray[counter] = false;
 					counter += inc;
 				}
 
 				sqrt += 2;
 
-				while (!(bool)primeMembershipArray.GetValue(sqrt))
+				while (!primeMembershipArray[sqrt])
 				{
 					sqrt++;
 				}
 			}
 
-			List<BigInteger> result = BigRange.GetRange(2, maxValue).Where(l => (bool)primeMembershipArray.GetValue((Int64)l)).ToList();
-			return result;
+			IEnumerable<int> result = Enumerable.Range(2, (int)maxValue).Where(l => primeMembershipArray[l]);
+			return result.Select(i => new BigInteger(i));
 		}
 	}
 }

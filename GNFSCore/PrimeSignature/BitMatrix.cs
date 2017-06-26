@@ -22,7 +22,7 @@ namespace GNFSCore.PrimeSignature
 
 		public BitMatrix(IEnumerable<BigInteger> array, int primeBound)
 		{
-			long maxArraySquareRoot = (long)(array.Max().SquareRoot() + 1);
+			int maxArraySquareRoot = (int)(array.Max().SquareRoot() + 1);
 			BigInteger maxArrayValue = PrimeFactory.GetValueFromIndex(maxArraySquareRoot);
 			BigInteger maxValue = BigInteger.Min(maxArrayValue, primeBound);
 

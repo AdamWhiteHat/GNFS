@@ -59,7 +59,7 @@ namespace GNFSCore
 		private int quantity = 200;
 		private int degree = 2;
 
-		private BigInteger[] _primes;
+		private IEnumerable<BigInteger> _primes;
 
 		public GNFS()
 		{
@@ -436,6 +436,11 @@ namespace GNFSCore
 			List<RoughPair> roughRelations = new List<RoughPair>();
 			foreach (Relation rel in unfactored)
 			{
+				if (gnfs.CancelToken.IsCancellationRequested)
+				{
+					return new Tuple<List<Relation>, List<RoughPair>>(smoothRelations, roughRelations);
+				}
+
 				rel.Sieve();
 				bool smooth = rel.IsSmooth;
 				if (smooth)

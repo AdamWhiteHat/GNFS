@@ -10,7 +10,7 @@ namespace GNFSCore.IntegerMath
 {
 	public static partial class FactorizationFactory
 	{
-		private static BigInteger[] primes;
+		private static IEnumerable<BigInteger> primes;
 
 		static FactorizationFactory()
 		{
