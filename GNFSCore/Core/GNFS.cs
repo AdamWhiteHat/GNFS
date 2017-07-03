@@ -145,7 +145,7 @@ namespace GNFSCore
 				LoadFactorBases();
 
 				// Load Relations
-				SmoothRelations = LoadRelations(Relations_SaveDirectory);
+				SmoothRelations = Relation.LoadRelations(Relations_SaveDirectory);
 			}
 		}
 
@@ -342,31 +342,6 @@ namespace GNFSCore
 			if (CancelToken.IsCancellationRequested) { return; }
 		}
 
-		private static List<Relation> LoadRelations(string saveDirectory)
-		{
-			List<Relation> result = new List<Relation>();
-			// Load Relations
-			if (Directory.Exists(saveDirectory))
-			{
-				IEnumerable<string> relationFiles = Directory.EnumerateFiles(saveDirectory, "*.relation");
-				if (relationFiles.Any())
-				{
-					foreach (string file in relationFiles)
-					{
-						Relation relation = (Relation)Serializer.Deserialize(file, typeof(Relation));
-						result.Add(relation);
-					}
-				}
-			}
-			return result;
-		}
-
-		public List<Relation> GenerateRelations()
-		{
-			CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-			return GenerateRelations(cancelTokenSource.Token);
-		}
-
 		public List<Relation> GenerateRelations(CancellationToken cancelToken)
 		{
 			if (quantity == -1)
@@ -399,7 +374,7 @@ namespace GNFSCore
 				IEnumerable<int> coprimes = A.Where(a => CoPrime.IsCoprime(a, b));
 				IEnumerable<Relation> unfactored = coprimes.Select(a => new Relation(this, a, b));
 
-				newestRelations.AddRange(SieveRelations(unfactored));
+				newestRelations.AddRange(SieveRelations(this, unfactored));
 
 				if (b > maxB)
 				{
@@ -413,25 +388,26 @@ namespace GNFSCore
 			return newestRelations;
 		}
 
-		public List<Relation> SieveRelations(IEnumerable<Relation> unfactored)
+		public static List<Relation> SieveRelations(GNFS gnfs, IEnumerable<Relation> unfactored)
 		{
-			Tuple<List<Relation>, List<RoughPair>> result = SieveRelations(this, unfactored);
+			Tuple<List<Relation>, List<RoughPair>> result = SieveRelations2(gnfs, unfactored);
 
 			if (result.Item1.Any())
 			{
-				this.SmoothRelations.AddRange(result.Item1);
+				gnfs.SmoothRelations.AddRange(result.Item1);
 			}
 			if (result.Item2.Any())
 			{
-				this.RoughRelations.AddRange(result.Item2);
+				gnfs.RoughRelations.AddRange(result.Item2);
 			}
 
 			return result.Item1;
 		}
 
 		// Tuple<SmoothRelations, RoughRelations>
-		public static Tuple<List<Relation>, List<RoughPair>> SieveRelations(GNFS gnfs, IEnumerable<Relation> unfactored)
+		public static Tuple<List<Relation>, List<RoughPair>> SieveRelations2(GNFS gnfs, IEnumerable<Relation> unfactored)
 		{
+			int currentIndex = 0;
 			List<Relation> smoothRelations = new List<Relation>();
 			List<RoughPair> roughRelations = new List<RoughPair>();
 			foreach (Relation rel in unfactored)
@@ -452,6 +428,8 @@ namespace GNFSCore
 				{
 					roughRelations.Add(new RoughPair(rel));
 				}
+
+				currentIndex++;
 			}
 			return new Tuple<List<Relation>, List<RoughPair>>(smoothRelations, roughRelations);
 		}

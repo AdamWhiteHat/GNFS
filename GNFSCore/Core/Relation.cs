@@ -2,20 +2,17 @@
 using System.Linq;
 using System.Text;
 using System.Numerics;
-using GNFSCore.IntegerMath;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Xml.Schema;
+using System.IO;
 
 namespace GNFSCore
 {
 	using FactorBase;
-	using Polynomial;
-	using IntegerMath;
-	using ExtendedNumerics;
 	using PrimeSignature;
-	using System.Xml.Serialization;
-	using System.Xml;
-	using System.Xml.Schema;
 
 	public class Relation : IXmlSerializable
 	{
@@ -115,6 +112,25 @@ namespace GNFSCore
 				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t" +
 				$"[ƒ(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)} ({AlgebraicNorm.IsSquare()}),\ta+b*m={RationalNorm.ToString().PadLeft(4)} ({RationalNorm.IsSquare()})]\t" +
 				$"ƒ({RationalNorm}) =".PadRight(8) + $"{C.ToString().PadLeft(6)}";
+		}
+
+		public static List<Relation> LoadRelations(string saveDirectory)
+		{
+			List<Relation> result = new List<Relation>();
+			// Load Relations
+			if (Directory.Exists(saveDirectory))
+			{
+				IEnumerable<string> relationFiles = Directory.EnumerateFiles(saveDirectory, "*.relation");
+				if (relationFiles.Any())
+				{
+					foreach (string file in relationFiles)
+					{
+						Relation relation = (Relation)Serializer.Deserialize(file, typeof(Relation));
+						result.Add(relation);
+					}
+				}
+			}
+			return result;
 		}
 
 		public static void Serialize(string filePath, Relation relation)
