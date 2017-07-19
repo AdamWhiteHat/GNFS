@@ -45,11 +45,12 @@ namespace GNFS_Winforms
 		{
 			InitializeComponent();
 			IsWorking = false;
+			gnfs = null;
 
 			gnfsBridge = new GnfsUiBridge(this);
 
-			tbN.Text = RSA_100.ToString();
-			tbDegree.Text = "5"; //"3"; //"6"; //"7"						
+			tbN.Text = PerLeslieJensen.ToString();//RSA_100.ToString();
+			tbDegree.Text = "3"; //"5"; //"6"; //"7"						
 
 
 			n = BigInteger.Parse(tbN.Text);
@@ -59,6 +60,7 @@ namespace GNFS_Winforms
 			BigInteger baseM = CommonPolynomial.SuggestPolynomialBase(n, degree, primes);
 
 			tbBase.Text = baseM.ToString();
+			tbBase.Text = "117";
 
 			BridgeTextboxN = new ControlBridge(tbN);
 			BridgeTextboxDegree = new ControlBridge(tbDegree);
@@ -109,9 +111,10 @@ namespace GNFS_Winforms
 
 		private void RestoreAllButtons()
 		{
-			ControlBridge.SetControlText(btnCreateGnfs, CreateGnfsButtonText);
+			ControlBridge.SetControlText(btnCreateGnfs, CreateGnfsButtonText); // Set Control.Text
 			ControlBridge.SetControlText(btnFindRelations, FindRelationsButtonText);
 			ControlBridge.SetControlText(btnFindSquares, FindSquaresButtonText);
+			ControlBridge.SetControlEnabledState(btnConstructPoly, true); // Control.Enable
 			ControlBridge.SetControlEnabledState(btnFindSquares, true);
 			IsWorking = false;
 		}
@@ -123,15 +126,15 @@ namespace GNFS_Winforms
 
 		private void btnCreateGnfs_Click(object sender, EventArgs e)
 		{
-			if (IsWorking)
+			 if (IsWorking)
 			{
 				HaultAllProcessing();
 			}
 			else
 			{
 				SetAsProcessing();
+				ControlBridge.SetControlEnabledState(btnConstructPoly, false); // Control.Enable
 				ControlBridge.SetControlText(btnCreateGnfs, CancelButtonText);
-				ControlBridge.SetControlEnabledState(btnConstructPoly, true); // Enable Construct Polynomials Button Control
 
 				n = BigInteger.Parse(tbN.Text);
 				degree = int.Parse(tbDegree.Text);
@@ -140,7 +143,8 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					gnfs = gnfsBridge.CreateGnfs(n, polyBase, degree, token);
+					gnfsBridge.CreateGnfs(gnfs, n, polyBase, degree, token);
+
 					HaultAllProcessing();
 
 				}).Start();
@@ -161,24 +165,31 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					new List<RoughPair>();
-					while (!token.IsCancellationRequested)
-					{
-						List<RoughPair> knownRough = gnfs.RoughRelations;
-
-						IEnumerable<Relation> relations = gnfs.GenerateRelations(token);
-						LogOutput($"Generated relations:");
-						LogOutput(relations/*.Skip(relations.Count()-5)*/.FormatString());
-						//LogOutput("(restricted result set to top 5)");
-						LogOutput();
-						LogOutput();
-						LogOutput($"Rough numbers (Relations with remainders, i.e. not fully factored):");
-						LogOutput(gnfs.RoughRelations.Except(knownRough)/*.Skip(gnfs.RoughNumbers.Count()-5)*/.FormatString());
-						//LogOutput("(restricted result set to top 5)");
-						LogOutput();
-					}
+					gnfsBridge.FindRelations(gnfs, token);
 					HaultAllProcessing();
 
+				}).Start();
+			}
+		}
+
+		private void btnMatrix_Click(object sender, EventArgs e)
+		{
+			if (IsWorking)
+			{
+				HaultAllProcessing();
+			}
+			else
+			{
+				SetAsProcessing();
+				ControlBridge.SetControlText(btnMatrix, CancelButtonText);
+
+				CancellationToken token = cancellationTokenSource.Token;
+				new Thread(() =>
+				{
+
+					IEnumerable<Tuple<BitVector, BitVector>> matrixVectors = gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.GetMatrixRowVector(gnfs.RationalFactorBase, gnfs.AlgebraicFactorBase));
+					gnfsBridge.MatrixSolve(token, matrixVectors);
+					HaultAllProcessing();
 				}).Start();
 			}
 		}
@@ -197,22 +208,42 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					gnfsBridge.FindSquares(gnfs, token);
+					BigInteger productC = gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
+					BigInteger gcd = GCD.FindGCD(n, productC % n);
+
+					LogOutput();
+					LogOutput($"relations.Select(rel => f(rel.C)).Product(): {productC}");
+					LogOutput();
+					LogOutput($"Product(C)%N: {productC % n}");
+					LogOutput();
+					LogOutput($"GCD(N,ProductC): {gcd}");
+					LogOutput();
+
+					if (gcd > 1)
+					{
+						LogOutput($@"+***************\n* FACTOR FOUND *\n\n*              * \n* {gcd} *\n****************");
+						LogOutput();
+					}
+					else
+					{
+						gnfsBridge.FindSquares(gnfs, token);
+					}
+
 					HaultAllProcessing();
 				}).Start();
 			}
 		}
 
-
-
-
 		private void btnConstructPoly_Click(object sender, EventArgs e)
 		{
-			SkewSymmetricPolynomial skewPoly = new SkewSymmetricPolynomial(gnfs, degree);
+			if (gnfs != null)
+			{
+				SkewSymmetricPolynomial skewPoly = new SkewSymmetricPolynomial(gnfs, degree);
 
-			LogOutput("Skew Polynomial:");
-			LogOutput($"{ skewPoly}");
-			LogOutput();
+				LogOutput("Skew Polynomial:");
+				LogOutput($"{skewPoly}");
+				LogOutput();
+			}
 		}
 
 		private void tbOutput_KeyUp(object sender, KeyEventArgs e)

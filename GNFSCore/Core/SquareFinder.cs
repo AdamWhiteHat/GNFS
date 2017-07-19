@@ -42,13 +42,6 @@ namespace GNFSCore
 		private IEnumerable<BigInteger> rationalSet;
 		private IEnumerable<BigInteger> algebraicSet;
 
-
-		public SquareFinder(GNFS sieve)
-			: this(sieve, sieve.SmoothRelations)
-		{
-			throw new ArithmeticException();
-		}
-
 		public SquareFinder(GNFS sieve, List<Relation> relations)
 		{
 			RationalProductMod = -1;

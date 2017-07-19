@@ -71,6 +71,11 @@ namespace GNFSCore.PrimeSignature
 			return Rows.Select(bv => bv[columnIndex] ? 1 : 0).Sum();
 		}
 
+		public void Sort()
+		{
+			var sortedRow = Rows.OrderBy(vect => (BitVector.GetWeight(vect)));
+		}
+
 		private void SortRows()
 		{
 			Rows = Rows.OrderByDescending(bv => bv.IndexOfRightmostElement())

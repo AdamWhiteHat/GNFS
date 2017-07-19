@@ -93,6 +93,43 @@ namespace GNFSCore.PrimeSignature
 			return Array.IndexOf(Elements, true);
 		}
 
+		public static int GetWeight(BitVector vector)
+		{
+			int count = vector.Length;
+
+			int left = vector.IndexOfLeftmostElement();
+			int right = vector.IndexOfRightmostElement() + 1;
+			int middle = 0;
+
+			int nonemptyBits = vector.Elements.Count(b => b == true);
+
+			if (nonemptyBits > 2)
+			{
+				middle = count - nonemptyBits;
+			}
+
+			return (left + middle + right);
+		}
+
+		public int CompareTo(BitVector other)
+		{
+			if (other == null)
+			{
+				return 1;
+			}
+
+			BitVector vector = other as BitVector;
+			if (vector == null)
+			{
+				throw new ArgumentException("BitVector is not a Temperature");
+			}
+
+			int left = GetWeight(this);
+			int right = GetWeight(vector);
+
+			return left.CompareTo(right);
+		}
+
 		public static string FormatElements(bool[] elements)
 		{
 			return string.Join(",", elements.Select(b => b ? '1' : '0'));
@@ -103,5 +140,7 @@ namespace GNFSCore.PrimeSignature
 			//  augmented matrix style
 			return $"{Number} | {FormatElements(Elements)}";
 		}
+
+
 	}
 }

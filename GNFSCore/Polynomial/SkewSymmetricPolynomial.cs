@@ -17,8 +17,7 @@ namespace GNFSCore.Polynomial
 		public BigInteger BaseA { get; private set; }
 		public BigInteger BaseB { get; private set; }
 		public BigInteger[] Terms { get; private set; }
-
-
+		
 		public SkewSymmetricPolynomial(GNFS gnfs, int degree)
 		{
 			N = gnfs.N;

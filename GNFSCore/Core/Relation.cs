@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Schema;
 using System.IO;
 
@@ -14,7 +15,7 @@ namespace GNFSCore
 	using FactorBase;
 	using PrimeSignature;
 
-	public class Relation : IXmlSerializable
+	public class Relation
 	{
 		public int A { get; set; }
 		public int B { get; set; }
@@ -40,8 +41,6 @@ namespace GNFSCore
 			return new Tuple<BigInteger, BigInteger>(AlgebraicQuotient, RationalQuotient);
 		}
 
-		public Relation() { }
-
 		public Relation(GNFS gnfs, int a, int b)
 		{
 			A = a;
@@ -56,6 +55,11 @@ namespace GNFSCore
 
 			BigInteger rationalEval = _gnfs.CurrentPolynomial.Evaluate(RationalNorm);
 			C = rationalEval % _gnfs.N;
+		}
+
+		public Relation(BigInteger a, BigInteger b, BigInteger c, BigInteger algebraicNorm, BigInteger rationalNorm)
+		{
+
 		}
 
 		public void Sieve()
@@ -93,11 +97,11 @@ namespace GNFSCore
 			return result;
 		}
 
-		public Tuple<BitVector, BitVector> GetMatrixRowVector()
+		public Tuple<BitVector, BitVector> GetMatrixRowVector(BigInteger rationalFactorBase, BigInteger algebraicFactorBase)
 		{
-			BitVector rationalBitVector = new BitVector(RationalNorm, _gnfs.RationalFactorBase);
-			BitVector algebraicBitVector = new BitVector(AlgebraicNorm, _gnfs.AlgebraicFactorBase);
-			//bool[] quadraticBitVector = QuadraticResidue.GetQuadraticCharacters(this, _gnfs.QFB);
+			BitVector rationalBitVector = new BitVector(RationalNorm, rationalFactorBase);
+			BitVector algebraicBitVector = new BitVector(AlgebraicNorm, algebraicFactorBase);
+			//bool[] quadraticBitVector = QuadraticResidue.GetQuadraticCharacters(this, qudraticFactorBase.QFB);
 			//List<bool> combinedVector = new List<bool>();
 			//combinedVector.AddRange(rationalBitVector.Elements);
 			//combinedVector.AddRange(algebraicBitVector.Elements);
@@ -114,51 +118,48 @@ namespace GNFSCore
 				$"ƒ({RationalNorm}) =".PadRight(8) + $"{C.ToString().PadLeft(6)}";
 		}
 
-		public static List<Relation> LoadRelations(string saveDirectory)
+		public static List<Relation> LoadUnfactoredFile(GNFS gnfs, string filename)
 		{
-			List<Relation> result = new List<Relation>();
-			// Load Relations
-			if (Directory.Exists(saveDirectory))
+			return File.ReadAllLines(filename).Select(str =>
 			{
-				IEnumerable<string> relationFiles = Directory.EnumerateFiles(saveDirectory, "*.relation");
-				if (relationFiles.Any())
-				{
-					foreach (string file in relationFiles)
-					{
-						Relation relation = (Relation)Serializer.Deserialize(file, typeof(Relation));
-						result.Add(relation);
-					}
-				}
-			}
-			return result;
+				string[] ab = str.Split(new char[] { ',' });
+				return new Relation(gnfs, int.Parse(ab[0]), int.Parse(ab[1]));
+			}).ToList();
 		}
 
-		public static void Serialize(string filePath, Relation relation)
+		public static void SerializeUnfactoredToFile(string filename, List<Relation> relations)
 		{
-			Serializer.Serialize($"{filePath}\\{relation.A}_{relation.B}.relation", relation);
+			File.WriteAllLines(filename, relations.Select(rel => $"{rel.A},{rel.B}"));
 		}
 
-		public void WriteXml(XmlWriter writer)
+		public void Save(string filename)
 		{
-			writer.WriteElementString("A", A.ToString());
-			writer.WriteElementString("B", B.ToString());
-			writer.WriteElementString("C", C.ToString());
-			writer.WriteElementString("AlgebraicNorm", AlgebraicNorm.ToString());
-			writer.WriteElementString("RationalNorm", RationalNorm.ToString());
+			SerializeToFile(this, filename);// $"{directory}\\{relation.A}_{relation.B}.relation"
 		}
 
-		public void ReadXml(XmlReader reader)
+		public static void SerializeToFile(Relation rel, string filename)
 		{
-			reader.MoveToContent();
-			reader.ReadStartElement();
-			A = int.Parse(reader.ReadElementString("A"));
-			B = int.Parse(reader.ReadElementString("B"));
-			C = BigInteger.Parse(reader.ReadElementString("C"));
-			AlgebraicNorm = BigInteger.Parse(reader.ReadElementString("AlgebraicNorm"));
-			RationalNorm = BigInteger.Parse(reader.ReadElementString("RationalNorm"));
-			reader.ReadEndElement();
+			new XDocument(
+				new XElement("Relation",
+					new XElement("A", rel.A),
+					new XElement("B", rel.B),
+					new XElement("C", rel.C),
+					new XElement("AlgebraicNorm", rel.AlgebraicNorm),
+					new XElement("RationalNorm", rel.RationalNorm)
+				)
+			).Save(filename);
 		}
 
-		public XmlSchema GetSchema() { return null; }
+		public static Relation LoadFromFile(string filename)
+		{
+			XElement rel = XElement.Load(filename);
+			BigInteger a = BigInteger.Parse(rel.Element("A").Value);
+			BigInteger b = BigInteger.Parse(rel.Element("B").Value);
+			BigInteger c = BigInteger.Parse(rel.Element("C").Value);
+			BigInteger an = BigInteger.Parse(rel.Element("AlgebraicNorm").Value);
+			BigInteger rn = BigInteger.Parse(rel.Element("RationalNorm").Value);
+
+			return new Relation(a, b, c, an, rn);
+		}
 	}
 }

@@ -25,15 +25,13 @@ namespace GNFS_Winforms
 				return;
 			}
 
-			GNFS nfs = gnfs;
-
 			List<BigInteger> norms = new List<BigInteger>();
-			norms.AddRange(nfs.SmoothRelations.Select(rel => BigInteger.Abs(rel.AlgebraicNorm)));
-			norms.AddRange(nfs.SmoothRelations.Select(rel => BigInteger.Abs(rel.RationalNorm)));
+			norms.AddRange(gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => BigInteger.Abs(rel.AlgebraicNorm)));
+			norms.AddRange(gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => BigInteger.Abs(rel.RationalNorm)));
 
-			norms.AddRange(nfs.SmoothRelations.Select(rel => BigInteger.Abs((BigInteger)rel.A)));
-			norms.AddRange(nfs.SmoothRelations.Select(rel => BigInteger.Abs((BigInteger)rel.B)));
-			norms.AddRange(nfs.SmoothRelations.Select(rel => BigInteger.Abs(rel.C)));
+			norms.AddRange(gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => BigInteger.Abs((BigInteger)rel.A)));
+			norms.AddRange(gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => BigInteger.Abs((BigInteger)rel.B)));
+			norms.AddRange(gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => BigInteger.Abs(rel.C)));
 
 			IEnumerable<BigInteger> squares = norms.Select(bi => BigInteger.Abs(bi)).Distinct();
 			squares = squares.Where(bi => bi.IsSquare()).Distinct();
@@ -48,7 +46,7 @@ namespace GNFS_Winforms
 				mainForm.LogOutput(squares.FormatString());
 				mainForm.LogOutput();
 
-				SquaresMethod squaresMethod = new SquaresMethod(nfs.N, squares);
+				SquaresMethod squaresMethod = new SquaresMethod(gnfs.N, squares);
 
 				int maxSteps = 5;
 				int counter = 0;

@@ -4,24 +4,24 @@ using System.Text;
 using System.Numerics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using GNFSCore.FactorBase;
-using GNFSCore.Polynomial;
-using GNFSCore.IntegerMath;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.Schema;
 using System.Threading;
 
+using GNFSCore.FactorBase;
+using GNFSCore.Polynomial;
+using GNFSCore.IntegerMath;
+
 namespace GNFSCore
 {
 	public partial class GNFS : IXmlSerializable
 	{
 		public BigInteger N { get; set; }
-		public List<Relation> SmoothRelations { get; private set; }
-		public List<RoughPair> RoughRelations { get; private set; }
 		public AlgebraicPolynomial CurrentPolynomial { get; private set; }
 		public List<AlgebraicPolynomial> PolynomialCollection;
+		public PolyRelationsSieveProgress CurrentRelationsProgress { get; set; }
 
 		public CancellationToken CancelToken { get; set; }
 
@@ -54,9 +54,6 @@ namespace GNFSCore
 		internal string QuadradicFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Quadradic.FactorBase"); } }
 
 		private BigInteger m;
-		private int b = 1;
-		private int valueRange = 200;
-		private int quantity = 200;
 		private int degree = 2;
 
 		private IEnumerable<BigInteger> _primes;
@@ -71,12 +68,11 @@ namespace GNFSCore
 		{
 			CancelToken = cancelToken;
 			N = n;
-			SmoothRelations = new List<Relation>();
-			RoughRelations = new List<RoughPair>();
 			PolynomialCollection = new List<AlgebraicPolynomial>();
 
 			if (!Directory.Exists(GNFS_SaveDirectory))
 			{
+				// New GNFS instance
 				Directory.CreateDirectory(GNFS_SaveDirectory);
 
 				if (polyDegree == -1)
@@ -91,61 +87,19 @@ namespace GNFSCore
 
 				CaclulatePrimeBounds();
 				ConstructNewPolynomial(polynomialBase, this.degree);
-				Directory.CreateDirectory(Relations_SaveDirectory);
-
 				m = polynomialBase;
 
-				// Save GNFS settings
+				Directory.CreateDirectory(Relations_SaveDirectory);
+				CurrentRelationsProgress = new PolyRelationsSieveProgress(CancelToken, Polynomial_SaveDirectory);
+
 				SaveGnfsProgress();
 
 				LoadFactorBases();
 			}
 			else
 			{
-				// Load GNFS settings
 				GNFS gnfs = (GNFS)Serializer.Deserialize(GnfsParameters_SaveFile, typeof(GNFS));
-
-				N = gnfs.N;
-				m = gnfs.m;
-				b = gnfs.b;
-				polyDegree = gnfs.degree;
-				quantity = gnfs.quantity;
-				valueRange = gnfs.valueRange;
-				PrimeBound = gnfs.PrimeBound;
-				RationalFactorBase = gnfs.RationalFactorBase;
-				AlgebraicFactorBase = gnfs.AlgebraicFactorBase;
-				QuadraticFactorBaseMin = gnfs.QuadraticFactorBaseMin;
-				QuadraticFactorBaseMax = gnfs.QuadraticFactorBaseMax;
-
-				if (Directory.Exists(GNFS_SaveDirectory))
-				{
-					IEnumerable<string> polynomialFiles = Directory.EnumerateFiles(GNFS_SaveDirectory, Polynomial_Filename, SearchOption.AllDirectories);
-					if (polynomialFiles.Any())
-					{
-						foreach (string file in polynomialFiles)
-						{
-							AlgebraicPolynomial poly = (AlgebraicPolynomial)Serializer.Deserialize(file, typeof(AlgebraicPolynomial));
-							PolynomialCollection.Add(poly);
-						}
-
-						PolynomialCollection = PolynomialCollection.OrderByDescending(ply => ply.Degree).ToList();
-						CurrentPolynomial = PolynomialCollection.First();
-					}
-				}
-
-				int base10 = N.ToString().Count();
-				int quadraticBaseSize = CalculateQuadraticBaseSize(polyDegree);
-
-				_primes = PrimeFactory.GetPrimes((RationalFactorBase * 3) + 2 + base10);
-				RationalPrimeBase = PrimeFactory.GetPrimesTo(RationalFactorBase);
-				AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(AlgebraicFactorBase);
-				QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(QuadraticFactorBaseMin).Take(quadraticBaseSize);
-
-				// Load FactorBases
-				LoadFactorBases();
-
-				// Load Relations
-				SmoothRelations = Relation.LoadRelations(Relations_SaveDirectory);
+				LoadGnfsProgress(gnfs);
 			}
 		}
 
@@ -158,6 +112,49 @@ namespace GNFSCore
 		{
 			Serializer.Serialize(GnfsParameters_SaveFile, this);
 		}
+
+		public void LoadGnfsProgress(GNFS input)
+		{
+			N = input.N;
+			m = input.m;
+			int polyDegree = input.degree;
+			PrimeBound = input.PrimeBound;
+			RationalFactorBase = input.RationalFactorBase;
+			AlgebraicFactorBase = input.AlgebraicFactorBase;
+			QuadraticFactorBaseMin = input.QuadraticFactorBaseMin;
+			QuadraticFactorBaseMax = input.QuadraticFactorBaseMax;
+
+			if (Directory.Exists(GNFS_SaveDirectory))
+			{
+				IEnumerable<string> polynomialFiles = Directory.EnumerateFiles(GNFS_SaveDirectory, Polynomial_Filename, SearchOption.AllDirectories);
+				if (polynomialFiles.Any())
+				{
+					foreach (string file in polynomialFiles)
+					{
+						AlgebraicPolynomial poly = (AlgebraicPolynomial)Serializer.Deserialize(file, typeof(AlgebraicPolynomial));
+						PolynomialCollection.Add(poly);
+					}
+
+					PolynomialCollection = PolynomialCollection.OrderByDescending(ply => ply.Degree).ToList();
+					CurrentPolynomial = PolynomialCollection.First();
+				}
+			}
+
+			int base10 = N.ToString().Count();
+			int quadraticBaseSize = CalculateQuadraticBaseSize(polyDegree);
+
+			_primes = PrimeFactory.GetPrimes((RationalFactorBase * 3) + 2 + base10);
+			RationalPrimeBase = PrimeFactory.GetPrimesTo(RationalFactorBase);
+			AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(AlgebraicFactorBase);
+			QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(QuadraticFactorBaseMin).Take(quadraticBaseSize);
+
+			// Load FactorBases
+			LoadFactorBases();
+
+			// Load Relations
+			CurrentRelationsProgress = PolyRelationsSieveProgress.LoadProgress(this, Polynomial_SaveDirectory);
+		}
+
 
 		private int showDigits = 22;
 		private string elipse = "[...]";
@@ -190,7 +187,7 @@ namespace GNFSCore
 		}
 
 		// Values were obtained from the paper:
-		// "Polynomial Selection for the Number Field Sieve Integer Factorisation Algorithm" - by Brian Antony Murphy
+		// "Polynomial Selection for the Number Field Sieve Integer factorization Algorithm" - by Brian Antony Murphy
 		// Table 3.1, page 44
 		private static int CalculateDegree(BigInteger n)
 		{
@@ -342,98 +339,6 @@ namespace GNFSCore
 			if (CancelToken.IsCancellationRequested) { return; }
 		}
 
-		public List<Relation> GenerateRelations(CancellationToken cancelToken)
-		{
-			if (quantity == -1)
-			{
-				quantity = RFB.Count + AFB.Count + QFB.Count + 1;
-			}
-			else if (SmoothRelations.Count() >= quantity)
-			{
-				quantity += 200;
-			}
-
-			if (b >= valueRange)
-			{
-				valueRange += 200;
-			}
-
-			int adjustedRange = valueRange % 2 == 0 ? valueRange + 1 : valueRange;
-			IEnumerable<int> A = Enumerable.Range(-adjustedRange, adjustedRange * 2);
-			int maxB = Math.Max(adjustedRange, quantity) + 2;
-
-			List<Relation> newestRelations = new List<Relation>();
-
-			while (SmoothRelations.Count() < quantity)
-			{
-				if (cancelToken.IsCancellationRequested)
-				{
-					break;
-				}
-
-				IEnumerable<int> coprimes = A.Where(a => CoPrime.IsCoprime(a, b));
-				IEnumerable<Relation> unfactored = coprimes.Select(a => new Relation(this, a, b));
-
-				newestRelations.AddRange(SieveRelations(this, unfactored));
-
-				if (b > maxB)
-				{
-					break;
-				}
-
-				b += 2;
-			}
-
-			SaveGnfsProgress();
-			return newestRelations;
-		}
-
-		public static List<Relation> SieveRelations(GNFS gnfs, IEnumerable<Relation> unfactored)
-		{
-			Tuple<List<Relation>, List<RoughPair>> result = SieveRelations2(gnfs, unfactored);
-
-			if (result.Item1.Any())
-			{
-				gnfs.SmoothRelations.AddRange(result.Item1);
-			}
-			if (result.Item2.Any())
-			{
-				gnfs.RoughRelations.AddRange(result.Item2);
-			}
-
-			return result.Item1;
-		}
-
-		// Tuple<SmoothRelations, RoughRelations>
-		public static Tuple<List<Relation>, List<RoughPair>> SieveRelations2(GNFS gnfs, IEnumerable<Relation> unfactored)
-		{
-			int currentIndex = 0;
-			List<Relation> smoothRelations = new List<Relation>();
-			List<RoughPair> roughRelations = new List<RoughPair>();
-			foreach (Relation rel in unfactored)
-			{
-				if (gnfs.CancelToken.IsCancellationRequested)
-				{
-					return new Tuple<List<Relation>, List<RoughPair>>(smoothRelations, roughRelations);
-				}
-
-				rel.Sieve();
-				bool smooth = rel.IsSmooth;
-				if (smooth)
-				{
-					smoothRelations.Add(rel);
-					Relation.Serialize(gnfs.Relations_SaveDirectory, rel);
-				}
-				else
-				{
-					roughRelations.Add(new RoughPair(rel));
-				}
-
-				currentIndex++;
-			}
-			return new Tuple<List<Relation>, List<RoughPair>>(smoothRelations, roughRelations);
-		}
-
 		public static List<RoughPair[]> GroupRoughNumbers(List<RoughPair> roughNumbers)
 		{
 			IEnumerable<RoughPair> input1 = roughNumbers.OrderBy(rp => rp.AlgebraicQuotient).ThenBy(rp => rp.RationalQuotient);
@@ -486,10 +391,7 @@ namespace GNFSCore
 		{
 			writer.WriteElementString("N", N.ToString());
 			writer.WriteElementString("M", m.ToString());
-			writer.WriteElementString("B", b.ToString());
 			writer.WriteElementString("Degree", this.degree.ToString());
-			writer.WriteElementString("Quantity", quantity.ToString());
-			writer.WriteElementString("ValueRange", valueRange.ToString());
 			writer.WriteElementString("PrimeBound", PrimeBound.ToString());
 			writer.WriteElementString("RationalFactorBase", RationalFactorBase.ToString());
 			writer.WriteElementString("AlgebraicFactorBase", AlgebraicFactorBase.ToString());
@@ -504,10 +406,7 @@ namespace GNFSCore
 
 			string nString = reader.ReadElementString("N");
 			string mString = reader.ReadElementString("M");
-			string bString = reader.ReadElementString("B");
 			string degreeString = reader.ReadElementString("Degree");
-			string quantityString = reader.ReadElementString("Quantity");
-			string valueRangeString = reader.ReadElementString("ValueRange");
 			string primeBoundString = reader.ReadElementString("PrimeBound");
 			string rationalFactorBaseString = reader.ReadElementString("RationalFactorBase");
 			string algebraicFactorBaseString = reader.ReadElementString("AlgebraicFactorBase");
@@ -518,10 +417,7 @@ namespace GNFSCore
 
 			N = BigInteger.Parse(nString);
 			m = BigInteger.Parse(mString);
-			b = int.Parse(bString);
 			this.degree = int.Parse(degreeString);
-			quantity = int.Parse(quantityString);
-			valueRange = int.Parse(valueRangeString);
 			PrimeBound = int.Parse(primeBoundString);
 			RationalFactorBase = int.Parse(rationalFactorBaseString);
 			AlgebraicFactorBase = int.Parse(algebraicFactorBaseString);

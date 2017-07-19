@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\PolyRelationsSieveProgress.cs" />
     <Compile Include="Core\QuadraticResidue.cs" />
     <Compile Include="Core\Relation.cs" />
     <Compile Include="Core\RoughPair.cs" />
@@ -49,7 +50,7 @@
     <Compile Include="Core\SquaresMethod.cs" />
     <Compile Include="FactorBase\FactorCollection.cs" />
     <Compile Include="FactorBase\FactorPair.cs" />
-    <Compile Include="FactorBase\Normal.cs" />
+    <Compile Include="IntegerMath\Normal.cs" />
     <Compile Include="IntegerMath\BigRange.cs" />
     <Compile Include="IntegerMath\BigRational.cs" />
     <Compile Include="IntegerMath\Fraction.cs" />

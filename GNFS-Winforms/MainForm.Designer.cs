@@ -41,6 +41,7 @@
 			this.btnFindRelations = new System.Windows.Forms.Button();
 			this.btnFindSquares = new System.Windows.Forms.Button();
 			this.btnConstructPoly = new System.Windows.Forms.Button();
+			this.btnMatrix = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// tbOutput
@@ -148,7 +149,7 @@
 			// 
 			this.btnFindRelations.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnFindRelations.Enabled = false;
-			this.btnFindRelations.Location = new System.Drawing.Point(396, 92);
+			this.btnFindRelations.Location = new System.Drawing.Point(348, 92);
 			this.btnFindRelations.Name = "btnFindRelations";
 			this.btnFindRelations.Size = new System.Drawing.Size(96, 23);
 			this.btnFindRelations.TabIndex = 10;
@@ -160,7 +161,7 @@
 			// 
 			this.btnFindSquares.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnFindSquares.Enabled = false;
-			this.btnFindSquares.Location = new System.Drawing.Point(492, 92);
+			this.btnFindSquares.Location = new System.Drawing.Point(540, 92);
 			this.btnFindSquares.Name = "btnFindSquares";
 			this.btnFindSquares.Size = new System.Drawing.Size(96, 23);
 			this.btnFindSquares.TabIndex = 11;
@@ -172,7 +173,7 @@
 			// 
 			this.btnConstructPoly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnConstructPoly.Enabled = false;
-			this.btnConstructPoly.Location = new System.Drawing.Point(380, 68);
+			this.btnConstructPoly.Location = new System.Drawing.Point(368, 68);
 			this.btnConstructPoly.Name = "btnConstructPoly";
 			this.btnConstructPoly.Size = new System.Drawing.Size(224, 23);
 			this.btnConstructPoly.TabIndex = 12;
@@ -180,11 +181,24 @@
 			this.btnConstructPoly.UseVisualStyleBackColor = true;
 			this.btnConstructPoly.Click += new System.EventHandler(this.btnConstructPoly_Click);
 			// 
+			// btnMatrix
+			// 
+			this.btnMatrix.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnMatrix.Enabled = false;
+			this.btnMatrix.Location = new System.Drawing.Point(444, 92);
+			this.btnMatrix.Name = "btnMatrix";
+			this.btnMatrix.Size = new System.Drawing.Size(96, 23);
+			this.btnMatrix.TabIndex = 13;
+			this.btnMatrix.Text = "Matrix Solve";
+			this.btnMatrix.UseVisualStyleBackColor = true;
+			this.btnMatrix.Click += new System.EventHandler(this.btnMatrix_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(710, 482);
+			this.Controls.Add(this.btnMatrix);
 			this.Controls.Add(this.btnConstructPoly);
 			this.Controls.Add(this.btnFindSquares);
 			this.Controls.Add(this.btnFindRelations);
@@ -221,6 +235,7 @@
 		private System.Windows.Forms.Button btnFindRelations;
 		private System.Windows.Forms.Button btnFindSquares;
 		private System.Windows.Forms.Button btnConstructPoly;
+		private System.Windows.Forms.Button btnMatrix;
 	}
 }
 
