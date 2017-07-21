@@ -73,7 +73,7 @@ namespace GNFSCore
 			RationalProduct = rationalSet.Product();
 			RationalInverseSquare = BigInteger.Multiply(RationalProduct, (BigInteger)SquarePolynomialDerivative);
 			RationalInverseSquareRoot = RationalInverseSquare.SquareRoot();
-			var residue = RationalInverseSquareRoot % gnfs.N;
+			var residue =(RationalInverseSquareRoot % gnfs.N);
 
 			RationalSum = RelationsSet.Select(rel => rel.A).Sum();
 			RationalNormSum = rationalSet.Sum();
@@ -89,7 +89,7 @@ namespace GNFSCore
 		//public BigInteger CalculateRationalModPrime(BigInteger prime)
 		//{
 		//	BigInteger mod = gnfs.Algebraic.Evaluate(prime);
-		//	return (RationalProduct % prime) % mod;
+		//	return BigIntegerExtensionMethods.Mod(BigIntegerExtensionMethods.Mod(RationalProduct, prime), mod);
 		//}
 
 		//public void CalculateRationalModPolynomial()
@@ -97,7 +97,7 @@ namespace GNFSCore
 		//	// Should be the same as N
 		//	BigInteger mod = gnfs.Algebraic.Evaluate(polyBase);
 
-		//	RationalModPolynomial = RationalProduct % mod;
+		//	RationalModPolynomial = BigIntegerExtensionMethods.Mod(RationalProduct, mod);
 
 		//}
 
@@ -110,10 +110,10 @@ namespace GNFSCore
 		//{
 		//	//AlgebraicNormSum = RelationsSet.Select(rel => rel.AlgebraicNorm).Sum();
 
-		//	//algebraicSet = RelationsSet.Select(rel => rel.AlgebraicNorm % prime);
+		//	//algebraicSet = RelationsSet.Select(rel => BigIntegerExtensionMethods.Mod(rel.AlgebraicNorm, prime));
 
 		//	AlgebraicProduct = algebraicSet.Product();
-		//	AlgebraicProductMod = AlgebraicProduct % prime;
+		//	AlgebraicProductMod = BigIntegerExtensionMethods.Mod(AlgebraicProduct, prime);
 		//	AlgebraicSum = algebraicSet.Sum();
 
 		//	IsAlgebraicIrreducible = _isIrreducible(algebraicSet); // Irreducible check

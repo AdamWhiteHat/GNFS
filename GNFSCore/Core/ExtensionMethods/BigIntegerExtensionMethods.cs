@@ -11,10 +11,10 @@ namespace GNFSCore
 	{
 		private static BigInteger Fifteen = new BigInteger(15);
 
-		public static BigInteger Mod(BigInteger l, BigInteger r)
-		{
-			return BigInteger.Subtract(l, BigInteger.Multiply(BigInteger.Divide(l, r), r));
-		}
+		//public static BigInteger Mod(BigInteger l, BigInteger r)
+		//{
+		//	return BigInteger.Subtract(l, BigInteger.Multiply(BigInteger.Divide(l, r), r));
+		//}
 
 		public static bool IsSquare(this BigInteger source)
 		{

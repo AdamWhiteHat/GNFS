@@ -77,7 +77,7 @@ namespace GNFSCore
 
 		public BigInteger[] SiftFactors(IEnumerable<BigInteger> squares)
 		{
-			IEnumerable<Tuple<BigInteger, BigInteger>> congruentSquares = squares.Select(bi => new Tuple<BigInteger, BigInteger>(bi, bi % N));
+			IEnumerable<Tuple<BigInteger, BigInteger>> congruentSquares = squares.Select(bi => new Tuple<BigInteger, BigInteger>(bi, (bi % N)));
 			congruentSquares = congruentSquares.Where(tup => tup.Item1 != tup.Item2);
 			congruentSquares = congruentSquares.Where(tup => tup.Item2.IsSquare());
 

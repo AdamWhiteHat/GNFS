@@ -42,6 +42,20 @@ namespace GNFS_Winforms
 			}
 		}
 
+		public static void SetControlVisibleState(Control control, bool visible)
+		{
+			if (control.InvokeRequired)
+			{
+				control.Invoke(new MethodInvoker(() =>
+					SetControlVisibleState(control, visible)
+				));
+			}
+			else
+			{
+				control.Visible = visible;
+			}
+		}
+
 		public static void SetControlText(Control control, string text)
 		{
 			if (control.InvokeRequired)

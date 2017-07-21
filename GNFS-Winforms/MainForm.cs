@@ -86,13 +86,25 @@ namespace GNFS_Winforms
 		private CancellationToken cancellationToken;
 		private CancellationTokenSource cancellationTokenSource;
 
-
-
-
-
+		private void SetGnfs(MainForm form, GNFS nfs)
+		{
+			if (form.InvokeRequired)
+			{
+				form.Invoke(new MethodInvoker(() =>
+					SetGnfs(form, nfs)
+				));
+			}
+			else
+			{
+				form.gnfs = nfs;
+			}
+		}
 
 		private void SetAsProcessing()
 		{
+			panelButtons.Visible = false;
+			panelCancel.Visible = true;
+
 			cancellationTokenSource = new CancellationTokenSource();
 			cancellationToken = cancellationTokenSource.Token;
 			cancellationToken.Register(new Action(() => RestoreAllButtons()));
@@ -104,19 +116,22 @@ namespace GNFS_Winforms
 			if (cancellationTokenSource != null && IsWorking)//(!cancellationTokenSource.IsCancellationRequested)
 			{
 				cancellationToken = cancellationTokenSource.Token;
-				cancellationToken.Register(new Action(() => RestoreAllButtons()));
+				//cancellationToken.Register(new Action(() => RestoreAllButtons()));
 				cancellationTokenSource.Cancel();
 			}
 		}
 
 		private void RestoreAllButtons()
 		{
-			ControlBridge.SetControlText(btnCreateGnfs, CreateGnfsButtonText); // Set Control.Text
-			ControlBridge.SetControlText(btnFindRelations, FindRelationsButtonText);
-			ControlBridge.SetControlText(btnFindSquares, FindSquaresButtonText);
-			ControlBridge.SetControlEnabledState(btnConstructPoly, true); // Control.Enable
-			ControlBridge.SetControlEnabledState(btnFindSquares, true);
+			//ControlBridge.SetControlText(btnCreateGnfs, CreateGnfsButtonText); // Set Control.Text
+			//ControlBridge.SetControlText(btnFindRelations, FindRelationsButtonText);
+			//ControlBridge.SetControlText(btnFindSquares, FindSquaresButtonText);
+			//ControlBridge.SetControlEnabledState(btnConstructPoly, true); // Control.Enable
+			//ControlBridge.SetControlEnabledState(btnFindSquares, true);
 			IsWorking = false;
+
+			ControlBridge.SetControlVisibleState(panelCancel, false);
+			ControlBridge.SetControlVisibleState(panelButtons, true);
 		}
 
 
@@ -126,15 +141,10 @@ namespace GNFS_Winforms
 
 		private void btnCreateGnfs_Click(object sender, EventArgs e)
 		{
-			 if (IsWorking)
-			{
-				HaultAllProcessing();
-			}
-			else
+			if (!IsWorking)
 			{
 				SetAsProcessing();
-				ControlBridge.SetControlEnabledState(btnConstructPoly, false); // Control.Enable
-				ControlBridge.SetControlText(btnCreateGnfs, CancelButtonText);
+				ControlBridge.SetControlEnabledState(btnCreateGnfs, false);
 
 				n = BigInteger.Parse(tbN.Text);
 				degree = int.Parse(tbDegree.Text);
@@ -143,9 +153,10 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					gnfsBridge.CreateGnfs(gnfs, n, polyBase, degree, token);
-
+					GNFS localGnfs = gnfsBridge.CreateGnfs(n, polyBase, degree, token);
+					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
+					ControlBridge.SetControlEnabledState(panelFunctions, true);
 
 				}).Start();
 			}
@@ -153,42 +164,34 @@ namespace GNFS_Winforms
 
 		private void btnFindRelations_Click(object sender, EventArgs e)
 		{
-			if (IsWorking)
-			{
-				HaultAllProcessing();
-			}
-			else
+			if (!IsWorking)
 			{
 				SetAsProcessing();
-				ControlBridge.SetControlText(btnFindRelations, CancelButtonText);
 
+				GNFS localGnfs = gnfs;
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					gnfsBridge.FindRelations(gnfs, token);
+					gnfsBridge.FindRelations(localGnfs, token);
+					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
-
 				}).Start();
 			}
 		}
 
 		private void btnMatrix_Click(object sender, EventArgs e)
 		{
-			if (IsWorking)
-			{
-				HaultAllProcessing();
-			}
-			else
+			if (!IsWorking)
 			{
 				SetAsProcessing();
-				ControlBridge.SetControlText(btnMatrix, CancelButtonText);
 
+				GNFS localGnfs = gnfs;
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-
-					IEnumerable<Tuple<BitVector, BitVector>> matrixVectors = gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.GetMatrixRowVector(gnfs.RationalFactorBase, gnfs.AlgebraicFactorBase));
+					IEnumerable<Tuple<BitVector, BitVector>> matrixVectors = localGnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.GetMatrixRowVector(localGnfs.RationalFactorBase, localGnfs.AlgebraicFactorBase));
 					gnfsBridge.MatrixSolve(token, matrixVectors);
+					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 				}).Start();
 			}
@@ -196,25 +199,21 @@ namespace GNFS_Winforms
 
 		private void btnFindSquares_Click(object sender, EventArgs e)
 		{
-			if (IsWorking)
-			{
-				HaultAllProcessing();
-			}
-			else
+			if (!IsWorking)
 			{
 				SetAsProcessing();
-				ControlBridge.SetControlText(btnFindSquares, CancelButtonText);
 
+				GNFS localGnfs = gnfs;
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					BigInteger productC = gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
-					BigInteger gcd = GCD.FindGCD(n, productC % n);
+					BigInteger productC = localGnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
+					BigInteger gcd = GCD.FindGCD(n, (productC % n));
 
 					LogOutput();
 					LogOutput($"relations.Select(rel => f(rel.C)).Product(): {productC}");
 					LogOutput();
-					LogOutput($"Product(C)%N: {productC % n}");
+					LogOutput($"Product(C)%N: {gcd}");
 					LogOutput();
 					LogOutput($"GCD(N,ProductC): {gcd}");
 					LogOutput();
@@ -226,9 +225,9 @@ namespace GNFS_Winforms
 					}
 					else
 					{
-						gnfsBridge.FindSquares(gnfs, token);
+						gnfsBridge.FindSquares(localGnfs, token);
 					}
-
+					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 				}).Start();
 			}
@@ -270,6 +269,11 @@ namespace GNFS_Winforms
 					tbOutput.AppendText(message + Environment.NewLine);
 				}
 			}
+		}
+
+		private void btnCancel_Click(object sender, EventArgs e)
+		{
+			HaultAllProcessing();
 		}
 	}
 }

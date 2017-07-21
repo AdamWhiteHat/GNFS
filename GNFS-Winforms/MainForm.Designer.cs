@@ -42,6 +42,13 @@
 			this.btnFindSquares = new System.Windows.Forms.Button();
 			this.btnConstructPoly = new System.Windows.Forms.Button();
 			this.btnMatrix = new System.Windows.Forms.Button();
+			this.panelButtons = new System.Windows.Forms.Panel();
+			this.panelCancel = new System.Windows.Forms.Panel();
+			this.btnCancel = new System.Windows.Forms.Button();
+			this.panelFunctions = new System.Windows.Forms.Panel();
+			this.panelButtons.SuspendLayout();
+			this.panelCancel.SuspendLayout();
+			this.panelFunctions.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tbOutput
@@ -49,7 +56,7 @@
 			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbOutput.Location = new System.Drawing.Point(4, 124);
+			this.tbOutput.Location = new System.Drawing.Point(-4, 124);
 			this.tbOutput.Multiline = true;
 			this.tbOutput.Name = "tbOutput";
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -117,8 +124,7 @@
 			// 
 			// btnCreateGnfs
 			// 
-			this.btnCreateGnfs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCreateGnfs.Location = new System.Drawing.Point(348, 48);
+			this.btnCreateGnfs.Location = new System.Drawing.Point(4, 4);
 			this.btnCreateGnfs.Name = "btnCreateGnfs";
 			this.btnCreateGnfs.Size = new System.Drawing.Size(288, 20);
 			this.btnCreateGnfs.TabIndex = 7;
@@ -147,9 +153,7 @@
 			// 
 			// btnFindRelations
 			// 
-			this.btnFindRelations.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnFindRelations.Enabled = false;
-			this.btnFindRelations.Location = new System.Drawing.Point(348, 92);
+			this.btnFindRelations.Location = new System.Drawing.Point(0, 20);
 			this.btnFindRelations.Name = "btnFindRelations";
 			this.btnFindRelations.Size = new System.Drawing.Size(96, 23);
 			this.btnFindRelations.TabIndex = 10;
@@ -159,9 +163,7 @@
 			// 
 			// btnFindSquares
 			// 
-			this.btnFindSquares.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnFindSquares.Enabled = false;
-			this.btnFindSquares.Location = new System.Drawing.Point(540, 92);
+			this.btnFindSquares.Location = new System.Drawing.Point(192, 20);
 			this.btnFindSquares.Name = "btnFindSquares";
 			this.btnFindSquares.Size = new System.Drawing.Size(96, 23);
 			this.btnFindSquares.TabIndex = 11;
@@ -171,9 +173,7 @@
 			// 
 			// btnConstructPoly
 			// 
-			this.btnConstructPoly.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnConstructPoly.Enabled = false;
-			this.btnConstructPoly.Location = new System.Drawing.Point(368, 68);
+			this.btnConstructPoly.Location = new System.Drawing.Point(32, 0);
 			this.btnConstructPoly.Name = "btnConstructPoly";
 			this.btnConstructPoly.Size = new System.Drawing.Size(224, 23);
 			this.btnConstructPoly.TabIndex = 12;
@@ -183,9 +183,7 @@
 			// 
 			// btnMatrix
 			// 
-			this.btnMatrix.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnMatrix.Enabled = false;
-			this.btnMatrix.Location = new System.Drawing.Point(444, 92);
+			this.btnMatrix.Location = new System.Drawing.Point(96, 20);
 			this.btnMatrix.Name = "btnMatrix";
 			this.btnMatrix.Size = new System.Drawing.Size(96, 23);
 			this.btnMatrix.TabIndex = 13;
@@ -193,18 +191,55 @@
 			this.btnMatrix.UseVisualStyleBackColor = true;
 			this.btnMatrix.Click += new System.EventHandler(this.btnMatrix_Click);
 			// 
+			// panelButtons
+			// 
+			this.panelButtons.Controls.Add(this.panelFunctions);
+			this.panelButtons.Controls.Add(this.btnCreateGnfs);
+			this.panelButtons.Location = new System.Drawing.Point(412, 44);
+			this.panelButtons.Name = "panelButtons";
+			this.panelButtons.Size = new System.Drawing.Size(296, 76);
+			this.panelButtons.TabIndex = 14;
+			// 
+			// panelCancel
+			// 
+			this.panelCancel.Controls.Add(this.btnCancel);
+			this.panelCancel.Location = new System.Drawing.Point(324, 64);
+			this.panelCancel.Name = "panelCancel";
+			this.panelCancel.Size = new System.Drawing.Size(304, 56);
+			this.panelCancel.TabIndex = 15;
+			this.panelCancel.Visible = false;
+			// 
+			// btnCancel
+			// 
+			this.btnCancel.Location = new System.Drawing.Point(192, 4);
+			this.btnCancel.Name = "btnCancel";
+			this.btnCancel.Size = new System.Drawing.Size(108, 32);
+			this.btnCancel.TabIndex = 14;
+			this.btnCancel.Text = "Cancel";
+			this.btnCancel.UseVisualStyleBackColor = true;
+			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+			// 
+			// panelFunctions
+			// 
+			this.panelFunctions.Controls.Add(this.btnMatrix);
+			this.panelFunctions.Controls.Add(this.btnFindSquares);
+			this.panelFunctions.Controls.Add(this.btnConstructPoly);
+			this.panelFunctions.Controls.Add(this.btnFindRelations);
+			this.panelFunctions.Enabled = false;
+			this.panelFunctions.Location = new System.Drawing.Point(4, 24);
+			this.panelFunctions.Name = "panelFunctions";
+			this.panelFunctions.Size = new System.Drawing.Size(288, 44);
+			this.panelFunctions.TabIndex = 16;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(710, 482);
-			this.Controls.Add(this.btnMatrix);
-			this.Controls.Add(this.btnConstructPoly);
-			this.Controls.Add(this.btnFindSquares);
-			this.Controls.Add(this.btnFindRelations);
+			this.Controls.Add(this.panelButtons);
+			this.Controls.Add(this.panelCancel);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.tbDegree);
-			this.Controls.Add(this.btnCreateGnfs);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
@@ -215,6 +250,9 @@
 			this.MinimumSize = new System.Drawing.Size(500, 300);
 			this.Name = "MainForm";
 			this.Text = "GNFS";
+			this.panelButtons.ResumeLayout(false);
+			this.panelCancel.ResumeLayout(false);
+			this.panelFunctions.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -236,6 +274,10 @@
 		private System.Windows.Forms.Button btnFindSquares;
 		private System.Windows.Forms.Button btnConstructPoly;
 		private System.Windows.Forms.Button btnMatrix;
+		private System.Windows.Forms.Panel panelButtons;
+		private System.Windows.Forms.Panel panelCancel;
+		private System.Windows.Forms.Button btnCancel;
+		private System.Windows.Forms.Panel panelFunctions;
 	}
 }
 

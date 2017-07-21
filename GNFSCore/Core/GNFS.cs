@@ -33,9 +33,9 @@ namespace GNFSCore
 		public BigInteger QuadraticFactorBaseMin { get; set; }
 		public BigInteger QuadraticFactorBaseMax { get; set; }
 
-		public IEnumerable<BigInteger> RationalPrimeBase;
-		public IEnumerable<BigInteger> AlgebraicPrimeBase;
-		public IEnumerable<BigInteger> QuadraticPrimeBase;
+		public List<BigInteger> RationalPrimeBase;
+		public List<BigInteger> AlgebraicPrimeBase;
+		public List<BigInteger> QuadraticPrimeBase;
 
 		public FactorCollection RFB { get; set; } = null;
 		public FactorCollection AFB { get; set; } = null;
@@ -89,8 +89,7 @@ namespace GNFSCore
 				ConstructNewPolynomial(polynomialBase, this.degree);
 				m = polynomialBase;
 
-				Directory.CreateDirectory(Relations_SaveDirectory);
-				CurrentRelationsProgress = new PolyRelationsSieveProgress(CancelToken, Polynomial_SaveDirectory);
+				CurrentRelationsProgress = new PolyRelationsSieveProgress(this, CancelToken, Polynomial_SaveDirectory);
 
 				SaveGnfsProgress();
 
@@ -105,7 +104,7 @@ namespace GNFSCore
 
 		public bool IsFactor(BigInteger toCheck)
 		{
-			return (N % toCheck == 0);
+			return ((N % toCheck) == 0);
 		}
 
 		public void SaveGnfsProgress()
@@ -144,9 +143,9 @@ namespace GNFSCore
 			int quadraticBaseSize = CalculateQuadraticBaseSize(polyDegree);
 
 			_primes = PrimeFactory.GetPrimes((RationalFactorBase * 3) + 2 + base10);
-			RationalPrimeBase = PrimeFactory.GetPrimesTo(RationalFactorBase);
-			AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(AlgebraicFactorBase);
-			QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(QuadraticFactorBaseMin).Take(quadraticBaseSize);
+			RationalPrimeBase = PrimeFactory.GetPrimesTo(RationalFactorBase).ToList();
+			AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(AlgebraicFactorBase).ToList();
+			QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(QuadraticFactorBaseMin).Take(quadraticBaseSize).ToList();
 
 			// Load FactorBases
 			LoadFactorBases();
@@ -225,7 +224,7 @@ namespace GNFSCore
 
 			if (base10 <= 18)
 			{
-				PrimeBound = base10 * 10;//(int)((int)N.NthRoot(_degree, ref remainder) * 1.5); // 60;
+				PrimeBound = base10 * 1000;//(int)((int)N.NthRoot(_degree, ref remainder) * 1.5); // 60;
 			}
 			else if (base10 <= 100)
 			{
@@ -250,7 +249,7 @@ namespace GNFSCore
 
 			_primes = PrimeFactory.GetPrimes((RationalFactorBase * 3) + 2 + base10);
 
-			RationalPrimeBase = PrimeFactory.GetPrimesTo(RationalFactorBase);
+			RationalPrimeBase = PrimeFactory.GetPrimesTo(RationalFactorBase).ToList();
 
 			//int algebraicQuantity = RationalPrimeBase.Count() * 3;
 
@@ -258,11 +257,11 @@ namespace GNFSCore
 			QuadraticFactorBaseMin = AlgebraicFactorBase + 2;
 			QuadraticFactorBaseMax = QuadraticFactorBaseMin + base10;
 
-			AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(AlgebraicFactorBase);
+			AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(AlgebraicFactorBase).ToList();
 
 			int quadraticBaseSize = CalculateQuadraticBaseSize(degree);
 
-			QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(QuadraticFactorBaseMin).Take(quadraticBaseSize);
+			QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(QuadraticFactorBaseMin).Take(quadraticBaseSize).ToList();
 		}
 
 		private static int CalculateQuadraticBaseSize(int polyDegree)

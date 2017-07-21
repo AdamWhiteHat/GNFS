@@ -23,8 +23,6 @@ namespace GNFSCore
 		public BigInteger AlgebraicNorm { get; set; }
 		public BigInteger RationalNorm { get; set; }
 
-		[NonSerialized]
-		private GNFS _gnfs;
 		internal BigInteger AlgebraicQuotient { get; set; }
 		internal BigInteger RationalQuotient { get; set; }
 
@@ -45,27 +43,35 @@ namespace GNFSCore
 		{
 			A = a;
 			B = b;
-			_gnfs = gnfs;
 
-			AlgebraicNorm = Normal.Algebraic(A, B, _gnfs.CurrentPolynomial); // b^deg * f( a/b )
-			RationalNorm = Normal.Rational(A, B, _gnfs.CurrentPolynomial.Base); // a + bm
+			AlgebraicNorm = Normal.Algebraic(A, B, gnfs.CurrentPolynomial); // b^deg * f( a/b )
+			RationalNorm = Normal.Rational(A, B, gnfs.CurrentPolynomial.Base); // a + bm
 
 			AlgebraicQuotient = AlgebraicNorm;
 			RationalQuotient = RationalNorm;
 
-			BigInteger rationalEval = _gnfs.CurrentPolynomial.Evaluate(RationalNorm);
-			C = rationalEval % _gnfs.N;
+			BigInteger rationalEval = gnfs.CurrentPolynomial.Evaluate(RationalNorm);
+			C = (rationalEval % gnfs.N);
 		}
 
-		public Relation(BigInteger a, BigInteger b, BigInteger c, BigInteger algebraicNorm, BigInteger rationalNorm)
+		public Relation(int a, int b, BigInteger c, BigInteger algebraicNorm, BigInteger rationalNorm)
 		{
+			A = a;
+			B = b;
+			C = c;
 
+			AlgebraicNorm = algebraicNorm;
+			RationalNorm = rationalNorm;
+
+			AlgebraicQuotient = 0;
+			RationalQuotient = 0;
 		}
 
-		public void Sieve()
+		public void Sieve(PolyRelationsSieveProgress relationsSieve)
 		{
-			AlgebraicQuotient = Factor(_gnfs.AlgebraicPrimeBase, AlgebraicNorm, AlgebraicQuotient);
-			RationalQuotient = Factor(_gnfs.RationalPrimeBase, RationalNorm, RationalQuotient);
+			int i = 0;
+			AlgebraicQuotient = Factor(relationsSieve.AlgebraicPrimeBase, AlgebraicNorm, AlgebraicQuotient);
+			RationalQuotient = Factor(relationsSieve.RationalPrimeBase, RationalNorm, RationalQuotient);
 		}
 
 		private static BigInteger Factor(IEnumerable<BigInteger> factors, BigInteger norm, BigInteger quotient)
@@ -153,8 +159,8 @@ namespace GNFSCore
 		public static Relation LoadFromFile(string filename)
 		{
 			XElement rel = XElement.Load(filename);
-			BigInteger a = BigInteger.Parse(rel.Element("A").Value);
-			BigInteger b = BigInteger.Parse(rel.Element("B").Value);
+			int a = int.Parse(rel.Element("A").Value);
+			int b = int.Parse(rel.Element("B").Value);
 			BigInteger c = BigInteger.Parse(rel.Element("C").Value);
 			BigInteger an = BigInteger.Parse(rel.Element("AlgebraicNorm").Value);
 			BigInteger rn = BigInteger.Parse(rel.Element("RationalNorm").Value);
