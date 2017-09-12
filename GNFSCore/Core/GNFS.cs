@@ -9,6 +9,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.Schema;
 using System.Threading;
+using Newtonsoft.Json;
 
 using GNFSCore.FactorBase;
 using GNFSCore.Polynomial;
@@ -19,61 +20,68 @@ namespace GNFSCore
 	public partial class GNFS : IXmlSerializable
 	{
 		public BigInteger N { get; set; }
-		public AlgebraicPolynomial CurrentPolynomial { get; private set; }
-		public List<AlgebraicPolynomial> PolynomialCollection;
-		public PolyRelationsSieveProgress CurrentRelationsProgress { get; set; }
+		public List<IPolynomial> PolynomialCollection;
 
+		[JsonIgnore]
+		public IPolynomial CurrentPolynomial { get; private set; }
+		[JsonIgnore]
+		public PolyRelationsSieveProgress CurrentRelationsProgress { get; set; }
+		[JsonIgnore]
 		public CancellationToken CancelToken { get; set; }
 
-		public BigInteger PrimeBound { get; set; }
-		public BigInteger MaxPrimeBound { get { return BigInteger.Max(BigInteger.Max(RationalFactorBase, AlgebraicFactorBase), QuadraticFactorBaseMax); } }
-
-		public BigInteger RationalFactorBase { get; set; }
-		public BigInteger AlgebraicFactorBase { get; set; }
-		public BigInteger QuadraticFactorBaseMin { get; set; }
-		public BigInteger QuadraticFactorBaseMax { get; set; }
-
-		public List<BigInteger> RationalPrimeBase;
-		public List<BigInteger> AlgebraicPrimeBase;
-		public List<BigInteger> QuadraticPrimeBase;
+		public PrimeBase PrimeBase { get; set; }
 
 		public FactorCollection RFB { get; set; } = null;
 		public FactorCollection AFB { get; set; } = null;
 		public FactorCollection QFB { get; set; } = null;
 
+		[JsonIgnore]
+		public DirectoryLocations SaveLocations { get; set; }
 
-		internal string GNFS_SaveDirectory { get { return Path.Combine("C:\\GNFS", GetNumberFilename()); } }
-		internal string GnfsParameters_SaveFile { get { return Path.Combine(GNFS_SaveDirectory, "_GNFS.Parameters"); } }
-
-		internal string Polynomial_Filename { get { return "_Polynomial.Parameters"; } }
-		internal string Polynomial_SaveDirectory { get { return GetPolynomialPath(CurrentPolynomial); } }
-		internal string Relations_SaveDirectory { get { return Path.Combine(Polynomial_SaveDirectory, "SmoothRelations"); } }
-
-		internal string RationalFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Rational.FactorBase"); } }
-		internal string AlgebraicFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Algebraic.FactorBase"); } }
-		internal string QuadradicFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Quadradic.FactorBase"); } }
-
+		[JsonIgnore]
 		private BigInteger m;
+		[JsonIgnore]
 		private int degree = 2;
-
+		[JsonIgnore]
 		private IEnumerable<BigInteger> _primes;
 
 		public GNFS()
 		{
-			CancelToken = CancellationToken.None;
+			PolynomialCollection = new List<IPolynomial>();
 		}
 
-		public GNFS(CancellationToken cancelToken, BigInteger n, BigInteger polynomialBase, int polyDegree = -1)
+		public GNFS(CancellationToken cancelToken, string openDirectory)
+			: this()
+		{
+			CancelToken = cancelToken;
+			SaveLocations = new DirectoryLocations(openDirectory);
+
+			if (!Directory.Exists(SaveLocations.SaveDirectory))
+			{
+				throw new ArgumentException($"Parameter {nameof(openDirectory)} must be a directory, that directory must exist and must contain the file {SaveLocations.GnfsParameters_SaveFile}");
+			}
+
+			if (!File.Exists(SaveLocations.GnfsParameters_SaveFile))
+			{
+				throw new FileNotFoundException($"File does not exist: \"{SaveLocations.GnfsParameters_SaveFile}\"!");
+			}
+
+			GNFS gnfs = (GNFS)Serializer.Deserialize(SaveLocations.GnfsParameters_SaveFile, typeof(GNFS));
+			LoadGnfsProgress(gnfs);
+		}
+
+		public GNFS(CancellationToken cancelToken, BigInteger n, BigInteger polynomialBase, int polyDegree, BigInteger primeBound, int relationQuantity, int relationValueRange)
 			: this()
 		{
 			CancelToken = cancelToken;
 			N = n;
-			PolynomialCollection = new List<AlgebraicPolynomial>();
 
-			if (!Directory.Exists(GNFS_SaveDirectory))
+			SaveLocations = new DirectoryLocations(GenerateSaveDirectory(N));
+
+			if (!Directory.Exists(SaveLocations.SaveDirectory))
 			{
 				// New GNFS instance
-				Directory.CreateDirectory(GNFS_SaveDirectory);
+				Directory.CreateDirectory(SaveLocations.SaveDirectory);
 
 				if (polyDegree == -1)
 				{
@@ -85,11 +93,12 @@ namespace GNFSCore
 				}
 
 
-				CaclulatePrimeBounds();
+
+				CaclulatePrimeBounds(primeBound);
 				ConstructNewPolynomial(polynomialBase, this.degree);
 				m = polynomialBase;
 
-				CurrentRelationsProgress = new PolyRelationsSieveProgress(this, CancelToken, Polynomial_SaveDirectory);
+				CurrentRelationsProgress = new PolyRelationsSieveProgress(this, CancelToken, SaveLocations.Polynomial_SaveDirectory, relationQuantity, relationValueRange);
 
 				SaveGnfsProgress();
 
@@ -97,7 +106,7 @@ namespace GNFSCore
 			}
 			else
 			{
-				GNFS gnfs = (GNFS)Serializer.Deserialize(GnfsParameters_SaveFile, typeof(GNFS));
+				GNFS gnfs = (GNFS)Serializer.Deserialize(SaveLocations.GnfsParameters_SaveFile, typeof(GNFS));
 				LoadGnfsProgress(gnfs);
 			}
 		}
@@ -109,7 +118,7 @@ namespace GNFSCore
 
 		public void SaveGnfsProgress()
 		{
-			Serializer.Serialize(GnfsParameters_SaveFile, this);
+			Serializer.Serialize(SaveLocations.GnfsParameters_SaveFile, this);
 		}
 
 		public void LoadGnfsProgress(GNFS input)
@@ -117,15 +126,25 @@ namespace GNFSCore
 			N = input.N;
 			m = input.m;
 			int polyDegree = input.degree;
-			PrimeBound = input.PrimeBound;
-			RationalFactorBase = input.RationalFactorBase;
-			AlgebraicFactorBase = input.AlgebraicFactorBase;
-			QuadraticFactorBaseMin = input.QuadraticFactorBaseMin;
-			QuadraticFactorBaseMax = input.QuadraticFactorBaseMax;
+			PrimeBase = new PrimeBase();
 
-			if (Directory.Exists(GNFS_SaveDirectory))
+			PrimeBase.RationalFactorBase	 = input.PrimeBase.RationalFactorBase;
+			PrimeBase.AlgebraicFactorBase	 = input.PrimeBase.AlgebraicFactorBase;
+			PrimeBase.QuadraticFactorBaseMin = input.PrimeBase.QuadraticFactorBaseMin;
+			PrimeBase.QuadraticFactorBaseMax = input.PrimeBase.QuadraticFactorBaseMax;
+
+			int base10 = N.ToString().Count();
+			int quadraticBaseSize = CalculateQuadraticBaseSize(polyDegree);
+
+			_primes = PrimeFactory.GetPrimes((PrimeBase.RationalFactorBase * 3) + 2 + base10);
+			PrimeBase.RationalPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.RationalFactorBase).ToList();
+			PrimeBase.AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.AlgebraicFactorBase).ToList();
+			PrimeBase.QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(PrimeBase.QuadraticFactorBaseMin).Take(quadraticBaseSize).ToList();
+
+			// Load Polynomial
+			if (Directory.Exists(SaveLocations.SaveDirectory))
 			{
-				IEnumerable<string> polynomialFiles = Directory.EnumerateFiles(GNFS_SaveDirectory, Polynomial_Filename, SearchOption.AllDirectories);
+				IEnumerable<string> polynomialFiles = Directory.EnumerateFiles(SaveLocations.SaveDirectory, SaveLocations.Polynomial_Filename, SearchOption.AllDirectories);
 				if (polynomialFiles.Any())
 				{
 					foreach (string file in polynomialFiles)
@@ -139,50 +158,41 @@ namespace GNFSCore
 				}
 			}
 
-			int base10 = N.ToString().Count();
-			int quadraticBaseSize = CalculateQuadraticBaseSize(polyDegree);
-
-			_primes = PrimeFactory.GetPrimes((RationalFactorBase * 3) + 2 + base10);
-			RationalPrimeBase = PrimeFactory.GetPrimesTo(RationalFactorBase).ToList();
-			AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(AlgebraicFactorBase).ToList();
-			QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(QuadraticFactorBaseMin).Take(quadraticBaseSize).ToList();
-
 			// Load FactorBases
 			LoadFactorBases();
 
 			// Load Relations
-			CurrentRelationsProgress = PolyRelationsSieveProgress.LoadProgress(this, Polynomial_SaveDirectory);
+			CurrentRelationsProgress = PolyRelationsSieveProgress.LoadProgress(this, SaveLocations.Polynomial_SaveDirectory);
 		}
 
+		private static readonly int showDigits = 22;
+		private static readonly string elipse = "[...]";
+		private static readonly string saveRootDirectory = "C:\\GNFS";
 
-		private int showDigits = 22;
-		private string elipse = "[...]";
-		public string GetNumberFilename()
+		public static string GenerateSaveDirectory(BigInteger n)
 		{
-			string result = N.ToString();
+			string result = n.ToString();
 
 			if (result.Length >= (showDigits * 2) + elipse.Length)
 			{
 				result = result.Substring(0, showDigits) + elipse + result.Substring(result.Length - showDigits, showDigits);
 			}
-			return result;
+			return Path.Combine(saveRootDirectory, result);
 		}
 
-		//public void SaveAllPolynomials() { foreach (AlgebraicPolynomial poly in PolynomialCollection) { SavePolynomial(poly); } }
+		//public void SaveAllPolynomials() { foreach (IPolynomial poly in PolynomialCollection) { SavePolynomial(poly); } }
 
-		private string GetPolynomialPath(AlgebraicPolynomial poly)
-		{
-			return Path.Combine(GNFS_SaveDirectory, $"Poly_B[{ poly.Base}]_D[{ poly.Degree}]");
-		}
 
-		public void SavePolynomial(AlgebraicPolynomial poly)
+		public void SavePolynomial(IPolynomial poly)
 		{
-			string polynomialDirectory = GetPolynomialPath(poly);
+			SaveLocations.SetPolynomialPath(poly);
+			string polynomialDirectory = SaveLocations.Polynomial_SaveDirectory;
+
 			if (!Directory.Exists(polynomialDirectory))
 			{
 				Directory.CreateDirectory(polynomialDirectory);
 			}
-			Serializer.Serialize(Path.Combine(polynomialDirectory, Polynomial_Filename), poly);
+			Serializer.Serialize(Path.Combine(polynomialDirectory, SaveLocations.Polynomial_Filename), poly);
 		}
 
 		// Values were obtained from the paper:
@@ -219,49 +229,62 @@ namespace GNFSCore
 
 		private void CaclulatePrimeBounds()
 		{
-			//BigInteger remainder = new BigInteger();
-			int base10 = N.ToString().Count(); //N.NthRoot(10, ref remainder);
+			BigInteger bound = new BigInteger();
 
-			if (base10 <= 18)
+			int base10 = N.ToString().Count(); //N.NthRoot(10, ref remainder);
+			if (base10 <= 10)
 			{
-				PrimeBound = base10 * 1000;//(int)((int)N.NthRoot(_degree, ref remainder) * 1.5); // 60;
+				bound = 100;//(int)((int)N.NthRoot(_degree, ref remainder) * 1.5); // 60;
+			}
+			else if (base10 <= 18)
+			{
+				bound = base10 * 1000;//(int)((int)N.NthRoot(_degree, ref remainder) * 1.5); // 60;
 			}
 			else if (base10 <= 100)
 			{
-				PrimeBound = 100000;
+				bound = 100000;
 			}
 			else if (base10 > 100 && base10 <= 150)
 			{
-				PrimeBound = 250000;
+				bound = 250000;
 			}
 			else if (base10 > 150 && base10 <= 200)
 			{
-				PrimeBound = 125000000;
+				bound = 125000000;
 			}
 			else if (base10 > 200)
 			{
-				PrimeBound = 250000000;
+				bound = 250000000;
 			}
 
-			PrimeBound *= 3;
+			CaclulatePrimeBounds(bound);
+		}
 
-			RationalFactorBase = PrimeBound;
+		private void CaclulatePrimeBounds(BigInteger bound)
+		{
+			PrimeBase = new PrimeBase();
+			int base10 = N.ToString().Count();
 
-			_primes = PrimeFactory.GetPrimes((RationalFactorBase * 3) + 2 + base10);
+			PrimeBase.RationalFactorBase = bound;
 
-			RationalPrimeBase = PrimeFactory.GetPrimesTo(RationalFactorBase).ToList();
+			_primes = PrimeFactory.GetPrimes(PrimeBase.RationalFactorBase);
+
+			PrimeBase.RationalPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.RationalFactorBase).ToList();
 
 			//int algebraicQuantity = RationalPrimeBase.Count() * 3;
 
-			AlgebraicFactorBase = RationalFactorBase * 3;//PrimeFactory.GetValueFromIndex(algebraicQuantity); //(int)(PrimeBound * 1.1);
-			QuadraticFactorBaseMin = AlgebraicFactorBase + 2;
-			QuadraticFactorBaseMax = QuadraticFactorBaseMin + base10;
+			PrimeBase.AlgebraicFactorBase = PrimeBase.RationalFactorBase * 3;// * 2;//PrimeFactory.GetValueFromIndex(algebraicQuantity); //(int)(PrimeBound * 1.1);
+			PrimeBase.QuadraticFactorBaseMin = PrimeBase.AlgebraicFactorBase + 2;
+			//QuadraticFactorBaseMax = QuadraticFactorBaseMin + base10;
 
-			AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(AlgebraicFactorBase).ToList();
+			PrimeBase.AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.AlgebraicFactorBase).ToList();
 
 			int quadraticBaseSize = CalculateQuadraticBaseSize(degree);
 
-			QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(QuadraticFactorBaseMin).Take(quadraticBaseSize).ToList();
+			PrimeBase.QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(PrimeBase.QuadraticFactorBaseMin).Take(quadraticBaseSize).ToList();
+
+			PrimeBase.QuadraticFactorBaseMax = PrimeBase.QuadraticPrimeBase.Last();
+
 		}
 
 		private static int CalculateQuadraticBaseSize(int polyDegree)
@@ -301,38 +324,38 @@ namespace GNFSCore
 
 		private void LoadFactorBases()
 		{
-			if (!File.Exists(RationalFactorBase_SaveFile))
+			if (!File.Exists(SaveLocations.RationalFactorBase_SaveFile))
 			{
 				RFB = FactorCollection.Factory.BuildRationalFactorBase(this);
-				FactorCollection.Serialize(RationalFactorBase_SaveFile, RFB);
+				FactorCollection.Serialize(SaveLocations.RationalFactorBase_SaveFile, RFB);
 			}
 			else
 			{
-				RFB = FactorCollection.Deserialize(RationalFactorBase_SaveFile);
+				RFB = FactorCollection.Deserialize(SaveLocations.RationalFactorBase_SaveFile);
 			}
 
 			if (CancelToken.IsCancellationRequested) { return; }
 
-			if (!File.Exists(AlgebraicFactorBase_SaveFile))
+			if (!File.Exists(SaveLocations.AlgebraicFactorBase_SaveFile))
 			{
-				AFB = FactorCollection.Factory.GetAlgebraicFactorBase(this);
-				FactorCollection.Serialize(AlgebraicFactorBase_SaveFile, AFB);
+				AFB = FactorCollection.Factory.BuildAlgebraicFactorBase(this);
+				FactorCollection.Serialize(SaveLocations.AlgebraicFactorBase_SaveFile, AFB);
 			}
 			else
 			{
-				AFB = FactorCollection.Deserialize(AlgebraicFactorBase_SaveFile);
+				AFB = FactorCollection.Deserialize(SaveLocations.AlgebraicFactorBase_SaveFile);
 			}
 
 			if (CancelToken.IsCancellationRequested) { return; }
 
-			if (!File.Exists(QuadradicFactorBase_SaveFile))
+			if (!File.Exists(SaveLocations.QuadradicFactorBase_SaveFile))
 			{
-				QFB = FactorCollection.Factory.GetQuadradicFactorBase(this);
-				FactorCollection.Serialize(QuadradicFactorBase_SaveFile, QFB);
+				QFB = FactorCollection.Factory.BuildQuadradicFactorBase(this);
+				FactorCollection.Serialize(SaveLocations.QuadradicFactorBase_SaveFile, QFB);
 			}
 			else
 			{
-				QFB = FactorCollection.Deserialize(QuadradicFactorBase_SaveFile);
+				QFB = FactorCollection.Deserialize(SaveLocations.QuadradicFactorBase_SaveFile);
 			}
 
 			if (CancelToken.IsCancellationRequested) { return; }
@@ -386,16 +409,42 @@ namespace GNFSCore
 			return result;
 		}
 
+		public override string ToString()
+		{
+			StringBuilder result = new StringBuilder();
+
+			result.AppendLine($"N = {N}");
+			result.AppendLine();
+			result.AppendLine($"Polynomial(degree: {degree}, base: {CurrentPolynomial.Base}):");
+			result.AppendLine(CurrentPolynomial.ToString());
+			result.AppendLine();
+			result.AppendLine("Prime Factor Base Bounds:");
+			result.AppendLine($"RationalFactorBase : {PrimeBase.RationalFactorBase}");
+			result.AppendLine($"AlgebraicFactorBase: {PrimeBase.AlgebraicFactorBase}");
+			result.AppendLine($"QuadraticPrimeBase : {PrimeBase.QuadraticPrimeBase.Last()}");
+			result.AppendLine();
+			result.AppendLine($"Rational Factor Base (RFB):");
+			result.AppendLine(RFB.ToString(20));
+			result.AppendLine();
+			result.AppendLine($"Algebraic Factor Base (AFB):");
+			result.AppendLine(AFB.ToString(20));
+			result.AppendLine();
+			result.AppendLine($"Quadratic Factor Base (QFB):");
+			result.AppendLine(QFB.ToString(20));
+			result.AppendLine();
+
+			return result.ToString();
+		}
+
 		public void WriteXml(XmlWriter writer)
 		{
 			writer.WriteElementString("N", N.ToString());
 			writer.WriteElementString("M", m.ToString());
 			writer.WriteElementString("Degree", this.degree.ToString());
-			writer.WriteElementString("PrimeBound", PrimeBound.ToString());
-			writer.WriteElementString("RationalFactorBase", RationalFactorBase.ToString());
-			writer.WriteElementString("AlgebraicFactorBase", AlgebraicFactorBase.ToString());
-			writer.WriteElementString("QuadraticFactorBaseMin", QuadraticFactorBaseMin.ToString());
-			writer.WriteElementString("QuadraticFactorBaseMax", QuadraticFactorBaseMax.ToString());
+			writer.WriteElementString("RationalFactorBase",		PrimeBase.RationalFactorBase.ToString());
+			writer.WriteElementString("AlgebraicFactorBase",	PrimeBase.AlgebraicFactorBase.ToString());
+			writer.WriteElementString("QuadraticFactorBaseMin", PrimeBase.QuadraticFactorBaseMin.ToString());
+			writer.WriteElementString("QuadraticFactorBaseMax", PrimeBase.QuadraticFactorBaseMax.ToString());
 		}
 
 		public void ReadXml(XmlReader reader)
@@ -417,11 +466,10 @@ namespace GNFSCore
 			N = BigInteger.Parse(nString);
 			m = BigInteger.Parse(mString);
 			this.degree = int.Parse(degreeString);
-			PrimeBound = int.Parse(primeBoundString);
-			RationalFactorBase = int.Parse(rationalFactorBaseString);
-			AlgebraicFactorBase = int.Parse(algebraicFactorBaseString);
-			QuadraticFactorBaseMin = int.Parse(quadraticFactorBaseMinString);
-			QuadraticFactorBaseMax = int.Parse(quadraticFactorBaseMaxString);
+			PrimeBase.RationalFactorBase = int.Parse(rationalFactorBaseString);
+			PrimeBase.AlgebraicFactorBase = int.Parse(algebraicFactorBaseString);
+			PrimeBase.QuadraticFactorBaseMin = int.Parse(quadraticFactorBaseMinString);
+			PrimeBase.QuadraticFactorBaseMax = int.Parse(quadraticFactorBaseMaxString);
 		}
 
 		public XmlSchema GetSchema() { return null; }

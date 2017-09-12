@@ -24,8 +24,6 @@ namespace GNFSCore.Polynomial
 
 		[XmlArrayItem("Terms")]
 		public BigInteger[] Terms { get; private set; }
-		public BigInteger BaseTotal { get; private set; }
-		public BigInteger FormalDerivative { get; private set; }
 
 		public AlgebraicPolynomial()
 		{ }
@@ -43,8 +41,6 @@ namespace GNFSCore.Polynomial
 		{
 			Terms = Enumerable.Repeat(BigInteger.Zero, Degree + 1).ToArray();
 			SetPolynomialValue(N);
-			BaseTotal = CommonPolynomial.Evaluate(this, Base);
-			FormalDerivative = CommonPolynomial.Derivative(this, Base);
 		}
 
 		private void SetPolynomialValue(BigInteger value)
@@ -177,8 +173,6 @@ namespace GNFSCore.Polynomial
 			if (terms.Any())
 			{
 				Terms = terms.Select(s => BigInteger.Parse(s)).ToArray();
-				BaseTotal = CommonPolynomial.Evaluate(this, Base);
-				FormalDerivative = CommonPolynomial.Derivative(this, Base);
 			}
 			else
 			{

@@ -14,6 +14,10 @@ namespace GNFSCore.Polynomial
 		int Degree { get; }
 		BigInteger Base { get; }
 		BigInteger[] Terms { get; }
+
+		BigInteger Evaluate(BigInteger baseM);
+		BigInteger Derivative(BigInteger baseM);
+		List<BigInteger> GetRootsMod(BigInteger baseM, IEnumerable<BigInteger> modList);
 	}
 
 	public enum SearchDirection

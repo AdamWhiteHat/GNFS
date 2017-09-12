@@ -1,41 +1,42 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Numerics;
 using ExtendedNumerics;
-using GNFSCore.Polynomial;
 
 namespace GNFSCore.FactorBase
 {
+	using GNFSCore.Polynomial;
+	using GNFSCore.Polynomial.Internal;
+
 	public static class Normal
 	{
-		public static BigRational AlgebraicRational(int a, int b, AlgebraicPolynomial polynomial)
+		//public static BigRational AlgebraicRational(int a, int b, IPolynomial polynomial)
+		//{
+		//	// f( a/-b ) * -b^deg
+		//
+		//	Fraction ratA = new Fraction(a);
+		//	Fraction negB = new Fraction(-b);
+		//	BigRational aOverB = BigRational.Divide(ratA, negB);
+		//
+		//	BigRational left = polynomial.Evaluate(aOverB);
+		//	BigRational right = BigRational.Pow(new BigRational(negB), polynomial.Degree);
+		//
+		//	BigRational result = BigRational.Multiply(left, right);
+		//	return result;
+		//}
+
+		public static BigInteger Algebraic(int a, int b, IPolynomial poly)
 		{
-			Fraction ratA = new Fraction(a);
-			Fraction negB = new Fraction(-b);
-			BigRational aOverB = BigRational.Divide(ratA, negB);
-
-			BigRational left = polynomial.Evaluate(aOverB);
-			BigRational right = BigRational.Pow(new BigRational(negB), polynomial.Degree);
-
-			BigRational result = BigRational.Multiply(left, right);
-			return result;
-		}
-
-		public static BigInteger Algebraic(int a, int b, AlgebraicPolynomial poly)
-		{
-			// b^deg * f( a/b )
+			// f( a/-b ) * -b^deg
 
 			int bneg = -b;
 			double ab = (double)a / (double)bneg;
 
 			//BigInteger remainder = new BigInteger();
 			//BigInteger quotient = BigInteger.DivRem(a, bneg, out remainder);
-			//double remaind = (double)remainder / (double)bneg;
+			//double remainder = (double)remainder / (double)bneg;
 
-			double right = poly.Evaluate(ab);
+			double right = CommonPolynomial.Evaluate(poly, ab);
 			double left = Math.Pow(bneg, poly.Degree);
 
 			double deci = right % 1;
@@ -50,6 +51,7 @@ namespace GNFSCore.FactorBase
 
 		public static BigInteger Rational(int a, int b, BigInteger polynomialBase)
 		{
+			// a + bm
 			return BigInteger.Add(a, BigInteger.Multiply(b, polynomialBase));
 		}
 	}

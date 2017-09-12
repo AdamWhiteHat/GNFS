@@ -34,27 +34,27 @@ namespace GNFSCore.FactorBase
 
 		public static class Factory
 		{
-			// array of (p, p mod m) up to bound
+			// array of (p, m % p) up to bound
 			// quantity = phi(bound)
 			public static FactorCollection BuildRationalFactorBase(GNFS gnfs)
 			{
-				IEnumerable<FactorPair> result = gnfs.RationalPrimeBase.Select(p => new FactorPair(p, (gnfs.CurrentPolynomial.Base % p))).Distinct();
+				IEnumerable<FactorPair> result = gnfs.PrimeBase.RationalPrimeBase.Select(p => new FactorPair(p, (gnfs.CurrentPolynomial.Base % p))).Distinct();
 				return new FactorCollection(gnfs, result.ToList());
 			}
 
-			// array of (p, r) where f(r) = 0 mod p
+			// array of (p, r) where f(r) % p == 0
 			// quantity = 2-3 times RFB.quantity
-			public static FactorCollection GetAlgebraicFactorBase(GNFS gnfs)
+			public static FactorCollection BuildAlgebraicFactorBase(GNFS gnfs)
 			{
-				return new FactorCollection(gnfs, GetPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.AlgebraicPrimeBase, 0, gnfs.AlgebraicFactorBase, 2000));
+				return new FactorCollection(gnfs, FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeBase.AlgebraicPrimeBase, 0, gnfs.PrimeBase.AlgebraicFactorBase, 2000));
 			}
 
-			// array of (p, r) where f(r) = 0 mod p		
+			// array of (p, r) where f(r) % p == 0
 			// quantity =< 100
 			// magnitude p > AFB.Last().p
-			public static FactorCollection GetQuadradicFactorBase(GNFS gnfs)
+			public static FactorCollection BuildQuadradicFactorBase(GNFS gnfs)
 			{
-				return new FactorCollection(gnfs, GetPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.QuadraticPrimeBase, 2, gnfs.QuadraticFactorBaseMin, 2000));
+				return new FactorCollection(gnfs, FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeBase.QuadraticPrimeBase, 2, gnfs.PrimeBase.QuadraticFactorBaseMin, 2000));
 			}
 
 			private delegate BigInteger BigIntegerEvaluateDelegate(BigInteger x);
@@ -66,13 +66,12 @@ namespace GNFSCore.FactorBase
 				BigInteger Cdd = BigInteger.Pow(Cd, (gnfs.CurrentPolynomial.Degree - 1));
 				DoubleEvaluateDelegate evalDelegate = gnfs.CurrentPolynomial.Evaluate;
 
-				IEnumerable<BigInteger> primes = gnfs.RationalPrimeBase;
-				IEnumerable<FactorPair> results = primes.Select(p => new FactorPair(p, BigInteger.Multiply(evalDelegate(BigInteger.Divide(p, Cd)), Cdd))).Distinct();
+				IEnumerable<FactorPair> results = gnfs.PrimeBase.RationalPrimeBase.Select(p => new FactorPair(p, BigInteger.Multiply(evalDelegate(BigInteger.Divide(p, Cd)), Cdd))).Distinct();
 				return new FactorCollection(gnfs, results.ToList());
 			}
 		}
 
-		public static List<FactorPair> GetPolynomialRootsInRange(CancellationToken cancelToken, AlgebraicPolynomial polynomial, IEnumerable<BigInteger> primes, BigInteger rangeFrom, BigInteger rangeTo, int totalFactorPairs)
+		public static List<FactorPair> FindPolynomialRootsInRange(CancellationToken cancelToken, IPolynomial polynomial, IEnumerable<BigInteger> primes, BigInteger rangeFrom, BigInteger rangeTo, int totalFactorPairs)
 		{
 			List<FactorPair> result = new List<FactorPair>();
 

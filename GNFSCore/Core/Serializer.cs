@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace GNFSCore
 {
@@ -29,6 +32,15 @@ namespace GNFSCore
 				result = serializer.Deserialize(reader);
 			}
 			return result;
+		}
+
+		public static class JSON
+		{
+			public static void Serialize<T>(T obj, string filename)
+			{
+				string content = JsonConvert.SerializeObject(obj);
+				File.WriteAllText(filename, content);
+			}
 		}
 	}
 }

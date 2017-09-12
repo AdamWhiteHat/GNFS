@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
+using GNFSCore.IntegerMath;
 
 namespace GNFSCore
 {
@@ -39,6 +40,11 @@ namespace GNFSCore
 		public Relation Combine(RoughPair rough)
 		{
 			throw new NotImplementedException();
+		}
+
+		public bool HasPrime()
+		{
+			return FactorizationFactory.IsPrime(AlgebraicQuotient) || FactorizationFactory.IsPrime(AlgebraicQuotient);
 		}
 
 		public override string ToString()

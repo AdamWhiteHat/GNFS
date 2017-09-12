@@ -66,12 +66,12 @@ namespace GNFSCore.Polynomial
 			}
 		}
 
-		public BigInteger Evaluate(RationalPolynomial polynomial, BigInteger baseM)
+		public BigInteger Evaluate(BigInteger baseM)
 		{
 			return CommonPolynomial.Evaluate(this, baseM);
 		}
 
-		public BigInteger Derivative(RationalPolynomial polynomial, BigInteger baseM)
+		public BigInteger Derivative(BigInteger baseM)
 		{
 			return CommonPolynomial.Derivative(this, baseM);
 		}

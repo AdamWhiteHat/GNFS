@@ -18,14 +18,14 @@ namespace GNFS_Winforms
 
 	public partial class GnfsUiBridge
 	{
-		public void FindRelations(GNFS gnfs, CancellationToken cancelToken)
+		public GNFS FindRelations(bool oneRound, GNFS gnfs, CancellationToken cancelToken)
 		{
 			while (!cancelToken.IsCancellationRequested)
 			{
 				//List<RoughPair> knownRough = gnfs.CurrentRelationsProgress.RoughRelations;
 				IEnumerable<Relation> smoothRelations = gnfs.CurrentRelationsProgress.GenerateRelations(gnfs, cancelToken);
 				if(smoothRelations == null)
-				{
+				{					
 					break;
 				}
 				if (smoothRelations.Any())
@@ -39,6 +39,11 @@ namespace GNFS_Winforms
 					mainForm.LogOutput();
 					mainForm.LogOutput();
 					mainForm.LogOutput();
+				}
+
+				if(oneRound)
+				{
+					break;
 				}
 
 				//IEnumerable<RoughPair> rough = gnfs.CurrentRelationsProgress.RoughRelations.Except(knownRough);
@@ -104,8 +109,9 @@ namespace GNFS_Winforms
 			    mainForm.LogOutput();
 			    mainForm.LogOutput();
 			    */
-
 			}
+
+			return gnfs;
 		}
 	}
 }

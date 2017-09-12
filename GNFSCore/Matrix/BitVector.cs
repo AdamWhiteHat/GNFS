@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace GNFSCore.PrimeSignature
+namespace GNFSCore.Matrix
 {
 	using IntegerMath;
 	using System.Numerics;
@@ -14,7 +14,6 @@ namespace GNFSCore.PrimeSignature
 		public BigInteger Number;
 		public bool[] Elements;
 		public int RowSum { get { return Elements.Count(b => b == true); } }
-
 		public int Length { get { return Elements.Length; } }
 
 		public bool this[int index] => Elements[index];
@@ -27,14 +26,23 @@ namespace GNFSCore.PrimeSignature
 		{
 			Number = number;
 
-			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue) + 2];
-			foreach (Tuple<BigInteger, BigInteger> factor in primeFactorization)
+			if (!primeFactorization.Any())
+			{
+				Elements = new bool[] { };
+				return;
+			}
+
+			//primeFactorization = primeFactorization.Where(factor => factor.Item1 <= maxValue);
+
+			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue) + 1];
+			foreach (Tuple<BigInteger, BigInteger> factor in primeFactorization.Where(f => (f.Item2 % 2) == 1))
 			{
 				if (factor.Item1 > maxValue)
 				{
-					break;
+					Elements = new bool[] { };
+					return;
 				}
-				result[PrimeFactory.GetIndexFromValue(factor.Item1) + 1] = ((factor.Item2 % 2) == 1);
+				result[PrimeFactory.GetIndexFromValue(factor.Item1)] = true;
 			}
 
 			Elements = result;
@@ -44,6 +52,12 @@ namespace GNFSCore.PrimeSignature
 		{
 			Elements = elements;
 			Number = number;
+		}
+
+		public bool IsSquare()
+		{
+			if (!Elements.Any()) { return false; }
+			else { return Elements.All(e => e == false); }
 		}
 
 		public static bool[] CombineVectors(IEnumerable<BitVector> vectors)
@@ -83,25 +97,30 @@ namespace GNFSCore.PrimeSignature
 			return result;
 		}
 
-		internal int IndexOfRightmostElement()
+		public int IndexOfRightmostElement()
 		{
 			return Array.LastIndexOf(Elements, true);
 		}
 
-		internal int IndexOfLeftmostElement()
+		public int IndexOfLeftmostElement()
 		{
-			return Array.IndexOf(Elements, true);
+			return Array.IndexOf(Elements.ToArray(), true);
+		}
+
+		public int ColumnContribution(int columnIndex)
+		{
+			return Elements[columnIndex] ? 1 : 0;
 		}
 
 		public static int GetWeight(BitVector vector)
 		{
 			int count = vector.Length;
 
-			int left = vector.IndexOfLeftmostElement();
+			int left = count - vector.IndexOfLeftmostElement();
 			int right = vector.IndexOfRightmostElement() + 1;
 			int middle = 0;
 
-			int nonemptyBits = vector.Elements.Count(b => b == true);
+			int nonemptyBits = vector.RowSum;
 
 			if (nonemptyBits > 2)
 			{
@@ -111,7 +130,12 @@ namespace GNFSCore.PrimeSignature
 			return (left + middle + right);
 		}
 
-		public int CompareTo(BitVector other)
+		public int GetWeight()
+		{
+			return GetWeight(this);
+		}
+
+	    public int CompareTo(BitVector other)
 		{
 			if (other == null)
 			{
@@ -121,7 +145,7 @@ namespace GNFSCore.PrimeSignature
 			BitVector vector = other as BitVector;
 			if (vector == null)
 			{
-				throw new ArgumentException("BitVector is not a Temperature");
+				throw new ArgumentException("BitVector is not of type BitVector");
 			}
 
 			int left = GetWeight(this);
@@ -138,7 +162,7 @@ namespace GNFSCore.PrimeSignature
 		public override string ToString()
 		{
 			//  augmented matrix style
-			return $"{Number} | {FormatElements(Elements)}";
+			return $"{Number.ToString().PadLeft(13)}\t|\t{FormatElements(Elements)}";
 		}
 
 

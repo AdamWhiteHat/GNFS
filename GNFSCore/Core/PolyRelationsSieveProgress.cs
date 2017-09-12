@@ -8,8 +8,10 @@ using System.IO;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using GNFSCore.IntegerMath;
 using System.Xml.Linq;
+using Newtonsoft.Json;
+
+using GNFSCore.IntegerMath;
 
 namespace GNFSCore
 {
@@ -19,14 +21,16 @@ namespace GNFSCore
 		private int Quantity;
 		private int ValueRange;
 		//private int IndexOfUnFactored;
+		[JsonIgnore]
 		public CancellationToken CancelToken;
 
 		public List<Relation> SmoothRelations { get; private set; }
+		[JsonIgnore]
 		public List<RoughPair> RoughRelations { get; private set; }
+		[JsonIgnore]
 		public List<Relation> UnFactored { get; private set; }
 
-		public List<BigInteger> AlgebraicPrimeBase;
-		public List<BigInteger> RationalPrimeBase;
+		public PrimeBase PrimeBase { get; private set; }
 
 		internal string Polynomial_SaveDirectory { get; private set; }
 		public string Relations_SaveDirectory { get { return Path.Combine(Polynomial_SaveDirectory, "Relations"); } }
@@ -35,7 +39,7 @@ namespace GNFSCore
 		internal string RoughRelations_Filename { get { return Path.Combine(Relations_SaveDirectory, "Rough.relations"); } }
 		internal string SmoothRelations_SaveDirectory { get { return Path.Combine(Relations_SaveDirectory, "SmoothRelations"); } }
 
-		public PolyRelationsSieveProgress(GNFS gnfs, CancellationToken cancelToken, string polynomialSaveDirectory)
+		public PolyRelationsSieveProgress(GNFS gnfs, CancellationToken cancelToken, string polynomialSaveDirectory, int quantity, int valueRange)
 		{
 			CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
 			CancelToken = cancellationSource.Token;
@@ -47,27 +51,30 @@ namespace GNFSCore
 				Directory.CreateDirectory(Relations_SaveDirectory);
 			}
 
-
 			if (!Directory.Exists(SmoothRelations_SaveDirectory))
 			{
 				Directory.CreateDirectory(SmoothRelations_SaveDirectory);
 			}
 
-			
-
 			B = 1;
-			Quantity = 200;
-			ValueRange = 2000;
+			Quantity = quantity;
+			ValueRange = valueRange;
+			if (gnfs.N < 5000000)
+			{
+				ValueRange = 400;
+			}
 			SmoothRelations = new List<Relation>();
 			RoughRelations = new List<RoughPair>();
 			UnFactored = new List<Relation>();
+			PrimeBase = new PrimeBase();
 
-			AlgebraicPrimeBase = gnfs.AlgebraicPrimeBase;
-			RationalPrimeBase = gnfs.RationalPrimeBase;
+			PrimeBase = gnfs.PrimeBase;
 		}
 
 		public PolyRelationsSieveProgress(GNFS gnfs, string polynomialSaveDirectory, int b, int quantity, int valueRange, List<Relation> smooth, List<RoughPair> rough, List<Relation> unfactored)
 		{
+			PrimeBase = new PrimeBase();
+
 			B = b;
 			Quantity = quantity;
 			ValueRange = valueRange;
@@ -76,8 +83,7 @@ namespace GNFSCore
 			UnFactored = unfactored;
 			Polynomial_SaveDirectory = polynomialSaveDirectory;
 
-			AlgebraicPrimeBase = gnfs.AlgebraicPrimeBase;
-			RationalPrimeBase = gnfs.RationalPrimeBase;
+			PrimeBase = gnfs.PrimeBase;
 
 			CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(gnfs.CancelToken);
 			CancelToken = cancellationSource.Token;
@@ -96,17 +102,16 @@ namespace GNFSCore
 
 			if (B >= ValueRange)
 			{
-				return null;
-				//ValueRange += 2000;
+				ValueRange += 100;
 			}
 
 			int adjustedRange = ValueRange % 2 == 0 ? ValueRange + 1 : ValueRange;
 			IEnumerable<int> A = Enumerable.Range(-adjustedRange, adjustedRange * 2);
-			int maxB = Math.Max(adjustedRange * 2, Quantity) + 2;
+			int maxB = Math.Min(adjustedRange * 2, Quantity);
 
 			List<Relation> newestRelations = new List<Relation>();
 
-			while (SmoothRelations.Count() < Quantity)
+			while (SmoothRelations.Count() < Quantity && B < ValueRange)
 			{
 				if (cancelToken.IsCancellationRequested)
 				{
@@ -131,30 +136,37 @@ namespace GNFSCore
 		}
 
 		// Tuple<SmoothRelations, RoughRelations>
-		public static List<Relation> SieveRelations(CancellationToken cancelToken, PolyRelationsSieveProgress relationsProgress, IEnumerable<Relation> unfactored)
+		public static List<Relation> SieveRelations(CancellationToken cancelToken, PolyRelationsSieveProgress relationsProgress, List<Relation> unfactored)
 		{
 			//IndexOfUnFactored = 0;
 			List<Relation> smoothRelations = new List<Relation>();
 			List<RoughPair> roughRelations = new List<RoughPair>();
-			foreach (Relation rel in unfactored)
+
+			int index = 0;
+			int max = unfactored.Count();
+
+			while (index < max)
 			{
 				if (cancelToken.IsCancellationRequested)
 				{
 					break;
 				}
 
+				Relation rel = unfactored[index];
+
 				rel.Sieve(relationsProgress);
 				bool smooth = rel.IsSmooth;
 				if (smooth)
 				{
 					smoothRelations.Add(rel);
-					rel.Save($"{relationsProgress.SmoothRelations_SaveDirectory}\\{rel.A}_{rel.B}.relation");
+					rel.Save($"{relationsProgress.SmoothRelations_SaveDirectory}\\{rel.A}_{rel.B}.relation", relationsProgress.PrimeBase);
 				}
 				else
 				{
 					roughRelations.Add(new RoughPair(rel));
 				}
-				//IndexOfUnFactored++;
+
+				index++;
 			}
 
 			if (smoothRelations.Any())
@@ -167,6 +179,11 @@ namespace GNFSCore
 			}
 
 			return new List<Relation>(smoothRelations);
+		}
+
+		public void PurgePrimeRoughRelations()
+		{
+			RoughRelations = RoughRelations.Where(r => !r.HasPrime()).ToList();
 		}
 
 		public void SaveProgress()
@@ -200,7 +217,7 @@ namespace GNFSCore
 					string filename = $"{SmoothRelations_SaveDirectory}\\{rel.A}_{rel.B}.relation";
 					if (!File.Exists(filename))
 					{
-						rel.Save(filename);
+						rel.Save(filename, this.PrimeBase);
 					}
 				}
 			}
@@ -235,9 +252,10 @@ namespace GNFSCore
 			string filenameRelationProgress = Path.Combine(directoryRelations, "Relations.Progress");
 			string filenameUnfactoredProgress = Path.Combine(directoryRelations, "Unfactored.relations");
 			string filenameRoughRelations = Path.Combine(directoryRelations, "Rough.relations");
+			string directorySmoothRelations = Path.Combine(directoryRelations, "SmoothRelations");
 
 			int b = 1;
-			int quantity = 100;
+			int quantity = 200;
 			int valueRange = 200;
 
 			if (Directory.Exists(directoryRelations))
@@ -255,7 +273,7 @@ namespace GNFSCore
 				List<Relation> unFactored = new List<Relation>();
 
 
-				IEnumerable<string> relationFiles = Directory.EnumerateFiles(directoryRelations, "*.relation");
+				IEnumerable<string> relationFiles = Directory.EnumerateFiles(directorySmoothRelations, "*.relation");
 				smoothRelations = relationFiles.Select(fn => Relation.LoadFromFile(fn)).ToList();
 
 				if (File.Exists(filenameRoughRelations))
@@ -280,7 +298,7 @@ namespace GNFSCore
 			}
 			else
 			{
-				return new PolyRelationsSieveProgress(gnfs, gnfs.CancelToken, gnfs.Polynomial_SaveDirectory);
+				return new PolyRelationsSieveProgress(gnfs, gnfs.CancelToken, gnfs.SaveLocations.Polynomial_SaveDirectory, quantity, valueRange);
 			}
 
 

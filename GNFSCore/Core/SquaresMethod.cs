@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GNFSCore.IntegerMath;
 
-namespace GNFSCore
+namespace GNFSCore.SquareRoot
 {
 	public class SquaresMethod
 	{

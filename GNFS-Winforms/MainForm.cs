@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Data;
 using System.Text;
@@ -14,6 +15,7 @@ namespace GNFS_Winforms
 	using GNFSCore;
 	using GNFSCore.Polynomial;
 	using GNFSCore.FactorBase;
+	using GNFSCore.SquareRoot;
 	using GNFSCore.IntegerMath;
 	using GNFSCore.PrimeSignature;
 	using GNFSCore.Polynomial.Internal;
@@ -81,6 +83,7 @@ namespace GNFS_Winforms
 		private int degree;
 		private BigInteger n;
 		private BigInteger polyBase;
+		private BigInteger primeBound;
 
 		private bool IsWorking = false;
 		private CancellationToken cancellationToken;
@@ -111,6 +114,11 @@ namespace GNFS_Winforms
 			IsWorking = true;
 		}
 
+		private void btnCancel_Click(object sender, EventArgs e)
+		{
+			HaultAllProcessing();
+		}
+
 		private void HaultAllProcessing()
 		{
 			if (cancellationTokenSource != null && IsWorking)//(!cancellationTokenSource.IsCancellationRequested)
@@ -132,117 +140,6 @@ namespace GNFS_Winforms
 
 			ControlBridge.SetControlVisibleState(panelCancel, false);
 			ControlBridge.SetControlVisibleState(panelButtons, true);
-		}
-
-
-
-
-
-
-		private void btnCreateGnfs_Click(object sender, EventArgs e)
-		{
-			if (!IsWorking)
-			{
-				SetAsProcessing();
-				ControlBridge.SetControlEnabledState(btnCreateGnfs, false);
-
-				n = BigInteger.Parse(tbN.Text);
-				degree = int.Parse(tbDegree.Text);
-				polyBase = BigInteger.Parse(tbBase.Text);
-
-				CancellationToken token = cancellationTokenSource.Token;
-				new Thread(() =>
-				{
-					GNFS localGnfs = gnfsBridge.CreateGnfs(n, polyBase, degree, token);
-					SetGnfs(this, localGnfs);
-					HaultAllProcessing();
-					ControlBridge.SetControlEnabledState(panelFunctions, true);
-
-				}).Start();
-			}
-		}
-
-		private void btnFindRelations_Click(object sender, EventArgs e)
-		{
-			if (!IsWorking)
-			{
-				SetAsProcessing();
-
-				GNFS localGnfs = gnfs;
-				CancellationToken token = cancellationTokenSource.Token;
-				new Thread(() =>
-				{
-					gnfsBridge.FindRelations(localGnfs, token);
-					SetGnfs(this, localGnfs);
-					HaultAllProcessing();
-				}).Start();
-			}
-		}
-
-		private void btnMatrix_Click(object sender, EventArgs e)
-		{
-			if (!IsWorking)
-			{
-				SetAsProcessing();
-
-				GNFS localGnfs = gnfs;
-				CancellationToken token = cancellationTokenSource.Token;
-				new Thread(() =>
-				{
-					IEnumerable<Tuple<BitVector, BitVector>> matrixVectors = localGnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.GetMatrixRowVector(localGnfs.RationalFactorBase, localGnfs.AlgebraicFactorBase));
-					gnfsBridge.MatrixSolve(token, matrixVectors);
-					SetGnfs(this, localGnfs);
-					HaultAllProcessing();
-				}).Start();
-			}
-		}
-
-		private void btnFindSquares_Click(object sender, EventArgs e)
-		{
-			if (!IsWorking)
-			{
-				SetAsProcessing();
-
-				GNFS localGnfs = gnfs;
-				CancellationToken token = cancellationTokenSource.Token;
-				new Thread(() =>
-				{
-					BigInteger productC = localGnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.C).Where(i => !i.IsZero).ProductMod(n);
-					BigInteger gcd = GCD.FindGCD(n, (productC % n));
-
-					LogOutput();
-					LogOutput($"relations.Select(rel => f(rel.C)).Product(): {productC}");
-					LogOutput();
-					LogOutput($"Product(C)%N: {gcd}");
-					LogOutput();
-					LogOutput($"GCD(N,ProductC): {gcd}");
-					LogOutput();
-
-					if (gcd > 1)
-					{
-						LogOutput($@"+***************\n* FACTOR FOUND *\n\n*              * \n* {gcd} *\n****************");
-						LogOutput();
-					}
-					else
-					{
-						gnfsBridge.FindSquares(localGnfs, token);
-					}
-					SetGnfs(this, localGnfs);
-					HaultAllProcessing();
-				}).Start();
-			}
-		}
-
-		private void btnConstructPoly_Click(object sender, EventArgs e)
-		{
-			if (gnfs != null)
-			{
-				SkewSymmetricPolynomial skewPoly = new SkewSymmetricPolynomial(gnfs, degree);
-
-				LogOutput("Skew Polynomial:");
-				LogOutput($"{skewPoly}");
-				LogOutput();
-			}
 		}
 
 		private void tbOutput_KeyUp(object sender, KeyEventArgs e)
@@ -271,9 +168,190 @@ namespace GNFS_Winforms
 			}
 		}
 
-		private void btnCancel_Click(object sender, EventArgs e)
+
+
+
+		private void btnCreateGnfs_Click(object sender, EventArgs e)
 		{
-			HaultAllProcessing();
+			if (!IsWorking)
+			{
+				SetAsProcessing();
+				ControlBridge.SetControlEnabledState(btnCreateGnfs, false);
+
+				firstFindRelations = true;
+
+				n = BigInteger.Parse(tbN.Text);
+				degree = int.Parse(tbDegree.Text);
+				polyBase = BigInteger.Parse(tbBase.Text);
+				primeBound = BigInteger.Parse(tbBound.Text);
+
+				int relationQuantity = int.Parse(tbRelationQuantity.Text);
+				int relationValueRange = int.Parse(tbRelationValueRange.Text);
+
+				CancellationToken token = cancellationTokenSource.Token;
+				new Thread(() =>
+				{
+					GNFS localGnfs = gnfsBridge.CreateGnfs(n, polyBase, degree, primeBound, relationQuantity, relationValueRange, token);
+					SetGnfs(this, localGnfs);
+					HaultAllProcessing();
+					ControlBridge.SetControlEnabledState(panelFunctions, true);
+
+				}).Start();
+			}
+		}
+
+		private bool firstFindRelations = false;
+		private void btnFindRelations_Click(object sender, EventArgs e)
+		{
+			if (!IsWorking)
+			{
+				SetAsProcessing();
+
+				bool breakAfterOneRound = false;
+
+				if (firstFindRelations)
+				{
+					firstFindRelations = false;
+					breakAfterOneRound = true;
+				}
+
+				GNFS localGnfs = gnfs;
+				CancellationToken token = cancellationTokenSource.Token;
+				new Thread(() =>
+				{
+					GNFS resultGnfs = gnfsBridge.FindRelations(breakAfterOneRound, localGnfs, token);
+					SetGnfs(this, resultGnfs);
+					HaultAllProcessing();
+				}).Start();
+			}
+		}
+
+		private void btnMatrix_Click(object sender, EventArgs e)
+		{
+			if (!IsWorking)
+			{
+				SetAsProcessing();
+
+				GNFS localGnfs = gnfs;
+				CancellationToken token = cancellationTokenSource.Token;
+				new Thread(() =>
+				{
+					GNFS resultGnfs = gnfsBridge.MatrixSolve5(token, localGnfs);
+
+					SetGnfs(this, resultGnfs);
+					HaultAllProcessing();
+					//LogOutput("Rational matrix (transposed):");
+					//LogOutput(string.Join(Environment.NewLine, squares.Select(bs => bs.ToString())));
+					//LogOutput();
+
+					//BitMatrix matrix1 = new BitMatrix(vectors1);
+
+
+					//---//
+
+					//var rationalNorms = localGnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.RationalNorm);
+					//BigInteger maxNorm = rationalNorms.Max();
+					//BigInteger maxNormSqrt = maxNorm.SquareRoot();
+
+					//var vectors2 = rationalNorms.Select(rn => new BitVector(rn, maxNormSqrt));
+
+					//BitMatrix matrix2 = new BitMatrix(vectors2);
+
+					//gnfsBridge.MatrixSolve(token, matrix1);
+				}).Start();
+			}
+		}
+
+		private void btnFindSquares_Click(object sender, EventArgs e)
+		{
+			if (!IsWorking)
+			{
+				SetAsProcessing();
+
+				GNFS localGnfs = gnfs;
+				CancellationToken token = cancellationTokenSource.Token;
+				new Thread(() =>
+				{
+					GNFS resultGnfs = gnfsBridge.FindSquares(localGnfs, token);
+
+					SetGnfs(this, resultGnfs);
+					HaultAllProcessing();
+				}).Start();
+			}
+		}
+
+		private void btnConstructPoly_Click(object sender, EventArgs e)
+		{
+			if (gnfs != null)
+			{
+				SkewSymmetricPolynomial skewPoly = new SkewSymmetricPolynomial(gnfs, degree);
+
+				LogOutput("Skew Polynomial:");
+				LogOutput($"{skewPoly}");
+				LogOutput();
+			}
+		}
+
+
+
+		private void btnResume_Click(object sender, EventArgs e)
+		{
+			string directory = string.Empty;
+			using (FolderBrowserDialog browseDialog = new FolderBrowserDialog())
+			{
+				if (browseDialog.ShowDialog() == DialogResult.OK)
+				{
+					directory = browseDialog.SelectedPath;
+				}
+			}
+
+			if (!string.IsNullOrWhiteSpace(directory) && Directory.Exists(directory))
+			{
+				cancellationTokenSource = new CancellationTokenSource();
+				gnfs = new GNFS(cancellationTokenSource.Token, directory);
+			}
+		}
+
+		private void btnPurgeRough_Click(object sender, EventArgs e)
+		{
+			int before = gnfs.CurrentRelationsProgress.RoughRelations.Count;
+
+			gnfs.CurrentRelationsProgress.PurgePrimeRoughRelations();
+
+			int after = gnfs.CurrentRelationsProgress.RoughRelations.Count;
+
+			int quantityRemoved = before - after;
+
+			MessageBox.Show($"Purged {quantityRemoved} rough relations whom were prime.");
+		}
+
+		private void btnSerialize_Click(object sender, EventArgs e)
+		{
+			string savePath = $"C:\\GNFS\\{gnfs.N}";
+			Serializer.JSON.Serialize(gnfs, savePath + ".gnfs");
+
+			/*
+			Serializer.JSON.Serialize(gnfs.CurrentPolynomial, savePath + ".polynomial");
+			Serializer.JSON.Serialize(gnfs.AFB, savePath + ".AFB");
+			Serializer.JSON.Serialize(gnfs.RFB, savePath + ".RFB");
+			Serializer.JSON.Serialize(gnfs.QFB, savePath + ".QFB");
+			Serializer.JSON.Serialize(gnfs.CurrentRelationsProgress.SmoothRelations, savePath + ".SmoothRelations");
+			*/
+		}
+
+		private void btnCollectSquares_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		private void btnPolySplittingField_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		private void btnLatticeSieve_Click(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

@@ -17,7 +17,7 @@ namespace GNFSCore.IntegerMath
 
 		static PrimeFactory()
 		{
-			MaxValue = 1000;
+			MaxValue = 10000;
 			SetPrimes();
 		}
 
@@ -78,6 +78,7 @@ namespace GNFSCore.IntegerMath
 			{
 				IncreaseMaxValue(value);
 			}
+
 			BigInteger primeValue = primes.First(p => p >= value);
 
 			int index = Array.IndexOf<BigInteger>(primes.ToArray(), primeValue);
@@ -115,6 +116,23 @@ namespace GNFSCore.IntegerMath
 		public static bool IsPrime(BigInteger value)
 		{
 			return primes.Contains(BigInteger.Abs(value));
+		}
+
+		public static BigInteger GetNextPrime(BigInteger fromValue)
+		{
+			BigInteger result = fromValue;
+
+			if(result.IsEven)
+			{
+				result += 1;
+			}
+
+			while(!FactorizationFactory.IsPrime(result))
+			{
+				result += 2;
+			}
+
+			return result;
 		}
 	}
 }

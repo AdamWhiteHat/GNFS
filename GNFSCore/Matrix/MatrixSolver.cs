@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GNFSCore.PrimeSignature
+namespace GNFSCore.Matrix
 {
 	using IntegerMath;
 	using System.Numerics;
@@ -64,9 +64,9 @@ namespace GNFSCore.PrimeSignature
 				}
 
 				BitVector toMatch = input.Skip(skip).First();
-				int[] matchPattern = BitPattern.GetPattern(toMatch);
+				BitPattern matchPattern = new BitPattern(toMatch);
 
-				IEnumerable<BitVector> matches = BitPattern.FindExactMatches(matchPattern, input);
+				IEnumerable<BitVector> matches = matchPattern.FindExactMatches(input);
 
 				if (matches.Count() > 1)
 				{
@@ -108,8 +108,8 @@ namespace GNFSCore.PrimeSignature
 				List<BitVector> matchCollection = new List<BitVector>();
 				BitVector toMatch = input.Skip(skip).First();
 				matchCollection.Add(toMatch);
-				int[] matchPattern = BitPattern.GetPattern(toMatch);
-				BitVector bestMatch = BitPattern.FindBestPartialMatch(matchPattern, input.Except(matchCollection));
+				BitPattern matchPattern = new BitPattern(toMatch);
+				BitVector bestMatch = matchPattern.FindBestPartialMatch(input.Except(matchCollection));
 
 				if (bestMatch == null || bestMatch == default(BitVector))
 				{
@@ -122,8 +122,8 @@ namespace GNFSCore.PrimeSignature
 
 				while (!combinedVector.All(b => !b))
 				{
-					matchPattern = BitPattern.GetPattern(combinedVector);
-					BitVector found = BitPattern.FindBestPartialMatch(matchPattern, input.Except(matchCollection));
+					matchPattern = new BitPattern(combinedVector);
+					BitVector found = matchPattern.FindBestPartialMatch(input.Except(matchCollection));
 
 					if (found == null || found == default(BitVector))
 					{

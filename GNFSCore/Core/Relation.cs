@@ -13,18 +13,21 @@ using System.IO;
 namespace GNFSCore
 {
 	using FactorBase;
+	using IntegerMath;
 	using PrimeSignature;
 
 	public class Relation
 	{
-		public int A { get; set; }
-		public int B { get; set; }
-		public BigInteger C;
-		public BigInteger AlgebraicNorm { get; set; }
-		public BigInteger RationalNorm { get; set; }
+		public int A { get; private set; }
+		public int B { get; private set; }
+		public BigInteger C { get; private set; }
 
-		internal BigInteger AlgebraicQuotient { get; set; }
-		internal BigInteger RationalQuotient { get; set; }
+		public BigInteger AlgebraicNorm { get; private set; }
+		public BigInteger RationalNorm { get; private set; }
+		public BigInteger NormProduct { get { return BigInteger.Multiply(AlgebraicNorm, RationalNorm); } }
+
+		internal BigInteger AlgebraicQuotient { get; private set; }
+		internal BigInteger RationalQuotient { get; private set; }
 
 		public bool IsSmooth
 		{
@@ -69,17 +72,16 @@ namespace GNFSCore
 
 		public void Sieve(PolyRelationsSieveProgress relationsSieve)
 		{
-			int i = 0;
-			AlgebraicQuotient = Factor(relationsSieve.AlgebraicPrimeBase, AlgebraicNorm, AlgebraicQuotient);
-			RationalQuotient = Factor(relationsSieve.RationalPrimeBase, RationalNorm, RationalQuotient);
+			AlgebraicQuotient = Factor(relationsSieve.PrimeBase.AlgebraicPrimeBase, AlgebraicNorm, AlgebraicQuotient);
+			RationalQuotient = Factor(relationsSieve.PrimeBase.RationalPrimeBase, RationalNorm, RationalQuotient);
 		}
 
-		private static BigInteger Factor(IEnumerable<BigInteger> factors, BigInteger norm, BigInteger quotient)
+		private static BigInteger Factor(IEnumerable<BigInteger> primeFactors, BigInteger norm, BigInteger quotient)
 		{
 			BigInteger sqrt = BigInteger.Abs(norm).SquareRoot();
 
 			BigInteger result = quotient;
-			foreach (BigInteger factor in factors)
+			foreach (BigInteger factor in primeFactors)
 			{
 				if (result == 0 || result == -1 || result == 1 || factor > sqrt)
 				{
@@ -93,7 +95,7 @@ namespace GNFSCore
 					if (absResult > 1 /*&& absResult < int.MaxValue - 1*/)
 					{
 						//int intValue = (int)absResult;
-						if (factors.Contains(absResult))
+						if (primeFactors.Contains(absResult))
 						{
 							result = 1;
 						}
@@ -101,19 +103,6 @@ namespace GNFSCore
 				}
 			}
 			return result;
-		}
-
-		public Tuple<BitVector, BitVector> GetMatrixRowVector(BigInteger rationalFactorBase, BigInteger algebraicFactorBase)
-		{
-			BitVector rationalBitVector = new BitVector(RationalNorm, rationalFactorBase);
-			BitVector algebraicBitVector = new BitVector(AlgebraicNorm, algebraicFactorBase);
-			//bool[] quadraticBitVector = QuadraticResidue.GetQuadraticCharacters(this, qudraticFactorBase.QFB);
-			//List<bool> combinedVector = new List<bool>();
-			//combinedVector.AddRange(rationalBitVector.Elements);
-			//combinedVector.AddRange(algebraicBitVector.Elements);
-			//combinedVector.AddRange(quadraticBitVector);
-			//return new BitVector(RationalNorm, combinedVector.ToArray());
-			return new Tuple<BitVector, BitVector>(rationalBitVector, algebraicBitVector);
 		}
 
 		public override string ToString()
@@ -138,12 +127,12 @@ namespace GNFSCore
 			File.WriteAllLines(filename, relations.Select(rel => $"{rel.A},{rel.B}"));
 		}
 
-		public void Save(string filename)
+		public void Save(string filename, PrimeBase primeBase)
 		{
-			SerializeToFile(this, filename);// $"{directory}\\{relation.A}_{relation.B}.relation"
+			SerializeToFile(this, primeBase, filename);// $"{directory}\\{relation.A}_{relation.B}.relation"
 		}
 
-		public static void SerializeToFile(Relation rel, string filename)
+		public static void SerializeToFile(Relation rel, PrimeBase primeBase, string filename)
 		{
 			new XDocument(
 				new XElement("Relation",
@@ -151,7 +140,9 @@ namespace GNFSCore
 					new XElement("B", rel.B),
 					new XElement("C", rel.C),
 					new XElement("AlgebraicNorm", rel.AlgebraicNorm),
-					new XElement("RationalNorm", rel.RationalNorm)
+					new XElement("RationalNorm", rel.RationalNorm),
+					new XElement("AlgebraicFactorization", FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(rel.AlgebraicNorm, primeBase.AlgebraicFactorBase))),
+					new XElement("RationalFactorization", FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(rel.RationalNorm, primeBase.RationalFactorBase)))
 				)
 			).Save(filename);
 		}
