@@ -17,7 +17,7 @@ namespace GNFS_Winforms
 	using GNFSCore.FactorBase;
 	using GNFSCore.SquareRoot;
 	using GNFSCore.IntegerMath;
-	using GNFSCore.PrimeSignature;
+	using GNFSCore.Matrix;
 	using GNFSCore.Polynomial.Internal;
 
 	public partial class MainForm : Form
