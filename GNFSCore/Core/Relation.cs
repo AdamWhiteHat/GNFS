@@ -14,7 +14,7 @@ namespace GNFSCore
 {
 	using FactorBase;
 	using IntegerMath;
-	using PrimeSignature;
+	using Matrix;
 
 	public class Relation
 	{
