@@ -132,28 +132,11 @@ namespace GNFSCore.Matrix
 			return Rows.Select(bv => bv[columnIndex]).ToArray();
 		}
 
-		//public BitMatrix GetTransposeMatrix()
-		//{
-
-		//	BigInteger[] numbers = PrimeFactory.GetPrimesTo(PrimeFactory.GetValueFromIndex(Width + 1)).ToArray();//Rows.Select(row => row.Number).ToArray();
-		//	int columns = Rows.First().Length;
-
-		//	int index = 0;
-		//	List<BitVector> vectors = new List<BitVector>();
-		//	while (index < columns)
-		//	{
-		//		bool[] vectorElements = GetColumn(index);
-		//		BitVector vector = new BitVector(numbers[index], vectorElements);
-		//		vectors.Add(vector);
-		//		index++;
-		//	}
-
-		//	return new BitMatrix(vectors);
-		//}
-
 		public override string ToString()
 		{
 			Sort();
+
+			StringBuilder result = new StringBuilder();
 
 			//BigInteger maxValue = Rows.Select(row => row.Number).Max();
 			//int numberLength = maxValue.ToString().Length + 3;
@@ -161,9 +144,28 @@ namespace GNFSCore.Matrix
 			//int vectorLength = Rows.First().ToString().Length;
 			//int padLength = numberLength + vectorLength + 4;
 
-			string result = string.Join(Environment.NewLine, Rows.Select(i => i.ToString())) + Environment.NewLine;
-			result += BitVector.FormatElements(GetColumnsMod2()) + Environment.NewLine;
-			return result;
+			int[] colSums = ColumnSums;
+
+			int padLength = colSums.Max().ToString().Length;
+
+
+			string indent = new string(Enumerable.Repeat(' ', 13).ToArray()) + "\t|\t";
+
+			string mod2 = indent + BitVector.FormatElements(GetColumnsMod2(), padLength);
+			string spacer = indent + String.Join(" ", Enumerable.Repeat("-", mod2.Length / 2));
+
+			result.AppendLine(mod2);
+			result.AppendLine(spacer);
+
+			result.AppendLine(string.Join(Environment.NewLine, Rows.Select(i => i.ToString(padLength))));
+
+			result.AppendLine(spacer);
+			result.AppendLine(indent + string.Join(",", colSums.Select(i => i.ToString().PadLeft(padLength))));
+			result.AppendLine(spacer);
+			result.AppendLine(mod2);
+
+
+			return result.ToString();
 		}
 	}
 }

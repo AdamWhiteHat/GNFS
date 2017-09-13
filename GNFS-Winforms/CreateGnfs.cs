@@ -20,7 +20,7 @@ namespace GNFS_Winforms
 	{
 		public GNFS CreateGnfs(BigInteger n, BigInteger polyBase, int degree, BigInteger primeBound, int relationQuantity, int relationValueRange, CancellationToken cancelToken)
 		{
-			GNFS gnfs = new GNFS(cancelToken, n, polyBase, degree, primeBound, relationValueRange, relationValueRange);
+			GNFS gnfs = new GNFS(cancelToken, n, polyBase, degree, primeBound, relationQuantity, relationValueRange);
 
 			mainForm.LogOutput(gnfs.ToString());
 

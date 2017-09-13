@@ -236,27 +236,23 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS resultGnfs = gnfsBridge.MatrixSolve5(token, localGnfs);
+					GNFS resultGnfs = gnfsBridge.MatrixSolveGaussian(token, localGnfs);
 
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
+
 					//LogOutput("Rational matrix (transposed):");
 					//LogOutput(string.Join(Environment.NewLine, squares.Select(bs => bs.ToString())));
 					//LogOutput();
-
+					//
 					//BitMatrix matrix1 = new BitMatrix(vectors1);
-
-
 					//---//
-
-					//var rationalNorms = localGnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.RationalNorm);
+					//IEnumerable<BigInteger> rationalNorms = localGnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.RationalNorm);
 					//BigInteger maxNorm = rationalNorms.Max();
 					//BigInteger maxNormSqrt = maxNorm.SquareRoot();
-
+					//
 					//var vectors2 = rationalNorms.Select(rn => new BitVector(rn, maxNormSqrt));
-
 					//BitMatrix matrix2 = new BitMatrix(vectors2);
-
 					//gnfsBridge.MatrixSolve(token, matrix1);
 				}).Start();
 			}

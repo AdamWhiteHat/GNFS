@@ -42,7 +42,8 @@ namespace GNFSCore.Matrix
 					Elements = new bool[] { };
 					return;
 				}
-				result[PrimeFactory.GetIndexFromValue(factor.Item1)] = true;
+				int index = PrimeFactory.GetIndexFromValue(factor.Item1);
+				result[index] = true;
 			}
 
 			Elements = result;
@@ -97,6 +98,29 @@ namespace GNFSCore.Matrix
 			return result;
 		}
 
+		public static BitVector Add(BitVector left, BitVector right)
+		{
+			if (left.Length != right.Length)
+			{
+				throw new ArgumentException($"Both vectors must have the same length.");
+			}
+
+			int length = left.Length;
+
+			bool[] result = new bool[length]; //Enumerable.Repeat(false, length).ToArray();
+
+			int index = 0;
+			while (index < length)
+			{
+				result[index] = left[index] ^ right[index];
+				index++;
+			}
+
+			BigInteger resultNumber = BigInteger.Multiply(left.Number, right.Number);
+
+			return new BitVector(resultNumber, result);
+		}
+
 		public int IndexOfRightmostElement()
 		{
 			return Array.LastIndexOf(Elements, true);
@@ -135,7 +159,7 @@ namespace GNFSCore.Matrix
 			return GetWeight(this);
 		}
 
-	    public int CompareTo(BitVector other)
+		public int CompareTo(BitVector other)
 		{
 			if (other == null)
 			{
@@ -159,12 +183,20 @@ namespace GNFSCore.Matrix
 			return string.Join(",", elements.Select(b => b ? '1' : '0'));
 		}
 
+		public static string FormatElements(bool[] elements, int padLength)
+		{
+			return string.Join(",", elements.Select(b => b ? "1".PadLeft(padLength) : "0".PadLeft(padLength)));
+		}
+
 		public override string ToString()
 		{
 			//  augmented matrix style
 			return $"{Number.ToString().PadLeft(13)}\t|\t{FormatElements(Elements)}";
 		}
 
-
+		public string ToString(int padLength)
+		{
+			return $"{Number.ToString().PadLeft(13)}\t|\t{FormatElements(Elements, padLength)}";
+		}
 	}
 }

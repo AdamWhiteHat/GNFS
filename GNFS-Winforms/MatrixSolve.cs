@@ -10,14 +10,76 @@ using System.Collections.Generic;
 namespace GNFS_Winforms
 {
 	using GNFSCore;
+	using GNFSCore.Matrix;
 	using GNFSCore.Polynomial;
 	using GNFSCore.FactorBase;
 	using GNFSCore.IntegerMath;
-	using GNFSCore.Matrix;
 	using GNFSCore.Polynomial.Internal;
 
 	public partial class GnfsUiBridge
 	{
+		public GNFS GODDAMNMATRIXBULLSHITFFFUUUUUUUUU(CancellationToken cancelToken, GNFS gnfs)
+		{
+			BitMatrix matrix = gnfs.CurrentRelationsProgress.GetRelationsMatrix();
+
+			mainForm.LogOutput("Relation matrix:");
+			mainForm.LogOutput(matrix.ToString());
+			mainForm.LogOutput();
+
+			mainForm.LogOutput("RPB");
+			mainForm.LogOutput(gnfs.PrimeBase.RationalPrimeBase.FormatString(false, 3));
+			mainForm.LogOutput();
+
+			mainForm.LogOutput("APB");
+			mainForm.LogOutput(gnfs.PrimeBase.AlgebraicPrimeBase.FormatString(false, 3));
+			mainForm.LogOutput();
+
+
+			return gnfs;
+		}
+
+		public GNFS MatrixSolveGaussian(CancellationToken cancelToken, GNFS gnfs)
+		{
+			List<Relation> orderedSmoothRelations = gnfs.CurrentRelationsProgress.SmoothRelations.ToList();
+
+			Gaussian gaussianReduction = new Gaussian(orderedSmoothRelations);
+
+			string matrixAfterTranspose = gaussianReduction.ToString();
+
+			mainForm.LogOutput("Matrix after transpose:");
+			mainForm.LogOutput($"  rows: {gaussianReduction.RowCount}");
+			mainForm.LogOutput($"  cols: {gaussianReduction.ColumnCount}");
+			mainForm.LogOutput(matrixAfterTranspose);
+			mainForm.LogOutput();
+
+			gaussianReduction.Elimination();
+
+			string matrixAfterElimination = gaussianReduction.ToString();
+			string freeVariables = Gaussian.VectorToString(gaussianReduction.FreeVariables);
+
+			mainForm.LogOutput("Matrix after elimination:");
+			mainForm.LogOutput(matrixAfterElimination);
+			mainForm.LogOutput();
+			mainForm.LogOutput("Free variables:");
+			mainForm.LogOutput(freeVariables);
+			mainForm.LogOutput();
+
+			int freeVarCount = gaussianReduction.FreeVariables.Count(b => b == true);
+
+			Relation[] solution1 = gaussianReduction.GetSolutionSet2();//gaussianReduction.GetSolutionSet(1);
+
+			string solutionSet1 = string.Join(Environment.NewLine, solution1.Select(rel => rel.ToString()));
+
+			mainForm.LogOutput();
+			mainForm.LogOutput("Solution set #1:");
+			mainForm.LogOutput(solutionSet1);
+			mainForm.LogOutput();
+			mainForm.LogOutput("All relations:");
+			mainForm.LogOutput(string.Join(Environment.NewLine, gnfs.CurrentRelationsProgress.SmoothRelations.OrderBy(rel => rel.A).Select(rel => rel.ToString())));
+
+			return gnfs;
+		}
+
 		public GNFS MatrixSolve5(CancellationToken cancelToken, GNFS gnfs)
 		{
 			BigInteger algebraicMax = gnfs.CurrentRelationsProgress.PrimeBase.AlgebraicPrimeBase.Max();

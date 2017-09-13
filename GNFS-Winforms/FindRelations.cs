@@ -23,9 +23,9 @@ namespace GNFS_Winforms
 			while (!cancelToken.IsCancellationRequested)
 			{
 				//List<RoughPair> knownRough = gnfs.CurrentRelationsProgress.RoughRelations;
-				IEnumerable<Relation> smoothRelations = gnfs.CurrentRelationsProgress.GenerateRelations(gnfs, cancelToken);
-				if(smoothRelations == null)
-				{					
+				IEnumerable<Relation> smoothRelations = gnfs.CurrentRelationsProgress.GenerateRelations(cancelToken);
+				if (smoothRelations == null)
+				{
 					break;
 				}
 				if (smoothRelations.Any())
@@ -41,7 +41,7 @@ namespace GNFS_Winforms
 					mainForm.LogOutput();
 				}
 
-				if(oneRound)
+				if (oneRound)
 				{
 					break;
 				}

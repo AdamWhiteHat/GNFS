@@ -12,6 +12,7 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 
 using GNFSCore.IntegerMath;
+using GNFSCore.Matrix;
 
 namespace GNFSCore
 {
@@ -31,6 +32,8 @@ namespace GNFSCore
 		public List<Relation> UnFactored { get; private set; }
 
 		public PrimeBase PrimeBase { get; private set; }
+
+		private GNFS _gnfs;
 
 		internal string Polynomial_SaveDirectory { get; private set; }
 		public string Relations_SaveDirectory { get { return Path.Combine(Polynomial_SaveDirectory, "Relations"); } }
@@ -56,10 +59,12 @@ namespace GNFSCore
 				Directory.CreateDirectory(SmoothRelations_SaveDirectory);
 			}
 
+			_gnfs = gnfs;
+
 			B = 1;
 			Quantity = quantity;
 			ValueRange = valueRange;
-			if (gnfs.N < 5000000)
+			if (ValueRange > 400 && gnfs.N < 5000000)
 			{
 				ValueRange = 400;
 			}
@@ -74,6 +79,7 @@ namespace GNFSCore
 		public PolyRelationsSieveProgress(GNFS gnfs, string polynomialSaveDirectory, int b, int quantity, int valueRange, List<Relation> smooth, List<RoughPair> rough, List<Relation> unfactored)
 		{
 			PrimeBase = new PrimeBase();
+			_gnfs = gnfs;
 
 			B = b;
 			Quantity = quantity;
@@ -89,11 +95,11 @@ namespace GNFSCore
 			CancelToken = cancellationSource.Token;
 		}
 
-		public List<Relation> GenerateRelations(GNFS gnfs, CancellationToken cancelToken)
+		public List<Relation> GenerateRelations(CancellationToken cancelToken)
 		{
 			if (Quantity == -1)
 			{
-				Quantity = gnfs.RFB.Count + gnfs.AFB.Count + gnfs.QFB.Count + 1;
+				Quantity = _gnfs.RFB.Count + _gnfs.AFB.Count + _gnfs.QFB.Count + 1;
 			}
 			else if (SmoothRelations.Count() >= Quantity)
 			{
@@ -119,9 +125,9 @@ namespace GNFSCore
 				}
 
 				List<int> coprimes = A.Where(a => CoPrime.IsCoprime(a, B)).ToList();
-				List<Relation> unfactored = coprimes.Select(a => new Relation(gnfs, a, B)).ToList();
+				List<Relation> unfactored = coprimes.Select(a => new Relation(_gnfs, a, B)).ToList();
 
-				newestRelations.AddRange(SieveRelations(cancelToken, gnfs.CurrentRelationsProgress, unfactored));
+				newestRelations.AddRange(SieveRelations(cancelToken, _gnfs.CurrentRelationsProgress, unfactored));
 
 				if (B > maxB)
 				{
@@ -159,7 +165,7 @@ namespace GNFSCore
 				if (smooth)
 				{
 					smoothRelations.Add(rel);
-					rel.Save($"{relationsProgress.SmoothRelations_SaveDirectory}\\{rel.A}_{rel.B}.relation", relationsProgress.PrimeBase);
+					rel.Save($"{relationsProgress.SmoothRelations_SaveDirectory}\\{rel.A}_{rel.B}.relation", relationsProgress._gnfs);
 				}
 				else
 				{
@@ -179,6 +185,13 @@ namespace GNFSCore
 			}
 
 			return new List<Relation>(smoothRelations);
+		}
+
+		public BitMatrix GetRelationsMatrix()
+		{
+			var vectors = SmoothRelations.Select(rel => new BitVector(rel.AlgebraicNorm, rel.GetMatrixRow()));
+			BitMatrix result = new BitMatrix(vectors);
+			return result;
 		}
 
 		public void PurgePrimeRoughRelations()
@@ -217,7 +230,7 @@ namespace GNFSCore
 					string filename = $"{SmoothRelations_SaveDirectory}\\{rel.A}_{rel.B}.relation";
 					if (!File.Exists(filename))
 					{
-						rel.Save(filename, this.PrimeBase);
+						rel.Save(filename, _gnfs);
 					}
 				}
 			}
@@ -274,7 +287,7 @@ namespace GNFSCore
 
 
 				IEnumerable<string> relationFiles = Directory.EnumerateFiles(directorySmoothRelations, "*.relation");
-				smoothRelations = relationFiles.Select(fn => Relation.LoadFromFile(fn)).ToList();
+				smoothRelations = relationFiles.Select(fn => Relation.LoadFromFile(gnfs, fn)).ToList();
 
 				if (File.Exists(filenameRoughRelations))
 				{

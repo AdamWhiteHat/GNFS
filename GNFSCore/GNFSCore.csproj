@@ -62,6 +62,7 @@
     <Compile Include="IntegerMath\Fraction.cs" />
     <Compile Include="IntegerMath\Legendre.cs" />
     <Compile Include="IntegerMath\PrimeFactory.cs" />
+    <Compile Include="Matrix\Gaussian.cs" />
     <Compile Include="Polynomial\CommonPolynomial.cs" />
     <Compile Include="Polynomial\SkewSymmetricPolynomial.cs" />
     <Compile Include="Polynomial\RationalPolynomial.cs" />

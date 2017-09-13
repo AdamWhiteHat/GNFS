@@ -42,6 +42,8 @@ namespace GNFSCore
 			return new Tuple<BigInteger, BigInteger>(AlgebraicQuotient, RationalQuotient);
 		}
 
+		private GNFS _gnfs;
+
 		public Relation(GNFS gnfs, int a, int b)
 		{
 			A = a;
@@ -55,9 +57,11 @@ namespace GNFSCore
 
 			BigInteger rationalEval = gnfs.CurrentPolynomial.Evaluate(RationalNorm);
 			C = (rationalEval % gnfs.N);
+
+			_gnfs = gnfs;
 		}
 
-		public Relation(int a, int b, BigInteger c, BigInteger algebraicNorm, BigInteger rationalNorm)
+		public Relation(GNFS gnfs, int a, int b, BigInteger c, BigInteger algebraicNorm, BigInteger rationalNorm)
 		{
 			A = a;
 			B = b;
@@ -68,6 +72,8 @@ namespace GNFSCore
 
 			AlgebraicQuotient = 0;
 			RationalQuotient = 0;
+
+			_gnfs = gnfs;
 		}
 
 		public void Sieve(PolyRelationsSieveProgress relationsSieve)
@@ -105,12 +111,40 @@ namespace GNFSCore
 			return result;
 		}
 
+		public bool[] GetMatrixRow()
+		{
+			List<bool> result = new List<bool>();
+
+			if (RationalNorm.Sign == -1)
+			{
+				result.Add(true);
+			}
+			else
+			{
+				result.Add(false);
+			}
+
+			BitVector rationalVector = new BitVector(RationalNorm, _gnfs.PrimeBase.RationalFactorBase);
+			BitVector algebraicVector = new BitVector(AlgebraicNorm, _gnfs.PrimeBase.AlgebraicFactorBase);
+
+			result.AddRange(rationalVector.Elements);
+			result.AddRange(algebraicVector.Elements);
+
+			foreach (FactorPair qc in _gnfs.QFB)
+			{
+				result.Add(QuadraticResidue.GetQuadraticCharacter(this, qc));
+			}
+
+			return result.ToArray();
+		}
+
 		public override string ToString()
 		{
 			return
-				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t" +
-				$"[ƒ(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)} ({AlgebraicNorm.IsSquare()}),\ta+b*m={RationalNorm.ToString().PadLeft(4)} ({RationalNorm.IsSquare()})]\t" +
-				$"ƒ({RationalNorm}) =".PadRight(8) + $"{C.ToString().PadLeft(6)}";
+				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t"
+				+ $"[ƒ(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)} ({AlgebraicNorm.IsSquare()}),\ta+b*m={RationalNorm.ToString().PadLeft(4)} ({RationalNorm.IsSquare()})]\t"
+				//+ $"ƒ({RationalNorm}) =".PadRight(8) + $"{C.ToString().PadLeft(6)}"
+				;
 		}
 
 		public static List<Relation> LoadUnfactoredFile(GNFS gnfs, string filename)
@@ -127,12 +161,12 @@ namespace GNFSCore
 			File.WriteAllLines(filename, relations.Select(rel => $"{rel.A},{rel.B}"));
 		}
 
-		public void Save(string filename, PrimeBase primeBase)
+		public void Save(string filename, GNFS gnfs)
 		{
-			SerializeToFile(this, primeBase, filename);// $"{directory}\\{relation.A}_{relation.B}.relation"
+			SerializeToFile(this, gnfs, filename);// $"{directory}\\{relation.A}_{relation.B}.relation"
 		}
 
-		public static void SerializeToFile(Relation rel, PrimeBase primeBase, string filename)
+		public static void SerializeToFile(Relation rel, GNFS gnfs, string filename)
 		{
 			new XDocument(
 				new XElement("Relation",
@@ -141,13 +175,14 @@ namespace GNFSCore
 					new XElement("C", rel.C),
 					new XElement("AlgebraicNorm", rel.AlgebraicNorm),
 					new XElement("RationalNorm", rel.RationalNorm),
-					new XElement("AlgebraicFactorization", FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(rel.AlgebraicNorm, primeBase.AlgebraicFactorBase))),
-					new XElement("RationalFactorization", FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(rel.RationalNorm, primeBase.RationalFactorBase)))
+					new XElement("AlgebraicFactorization", FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(rel.AlgebraicNorm, gnfs.PrimeBase.AlgebraicFactorBase))),
+					new XElement("RationalFactorization", FactorizationFactory.FormatString.PrimeFactorization(FactorizationFactory.GetPrimeFactorizationTuple(rel.RationalNorm, gnfs.PrimeBase.RationalFactorBase))),
+					new XElement("MatrixRow", string.Join(",", rel.GetMatrixRow().Select(b => b ? '1' : '0')))
 				)
 			).Save(filename);
 		}
 
-		public static Relation LoadFromFile(string filename)
+		public static Relation LoadFromFile(GNFS gnfs, string filename)
 		{
 			XElement rel = XElement.Load(filename);
 			int a = int.Parse(rel.Element("A").Value);
@@ -156,7 +191,7 @@ namespace GNFSCore
 			BigInteger an = BigInteger.Parse(rel.Element("AlgebraicNorm").Value);
 			BigInteger rn = BigInteger.Parse(rel.Element("RationalNorm").Value);
 
-			return new Relation(a, b, c, an, rn);
+			return new Relation(gnfs, a, b, c, an, rn);
 		}
 	}
 }

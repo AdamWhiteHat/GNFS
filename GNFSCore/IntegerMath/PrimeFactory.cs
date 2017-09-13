@@ -12,7 +12,7 @@ namespace GNFSCore.IntegerMath
 	public static class PrimeFactory
 	{
 		private static BigInteger MaxValue;
-		private static IEnumerable<BigInteger> primes;
+		private static IEnumerable<BigInteger> primes = new BigInteger[] { 2, 3, 5, 7, 11, 13 };
 		private static BigInteger lastPrime;
 
 		static PrimeFactory()
@@ -122,12 +122,12 @@ namespace GNFSCore.IntegerMath
 		{
 			BigInteger result = fromValue;
 
-			if(result.IsEven)
+			if (result.IsEven)
 			{
 				result += 1;
 			}
 
-			while(!FactorizationFactory.IsPrime(result))
+			while (!FactorizationFactory.IsPrime(result))
 			{
 				result += 2;
 			}

@@ -42,11 +42,10 @@ namespace GNFSCore
 		private BigInteger m;
 		[JsonIgnore]
 		private int degree = 2;
-		[JsonIgnore]
-		private IEnumerable<BigInteger> _primes;
 
 		public GNFS()
 		{
+			PrimeBase = new PrimeBase();
 			PolynomialCollection = new List<IPolynomial>();
 		}
 
@@ -126,17 +125,16 @@ namespace GNFSCore
 			N = input.N;
 			m = input.m;
 			int polyDegree = input.degree;
-			PrimeBase = new PrimeBase();
+			
 
-			PrimeBase.RationalFactorBase	 = input.PrimeBase.RationalFactorBase;
-			PrimeBase.AlgebraicFactorBase	 = input.PrimeBase.AlgebraicFactorBase;
+			PrimeBase.RationalFactorBase = input.PrimeBase.RationalFactorBase;
+			PrimeBase.AlgebraicFactorBase = input.PrimeBase.AlgebraicFactorBase;
 			PrimeBase.QuadraticFactorBaseMin = input.PrimeBase.QuadraticFactorBaseMin;
 			PrimeBase.QuadraticFactorBaseMax = input.PrimeBase.QuadraticFactorBaseMax;
 
 			int base10 = N.ToString().Count();
 			int quadraticBaseSize = CalculateQuadraticBaseSize(polyDegree);
 
-			_primes = PrimeFactory.GetPrimes((PrimeBase.RationalFactorBase * 3) + 2 + base10);
 			PrimeBase.RationalPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.RationalFactorBase).ToList();
 			PrimeBase.AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.AlgebraicFactorBase).ToList();
 			PrimeBase.QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(PrimeBase.QuadraticFactorBaseMin).Take(quadraticBaseSize).ToList();
@@ -263,25 +261,29 @@ namespace GNFSCore
 		private void CaclulatePrimeBounds(BigInteger bound)
 		{
 			PrimeBase = new PrimeBase();
-			int base10 = N.ToString().Count();
 
 			PrimeBase.RationalFactorBase = bound;
-
-			_primes = PrimeFactory.GetPrimes(PrimeBase.RationalFactorBase);
-
 			PrimeBase.RationalPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.RationalFactorBase).ToList();
 
-			//int algebraicQuantity = RationalPrimeBase.Count() * 3;
-
-			PrimeBase.AlgebraicFactorBase = PrimeBase.RationalFactorBase * 3;// * 2;//PrimeFactory.GetValueFromIndex(algebraicQuantity); //(int)(PrimeBound * 1.1);
-			PrimeBase.QuadraticFactorBaseMin = PrimeBase.AlgebraicFactorBase + 2;
-			//QuadraticFactorBaseMax = QuadraticFactorBaseMin + base10;
-
+			PrimeBase.AlgebraicFactorBase = (PrimeBase.RationalFactorBase) * 3;
 			PrimeBase.AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.AlgebraicFactorBase).ToList();
 
-			int quadraticBaseSize = CalculateQuadraticBaseSize(degree);
+			int quadraticBaseSize = 0;
 
-			PrimeBase.QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(PrimeBase.QuadraticFactorBaseMin).Take(quadraticBaseSize).ToList();
+			if (degree <= 3)
+			{
+				int tempQ = (PrimeBase.RationalPrimeBase.Count + PrimeBase.AlgebraicPrimeBase.Count + 1);
+				tempQ = tempQ / 10;
+
+				quadraticBaseSize = Math.Min(tempQ, 100);
+			}
+			else
+			{
+				quadraticBaseSize = CalculateQuadraticBaseSize(degree);
+			}
+
+			PrimeBase.QuadraticFactorBaseMin = BigInteger.Multiply(bound, 3) + BigInteger.Divide(bound, 2);
+			PrimeBase.QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(PrimeBase.QuadraticFactorBaseMin).Take((quadraticBaseSize*2)+1).ToList();
 
 			PrimeBase.QuadraticFactorBaseMax = PrimeBase.QuadraticPrimeBase.Last();
 
@@ -291,11 +293,7 @@ namespace GNFSCore
 		{
 			int result = -1;
 
-			if (polyDegree < 3)
-			{
-				result = 10;
-			}
-			else if (polyDegree == 3 || polyDegree == 4)
+			if (polyDegree == 4)
 			{
 				result = 20;
 			}
@@ -421,16 +419,17 @@ namespace GNFSCore
 			result.AppendLine("Prime Factor Base Bounds:");
 			result.AppendLine($"RationalFactorBase : {PrimeBase.RationalFactorBase}");
 			result.AppendLine($"AlgebraicFactorBase: {PrimeBase.AlgebraicFactorBase}");
-			result.AppendLine($"QuadraticPrimeBase : {PrimeBase.QuadraticPrimeBase.Last()}");
+			result.AppendLine($"QuadraticPrimeBase Range: {PrimeBase.QuadraticFactorBaseMin} - {PrimeBase.QuadraticFactorBaseMax}");
+			result.AppendLine($"QuadraticPrimeBase Count: {PrimeBase.QuadraticPrimeBase.Count}");
 			result.AppendLine();
-			result.AppendLine($"Rational Factor Base (RFB):");
-			result.AppendLine(RFB.ToString(20));
+			result.AppendLine($"RFB - Rational Factor Base (Count: {RFB.Count}):");
+			result.AppendLine(RFB.ToString(200));
 			result.AppendLine();
-			result.AppendLine($"Algebraic Factor Base (AFB):");
-			result.AppendLine(AFB.ToString(20));
+			result.AppendLine($"AFB - Algebraic Factor Base (Count: {AFB.Count}):");
+			result.AppendLine(AFB.ToString(200));
 			result.AppendLine();
-			result.AppendLine($"Quadratic Factor Base (QFB):");
-			result.AppendLine(QFB.ToString(20));
+			result.AppendLine($"QFB - Quadratic Factor Base (Count: {QFB.Count}):");
+			result.AppendLine(QFB.ToString());
 			result.AppendLine();
 
 			return result.ToString();
@@ -441,8 +440,8 @@ namespace GNFSCore
 			writer.WriteElementString("N", N.ToString());
 			writer.WriteElementString("M", m.ToString());
 			writer.WriteElementString("Degree", this.degree.ToString());
-			writer.WriteElementString("RationalFactorBase",		PrimeBase.RationalFactorBase.ToString());
-			writer.WriteElementString("AlgebraicFactorBase",	PrimeBase.AlgebraicFactorBase.ToString());
+			writer.WriteElementString("RationalFactorBase", PrimeBase.RationalFactorBase.ToString());
+			writer.WriteElementString("AlgebraicFactorBase", PrimeBase.AlgebraicFactorBase.ToString());
 			writer.WriteElementString("QuadraticFactorBaseMin", PrimeBase.QuadraticFactorBaseMin.ToString());
 			writer.WriteElementString("QuadraticFactorBaseMax", PrimeBase.QuadraticFactorBaseMax.ToString());
 		}
@@ -455,7 +454,6 @@ namespace GNFSCore
 			string nString = reader.ReadElementString("N");
 			string mString = reader.ReadElementString("M");
 			string degreeString = reader.ReadElementString("Degree");
-			string primeBoundString = reader.ReadElementString("PrimeBound");
 			string rationalFactorBaseString = reader.ReadElementString("RationalFactorBase");
 			string algebraicFactorBaseString = reader.ReadElementString("AlgebraicFactorBase");
 			string quadraticFactorBaseMinString = reader.ReadElementString("QuadraticFactorBaseMin");

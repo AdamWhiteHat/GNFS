@@ -78,7 +78,7 @@
 			this.tbOutput.Multiline = true;
 			this.tbOutput.Name = "tbOutput";
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.tbOutput.Size = new System.Drawing.Size(703, 204);
+			this.tbOutput.Size = new System.Drawing.Size(575, 167);
 			this.tbOutput.TabIndex = 0;
 			this.tbOutput.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbOutput_KeyUp);
 			// 
@@ -88,7 +88,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbN.Location = new System.Drawing.Point(20, 4);
 			this.tbN.Name = "tbN";
-			this.tbN.Size = new System.Drawing.Size(687, 20);
+			this.tbN.Size = new System.Drawing.Size(559, 20);
 			this.tbN.TabIndex = 1;
 			// 
 			// tbBase
@@ -97,7 +97,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbBase.Location = new System.Drawing.Point(117, 52);
 			this.tbBase.Name = "tbBase";
-			this.tbBase.Size = new System.Drawing.Size(230, 20);
+			this.tbBase.Size = new System.Drawing.Size(115, 20);
 			this.tbBase.TabIndex = 2;
 			// 
 			// tbBound
@@ -106,7 +106,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbBound.Location = new System.Drawing.Point(117, 26);
 			this.tbBound.Name = "tbBound";
-			this.tbBound.Size = new System.Drawing.Size(180, 20);
+			this.tbBound.Size = new System.Drawing.Size(115, 20);
 			this.tbBound.TabIndex = 3;
 			this.tbBound.Text = "61";
 			// 
@@ -166,7 +166,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbDegree.Location = new System.Drawing.Point(117, 72);
 			this.tbDegree.Name = "tbDegree";
-			this.tbDegree.Size = new System.Drawing.Size(61, 20);
+			this.tbDegree.Size = new System.Drawing.Size(115, 20);
 			this.tbDegree.TabIndex = 8;
 			// 
 			// btnFindRelations
@@ -211,11 +211,12 @@
 			// 
 			// panelButtons
 			// 
+			this.panelButtons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.panelButtons.Controls.Add(this.btnSerialize);
 			this.panelButtons.Controls.Add(this.btnResume);
 			this.panelButtons.Controls.Add(this.panelFunctions);
 			this.panelButtons.Controls.Add(this.btnCreateGnfs);
-			this.panelButtons.Location = new System.Drawing.Point(396, 44);
+			this.panelButtons.Location = new System.Drawing.Point(268, 44);
 			this.panelButtons.Name = "panelButtons";
 			this.panelButtons.Size = new System.Drawing.Size(308, 228);
 			this.panelButtons.TabIndex = 14;
@@ -346,8 +347,9 @@
 			// 
 			// panelCancel
 			// 
+			this.panelCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.panelCancel.Controls.Add(this.btnCancel);
-			this.panelCancel.Location = new System.Drawing.Point(366, 122);
+			this.panelCancel.Location = new System.Drawing.Point(238, 122);
 			this.panelCancel.Name = "panelCancel";
 			this.panelCancel.Size = new System.Drawing.Size(304, 56);
 			this.panelCancel.TabIndex = 15;
@@ -379,7 +381,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbRelationQuantity.Location = new System.Drawing.Point(117, 98);
 			this.tbRelationQuantity.Name = "tbRelationQuantity";
-			this.tbRelationQuantity.Size = new System.Drawing.Size(180, 20);
+			this.tbRelationQuantity.Size = new System.Drawing.Size(115, 20);
 			this.tbRelationQuantity.TabIndex = 16;
 			this.tbRelationQuantity.Text = "70";
 			// 
@@ -399,7 +401,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbRelationValueRange.Location = new System.Drawing.Point(117, 118);
 			this.tbRelationValueRange.Name = "tbRelationValueRange";
-			this.tbRelationValueRange.Size = new System.Drawing.Size(180, 20);
+			this.tbRelationValueRange.Size = new System.Drawing.Size(115, 20);
 			this.tbRelationValueRange.TabIndex = 18;
 			this.tbRelationValueRange.Text = "200";
 			// 
@@ -407,7 +409,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(710, 482);
+			this.ClientSize = new System.Drawing.Size(582, 445);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.tbRelationValueRange);
 			this.Controls.Add(this.label5);
