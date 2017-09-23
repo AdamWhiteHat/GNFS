@@ -12,7 +12,8 @@ namespace GNFSCore.FactorBase
 	{
 		//public static BigRational AlgebraicRational(int a, int b, IPolynomial polynomial)
 		//{
-		//	// f( a/-b ) * -b^deg
+		//	ƒ(−a/b) ∙ −bᵈ 
+		// (−b)ᵈ ∙ ƒ(−a/b)
 		//
 		//	Fraction ratA = new Fraction(a);
 		//	Fraction negB = new Fraction(-b);
@@ -27,7 +28,7 @@ namespace GNFSCore.FactorBase
 
 		public static BigInteger Algebraic(int a, int b, IPolynomial poly)
 		{
-			// f( a/-b ) * -b^deg
+			// ƒ(-a/b) * -b^deg
 
 			int bneg = -b;
 			double ab = (double)a / (double)bneg;

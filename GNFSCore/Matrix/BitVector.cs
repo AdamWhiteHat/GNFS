@@ -19,10 +19,10 @@ namespace GNFSCore.Matrix
 		public bool this[int index] => Elements[index];
 
 		public BitVector(BigInteger number, BigInteger maxValue)
-			: this(number, maxValue, FactorizationFactory.GetPrimeFactorizationTuple(number, maxValue))
+			: this(number, maxValue, FactorizationFactory.GetPrimeFactorization(number, maxValue))
 		{ }
 
-		public BitVector(BigInteger number, BigInteger maxValue, IEnumerable<Tuple<BigInteger, BigInteger>> primeFactorization)
+		public BitVector(BigInteger number, BigInteger maxValue, PrimeFactorization primeFactorization)
 		{
 			Number = number;
 
@@ -35,14 +35,14 @@ namespace GNFSCore.Matrix
 			//primeFactorization = primeFactorization.Where(factor => factor.Item1 <= maxValue);
 
 			bool[] result = new bool[PrimeFactory.GetIndexFromValue(maxValue) + 1];
-			foreach (Tuple<BigInteger, BigInteger> factor in primeFactorization.Where(f => (f.Item2 % 2) == 1))
+			foreach (Factor factor in primeFactorization.Where(f => f.ExponentMod2 == 1))
 			{
-				if (factor.Item1 > maxValue)
+				if (factor.Prime > maxValue)
 				{
 					Elements = new bool[] { };
 					return;
 				}
-				int index = PrimeFactory.GetIndexFromValue(factor.Item1);
+				int index = PrimeFactory.GetIndexFromValue(factor.Prime);
 				result[index] = true;
 			}
 

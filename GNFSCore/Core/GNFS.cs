@@ -414,7 +414,7 @@ namespace GNFSCore
 			result.AppendLine($"N = {N}");
 			result.AppendLine();
 			result.AppendLine($"Polynomial(degree: {degree}, base: {CurrentPolynomial.Base}):");
-			result.AppendLine(CurrentPolynomial.ToString());
+			result.AppendLine("ƒ(m) = " + CurrentPolynomial.ToString());
 			result.AppendLine();
 			result.AppendLine("Prime Factor Base Bounds:");
 			result.AppendLine($"RationalFactorBase : {PrimeBase.RationalFactorBase}");

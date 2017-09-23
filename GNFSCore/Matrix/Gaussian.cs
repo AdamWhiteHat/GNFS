@@ -1,6 +1,9 @@
-﻿using System;
+﻿using GNFSCore.FactorBase;
+using GNFSCore.IntegerMath;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,39 +15,146 @@ namespace GNFSCore.Matrix
 		public bool[] FreeVariables { get { return freeCols; } }
 
 		public int RowCount { get { return M.Count; } }
-		public int ColumnCount { get { return M.First().Length; } }
+		public int ColumnCount { get { return M.Any() ? M.First().Length : 0; } }
 
 		private List<bool[]> M;
 		private bool[] freeCols;
 		private bool eliminationStep;
 
+		private GNFS _gnfs;
 		private Relation[] relations;
 		public Dictionary<int, Relation> ColumnIndexRelationDictionary;
+		private List<Tuple<Relation, bool[]>> relationMatrixTuple;
 
-		public Gaussian(List<Relation> rels)
+
+		public Gaussian(GNFS gnfs, List<Relation> rels)
 		{
+			_gnfs = gnfs;
+			relationMatrixTuple = new List<Tuple<Relation, bool[]>>();
 			eliminationStep = false;
 			freeCols = new bool[0];
 			M = new List<bool[]>();
 
+
+			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeBase.RationalFactorBase) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeBase.AlgebraicFactorBase) + _gnfs.QFB.Count() + 3;
+
+
 			relations = rels.ToArray();
 
-			List<Tuple<Relation, bool[]>> relationMatrixTuple = new List<Tuple<Relation, bool[]>>();
+			//foreach (Relation rel in relations)
+			//{
+			//	rel.MatrixInitialize();
+			//}
+
+			//relations = relations.Where(rel => rel.AlgebraicWeight != 0 && rel.RationalWeight != 0);
+			//relations = relations.OrderByDescending(rel => rel.AlgebraicWeight).ThenByDescending(rel => rel.RationalWeight);
+
+
+			List<PrimeFactorization> rationalNormFactorizations = new List<PrimeFactorization>();
 			foreach (Relation rel in relations)
 			{
-				relationMatrixTuple.Add(new Tuple<Relation, bool[]>(rel, rel.GetMatrixRow()));
+				rationalNormFactorizations.Add(new PrimeFactorization(rel.RationalNorm, _gnfs.PrimeBase.RationalFactorBase, true));
+			}
+			
+			List<PrimeFactorization> algebraicNormFactorizations = new List<PrimeFactorization>();
+			foreach (Relation rel in relations)
+			{
+				algebraicNormFactorizations.Add(new PrimeFactorization(rel.AlgebraicNorm, _gnfs.PrimeBase.AlgebraicFactorBase, true));
+			}
+			
+			BigInteger rationalMaxPrimeFactor = rationalNormFactorizations.Max(lst => lst.Any() ? lst.Max(factor => factor.Prime) : 0);
+			BigInteger algebraicMaxPrimeFactor = algebraicNormFactorizations.Max(lst => lst.Any() ? lst.Max(factor => factor.Prime) : 0);
+			
+			
+			int maxIndex = relations.Length - 1;
+			
+			int index = 0;
+			while (index < maxIndex)
+			{
+				rationalNormFactorizations[index].RestrictFactors(rationalMaxPrimeFactor);
+				algebraicNormFactorizations[index].RestrictFactors(algebraicMaxPrimeFactor);
+			
+				index++;
 			}
 
-			TransposeAppend(relationMatrixTuple);
+			index = 0;
+			while (index < maxIndex)
+			{
+				Relation rel = relations[index];
+				var binaryRow = GetMatrixRow(rel, rationalNormFactorizations[index], algebraicNormFactorizations[index], rationalMaxPrimeFactor, algebraicMaxPrimeFactor);
+			
+				relationMatrixTuple.Add(new Tuple<Relation, bool[]>(rel, binaryRow));
+			
+				index++;
+			}
+
+
+			//foreach (Relation rel in relations/*.Take(maxRelationsToSelect)*/)
+			//{
+			//	relationMatrixTuple.Add(new Tuple<Relation, bool[]>(rel, rel.GetMatrixRow()));
+			//}
+
+
+
 		}
 
-		private void DontTransposeAppend(List<Tuple<Relation, bool[]>> relationMatrixTuple)
+
+
+
+
+		private bool[] GetMatrixRow(Relation rel, PrimeFactorization rationalFactorization, PrimeFactorization algebraicFactorization, BigInteger rationalMaxValue, BigInteger algebraicMaxValue)
+		{
+			bool sign = false;
+			if (rel.RationalNorm.Sign == -1)
+			{
+				sign = true;
+			}
+
+			bool[] rational = GetVector(rationalFactorization, rationalMaxValue);
+			bool[] algebraic = GetVector(algebraicFactorization, algebraicMaxValue);
+			bool[] quadratic = _gnfs.QFB.Select(qf => QuadraticResidue.GetQuadraticCharacter(rel, qf)).ToArray();
+
+			List<bool> result = new List<bool>() { sign };
+			result.AddRange(rational);
+			result.AddRange(algebraic);
+			result.AddRange(quadratic);
+			return result.ToArray();
+		}
+
+		private bool[] GetVector(PrimeFactorization primeFactorization, BigInteger maxValue)
+		{
+			int primeIndex = PrimeFactory.GetIndexFromValue(maxValue);
+
+			bool[] result = new bool[primeIndex + 1];
+			if (primeFactorization.Any())
+			{
+				foreach (Factor oddFactor in primeFactorization.Where(f => f.ExponentMod2 == 1))
+				{
+					if (oddFactor.Prime > maxValue)
+					{
+						throw new Exception();
+					}
+					int index = PrimeFactory.GetIndexFromValue(oddFactor.Prime);
+					result[index] = true;
+				}
+			}
+
+			return result.Take(primeIndex).ToArray();
+		}
+
+
+
+
+
+
+
+		public void DontTransposeAppend()
 		{
 			List<bool[]> result = new List<bool[]>();
 			ColumnIndexRelationDictionary = new Dictionary<int, Relation>();
 
 			int index = 0;
-			int numRows = relationMatrixTuple[0].Item2.Length;
+			int numRows = relationMatrixTuple.Count; //[0].Item2.Length;
 
 			while (index < numRows)
 			{
@@ -58,7 +168,12 @@ namespace GNFSCore.Matrix
 			freeCols = new bool[M.Count];
 		}
 
-		private void TransposeAppend(List<Tuple<Relation, bool[]>> relationMatrixTuple)
+
+
+
+
+
+		public void TransposeAppend()
 		{
 			List<bool[]> result = new List<bool[]>();
 			ColumnIndexRelationDictionary = new Dictionary<int, Relation>();
@@ -199,7 +314,7 @@ namespace GNFSCore.Matrix
 			return result.ToArray();
 		}
 
-		private bool[] GetSolutionFlags(int numSolutions)
+		public bool[] GetSolutionFlags(int numSolutions)
 		{
 			if (!eliminationStep)
 			{
@@ -258,10 +373,10 @@ namespace GNFSCore.Matrix
 			return result;
 		}
 
-		public override string ToString()
-		{
-			return MatrixToString(M);
-		}
+
+
+
+
 
 
 
@@ -281,6 +396,12 @@ namespace GNFSCore.Matrix
 
 			return result;
 		}
+		
+
+
+
+
+
 
 		public static string VectorToString(bool[] vector)
 		{
@@ -292,5 +413,9 @@ namespace GNFSCore.Matrix
 			return string.Join(Environment.NewLine, matrix.Select(i => VectorToString(i)));
 		}
 
+		public override string ToString()
+		{
+			return MatrixToString(M);
+		}
 	}
 }

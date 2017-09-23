@@ -18,6 +18,55 @@ namespace GNFS_Winforms
 
 	public partial class GnfsUiBridge
 	{
+		public GNFS FindDependenciesWithDictionary(GNFS gnfs, CancellationToken cancelToken)
+		{
+			if (cancelToken.IsCancellationRequested)
+			{
+				return gnfs;
+			}
+
+			//Func<Relation, PrimeFactorization> algebraicFunc = (rel) => rel.GetAlgebraicPrimeFactorization();
+			//Func<Relation, PrimeFactorization> rationalFunc = (rel) => rel.GetRationalPrimeFactorization();
+
+			//Dictionary<BigInteger, List<Relation>> AlgebraicRelationFactorizationDict = BuildFactorizationDict(gnfs.CurrentRelationsProgress.SmoothRelations, algebraicFunc);
+			//Dictionary<BigInteger, List<Relation>> RationalRelationFactorizationDict = BuildFactorizationDict(gnfs.CurrentRelationsProgress.SmoothRelations, rationalFunc);
+
+			return gnfs;
+		}
+
+
+		private Dictionary<BigInteger, List<Relation>> BuildFactorizationDict(List<Relation> relations, Func<Relation, PrimeFactorization> getFactorizationFunc)
+		{
+			Dictionary<BigInteger, List<Relation>> resultDict = new Dictionary<BigInteger, List<Relation>>();
+
+			RelationFactorizationDictionary resultictionary = new RelationFactorizationDictionary();
+
+			foreach (Relation rel in relations)
+			{
+				PrimeFactorization factorizationTuple = getFactorizationFunc.Invoke(rel);
+
+				List<BigInteger> oddFactors = factorizationTuple.Where(factor => factor.ExponentMod2 == 1).Select(factor => factor.Exponent).ToList();
+
+
+
+
+				foreach (Factor tup in factorizationTuple)
+				{
+
+
+					int i = 0;
+
+				}
+			}
+
+			return resultDict;
+		}
+
+
+
+
+
+
 		public GNFS GODDAMNMATRIXBULLSHITFFFUUUUUUUUU(CancellationToken cancelToken, GNFS gnfs)
 		{
 			BitMatrix matrix = gnfs.CurrentRelationsProgress.GetRelationsMatrix();
@@ -42,7 +91,19 @@ namespace GNFS_Winforms
 		{
 			List<Relation> orderedSmoothRelations = gnfs.CurrentRelationsProgress.SmoothRelations.ToList();
 
-			Gaussian gaussianReduction = new Gaussian(orderedSmoothRelations);
+			Gaussian gaussianReduction = new Gaussian(gnfs, orderedSmoothRelations);
+			gaussianReduction.DontTransposeAppend();
+
+			string matrixBeforeTranspose = gaussianReduction.ToString();
+
+			mainForm.LogOutput("Matrix BEFORE transpose:");
+			mainForm.LogOutput($"  rows: {gaussianReduction.RowCount}");
+			mainForm.LogOutput($"  cols: {gaussianReduction.ColumnCount}");
+			mainForm.LogOutput(matrixBeforeTranspose);
+			mainForm.LogOutput();
+
+
+			gaussianReduction.TransposeAppend();
 
 			string matrixAfterTranspose = gaussianReduction.ToString();
 
@@ -64,20 +125,137 @@ namespace GNFS_Winforms
 			mainForm.LogOutput(freeVariables);
 			mainForm.LogOutput();
 
-			int freeVarCount = gaussianReduction.FreeVariables.Count(b => b == true);
 
-			Relation[] solution1 = gaussianReduction.GetSolutionSet2();//gaussianReduction.GetSolutionSet(1);
 
-			string solutionSet1 = string.Join(Environment.NewLine, solution1.Select(rel => rel.ToString()));
+			int index = 0;
+			List<Relation> result = new List<Relation>();
+			foreach (bool solution in gaussianReduction.GetSolutionFlags(1))
+			{
+				if (solution)
+				{
+					result.Add(orderedSmoothRelations[index]);
+				}
+
+				index++;
+			}
 
 			mainForm.LogOutput();
-			mainForm.LogOutput("Solution set #1:");
-			mainForm.LogOutput(solutionSet1);
+			mainForm.LogOutput("Square relations (Solution):");
+			mainForm.LogOutput(result.FormatString());
 			mainForm.LogOutput();
-			mainForm.LogOutput("All relations:");
-			mainForm.LogOutput(string.Join(Environment.NewLine, gnfs.CurrentRelationsProgress.SmoothRelations.OrderBy(rel => rel.A).Select(rel => rel.ToString())));
+
+
+			//string solutionSet1 = gaussianReduction.GetSolutionFlags(1).FormatString();
+			//
+			//char tab = '\t';
+			//mainForm.LogOutput();
+			//mainForm.LogOutput("Solution set #1:");
+			//mainForm.LogOutput(solutionSet1);
+			//mainForm.LogOutput();
+			//mainForm.LogOutput("All relations:");
+			//mainForm.LogOutput(orderedSmoothRelations.Select(rel => $"({rel.A},{tab}{rel.B}){tab}[{rel.RationalNorm}:{rel.AlgebraicNorm}]{tab}{tab}{{{Gaussian.VectorToString(rel.GetMatrixRow())}}}").FormatString());
+			//mainForm.LogOutput(string.Join(Environment.NewLine, gnfs.CurrentRelationsProgress.SmoothRelations.OrderBy(rel => rel.A).Select(rel => rel.ToString())));
+
+
 
 			return gnfs;
+		}
+
+		public GNFS MatrixSolve6(CancellationToken cancelToken, GNFS gnfs)
+		{
+			List<BigInteger> algebraicNorms = gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.AlgebraicNorm).OrderBy(n => n).ToList();
+			List<BigInteger> rationalNorms = gnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.RationalNorm).OrderBy(n => n).ToList();
+
+			int algPadLength = algebraicNorms.Max().ToString().Length + 1;
+			int ratPadLength = rationalNorms.Max().ToString().Length + 1;
+
+			var algebraicFactorizations = algebraicNorms.Select(norm => new Tuple<BigInteger, PrimeFactorization>(norm, FactorizationFactory.GetPrimeFactorizationGridRow(norm, gnfs.PrimeBase.AlgebraicFactorBase)));
+			var rationalFactorizations = rationalNorms.Select(norm => new Tuple<BigInteger, PrimeFactorization>(norm, FactorizationFactory.GetPrimeFactorizationGridRow(norm, gnfs.PrimeBase.RationalFactorBase)));
+
+			algebraicFactorizations = algebraicFactorizations.OrderByDescending(OrderByExponentsDescending);
+			rationalFactorizations = GroupByExponentCount(rationalFactorizations);
+
+			var algFactorsString = algebraicFactorizations.Select(tup2 => new Tuple<BigInteger, string>(tup2.Item1, tup2.Item2.ToString()));
+			var ratFactorsString = rationalFactorizations.Select(tup2 => new Tuple<BigInteger, string>(tup2.Item1, tup2.Item2.ToString()));
+
+			var algFinalString = string.Join(Environment.NewLine, algFactorsString.Select(tup => string.Concat(tup.Item1.ToString().PadRight(algPadLength), " : ", tup.Item2)));
+			var ratFinalString = string.Join(Environment.NewLine, ratFactorsString.Select(tup => string.Concat(tup.Item1.ToString().PadRight(ratPadLength), " : ", tup.Item2)));
+
+
+			mainForm.LogOutput("Algebraic relation norm factorizations:");
+			mainForm.LogOutput(algFinalString);
+			mainForm.LogOutput();
+
+			mainForm.LogOutput("Rational relation norm factorizations:");
+			mainForm.LogOutput(ratFinalString);
+			mainForm.LogOutput();
+
+			return gnfs;
+		}
+
+
+		public BigInteger OrderByExponentsDescending(Tuple<BigInteger, PrimeFactorization> input)
+		{
+			return OrderByExponentsInternal(input, true);
+		}
+
+		public BigInteger OrderByExponents(Tuple<BigInteger, PrimeFactorization> input)
+		{
+			return OrderByExponentsInternal(input, false);
+		}
+
+		private BigInteger OrderByExponentsInternal(Tuple<BigInteger, PrimeFactorization> input, bool descending)
+		{
+			BigInteger exponentCount = input.Item2.Select(factor => factor.Exponent).Sum();
+
+			var primeFactorExponents = input.Item2.Select(factor => (int)factor.Exponent).ToList();
+			if (descending)
+			{
+				primeFactorExponents.Reverse();
+			}
+
+			BigInteger weight = 0;
+
+			int powerOfTwoExponent = 1;
+			foreach (int factor in primeFactorExponents)
+			{
+				if (factor > 0)
+				{
+					weight += BigInteger.Pow(2, powerOfTwoExponent);
+				}
+
+				powerOfTwoExponent++;
+			}
+
+			return weight;
+		}
+
+		public List<Tuple<BigInteger, PrimeFactorization>> GroupByExponentCount(IEnumerable<Tuple<BigInteger, PrimeFactorization>> input)
+		{
+			IEnumerable<IGrouping<BigInteger, Tuple<BigInteger, PrimeFactorization>>> grouped
+				= input.GroupBy(tup2 => tup2.Item2.Select(factor => factor.Exponent).Sum()).OrderBy(grp => grp.Key).ToList();
+
+			List<Tuple<BigInteger, PrimeFactorization>> result = grouped.SelectMany(grp => grp.OrderBy(OrderByExponents).ToList()).ToList();
+			return result;
+		}
+
+		private List<Tuple<BigInteger, PrimeFactorization>> SortByExponents(IEnumerable<Tuple<BigInteger, PrimeFactorization>> input)
+		{
+			int index = 1;
+			int maxIndex = input.First().Item2.Count - 1;
+
+			var sortedInput = input/*.OrderByDescending(tup2 => tup2.Item2.Select(tup1 => tup1.Item2).Sum())*/.ToList();
+
+			IOrderedEnumerable<Tuple<BigInteger, PrimeFactorization>> result = sortedInput.OrderByDescending(tup2 => tup2.Item2[0].Exponent);
+
+			while (index < maxIndex)
+			{
+				result = result.ThenByDescending(factor => factor.Item2[index].Exponent);
+
+				index++;
+			}
+
+			return result.ToList();
 		}
 
 		public GNFS MatrixSolve5(CancellationToken cancelToken, GNFS gnfs)

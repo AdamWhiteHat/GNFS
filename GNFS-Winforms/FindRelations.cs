@@ -30,14 +30,8 @@ namespace GNFS_Winforms
 				}
 				if (smoothRelations.Any())
 				{
-					mainForm.LogOutput($"Smooth relations:");
-					mainForm.LogOutput("\t_______________________________________________");
-					mainForm.LogOutput($"\t|   A   |  B | ALGEBRAIC_NORM | RATIONAL_NORM | \t\tQuantity: {smoothRelations.Count()} Target quantity: {(gnfs.RFB.Count() + gnfs.AFB.Count() + gnfs.QFB.Count() + 1).ToString()}"/* Search range: -{relationsRange} to {relationsRange}"*/);
-					mainForm.LogOutput("\t```````````````````````````````````````````````");
-					mainForm.LogOutput(smoothRelations.OrderByDescending(rel => rel.A * rel.B).Take(5).FormatString());
+					mainForm.LogOutput(gnfs.CurrentRelationsProgress.FormatRelations(smoothRelations.OrderByDescending(rel => rel.A * rel.B).Take(5)));
 					mainForm.LogOutput("(restricted result set to top 5)");
-					mainForm.LogOutput();
-					mainForm.LogOutput();
 					mainForm.LogOutput();
 				}
 

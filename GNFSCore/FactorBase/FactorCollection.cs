@@ -42,14 +42,14 @@ namespace GNFSCore.FactorBase
 				return new FactorCollection(gnfs, result.ToList());
 			}
 
-			// array of (p, r) where f(r) % p == 0
+			// array of (p, r) where ƒ(r) % p == 0
 			// quantity = 2-3 times RFB.quantity
 			public static FactorCollection BuildAlgebraicFactorBase(GNFS gnfs)
 			{
 				return new FactorCollection(gnfs, FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeBase.AlgebraicPrimeBase, 0, gnfs.PrimeBase.AlgebraicFactorBase, 2000));
 			}
 
-			// array of (p, r) where f(r) % p == 0
+			// array of (p, r) where ƒ(r) % p == 0
 			// quantity =< 100
 			// magnitude p > AFB.Last().p
 			public static FactorCollection BuildQuadradicFactorBase(GNFS gnfs)

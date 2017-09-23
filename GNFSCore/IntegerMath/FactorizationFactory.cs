@@ -17,23 +17,49 @@ namespace GNFSCore.IntegerMath
 			primes = new BigInteger[] { 2, 3, 5, 7, 11 };
 		}
 
-		public static IEnumerable<Tuple<BigInteger, BigInteger>> GetPrimeFactorizationTuple(BigInteger value, BigInteger maxValue)
+		public static PrimeFactorization GetPrimeFactorizationGridRow(BigInteger value, BigInteger maxValue)
+		{
+			PrimeFactorization factorizationTuple = GetPrimeFactorization(value, maxValue);
+
+			PrimeFactorization results = new PrimeFactorization();
+
+			IEnumerable<BigInteger> primeCollection = PrimeFactory.GetPrimesTo(maxValue);
+
+			foreach (BigInteger prime in primeCollection)
+			{
+				var primeFactor = factorizationTuple.Where(factor => factor.Prime == prime);
+
+				if (primeFactor.Any())
+				{
+					var tup = primeFactor.First();
+					results.Add(new Factor(prime, tup.Exponent % 2));
+				}
+				else
+				{
+					results.Add(new Factor(prime, 0));
+				}
+			}
+
+			return results;
+		}
+
+		public static PrimeFactorization GetPrimeFactorization(BigInteger value, BigInteger maxValue)
 		{
 			if (value == 0)
 			{
-				return new Tuple<BigInteger, BigInteger>[] { new Tuple<BigInteger, BigInteger>(0, 0) };
+				throw new ArgumentException();
 			}
 
-			List<Tuple<BigInteger, BigInteger>> result = new List<Tuple<BigInteger, BigInteger>>();
+			PrimeFactorization result = new PrimeFactorization();
 			BigInteger toFactor = value;
 
 			BigInteger lastPrime = int.MinValue;
 			BigInteger primeCounter = 1;
-			IEnumerable<BigInteger> factorization = GetPrimeFactorization(toFactor, maxValue);
+			IEnumerable<BigInteger> factorization = GetPrimeFactorCollection(toFactor, maxValue);
 
 			if (!factorization.Any())
 			{
-				return new Tuple<BigInteger, BigInteger>[] { };
+				return new PrimeFactorization();
 			}
 
 			foreach (BigInteger prime in factorization)
@@ -44,24 +70,24 @@ namespace GNFSCore.IntegerMath
 				}
 				else if (lastPrime != int.MinValue)
 				{
-					result.Add(new Tuple<BigInteger, BigInteger>(lastPrime, primeCounter));
+					result.Add(new Factor(lastPrime, primeCounter));
 					primeCounter = 1;
 				}
 
 				lastPrime = prime;
 			}
 
-			result.Add(new Tuple<BigInteger, BigInteger>(lastPrime, primeCounter));
+			result.Add(new Factor(lastPrime, primeCounter));
 
 			if (factorization.Distinct().Count() != result.Count)
 			{
-				throw new Exception($"There is a bug in {nameof(FactorizationFactory.GetPrimeFactorizationTuple)}!");
+				throw new Exception($"There is a bug in {nameof(FactorizationFactory.GetPrimeFactorization)}!");
 			}
 
 			return result;
 		}
 
-		public static IEnumerable<BigInteger> GetPrimeFactorization(BigInteger value, BigInteger maxValue)
+		public static IEnumerable<BigInteger> GetPrimeFactorCollection(BigInteger value, BigInteger maxValue)
 		{
 			if (value == 0)
 			{
@@ -77,9 +103,9 @@ namespace GNFSCore.IntegerMath
 				toFactor = BigInteger.Abs(toFactor);
 			}
 
-			if (toFactor < 10)
+			if (toFactor < 2)
 			{
-				if (toFactor == 1 || toFactor == 2 || toFactor == 3 || toFactor == 5 || toFactor == 7)
+				if (toFactor == 1)
 				{
 					return new BigInteger[] { toFactor };
 				}
@@ -87,7 +113,7 @@ namespace GNFSCore.IntegerMath
 
 			if (primes.Last() < maxValue)
 			{
-				primes = PrimeFactory.GetPrimes(maxValue + 1);
+				primes = PrimeFactory.GetPrimes(maxValue);
 			}
 
 			if (PrimeFactory.IsPrime(toFactor))
@@ -96,7 +122,7 @@ namespace GNFSCore.IntegerMath
 				return factors;
 			}
 
-			foreach (BigInteger prime in primes)
+			foreach (BigInteger prime in primes.Where(p => p <= maxValue))
 			{
 				while (toFactor % prime == 0)
 				{
@@ -127,7 +153,7 @@ namespace GNFSCore.IntegerMath
 
 		public static BigInteger[] GetFactorizationExponents(BigInteger value, BigInteger maxValue)
 		{
-			return GetPrimeFactorizationTuple(value, maxValue).Select(tup => tup.Item2).ToArray();
+			return GetPrimeFactorization(value, maxValue).Select(factor => factor.Exponent).ToArray();
 		}
 
 		public static bool IsSmoothOverFactorBase(BigInteger n, IEnumerable<BigInteger> factorBase)
@@ -214,9 +240,9 @@ namespace GNFSCore.IntegerMath
 
 		public static class FormatString
 		{
-			public static string PrimeFactorization(IEnumerable<Tuple<BigInteger, BigInteger>> factorization)
+			public static string PrimeFactorizationTuple(PrimeFactorization factorization)
 			{
-				return $"{string.Join(" * ", factorization.Select(tup => $"{tup.Item1}^{tup.Item2}"))}";
+				return $"{string.Join(" * ", factorization.Select(factor => $"{factor.Prime}^{factor.Exponent}"))}";
 			}
 		}
 	}

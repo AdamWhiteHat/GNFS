@@ -60,6 +60,7 @@
 			this.tbRelationQuantity = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.tbRelationValueRange = new System.Windows.Forms.TextBox();
+			this.btnPrintRelations = new System.Windows.Forms.Button();
 			this.panelButtons.SuspendLayout();
 			this.panelFunctions.SuspendLayout();
 			this.groupBox4.SuspendLayout();
@@ -142,6 +143,8 @@
 			// 
 			// btnCreateGnfs
 			// 
+			this.btnCreateGnfs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnCreateGnfs.Location = new System.Drawing.Point(8, 4);
 			this.btnCreateGnfs.Name = "btnCreateGnfs";
 			this.btnCreateGnfs.Size = new System.Drawing.Size(96, 23);
@@ -171,9 +174,9 @@
 			// 
 			// btnFindRelations
 			// 
-			this.btnFindRelations.Location = new System.Drawing.Point(16, 16);
+			this.btnFindRelations.Location = new System.Drawing.Point(16, 15);
 			this.btnFindRelations.Name = "btnFindRelations";
-			this.btnFindRelations.Size = new System.Drawing.Size(96, 23);
+			this.btnFindRelations.Size = new System.Drawing.Size(83, 23);
 			this.btnFindRelations.TabIndex = 10;
 			this.btnFindRelations.Text = "Find Relations";
 			this.btnFindRelations.UseVisualStyleBackColor = true;
@@ -216,14 +219,16 @@
 			this.panelButtons.Controls.Add(this.btnResume);
 			this.panelButtons.Controls.Add(this.panelFunctions);
 			this.panelButtons.Controls.Add(this.btnCreateGnfs);
-			this.panelButtons.Location = new System.Drawing.Point(268, 44);
+			this.panelButtons.Location = new System.Drawing.Point(238, 44);
 			this.panelButtons.Name = "panelButtons";
-			this.panelButtons.Size = new System.Drawing.Size(308, 228);
+			this.panelButtons.Size = new System.Drawing.Size(338, 228);
 			this.panelButtons.TabIndex = 14;
 			// 
 			// btnSerialize
 			// 
-			this.btnSerialize.Location = new System.Drawing.Point(200, 4);
+			this.btnSerialize.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnSerialize.Location = new System.Drawing.Point(236, 4);
 			this.btnSerialize.Name = "btnSerialize";
 			this.btnSerialize.Size = new System.Drawing.Size(96, 23);
 			this.btnSerialize.TabIndex = 17;
@@ -233,7 +238,8 @@
 			// 
 			// btnResume
 			// 
-			this.btnResume.Location = new System.Drawing.Point(104, 4);
+			this.btnResume.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+			this.btnResume.Location = new System.Drawing.Point(122, 4);
 			this.btnResume.Name = "btnResume";
 			this.btnResume.Size = new System.Drawing.Size(96, 23);
 			this.btnResume.TabIndex = 14;
@@ -243,6 +249,8 @@
 			// 
 			// panelFunctions
 			// 
+			this.panelFunctions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.panelFunctions.Controls.Add(this.groupBox4);
 			this.panelFunctions.Controls.Add(this.groupBox3);
 			this.panelFunctions.Controls.Add(this.groupBox2);
@@ -250,7 +258,7 @@
 			this.panelFunctions.Enabled = false;
 			this.panelFunctions.Location = new System.Drawing.Point(8, 32);
 			this.panelFunctions.Name = "panelFunctions";
-			this.panelFunctions.Size = new System.Drawing.Size(292, 188);
+			this.panelFunctions.Size = new System.Drawing.Size(324, 188);
 			this.panelFunctions.TabIndex = 16;
 			// 
 			// groupBox4
@@ -261,13 +269,14 @@
 			this.groupBox4.Controls.Add(this.btnConstructPoly);
 			this.groupBox4.Location = new System.Drawing.Point(4, 12);
 			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Size = new System.Drawing.Size(284, 40);
+			this.groupBox4.Size = new System.Drawing.Size(316, 40);
 			this.groupBox4.TabIndex = 20;
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "Polynomials";
 			// 
 			// btnPolySplittingField
 			// 
+			this.btnPolySplittingField.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
 			this.btnPolySplittingField.Location = new System.Drawing.Point(148, 16);
 			this.btnPolySplittingField.Name = "btnPolySplittingField";
 			this.btnPolySplittingField.Size = new System.Drawing.Size(88, 23);
@@ -280,21 +289,23 @@
 			// 
 			this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBox3.Controls.Add(this.btnLatticeSieve);
+			this.groupBox3.Controls.Add(this.btnPrintRelations);
 			this.groupBox3.Controls.Add(this.btnPurgeRough);
 			this.groupBox3.Controls.Add(this.btnFindRelations);
+			this.groupBox3.Controls.Add(this.btnLatticeSieve);
 			this.groupBox3.Location = new System.Drawing.Point(4, 56);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(284, 40);
+			this.groupBox3.Size = new System.Drawing.Size(316, 40);
 			this.groupBox3.TabIndex = 20;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Sieve Relations";
 			// 
 			// btnLatticeSieve
 			// 
-			this.btnLatticeSieve.Location = new System.Drawing.Point(112, 16);
+			this.btnLatticeSieve.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+			this.btnLatticeSieve.Location = new System.Drawing.Point(99, 15);
 			this.btnLatticeSieve.Name = "btnLatticeSieve";
-			this.btnLatticeSieve.Size = new System.Drawing.Size(116, 23);
+			this.btnLatticeSieve.Size = new System.Drawing.Size(78, 23);
 			this.btnLatticeSieve.TabIndex = 12;
 			this.btnLatticeSieve.Text = "Lattice sieve";
 			this.btnLatticeSieve.UseVisualStyleBackColor = true;
@@ -302,9 +313,10 @@
 			// 
 			// btnPurgeRough
 			// 
-			this.btnPurgeRough.Location = new System.Drawing.Point(228, 16);
+			this.btnPurgeRough.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnPurgeRough.Location = new System.Drawing.Point(268, 15);
 			this.btnPurgeRough.Name = "btnPurgeRough";
-			this.btnPurgeRough.Size = new System.Drawing.Size(56, 23);
+			this.btnPurgeRough.Size = new System.Drawing.Size(45, 23);
 			this.btnPurgeRough.TabIndex = 11;
 			this.btnPurgeRough.Text = "Purge";
 			this.btnPurgeRough.UseVisualStyleBackColor = true;
@@ -318,13 +330,14 @@
 			this.groupBox2.Controls.Add(this.btnMatrix);
 			this.groupBox2.Location = new System.Drawing.Point(4, 100);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(284, 40);
+			this.groupBox2.Size = new System.Drawing.Size(316, 40);
 			this.groupBox2.TabIndex = 19;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Matrix";
 			// 
 			// btnCollectSquares
 			// 
+			this.btnCollectSquares.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
 			this.btnCollectSquares.Location = new System.Drawing.Point(112, 16);
 			this.btnCollectSquares.Name = "btnCollectSquares";
 			this.btnCollectSquares.Size = new System.Drawing.Size(96, 23);
@@ -340,7 +353,7 @@
 			this.groupBox1.Controls.Add(this.btnFindSquares);
 			this.groupBox1.Location = new System.Drawing.Point(4, 144);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(284, 44);
+			this.groupBox1.Size = new System.Drawing.Size(316, 44);
 			this.groupBox1.TabIndex = 18;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Square Root";
@@ -349,15 +362,16 @@
 			// 
 			this.panelCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.panelCancel.Controls.Add(this.btnCancel);
-			this.panelCancel.Location = new System.Drawing.Point(238, 122);
+			this.panelCancel.Location = new System.Drawing.Point(195, 144);
 			this.panelCancel.Name = "panelCancel";
-			this.panelCancel.Size = new System.Drawing.Size(304, 56);
+			this.panelCancel.Size = new System.Drawing.Size(289, 56);
 			this.panelCancel.TabIndex = 15;
 			this.panelCancel.Visible = false;
 			// 
 			// btnCancel
 			// 
-			this.btnCancel.Location = new System.Drawing.Point(136, 3);
+			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnCancel.Location = new System.Drawing.Point(178, 3);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(108, 32);
 			this.btnCancel.TabIndex = 14;
@@ -404,6 +418,17 @@
 			this.tbRelationValueRange.Size = new System.Drawing.Size(115, 20);
 			this.tbRelationValueRange.TabIndex = 18;
 			this.tbRelationValueRange.Text = "200";
+			// 
+			// btnPrintRelations
+			// 
+			this.btnPrintRelations.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+			this.btnPrintRelations.Location = new System.Drawing.Point(177, 15);
+			this.btnPrintRelations.Name = "btnPrintRelations";
+			this.btnPrintRelations.Size = new System.Drawing.Size(91, 23);
+			this.btnPrintRelations.TabIndex = 20;
+			this.btnPrintRelations.Text = "Print Relations";
+			this.btnPrintRelations.UseVisualStyleBackColor = true;
+			this.btnPrintRelations.Click += new System.EventHandler(this.btnPrintRelations_Click);
 			// 
 			// MainForm
 			// 
@@ -474,6 +499,7 @@
 		private System.Windows.Forms.TextBox tbRelationQuantity;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.TextBox tbRelationValueRange;
+		private System.Windows.Forms.Button btnPrintRelations;
 	}
 }
 

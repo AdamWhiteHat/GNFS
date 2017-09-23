@@ -63,7 +63,7 @@ namespace GNFSCore.Polynomial
 					BigInteger remainder = 0;
 					BigInteger quotient = BigInteger.DivRem(toAdd, placeValue, out remainder);
 
-					Fraction fractionRemainder = new Fraction(remainder, placeValue);
+					//Fraction fractionRemainder = new Fraction(remainder, placeValue);
 
 					//bool roundUp = (Fraction.Abs(fractionRemainder) > Fraction.OneHalf);
 
@@ -73,9 +73,9 @@ namespace GNFSCore.Polynomial
 					//	quotient += adjustment;
 					//}
 
-					if (quotient > Base)
+					if (quotient > placeValue)
 					{
-						quotient = Base;
+						quotient = placeValue;
 					}
 
 					Terms[d] = quotient;

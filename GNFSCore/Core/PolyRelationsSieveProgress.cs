@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 
 using GNFSCore.IntegerMath;
 using GNFSCore.Matrix;
+using System.Text;
 
 namespace GNFSCore
 {
@@ -199,6 +200,26 @@ namespace GNFSCore
 			RoughRelations = RoughRelations.Where(r => !r.HasPrime()).ToList();
 		}
 
+
+		public string FormatRelations(IEnumerable<Relation> relations)
+		{
+			StringBuilder result = new StringBuilder();
+
+			result.AppendLine($"Smooth relations:");
+			result.AppendLine("\t_______________________________________________");
+			result.AppendLine($"\t|   A   |  B | ALGEBRAIC_NORM | RATIONAL_NORM | \t\tQuantity: {SmoothRelations.Count()} Target quantity: {(_gnfs.RFB.Count() + _gnfs.AFB.Count() + _gnfs.QFB.Count() + 1).ToString()}");
+			result.AppendLine("\t```````````````````````````````````````````````");
+			result.AppendLine(relations.FormatString());
+			result.AppendLine();
+
+			return result.ToString();
+		}
+
+		public override string ToString()
+		{
+			return FormatRelations(SmoothRelations.OrderByDescending(rel => rel.A * rel.B));			
+		}
+
 		public void SaveProgress()
 		{
 			//Serializer.Serialize(RelationProgress_Filename, this);
@@ -257,7 +278,6 @@ namespace GNFSCore
 				Relation.SerializeUnfactoredToFile(UnfactoredProgress_Filename, UnFactored);
 			}
 		}
-
 
 		public static PolyRelationsSieveProgress LoadProgress(GNFS gnfs, string polynomialSaveDirectory)
 		{

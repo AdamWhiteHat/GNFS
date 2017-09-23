@@ -84,15 +84,11 @@ namespace GNFSCore
 
 		public static BigInteger SquareRoot(this BigInteger number)
 		{
-			BigInteger input = number;
-			if (input.IsZero)
+			if (number.IsZero)
 			{
 				return new BigInteger(0);
 			}
-			if (input.Sign == -1)
-			{
-				input = -input;
-			}
+			BigInteger input = BigInteger.Abs(number);
 
 			BigInteger n = new BigInteger(0);
 			BigInteger p = new BigInteger(0);

@@ -77,25 +77,25 @@ namespace GNFSCore.SquareRoot
 
 		public BigInteger[] SiftFactors(IEnumerable<BigInteger> squares)
 		{
-			IEnumerable<Tuple<BigInteger, BigInteger>> congruentSquares = squares.Select(bi => new Tuple<BigInteger, BigInteger>(bi, (bi % N)));
-			congruentSquares = congruentSquares.Where(tup => tup.Item1 != tup.Item2);
-			congruentSquares = congruentSquares.Where(tup => tup.Item2.IsSquare());
+			IEnumerable<Factor> congruentSquares = squares.Select(sqr => new Factor(sqr, (sqr % N)));
+			congruentSquares = congruentSquares.Where(factor => factor.Prime != factor.Exponent);
+			congruentSquares = congruentSquares.Where(factor => factor.Exponent.IsSquare());
 
 			if (congruentSquares.Any())
 			{
-				//congruentSquares = congruentSquares.OrderBy(tup => tup.Item1);
-				IEnumerable<Tuple<BigInteger, BigInteger>> roots = congruentSquares.Select(tup => new Tuple<BigInteger, BigInteger>(tup.Item1.SquareRoot(), tup.Item2.SquareRoot()));
+				//congruentSquares = congruentSquares.OrderBy(factor => factor.Prime);
+				IEnumerable<Factor> roots = congruentSquares.Select(factor => new Factor(factor.Prime.SquareRoot(), factor.Exponent.SquareRoot()));
 
 				List<BigInteger> plusminusRoots = new List<BigInteger>();
-				plusminusRoots.AddRange(roots.Select(tup => BigInteger.Add(tup.Item1, tup.Item2)));
-				plusminusRoots.AddRange(roots.Select(tup => BigInteger.Subtract(tup.Item1, tup.Item2)));
+				plusminusRoots.AddRange(roots.Select(factor => BigInteger.Add(factor.Prime, factor.Exponent)));
+				plusminusRoots.AddRange(roots.Select(factor => BigInteger.Subtract(factor.Prime, factor.Exponent)));
 
-				IEnumerable<BigInteger> factors = plusminusRoots.Select(bi => GCD.FindGCD(N, bi)).Where(gcd => (gcd > 1) && (gcd != N));
-				factors = factors.Distinct().OrderByDescending(bi => bi);
+				IEnumerable<BigInteger> result = plusminusRoots.Select(bi => GCD.FindGCD(N, bi)).Where(gcd => (gcd > 1) && (gcd != N));
+				result = result.Distinct().OrderByDescending(bi => bi);
 
-				if (factors.Any())
+				if (result.Any())
 				{
-					return factors.ToArray();
+					return result.ToArray();
 				}
 			}
 

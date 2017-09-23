@@ -32,6 +32,20 @@ namespace GNFS_Winforms
 
 			mainForm.LogOutput(squareRootFinder.ToString());
 
+			// root, rootSet[], rootProduct, rootProduct % ƒ, ƒ(x)
+			List<Tuple<int, BigInteger[], BigInteger, BigInteger, BigInteger>> rootProductModTuples = squareRootFinder.CalculateRootProducts();
+
+			int rootPadLength = rootProductModTuples.Select(tup => tup.Item1).Max().ToString().Length;
+			int productPadLength = rootProductModTuples.Select(tup => BigInteger.Abs(tup.Item4)).Max().ToString().Length + 1;
+
+			char tab = '\t';
+			string rootProductsString = string.Join(Environment.NewLine, rootProductModTuples.Select(tup => $"a + b∙{tup.Item1.ToString().PadRight(rootPadLength)}{tab}≡{tab}{tup.Item2.ToString().PadLeft(productPadLength)} (mod {tup.Item3})"));
+
+			mainForm.LogOutput("Root products:");
+			mainForm.LogOutput("( (a₁ + b₁∙x) * … * (aᵢ + bᵢ∙x) ) mod ƒ(x) =");
+			mainForm.LogOutput(rootProductsString);
+			mainForm.LogOutput();
+
 			//BigInteger factor = squareRootFinder.NewtonDirectSqrt();
 			//if (factor > 1)
 			//{

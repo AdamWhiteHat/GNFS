@@ -239,21 +239,7 @@ namespace GNFS_Winforms
 					GNFS resultGnfs = gnfsBridge.MatrixSolveGaussian(token, localGnfs);
 
 					SetGnfs(this, resultGnfs);
-					HaultAllProcessing();
-
-					//LogOutput("Rational matrix (transposed):");
-					//LogOutput(string.Join(Environment.NewLine, squares.Select(bs => bs.ToString())));
-					//LogOutput();
-					//
-					//BitMatrix matrix1 = new BitMatrix(vectors1);
-					//---//
-					//IEnumerable<BigInteger> rationalNorms = localGnfs.CurrentRelationsProgress.SmoothRelations.Select(rel => rel.RationalNorm);
-					//BigInteger maxNorm = rationalNorms.Max();
-					//BigInteger maxNormSqrt = maxNorm.SquareRoot();
-					//
-					//var vectors2 = rationalNorms.Select(rn => new BitVector(rn, maxNormSqrt));
-					//BitMatrix matrix2 = new BitMatrix(vectors2);
-					//gnfsBridge.MatrixSolve(token, matrix1);
+					HaultAllProcessing();					
 				}).Start();
 			}
 		}
@@ -333,6 +319,14 @@ namespace GNFS_Winforms
 			Serializer.JSON.Serialize(gnfs.QFB, savePath + ".QFB");
 			Serializer.JSON.Serialize(gnfs.CurrentRelationsProgress.SmoothRelations, savePath + ".SmoothRelations");
 			*/
+		}
+
+		private void btnPrintRelations_Click(object sender, EventArgs e)
+		{
+			if(gnfs.CurrentRelationsProgress.SmoothRelations.Any())
+			{
+				LogOutput(gnfs.CurrentRelationsProgress.ToString());
+			}
 		}
 
 		private void btnCollectSquares_Click(object sender, EventArgs e)

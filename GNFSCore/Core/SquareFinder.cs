@@ -13,26 +13,22 @@ namespace GNFSCore.SquareRoot
 	public class SquareFinder
 	{
 		public Relation[] RelationsSet;
-		public BigInteger SquarePolynomialDerivative;
 
-		public bool IsIrreducible { get { return IsRationalIrreducible && IsAlgebraicIrreducible; } }
-
+		public BigInteger PolynomialDerivative;
+		public BigInteger PolynomialDerivativeSquared;
+		
+		public BigInteger RationalProduct;
+		public BigInteger RationalSquare;
+		public BigInteger RationalSquareRoot;
+		public BigInteger RationalSquareRootResidue;		
 		public bool IsRationalSquare;
 		public bool IsRationalIrreducible;
-		public BigInteger RationalSum;
-		public BigInteger RationalNormSum;
-		public BigInteger RationalProductMod;
-		public BigInteger RationalInverseSquare;
-		public BigInteger RationalInverseSquareRoot;
-		public BigInteger RationalModPolynomial;
-		public BigInteger RationalProduct;
-
+				
+		public BigInteger AlgebraicProduct;
+		public BigInteger AlgebraicSquare;
+		public BigInteger AlgebraicSquareResidue;
 		public bool IsAlgebraicSquare;
 		public bool IsAlgebraicIrreducible;
-		public BigInteger AlgebraicSum;
-		public BigInteger AlgebraicNormSum;
-		public BigInteger AlgebraicProductMod;
-		public BigInteger AlgebraicProduct;
 
 		public BigInteger Y2;
 		public BigInteger Y2_S;
@@ -47,7 +43,7 @@ namespace GNFSCore.SquareRoot
 
 		public SquareFinder(GNFS sieve, List<Relation> relations)
 		{
-			RationalProductMod = -1;
+			RationalSquareRootResidue = -1;
 
 			rand = new Random();
 
@@ -63,11 +59,11 @@ namespace GNFSCore.SquareRoot
 			f = (x) => gnfs.CurrentPolynomial.Evaluate(x);
 
 			RelationsSet = relations.ToArray();
-			BigInteger formalDerivative = gnfs.CurrentPolynomial.Derivative(gnfs.CurrentPolynomial.Base);
-			SquarePolynomialDerivative = BigInteger.Multiply(formalDerivative, formalDerivative);
+			PolynomialDerivative = gnfs.CurrentPolynomial.Derivative(gnfs.CurrentPolynomial.Base);
+			PolynomialDerivativeSquared = BigInteger.Multiply(PolynomialDerivative, PolynomialDerivative);
 		}
 
-		private static bool _isIrreducible(IEnumerable<BigInteger> coefficients)
+		private static bool IsIrreducible(IEnumerable<BigInteger> coefficients)
 		{
 			return (GCD.FindGCD(coefficients) == 1);
 		}
@@ -78,22 +74,21 @@ namespace GNFSCore.SquareRoot
 		// y = 2860383 (for example)
 		// 
 		// 
-		// S(m) mod f(x)
+		// S(x) mod f(x)
 		// 
 		// a*x^3+b*x^2+c*x^1+d*x^0
 
 		public void CalculateRationalSide()
 		{
 			rationalSet = RelationsSet.Select(rel => rel.RationalNorm);
-			RationalProduct = rationalSet.Product();
-			RationalInverseSquare = BigInteger.Multiply(RationalProduct, SquarePolynomialDerivative);
-			RationalInverseSquareRoot = RationalInverseSquare.SquareRoot();
 
-			RationalSum = RelationsSet.Select(rel => rel.A).Sum();
-			RationalNormSum = rationalSet.Sum();
-			RationalProductMod = (RationalInverseSquareRoot % N);
-			IsRationalIrreducible = _isIrreducible(rationalSet);
-			IsRationalSquare = RationalProductMod.IsSquare();
+			RationalProduct = rationalSet.Product();
+			RationalSquare = BigInteger.Multiply(RationalProduct, PolynomialDerivativeSquared);
+			RationalSquareRoot = RationalSquare.SquareRoot();
+			RationalSquareRootResidue = (RationalSquareRoot % N);
+
+			IsRationalIrreducible = IsIrreducible(rationalSet);
+			IsRationalSquare = RationalSquareRootResidue.IsSquare();
 		}
 
 		public void CalculateAlgebraicSide()
@@ -101,11 +96,30 @@ namespace GNFSCore.SquareRoot
 			algebraicSet = RelationsSet.Select(rel => rel.AlgebraicNorm);
 
 			AlgebraicProduct = algebraicSet.Product();
-			AlgebraicProductMod = AlgebraicProduct % N;
-			AlgebraicSum = algebraicSet.Sum();
+			AlgebraicSquare = BigInteger.Multiply(AlgebraicProduct, PolynomialDerivative);
+			AlgebraicSquareResidue = AlgebraicSquare % N;
 
-			IsAlgebraicIrreducible = _isIrreducible(algebraicSet); // Irreducible check
-			IsAlgebraicSquare = AlgebraicProductMod.IsSquare();
+			IsAlgebraicIrreducible = IsIrreducible(algebraicSet); // Irreducible check
+			IsAlgebraicSquare = AlgebraicSquareResidue.IsSquare();
+		}
+
+		public List<Tuple<int, BigInteger[], BigInteger, BigInteger, BigInteger>> CalculateRootProducts()
+		{
+			List<Tuple<int, BigInteger[], BigInteger, BigInteger, BigInteger>> results = new List<Tuple<int, BigInteger[], BigInteger, BigInteger, BigInteger>>();
+
+			IEnumerable<int> roots = gnfs.AFB.Select(fp => fp.R).Distinct();
+			foreach (int root in roots)
+			{
+				BigInteger f = gnfs.CurrentPolynomial.Evaluate(root);
+
+				IEnumerable<BigInteger> rootSet = RelationsSet.Select(rel => rel.Apply(root));
+
+				BigInteger rootProduct = rootSet.Product();
+
+				results.Add(new Tuple<int, BigInteger[], BigInteger, BigInteger, BigInteger>(root, rootSet.ToArray(), rootProduct, rootProduct % f, f));
+			}
+
+			return results.OrderBy(tup => BigInteger.Abs(tup.Item4)).ThenBy(tup => tup.Item1).ThenBy(tup => tup.Item5).ToList();
 		}
 
 		private BigInteger LogExpand(int logBase, double logExponent)
@@ -132,7 +146,7 @@ namespace GNFSCore.SquareRoot
 			// Set S, Y
 			int d = gnfs.CurrentPolynomial.Degree;
 			BigInteger S = RationalProduct;
-			BigInteger Y = RationalProductMod;
+			BigInteger Y = RationalSquareRootResidue;
 			Y2 = BigInteger.Multiply(Y, Y);
 			Y2_S = BigInteger.Subtract(Y2, S);
 
@@ -150,9 +164,9 @@ namespace GNFSCore.SquareRoot
 				while (GCD.FindGCD(q, N) != 1);
 
 				// Choose R
-				RationalPolynomial randomPolynomial = new RationalPolynomial(N, 2, rand.Next(), N);				
+				RationalPolynomial randomPolynomial = new RationalPolynomial(N, 2, rand.Next(), N);
 				BigInteger R0 = randomPolynomial.Evaluate(q); // RandomPolynomial
-				
+
 
 				// Compute (R - Y)^( q^(d-1) / 2 ) % (Y^2 - S)
 				BigInteger R_Y = BigInteger.Subtract(R0, Y);
@@ -199,7 +213,7 @@ namespace GNFSCore.SquareRoot
 			bool escape = false;
 			do
 			{
-				BigInteger X = BigInteger.Multiply(sX, SquarePolynomialDerivative) % N;
+				BigInteger X = BigInteger.Multiply(sX, PolynomialDerivativeSquared) % N;
 
 				BigInteger gcd1 = GCD.FindGCD(N, BigInteger.Subtract(X, Y));
 				BigInteger gcd2 = GCD.FindGCD(N, BigInteger.Subtract(Y, X));
@@ -262,33 +276,28 @@ namespace GNFSCore.SquareRoot
 		{
 			StringBuilder result = new StringBuilder();
 
-			result.AppendLine("Square finder, rational:");
-			result.AppendLine($"  √( {RationalProduct} * {SquarePolynomialDerivative} )");
-			result.AppendLine($"= √( {RationalInverseSquare} )");
-			result.AppendLine($"=    {RationalInverseSquareRoot}");
-			result.AppendLine();
-			//result.AppendLine($"Rational Product (δ) = {RationalProduct}");
-			result.AppendLine($"γ = δ mod N = {RationalProductMod}");
-			//result.AppendLine($"*InverseSquare: {RationalInverseSquare}");
-			//result.AppendLine($"Sum: {RationalSum}");
-			//result.AppendLine($"SumOfNorms: {RationalNormSum}");
-			result.AppendLine($"IsRationalSquare ? {IsRationalSquare}");
-			result.AppendLine($"IsRationalIrreducible ? {IsRationalIrreducible}");
-			result.AppendLine($"RationalModPolynomial: {RationalModPolynomial}");
+			result.AppendLine("Square finder, Rational:");
+			result.AppendLine($"γ² = √(  Sᵣ(m)  *  ƒ'(m)²  )");
+			result.AppendLine($"γ² = √( {RationalProduct} * {PolynomialDerivativeSquared} )");
+			result.AppendLine($"γ² = √( {RationalSquare} )");
+			result.AppendLine($"γ  =    {RationalSquareRoot} mod N");
+			result.AppendLine($"γ  =    {RationalSquareRootResidue}"); // δ mod N 
+			//result.AppendLine();
+			//result.AppendLine($"IsSquare(Rational) ? {IsRationalSquare}");
+			//result.AppendLine($"IsIrreducible(Rational) ? {IsRationalIrreducible}");
 			result.AppendLine();
 			result.AppendLine();
-			result.AppendLine("Square finder, algebraic:");
-			result.AppendLine($"Product: {AlgebraicProduct}");
-			result.AppendLine($"X = s(m) * f(m) mod n = {AlgebraicProductMod}");
-			result.AppendLine($"Sum: {AlgebraicSum}");
-			//result.AppendLine($"SumOfNorms: {AlgebraicNormSum}");
-			result.AppendLine($"IsAlgebraicSquare ? {IsAlgebraicSquare}");
-			result.AppendLine($"IsAlgebraicIrreducible ? {IsAlgebraicIrreducible}");
+			result.AppendLine("Square finder, Algebraic:");
+			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicProduct} * {PolynomialDerivative}");
+			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicSquare}");
+			result.AppendLine($"χ = Sₐ(m) * ƒ'(m) mod N = {AlgebraicSquareResidue}");
+			//result.AppendLine($"IsAlgebraicSquare ? {IsAlgebraicSquare}");
+			//result.AppendLine($"IsAlgebraicIrreducible ? {IsAlgebraicIrreducible}");
 			result.AppendLine();
-			result.AppendLine($"***  {(RationalInverseSquareRoot * AlgebraicProductMod) % N}");
+			result.AppendLine($"***  {(RationalSquareRoot * AlgebraicSquareResidue) % N}");
 			result.AppendLine();
 
-			
+
 
 			return result.ToString();
 		}
