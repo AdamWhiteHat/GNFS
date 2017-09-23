@@ -49,8 +49,9 @@
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.btnPolySplittingField = new System.Windows.Forms.Button();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
-			this.btnLatticeSieve = new System.Windows.Forms.Button();
+			this.btnPrintRelations = new System.Windows.Forms.Button();
 			this.btnPurgeRough = new System.Windows.Forms.Button();
+			this.btnLatticeSieve = new System.Windows.Forms.Button();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.btnCollectSquares = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -60,7 +61,6 @@
 			this.tbRelationQuantity = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.tbRelationValueRange = new System.Windows.Forms.TextBox();
-			this.btnPrintRelations = new System.Windows.Forms.Button();
 			this.panelButtons.SuspendLayout();
 			this.panelFunctions.SuspendLayout();
 			this.groupBox4.SuspendLayout();
@@ -277,6 +277,7 @@
 			// btnPolySplittingField
 			// 
 			this.btnPolySplittingField.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+			this.btnPolySplittingField.Enabled = false;
 			this.btnPolySplittingField.Location = new System.Drawing.Point(148, 16);
 			this.btnPolySplittingField.Name = "btnPolySplittingField";
 			this.btnPolySplittingField.Size = new System.Drawing.Size(88, 23);
@@ -300,16 +301,16 @@
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Sieve Relations";
 			// 
-			// btnLatticeSieve
+			// btnPrintRelations
 			// 
-			this.btnLatticeSieve.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
-			this.btnLatticeSieve.Location = new System.Drawing.Point(99, 15);
-			this.btnLatticeSieve.Name = "btnLatticeSieve";
-			this.btnLatticeSieve.Size = new System.Drawing.Size(78, 23);
-			this.btnLatticeSieve.TabIndex = 12;
-			this.btnLatticeSieve.Text = "Lattice sieve";
-			this.btnLatticeSieve.UseVisualStyleBackColor = true;
-			this.btnLatticeSieve.Click += new System.EventHandler(this.btnLatticeSieve_Click);
+			this.btnPrintRelations.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+			this.btnPrintRelations.Location = new System.Drawing.Point(177, 15);
+			this.btnPrintRelations.Name = "btnPrintRelations";
+			this.btnPrintRelations.Size = new System.Drawing.Size(91, 23);
+			this.btnPrintRelations.TabIndex = 20;
+			this.btnPrintRelations.Text = "Print Relations";
+			this.btnPrintRelations.UseVisualStyleBackColor = true;
+			this.btnPrintRelations.Click += new System.EventHandler(this.btnPrintRelations_Click);
 			// 
 			// btnPurgeRough
 			// 
@@ -321,6 +322,18 @@
 			this.btnPurgeRough.Text = "Purge";
 			this.btnPurgeRough.UseVisualStyleBackColor = true;
 			this.btnPurgeRough.Click += new System.EventHandler(this.btnPurgeRough_Click);
+			// 
+			// btnLatticeSieve
+			// 
+			this.btnLatticeSieve.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+			this.btnLatticeSieve.Enabled = false;
+			this.btnLatticeSieve.Location = new System.Drawing.Point(99, 15);
+			this.btnLatticeSieve.Name = "btnLatticeSieve";
+			this.btnLatticeSieve.Size = new System.Drawing.Size(78, 23);
+			this.btnLatticeSieve.TabIndex = 12;
+			this.btnLatticeSieve.Text = "Lattice sieve";
+			this.btnLatticeSieve.UseVisualStyleBackColor = true;
+			this.btnLatticeSieve.Click += new System.EventHandler(this.btnLatticeSieve_Click);
 			// 
 			// groupBox2
 			// 
@@ -338,6 +351,7 @@
 			// btnCollectSquares
 			// 
 			this.btnCollectSquares.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+			this.btnCollectSquares.Enabled = false;
 			this.btnCollectSquares.Location = new System.Drawing.Point(112, 16);
 			this.btnCollectSquares.Name = "btnCollectSquares";
 			this.btnCollectSquares.Size = new System.Drawing.Size(96, 23);
@@ -418,17 +432,6 @@
 			this.tbRelationValueRange.Size = new System.Drawing.Size(115, 20);
 			this.tbRelationValueRange.TabIndex = 18;
 			this.tbRelationValueRange.Text = "200";
-			// 
-			// btnPrintRelations
-			// 
-			this.btnPrintRelations.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
-			this.btnPrintRelations.Location = new System.Drawing.Point(177, 15);
-			this.btnPrintRelations.Name = "btnPrintRelations";
-			this.btnPrintRelations.Size = new System.Drawing.Size(91, 23);
-			this.btnPrintRelations.TabIndex = 20;
-			this.btnPrintRelations.Text = "Print Relations";
-			this.btnPrintRelations.UseVisualStyleBackColor = true;
-			this.btnPrintRelations.Click += new System.EventHandler(this.btnPrintRelations_Click);
 			// 
 			// MainForm
 			// 
