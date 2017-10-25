@@ -39,7 +39,14 @@ namespace GNFS_Winforms
 			int productPadLength = rootProductModTuples.Select(tup => BigInteger.Abs(tup.Item4)).Max().ToString().Length + 1;
 
 			char tab = '\t';
-			string rootProductsString = string.Join(Environment.NewLine, rootProductModTuples.Select(tup => $"a + b∙{tup.Item1.ToString().PadRight(rootPadLength)}{tab}≡{tab}{tup.Item2.ToString().PadLeft(productPadLength)} (mod {tup.Item3})"));
+			string rootProductsString = string.Join(Environment.NewLine,
+				// root, rootSet.ToArray(), rootProduct, rootProduct % f, f
+				rootProductModTuples.Select(tup => $"a + b∙{tup.Item1.ToString().PadRight(rootPadLength)} = {tup.Item3}{tab}≡{tab}{tup.Item4.ToString().PadLeft(productPadLength)} (mod {tup.Item5})")); //[{tup.Item2.FormatString(false)}]
+
+
+
+
+
 
 			mainForm.LogOutput("Root products:");
 			mainForm.LogOutput("( (a₁ + b₁∙x) * … * (aᵢ + bᵢ∙x) ) mod ƒ(x) =");

@@ -157,12 +157,12 @@ namespace GNFSCore
 
 			bool[] rational = GetVector(_rationalFactorization, _gnfs.PrimeBase.RationalFactorBase);
 			bool[] algebraic = GetVector(_algebraicFactorization, _gnfs.PrimeBase.AlgebraicFactorBase);
-			bool[] quadratic = _gnfs.QFB.Select(qf => QuadraticResidue.GetQuadraticCharacter(this, qf)).ToArray();
+			//bool[] quadratic = _gnfs.QFB.Select(qf => QuadraticResidue.GetQuadraticCharacter(this, qf)).ToArray();
 
 			List<bool> result = new List<bool>() { sign };
 			result.AddRange(rational);
 			result.AddRange(algebraic);
-			result.AddRange(quadratic);
+			//result.AddRange(quadratic);
 			return result.ToArray();
 		}
 

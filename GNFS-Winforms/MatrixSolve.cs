@@ -91,6 +91,11 @@ namespace GNFS_Winforms
 		{
 			List<Relation> orderedSmoothRelations = gnfs.CurrentRelationsProgress.SmoothRelations.ToList();
 
+			if(orderedSmoothRelations.Count %2 != 0)
+			{
+				orderedSmoothRelations.RemoveAt(orderedSmoothRelations.Count - 1);
+			}
+
 			Gaussian gaussianReduction = new Gaussian(gnfs, orderedSmoothRelations);
 			gaussianReduction.DontTransposeAppend();
 
@@ -139,10 +144,50 @@ namespace GNFS_Winforms
 				index++;
 			}
 
+			BigInteger currentPolynomialDerivative = gnfs.CurrentPolynomial.Derivative(gnfs.CurrentPolynomial.Base);
+
+			BigInteger rationalNormProduct = result.Select(rel => rel.RationalNorm).Product();
+			BigInteger algebraidNormProduct = result.Select(rel => rel.AlgebraicNorm).Product();
+
+
 			mainForm.LogOutput();
 			mainForm.LogOutput("Square relations (Solution):");
 			mainForm.LogOutput(result.FormatString());
 			mainForm.LogOutput();
+
+			mainForm.LogOutput("CurrentPolynomial.Derivative(gnfs.CurrentPolynomial.Base):");
+			mainForm.LogOutput(currentPolynomialDerivative.ToString());
+			mainForm.LogOutput();
+
+			mainForm.LogOutput("Product of Rational Norms:");
+			mainForm.LogOutput(rationalNormProduct.ToString());
+			mainForm.LogOutput("Product of Algebraic Norms:");
+			mainForm.LogOutput(algebraidNormProduct.ToString());
+			mainForm.LogOutput();
+
+
+
+			BigInteger rationalSquare = rationalNormProduct * currentPolynomialDerivative;
+			BigInteger algebraicSquare = algebraidNormProduct * currentPolynomialDerivative;
+
+
+			BigInteger rationalSquareRt = rationalSquare.SquareRoot();
+			BigInteger algebraicSquareRt = algebraicSquare.SquareRoot();
+
+
+			mainForm.LogOutput("rationalNormProduct* currentPolynomialDerivative:");
+			mainForm.LogOutput(rationalSquare.ToString());
+			mainForm.LogOutput("algebraidNormProduct* currentPolynomialDerivative:");
+			mainForm.LogOutput(algebraicSquare.ToString());
+			mainForm.LogOutput();
+
+			mainForm.LogOutput("rationalSquareRt:");
+			mainForm.LogOutput(rationalSquareRt.ToString());
+			mainForm.LogOutput("algebraicSquareRt:");
+			mainForm.LogOutput(algebraicSquareRt.ToString());
+			mainForm.LogOutput();
+
+
 
 
 			//string solutionSet1 = gaussianReduction.GetSolutionFlags(1).FormatString();

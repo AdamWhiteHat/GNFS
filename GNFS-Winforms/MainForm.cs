@@ -131,11 +131,6 @@ namespace GNFS_Winforms
 
 		private void RestoreAllButtons()
 		{
-			//ControlBridge.SetControlText(btnCreateGnfs, CreateGnfsButtonText); // Set Control.Text
-			//ControlBridge.SetControlText(btnFindRelations, FindRelationsButtonText);
-			//ControlBridge.SetControlText(btnFindSquares, FindSquaresButtonText);
-			//ControlBridge.SetControlEnabledState(btnConstructPoly, true); // Control.Enable
-			//ControlBridge.SetControlEnabledState(btnFindSquares, true);
 			IsWorking = false;
 
 			ControlBridge.SetControlVisibleState(panelCancel, false);
@@ -239,7 +234,7 @@ namespace GNFS_Winforms
 					GNFS resultGnfs = gnfsBridge.MatrixSolveGaussian(token, localGnfs);
 
 					SetGnfs(this, resultGnfs);
-					HaultAllProcessing();					
+					HaultAllProcessing();
 				}).Start();
 			}
 		}
@@ -262,37 +257,23 @@ namespace GNFS_Winforms
 			}
 		}
 
-		private void btnConstructPoly_Click(object sender, EventArgs e)
-		{
-			if (gnfs != null)
-			{
-				SkewSymmetricPolynomial skewPoly = new SkewSymmetricPolynomial(gnfs, degree);
+		//private void btnResume_Click(object sender, EventArgs e)
+		//{
+		//	string directory = string.Empty;
+		//	using (FolderBrowserDialog browseDialog = new FolderBrowserDialog())
+		//	{
+		//		if (browseDialog.ShowDialog() == DialogResult.OK)
+		//		{
+		//			directory = browseDialog.SelectedPath;
+		//		}
+		//	}
 
-				LogOutput("Skew Polynomial:");
-				LogOutput($"{skewPoly}");
-				LogOutput();
-			}
-		}
-
-
-
-		private void btnResume_Click(object sender, EventArgs e)
-		{
-			string directory = string.Empty;
-			using (FolderBrowserDialog browseDialog = new FolderBrowserDialog())
-			{
-				if (browseDialog.ShowDialog() == DialogResult.OK)
-				{
-					directory = browseDialog.SelectedPath;
-				}
-			}
-
-			if (!string.IsNullOrWhiteSpace(directory) && Directory.Exists(directory))
-			{
-				cancellationTokenSource = new CancellationTokenSource();
-				gnfs = new GNFS(cancellationTokenSource.Token, directory);
-			}
-		}
+		//	if (!string.IsNullOrWhiteSpace(directory) && Directory.Exists(directory))
+		//	{
+		//		cancellationTokenSource = new CancellationTokenSource();
+		//		gnfs = new GNFS(cancellationTokenSource.Token, directory);
+		//	}
+		//}
 
 		private void btnPurgeRough_Click(object sender, EventArgs e)
 		{
@@ -323,18 +304,13 @@ namespace GNFS_Winforms
 
 		private void btnPrintRelations_Click(object sender, EventArgs e)
 		{
-			if(gnfs.CurrentRelationsProgress.SmoothRelations.Any())
+			if (gnfs.CurrentRelationsProgress.SmoothRelations.Any())
 			{
 				LogOutput(gnfs.CurrentRelationsProgress.ToString());
 			}
 		}
 
 		private void btnCollectSquares_Click(object sender, EventArgs e)
-		{
-
-		}
-
-		private void btnPolySplittingField_Click(object sender, EventArgs e)
 		{
 
 		}

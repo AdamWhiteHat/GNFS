@@ -16,14 +16,14 @@ namespace GNFSCore.SquareRoot
 
 		public BigInteger PolynomialDerivative;
 		public BigInteger PolynomialDerivativeSquared;
-		
+
 		public BigInteger RationalProduct;
 		public BigInteger RationalSquare;
 		public BigInteger RationalSquareRoot;
-		public BigInteger RationalSquareRootResidue;		
+		public BigInteger RationalSquareRootResidue;
 		public bool IsRationalSquare;
 		public bool IsRationalIrreducible;
-				
+
 		public BigInteger AlgebraicProduct;
 		public BigInteger AlgebraicSquare;
 		public BigInteger AlgebraicSquareResidue;
@@ -282,9 +282,9 @@ namespace GNFSCore.SquareRoot
 			result.AppendLine($"γ² = √( {RationalSquare} )");
 			result.AppendLine($"γ  =    {RationalSquareRoot} mod N");
 			result.AppendLine($"γ  =    {RationalSquareRootResidue}"); // δ mod N 
-			//result.AppendLine();
-			//result.AppendLine($"IsSquare(Rational) ? {IsRationalSquare}");
-			//result.AppendLine($"IsIrreducible(Rational) ? {IsRationalIrreducible}");
+																	   //result.AppendLine();
+																	   //result.AppendLine($"IsSquare(Rational) ? {IsRationalSquare}");
+																	   //result.AppendLine($"IsIrreducible(Rational) ? {IsRationalIrreducible}");
 			result.AppendLine();
 			result.AppendLine();
 			result.AppendLine("Square finder, Algebraic:");
@@ -293,8 +293,38 @@ namespace GNFSCore.SquareRoot
 			result.AppendLine($"χ = Sₐ(m) * ƒ'(m) mod N = {AlgebraicSquareResidue}");
 			//result.AppendLine($"IsAlgebraicSquare ? {IsAlgebraicSquare}");
 			//result.AppendLine($"IsAlgebraicIrreducible ? {IsAlgebraicIrreducible}");
+
+
+			BigInteger max = BigInteger.Max(RationalSquareRoot, AlgebraicSquareResidue);
+			BigInteger min = BigInteger.Min(RationalSquareRoot, AlgebraicSquareResidue);
+
+
+			BigInteger A = max + min;
+			BigInteger B = max - min;
+
+			BigInteger gcdA = GCD.FindGCD(N, A);
+			BigInteger gcdB = GCD.FindGCD(N, A);
+
+			BigInteger answer = BigInteger.Max(gcdA, gcdB);
+
+
 			result.AppendLine();
-			result.AppendLine($"***  {(RationalSquareRoot * AlgebraicSquareResidue) % N}");
+			result.AppendLine($"GCD(N, A+B) = {gcdA}");
+			result.AppendLine($"GCD(N, A-B) = {gcdB}");
+			result.AppendLine();
+			result.AppendLine($"Solution? {(answer != 1).ToString().ToUpper()}");
+			if (answer != 1)
+			{
+				result.AppendLine();
+				result.AppendLine();
+				result.AppendLine("*********************");
+				result.AppendLine();
+				result.AppendLine($" SOLUTION = {answer} ");
+				result.AppendLine();
+				result.AppendLine("*********************");
+				result.AppendLine();
+				result.AppendLine();
+			}
 			result.AppendLine();
 
 

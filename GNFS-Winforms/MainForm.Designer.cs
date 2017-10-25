@@ -40,14 +40,11 @@
 			this.tbDegree = new System.Windows.Forms.TextBox();
 			this.btnFindRelations = new System.Windows.Forms.Button();
 			this.btnFindSquares = new System.Windows.Forms.Button();
-			this.btnConstructPoly = new System.Windows.Forms.Button();
 			this.btnMatrix = new System.Windows.Forms.Button();
 			this.panelButtons = new System.Windows.Forms.Panel();
-			this.btnSerialize = new System.Windows.Forms.Button();
-			this.btnResume = new System.Windows.Forms.Button();
 			this.panelFunctions = new System.Windows.Forms.Panel();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
-			this.btnPolySplittingField = new System.Windows.Forms.Button();
+			this.btnSerialize = new System.Windows.Forms.Button();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.btnPrintRelations = new System.Windows.Forms.Button();
 			this.btnPurgeRough = new System.Windows.Forms.Button();
@@ -75,11 +72,11 @@
 			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbOutput.Location = new System.Drawing.Point(-4, 276);
+			this.tbOutput.Location = new System.Drawing.Point(-4, 246);
 			this.tbOutput.Multiline = true;
 			this.tbOutput.Name = "tbOutput";
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.tbOutput.Size = new System.Drawing.Size(575, 167);
+			this.tbOutput.Size = new System.Drawing.Size(718, 241);
 			this.tbOutput.TabIndex = 0;
 			this.tbOutput.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbOutput_KeyUp);
 			// 
@@ -89,7 +86,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbN.Location = new System.Drawing.Point(20, 4);
 			this.tbN.Name = "tbN";
-			this.tbN.Size = new System.Drawing.Size(559, 20);
+			this.tbN.Size = new System.Drawing.Size(702, 20);
 			this.tbN.TabIndex = 1;
 			// 
 			// tbBase
@@ -98,7 +95,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbBase.Location = new System.Drawing.Point(117, 52);
 			this.tbBase.Name = "tbBase";
-			this.tbBase.Size = new System.Drawing.Size(115, 20);
+			this.tbBase.Size = new System.Drawing.Size(258, 20);
 			this.tbBase.TabIndex = 2;
 			// 
 			// tbBound
@@ -107,7 +104,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbBound.Location = new System.Drawing.Point(117, 26);
 			this.tbBound.Name = "tbBound";
-			this.tbBound.Size = new System.Drawing.Size(115, 20);
+			this.tbBound.Size = new System.Drawing.Size(258, 20);
 			this.tbBound.TabIndex = 3;
 			this.tbBound.Text = "61";
 			// 
@@ -145,7 +142,7 @@
 			// 
 			this.btnCreateGnfs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCreateGnfs.Location = new System.Drawing.Point(8, 4);
+			this.btnCreateGnfs.Location = new System.Drawing.Point(16, 15);
 			this.btnCreateGnfs.Name = "btnCreateGnfs";
 			this.btnCreateGnfs.Size = new System.Drawing.Size(96, 23);
 			this.btnCreateGnfs.TabIndex = 7;
@@ -169,7 +166,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbDegree.Location = new System.Drawing.Point(117, 72);
 			this.tbDegree.Name = "tbDegree";
-			this.tbDegree.Size = new System.Drawing.Size(115, 20);
+			this.tbDegree.Size = new System.Drawing.Size(18, 20);
 			this.tbDegree.TabIndex = 8;
 			// 
 			// btnFindRelations
@@ -192,16 +189,6 @@
 			this.btnFindSquares.UseVisualStyleBackColor = true;
 			this.btnFindSquares.Click += new System.EventHandler(this.btnFindSquares_Click);
 			// 
-			// btnConstructPoly
-			// 
-			this.btnConstructPoly.Location = new System.Drawing.Point(16, 16);
-			this.btnConstructPoly.Name = "btnConstructPoly";
-			this.btnConstructPoly.Size = new System.Drawing.Size(132, 23);
-			this.btnConstructPoly.TabIndex = 12;
-			this.btnConstructPoly.Text = "Construct Polynomial";
-			this.btnConstructPoly.UseVisualStyleBackColor = true;
-			this.btnConstructPoly.Click += new System.EventHandler(this.btnConstructPoly_Click);
-			// 
 			// btnMatrix
 			// 
 			this.btnMatrix.Location = new System.Drawing.Point(16, 16);
@@ -215,76 +202,50 @@
 			// panelButtons
 			// 
 			this.panelButtons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.panelButtons.Controls.Add(this.btnSerialize);
-			this.panelButtons.Controls.Add(this.btnResume);
+			this.panelButtons.Controls.Add(this.groupBox4);
 			this.panelButtons.Controls.Add(this.panelFunctions);
-			this.panelButtons.Controls.Add(this.btnCreateGnfs);
-			this.panelButtons.Location = new System.Drawing.Point(238, 44);
+			this.panelButtons.Location = new System.Drawing.Point(381, 26);
 			this.panelButtons.Name = "panelButtons";
-			this.panelButtons.Size = new System.Drawing.Size(338, 228);
+			this.panelButtons.Size = new System.Drawing.Size(338, 214);
 			this.panelButtons.TabIndex = 14;
-			// 
-			// btnSerialize
-			// 
-			this.btnSerialize.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnSerialize.Location = new System.Drawing.Point(236, 4);
-			this.btnSerialize.Name = "btnSerialize";
-			this.btnSerialize.Size = new System.Drawing.Size(96, 23);
-			this.btnSerialize.TabIndex = 17;
-			this.btnSerialize.Text = "Save";
-			this.btnSerialize.UseVisualStyleBackColor = true;
-			this.btnSerialize.Click += new System.EventHandler(this.btnSerialize_Click);
-			// 
-			// btnResume
-			// 
-			this.btnResume.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
-			this.btnResume.Location = new System.Drawing.Point(122, 4);
-			this.btnResume.Name = "btnResume";
-			this.btnResume.Size = new System.Drawing.Size(96, 23);
-			this.btnResume.TabIndex = 14;
-			this.btnResume.Text = "Resume";
-			this.btnResume.UseVisualStyleBackColor = true;
-			this.btnResume.Click += new System.EventHandler(this.btnResume_Click);
 			// 
 			// panelFunctions
 			// 
 			this.panelFunctions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.panelFunctions.Controls.Add(this.groupBox4);
 			this.panelFunctions.Controls.Add(this.groupBox3);
 			this.panelFunctions.Controls.Add(this.groupBox2);
 			this.panelFunctions.Controls.Add(this.groupBox1);
 			this.panelFunctions.Enabled = false;
-			this.panelFunctions.Location = new System.Drawing.Point(8, 32);
+			this.panelFunctions.Location = new System.Drawing.Point(8, 49);
 			this.panelFunctions.Name = "panelFunctions";
-			this.panelFunctions.Size = new System.Drawing.Size(324, 188);
+			this.panelFunctions.Size = new System.Drawing.Size(324, 156);
 			this.panelFunctions.TabIndex = 16;
 			// 
 			// groupBox4
 			// 
 			this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBox4.Controls.Add(this.btnPolySplittingField);
-			this.groupBox4.Controls.Add(this.btnConstructPoly);
-			this.groupBox4.Location = new System.Drawing.Point(4, 12);
+			this.groupBox4.Controls.Add(this.btnSerialize);
+			this.groupBox4.Controls.Add(this.btnCreateGnfs);
+			this.groupBox4.Location = new System.Drawing.Point(11, 6);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Size = new System.Drawing.Size(316, 40);
 			this.groupBox4.TabIndex = 20;
 			this.groupBox4.TabStop = false;
-			this.groupBox4.Text = "Polynomials";
+			this.groupBox4.Text = "1) Create Polynomial, Factor Bases && Roots";
 			// 
-			// btnPolySplittingField
+			// btnSerialize
 			// 
-			this.btnPolySplittingField.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
-			this.btnPolySplittingField.Enabled = false;
-			this.btnPolySplittingField.Location = new System.Drawing.Point(148, 16);
-			this.btnPolySplittingField.Name = "btnPolySplittingField";
-			this.btnPolySplittingField.Size = new System.Drawing.Size(88, 23);
-			this.btnPolySplittingField.TabIndex = 13;
-			this.btnPolySplittingField.Text = "Splitting Field";
-			this.btnPolySplittingField.UseVisualStyleBackColor = true;
-			this.btnPolySplittingField.Click += new System.EventHandler(this.btnPolySplittingField_Click);
+			this.btnSerialize.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnSerialize.Location = new System.Drawing.Point(214, 15);
+			this.btnSerialize.Name = "btnSerialize";
+			this.btnSerialize.Size = new System.Drawing.Size(96, 23);
+			this.btnSerialize.TabIndex = 17;
+			this.btnSerialize.Text = "Save";
+			this.btnSerialize.UseVisualStyleBackColor = true;
+			this.btnSerialize.Click += new System.EventHandler(this.btnSerialize_Click);
 			// 
 			// groupBox3
 			// 
@@ -294,12 +255,12 @@
 			this.groupBox3.Controls.Add(this.btnPurgeRough);
 			this.groupBox3.Controls.Add(this.btnFindRelations);
 			this.groupBox3.Controls.Add(this.btnLatticeSieve);
-			this.groupBox3.Location = new System.Drawing.Point(4, 56);
+			this.groupBox3.Location = new System.Drawing.Point(3, 3);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(316, 40);
 			this.groupBox3.TabIndex = 20;
 			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "Sieve Relations";
+			this.groupBox3.Text = "2) Sieve Relations";
 			// 
 			// btnPrintRelations
 			// 
@@ -341,12 +302,12 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox2.Controls.Add(this.btnCollectSquares);
 			this.groupBox2.Controls.Add(this.btnMatrix);
-			this.groupBox2.Location = new System.Drawing.Point(4, 100);
+			this.groupBox2.Location = new System.Drawing.Point(3, 47);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(316, 40);
 			this.groupBox2.TabIndex = 19;
 			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Matrix";
+			this.groupBox2.Text = "3) Matrix";
 			// 
 			// btnCollectSquares
 			// 
@@ -365,18 +326,18 @@
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox1.Controls.Add(this.btnFindSquares);
-			this.groupBox1.Location = new System.Drawing.Point(4, 144);
+			this.groupBox1.Location = new System.Drawing.Point(3, 91);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(316, 44);
 			this.groupBox1.TabIndex = 18;
 			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "Square Root";
+			this.groupBox1.Text = "4) Square Root Solve";
 			// 
 			// panelCancel
 			// 
 			this.panelCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.panelCancel.Controls.Add(this.btnCancel);
-			this.panelCancel.Location = new System.Drawing.Point(195, 144);
+			this.panelCancel.Location = new System.Drawing.Point(338, 144);
 			this.panelCancel.Name = "panelCancel";
 			this.panelCancel.Size = new System.Drawing.Size(289, 56);
 			this.panelCancel.TabIndex = 15;
@@ -409,7 +370,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbRelationQuantity.Location = new System.Drawing.Point(117, 98);
 			this.tbRelationQuantity.Name = "tbRelationQuantity";
-			this.tbRelationQuantity.Size = new System.Drawing.Size(115, 20);
+			this.tbRelationQuantity.Size = new System.Drawing.Size(258, 20);
 			this.tbRelationQuantity.TabIndex = 16;
 			this.tbRelationQuantity.Text = "70";
 			// 
@@ -429,7 +390,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbRelationValueRange.Location = new System.Drawing.Point(117, 118);
 			this.tbRelationValueRange.Name = "tbRelationValueRange";
-			this.tbRelationValueRange.Size = new System.Drawing.Size(115, 20);
+			this.tbRelationValueRange.Size = new System.Drawing.Size(258, 20);
 			this.tbRelationValueRange.TabIndex = 18;
 			this.tbRelationValueRange.Text = "200";
 			// 
@@ -437,7 +398,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(582, 445);
+			this.ClientSize = new System.Drawing.Size(725, 489);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.tbRelationValueRange);
 			this.Controls.Add(this.label5);
@@ -482,20 +443,16 @@
 		private System.Windows.Forms.TextBox tbDegree;
 		private System.Windows.Forms.Button btnFindRelations;
 		private System.Windows.Forms.Button btnFindSquares;
-		private System.Windows.Forms.Button btnConstructPoly;
 		private System.Windows.Forms.Button btnMatrix;
 		private System.Windows.Forms.Panel panelButtons;
 		private System.Windows.Forms.Panel panelCancel;
 		private System.Windows.Forms.Button btnCancel;
 		private System.Windows.Forms.Panel panelFunctions;
-		private System.Windows.Forms.Button btnResume;
 		private System.Windows.Forms.Button btnSerialize;
-		private System.Windows.Forms.GroupBox groupBox4;
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.Button btnPurgeRough;
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.GroupBox groupBox1;
-		private System.Windows.Forms.Button btnPolySplittingField;
 		private System.Windows.Forms.Button btnCollectSquares;
 		private System.Windows.Forms.Button btnLatticeSieve;
 		private System.Windows.Forms.Label label5;
@@ -503,6 +460,7 @@
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.TextBox tbRelationValueRange;
 		private System.Windows.Forms.Button btnPrintRelations;
+		private System.Windows.Forms.GroupBox groupBox4;
 	}
 }
 
