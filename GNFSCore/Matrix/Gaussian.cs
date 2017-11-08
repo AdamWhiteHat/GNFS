@@ -95,9 +95,9 @@ namespace GNFSCore.Matrix
 
 			List<GaussianRow> gaussianRows = gaussianTuples.Select(tup => tup.Item2).ToList();
 
-			int maxIndexRat = gaussianRows.Select(row => row.LastIndex_Rational).Max();
-			int maxIndexAlg = gaussianRows.Select(row => row.LastIndex_Algebraic).Max();
-			int maxIndexQua = gaussianRows.Select(row => row.LastIndex_Quadratic).Max();
+			int maxIndexRat = gaussianRows.Select(row => row.LastIndexOfRational).Max();
+			int maxIndexAlg = gaussianRows.Select(row => row.LastIndexOfAlgebraic).Max();
+			int maxIndexQua = gaussianRows.Select(row => row.LastIndexOfQuadratic).Max();
 
 			foreach (GaussianRow row in gaussianRows)
 			{
@@ -153,13 +153,13 @@ namespace GNFSCore.Matrix
 			public List<bool> QuadraticPart { get; set; }
 
 
-			public int LastIndex_Rational { get { return RationalPart.LastIndexOf(true); } }
-			public int LastIndex_Algebraic { get { return AlgebraicPart.LastIndexOf(true); } }
-			public int LastIndex_Quadratic { get { return QuadraticPart.LastIndexOf(true); } }
+			public int LastIndexOfRational { get { return RationalPart.LastIndexOf(true); } }
+			public int LastIndexOfAlgebraic { get { return AlgebraicPart.LastIndexOf(true); } }
+			public int LastIndexOfQuadratic { get { return QuadraticPart.LastIndexOf(true); } }
 
-			public int Index_Rational { get { return RationalPart.Count() - 1; } }
-			public int Index_Algebraic { get { return AlgebraicPart.Count() - 1; } }
-			public int Index_Quadratic { get { return QuadraticPart.Count() - 1; } }
+			public int RationalLength { get { return RationalPart.Count() - 1; } }
+			public int AlgebraicLength { get { return AlgebraicPart.Count() - 1; } }
+			public int QuadraticLength { get { return QuadraticPart.Count() - 1; } }
 
 
 			public GaussianRow(Relation rel, PrimeFactorization rationalFactorization, PrimeFactorization algebraicFactorization, FactorCollection qfb, BigInteger rationalMaxValue, BigInteger algebraicMaxValue)
