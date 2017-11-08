@@ -144,7 +144,7 @@ namespace GNFSCore.Matrix
 		//}
 
 
-		private class GaussianRow
+		public class GaussianRow
 		{
 			public bool Sign { get; set; }
 
@@ -161,6 +161,29 @@ namespace GNFSCore.Matrix
 			public int AlgebraicLength { get { return AlgebraicPart.Count() - 1; } }
 			public int QuadraticLength { get { return QuadraticPart.Count() - 1; } }
 
+			public GaussianRow(GNFS gnfs, Relation relation)
+			{
+				if (relation.RationalNorm.Sign == -1)
+				{
+					Sign = true;
+				}
+				else
+				{
+					Sign = false;
+				}
+
+				FactorCollection qfb = gnfs.QFB;
+
+				BigInteger rationalMaxValue = gnfs.PrimeBase.RationalFactorBase;
+				BigInteger algebraicMaxValue = gnfs.PrimeBase.AlgebraicFactorBase;
+
+				PrimeFactorization rationalFactorization = new PrimeFactorization(relation.RationalNorm, rationalMaxValue, true);
+				PrimeFactorization algebraicFactorization = new PrimeFactorization(relation.AlgebraicNorm, algebraicMaxValue, true);
+
+				RationalPart = GetVector(rationalFactorization, rationalMaxValue).ToList();
+				AlgebraicPart = GetVector(algebraicFactorization, algebraicMaxValue).ToList();
+				QuadraticPart = qfb.Select(qf => QuadraticResidue.GetQuadraticCharacter(relation, qf)).ToList();
+			}
 
 			public GaussianRow(Relation rel, PrimeFactorization rationalFactorization, PrimeFactorization algebraicFactorization, FactorCollection qfb, BigInteger rationalMaxValue, BigInteger algebraicMaxValue)
 			{
