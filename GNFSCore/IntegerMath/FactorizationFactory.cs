@@ -141,7 +141,16 @@ namespace GNFSCore.IntegerMath
 				}
 			}
 
-			if (BigInteger.Abs(toFactor) != 1 || !factors.Any())
+			if (BigInteger.Abs(toFactor) != 1)
+			{
+				if (FactorizationFactory.IsPrime(toFactor))
+				{
+					factors.Add(toFactor);
+				}
+
+				return factors;
+			}
+			else if (!factors.Any())
 			{
 				return new BigInteger[] { };
 			}

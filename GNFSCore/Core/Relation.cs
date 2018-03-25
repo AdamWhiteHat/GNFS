@@ -12,7 +12,7 @@ using System.IO;
 
 namespace GNFSCore
 {
-	using FactorBase;
+	using Factors;
 	using IntegerMath;
 	using Matrix;
 
@@ -89,8 +89,8 @@ namespace GNFSCore
 
 		public void Sieve(PolyRelationsSieveProgress relationsSieve)
 		{
-			AlgebraicQuotient = Factor(relationsSieve.PrimeBase.AlgebraicPrimeBase, AlgebraicNorm, AlgebraicQuotient);
-			RationalQuotient = Factor(relationsSieve.PrimeBase.RationalPrimeBase, RationalNorm, RationalQuotient);
+			AlgebraicQuotient = Factor(relationsSieve.PrimeBase.AlgebraicFactorBase, AlgebraicNorm, AlgebraicQuotient);
+			RationalQuotient = Factor(relationsSieve.PrimeBase.RationalFactorBase, RationalNorm, RationalQuotient);
 		}
 
 		private static BigInteger Factor(IEnumerable<BigInteger> primeFactors, BigInteger norm, BigInteger quotient)
@@ -125,6 +125,10 @@ namespace GNFSCore
 		public int RationalWeight { get { return _rationalFactorization.Any() ? _rationalFactorization.Count : 0; } }
 		public int AlgebraicWeight { get { return _algebraicFactorization.Any() ? _algebraicFactorization.Count : 0; } }
 
+
+
+
+
 		private PrimeFactorization _algebraicFactorization = new PrimeFactorization();
 		private PrimeFactorization _rationalFactorization = new PrimeFactorization();
 
@@ -133,8 +137,8 @@ namespace GNFSCore
 
 		public void MatrixInitialize()
 		{
-			_rationalFactorization = new PrimeFactorization(RationalNorm, _gnfs.PrimeBase.RationalFactorBase, true);
-			_algebraicFactorization = new PrimeFactorization(AlgebraicNorm, _gnfs.PrimeBase.AlgebraicFactorBase, true);
+			_rationalFactorization = new PrimeFactorization(RationalNorm, _gnfs.PrimeFactorBase.MaxRationalFactorBase, true);
+			_algebraicFactorization = new PrimeFactorization(AlgebraicNorm, _gnfs.PrimeFactorBase.MaxAlgebraicFactorBase, true);
 		}
 
 		private void checkMatrixInitialization()
@@ -145,25 +149,24 @@ namespace GNFSCore
 			}
 		}
 
-		public bool[] GetMatrixRow()
+		public bool[] GetRationalMatrixRow()
 		{
 			checkMatrixInitialization();
 
-			bool sign = false;
-			if (RationalNorm.Sign == -1)
-			{
-				sign = true;
-			}
+			bool[] rational = GetVector(_rationalFactorization, _gnfs.PrimeFactorBase.MaxRationalFactorBase);
 
-			bool[] rational = GetVector(_rationalFactorization, _gnfs.PrimeBase.RationalFactorBase);
-			bool[] algebraic = GetVector(_algebraicFactorization, _gnfs.PrimeBase.AlgebraicFactorBase);
-			//bool[] quadratic = _gnfs.QFB.Select(qf => QuadraticResidue.GetQuadraticCharacter(this, qf)).ToArray();
+			bool sign = (RationalNorm.Sign == -1);
+			return new bool[] { sign }.Concat(rational).ToArray();
+		}
 
-			List<bool> result = new List<bool>() { sign };
-			result.AddRange(rational);
-			result.AddRange(algebraic);
-			//result.AddRange(quadratic);
-			return result.ToArray();
+		public bool[] GetAlgebraicMatrixRow()
+		{
+			checkMatrixInitialization();
+
+			bool[] algebraic = GetVector(_algebraicFactorization, _gnfs.PrimeFactorBase.MaxAlgebraicFactorBase);
+
+			bool sign = (AlgebraicNorm.Sign == -1);
+			return new bool[] { sign }.Concat(algebraic).ToArray();
 		}
 
 		private bool[] GetVector(PrimeFactorization primeFactorization, BigInteger maxValue)
@@ -187,6 +190,7 @@ namespace GNFSCore
 			return result.Take(primeIndex).ToArray();
 		}
 
+		
 		public override string ToString()
 		{
 			return
@@ -224,9 +228,9 @@ namespace GNFSCore
 					new XElement("C", rel.C),
 					new XElement("AlgebraicNorm", rel.AlgebraicNorm),
 					new XElement("RationalNorm", rel.RationalNorm),
-					new XElement("AlgebraicFactorization", FactorizationFactory.GetPrimeFactorization(rel.AlgebraicNorm, gnfs.PrimeBase.AlgebraicFactorBase).ToString()),
-					new XElement("RationalFactorization", FactorizationFactory.GetPrimeFactorization(rel.RationalNorm, gnfs.PrimeBase.RationalFactorBase).ToString()),
-					new XElement("MatrixRow", string.Join(",", rel.GetMatrixRow().Select(b => b ? '1' : '0')))
+					new XElement("AlgebraicFactorization", FactorizationFactory.GetPrimeFactorization(rel.AlgebraicNorm, gnfs.PrimeFactorBase.MaxAlgebraicFactorBase).ToString()),
+					new XElement("RationalFactorization", FactorizationFactory.GetPrimeFactorization(rel.RationalNorm, gnfs.PrimeFactorBase.MaxRationalFactorBase).ToString()),
+					new XElement("AlgebraicMatrixRow", string.Join(",", rel.GetAlgebraicMatrixRow().Select(b => b ? '1' : '0')))
 				)
 			).Save(filename);
 		}

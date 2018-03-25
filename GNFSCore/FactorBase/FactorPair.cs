@@ -7,7 +7,7 @@ using GNFSCore.Polynomial;
 using GNFSCore.IntegerMath;
 using System.Runtime.Serialization;
 
-namespace GNFSCore.FactorBase
+namespace GNFSCore.Factors
 {
 	public struct FactorPair : IEquatable<FactorPair>
 	{

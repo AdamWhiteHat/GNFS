@@ -11,12 +11,11 @@ using System.Xml.Schema;
 using System.Threading;
 using Newtonsoft.Json;
 
-using GNFSCore.FactorBase;
-using GNFSCore.Polynomial;
-using GNFSCore.IntegerMath;
-
 namespace GNFSCore
 {
+	using Factors;
+	using Polynomial;
+	using IntegerMath;
 	public partial class GNFS : IXmlSerializable
 	{
 		public BigInteger N { get; set; }
@@ -29,7 +28,7 @@ namespace GNFSCore
 		[JsonIgnore]
 		public CancellationToken CancelToken { get; set; }
 
-		public PrimeBase PrimeBase { get; set; }
+		public FactorBase PrimeFactorBase { get; set; }
 
 		public FactorCollection RFB { get; set; } = null;
 		public FactorCollection AFB { get; set; } = null;
@@ -45,7 +44,7 @@ namespace GNFSCore
 
 		public GNFS()
 		{
-			PrimeBase = new PrimeBase();
+			PrimeFactorBase = new FactorBase();
 			PolynomialCollection = new List<IPolynomial>();
 		}
 
@@ -127,17 +126,17 @@ namespace GNFSCore
 			int polyDegree = input.degree;
 			
 
-			PrimeBase.RationalFactorBase = input.PrimeBase.RationalFactorBase;
-			PrimeBase.AlgebraicFactorBase = input.PrimeBase.AlgebraicFactorBase;
-			PrimeBase.QuadraticFactorBaseMin = input.PrimeBase.QuadraticFactorBaseMin;
-			PrimeBase.QuadraticFactorBaseMax = input.PrimeBase.QuadraticFactorBaseMax;
+			PrimeFactorBase.MaxRationalFactorBase = input.PrimeFactorBase.MaxRationalFactorBase;
+			PrimeFactorBase.MaxAlgebraicFactorBase = input.PrimeFactorBase.MaxAlgebraicFactorBase;
+			PrimeFactorBase.MinQuadraticFactorBase = input.PrimeFactorBase.MinQuadraticFactorBase;
+			PrimeFactorBase.MaxQuadraticFactorBase = input.PrimeFactorBase.MaxQuadraticFactorBase;
 
 			int base10 = N.ToString().Count();
 			int quadraticBaseSize = CalculateQuadraticBaseSize(polyDegree);
 
-			PrimeBase.RationalPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.RationalFactorBase).ToList();
-			PrimeBase.AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.AlgebraicFactorBase).ToList();
-			PrimeBase.QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(PrimeBase.QuadraticFactorBaseMin).Take(quadraticBaseSize).ToList();
+			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxRationalFactorBase).ToList();
+			PrimeFactorBase.AlgebraicFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxAlgebraicFactorBase).ToList();
+			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesFrom(PrimeFactorBase.MinQuadraticFactorBase).Take(quadraticBaseSize).ToList();
 
 			// Load Polynomial
 			if (Directory.Exists(SaveLocations.SaveDirectory))
@@ -260,19 +259,19 @@ namespace GNFSCore
 
 		private void CaclulatePrimeBounds(BigInteger bound)
 		{
-			PrimeBase = new PrimeBase();
+			PrimeFactorBase = new FactorBase();
 
-			PrimeBase.RationalFactorBase = bound;
-			PrimeBase.RationalPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.RationalFactorBase).ToList();
+			PrimeFactorBase.MaxRationalFactorBase = bound;
+			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxRationalFactorBase).ToList();
 
-			PrimeBase.AlgebraicFactorBase = (PrimeBase.RationalFactorBase) * 3;
-			PrimeBase.AlgebraicPrimeBase = PrimeFactory.GetPrimesTo(PrimeBase.AlgebraicFactorBase).ToList();
+			PrimeFactorBase.MaxAlgebraicFactorBase = (PrimeFactorBase.MaxRationalFactorBase) * 3;
+			PrimeFactorBase.AlgebraicFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxAlgebraicFactorBase).ToList();
 
 			int quadraticBaseSize = 0;
 
 			if (degree <= 3)
 			{
-				int tempQ = (PrimeBase.RationalPrimeBase.Count + PrimeBase.AlgebraicPrimeBase.Count + 1);
+				int tempQ = (PrimeFactorBase.RationalFactorBase.Count + PrimeFactorBase.AlgebraicFactorBase.Count + 1);
 				tempQ = tempQ / 10;
 
 				quadraticBaseSize = Math.Min(tempQ, 100);
@@ -282,10 +281,10 @@ namespace GNFSCore
 				quadraticBaseSize = CalculateQuadraticBaseSize(degree);
 			}
 
-			PrimeBase.QuadraticFactorBaseMin = BigInteger.Multiply(bound, 3) + BigInteger.Divide(bound, 2);
-			PrimeBase.QuadraticPrimeBase = PrimeFactory.GetPrimesFrom(PrimeBase.QuadraticFactorBaseMin).Take((quadraticBaseSize*2)+1).ToList();
+			PrimeFactorBase.MinQuadraticFactorBase = BigInteger.Multiply(bound, 3) + BigInteger.Divide(bound, 2);
+			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesFrom(PrimeFactorBase.MinQuadraticFactorBase).Take((quadraticBaseSize*2)+1).ToList();
 
-			PrimeBase.QuadraticFactorBaseMax = PrimeBase.QuadraticPrimeBase.Last();
+			PrimeFactorBase.MaxQuadraticFactorBase = PrimeFactorBase.QuadraticFactorBase.Last();
 
 		}
 
@@ -417,10 +416,10 @@ namespace GNFSCore
 			result.AppendLine("ƒ(m) = " + CurrentPolynomial.ToString());
 			result.AppendLine();
 			result.AppendLine("Prime Factor Base Bounds:");
-			result.AppendLine($"RationalFactorBase : {PrimeBase.RationalFactorBase}");
-			result.AppendLine($"AlgebraicFactorBase: {PrimeBase.AlgebraicFactorBase}");
-			result.AppendLine($"QuadraticPrimeBase Range: {PrimeBase.QuadraticFactorBaseMin} - {PrimeBase.QuadraticFactorBaseMax}");
-			result.AppendLine($"QuadraticPrimeBase Count: {PrimeBase.QuadraticPrimeBase.Count}");
+			result.AppendLine($"RationalFactorBase : {PrimeFactorBase.MaxRationalFactorBase}");
+			result.AppendLine($"AlgebraicFactorBase: {PrimeFactorBase.MaxAlgebraicFactorBase}");
+			result.AppendLine($"QuadraticPrimeBase Range: {PrimeFactorBase.MinQuadraticFactorBase} - {PrimeFactorBase.MaxQuadraticFactorBase}");
+			result.AppendLine($"QuadraticPrimeBase Count: {PrimeFactorBase.QuadraticFactorBase.Count}");
 			result.AppendLine();
 			result.AppendLine($"RFB - Rational Factor Base (Count: {RFB.Count}):");
 			result.AppendLine(RFB.ToString(200));
@@ -432,6 +431,19 @@ namespace GNFSCore
 			result.AppendLine(QFB.ToString());
 			result.AppendLine();
 
+			List<int> prms = new List<int>();
+			prms.AddRange(RFB.Primes);
+			prms.AddRange(AFB.Primes);
+			prms.AddRange(QFB.Primes);
+			prms = prms.Distinct().ToList();
+
+			BigInteger maxPrime = prms.Max();
+
+			result.AppendLine();
+			result.AppendLine("Distinct primes (from factor bases):");
+			result.AppendLine(prms.FormatString(false));
+			result.AppendLine();
+
 			return result.ToString();
 		}
 
@@ -440,10 +452,10 @@ namespace GNFSCore
 			writer.WriteElementString("N", N.ToString());
 			writer.WriteElementString("M", m.ToString());
 			writer.WriteElementString("Degree", this.degree.ToString());
-			writer.WriteElementString("RationalFactorBase", PrimeBase.RationalFactorBase.ToString());
-			writer.WriteElementString("AlgebraicFactorBase", PrimeBase.AlgebraicFactorBase.ToString());
-			writer.WriteElementString("QuadraticFactorBaseMin", PrimeBase.QuadraticFactorBaseMin.ToString());
-			writer.WriteElementString("QuadraticFactorBaseMax", PrimeBase.QuadraticFactorBaseMax.ToString());
+			writer.WriteElementString("RationalFactorBase", PrimeFactorBase.MaxRationalFactorBase.ToString());
+			writer.WriteElementString("AlgebraicFactorBase", PrimeFactorBase.MaxAlgebraicFactorBase.ToString());
+			writer.WriteElementString("QuadraticFactorBaseMin", PrimeFactorBase.MinQuadraticFactorBase.ToString());
+			writer.WriteElementString("QuadraticFactorBaseMax", PrimeFactorBase.MaxQuadraticFactorBase.ToString());
 		}
 
 		public void ReadXml(XmlReader reader)
@@ -464,10 +476,10 @@ namespace GNFSCore
 			N = BigInteger.Parse(nString);
 			m = BigInteger.Parse(mString);
 			this.degree = int.Parse(degreeString);
-			PrimeBase.RationalFactorBase = int.Parse(rationalFactorBaseString);
-			PrimeBase.AlgebraicFactorBase = int.Parse(algebraicFactorBaseString);
-			PrimeBase.QuadraticFactorBaseMin = int.Parse(quadraticFactorBaseMinString);
-			PrimeBase.QuadraticFactorBaseMax = int.Parse(quadraticFactorBaseMaxString);
+			PrimeFactorBase.MaxRationalFactorBase = int.Parse(rationalFactorBaseString);
+			PrimeFactorBase.MaxAlgebraicFactorBase = int.Parse(algebraicFactorBaseString);
+			PrimeFactorBase.MinQuadraticFactorBase = int.Parse(quadraticFactorBaseMinString);
+			PrimeFactorBase.MaxQuadraticFactorBase = int.Parse(quadraticFactorBaseMaxString);
 		}
 
 		public XmlSchema GetSchema() { return null; }

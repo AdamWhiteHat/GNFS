@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace GNFSCore
 {
-	using FactorBase;
+	using Factors;
 	using IntegerMath;
 
 	public class QuadraticResidue

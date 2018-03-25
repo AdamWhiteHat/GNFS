@@ -3,10 +3,10 @@ using System.Linq;
 using System.Numerics;
 using ExtendedNumerics;
 
-namespace GNFSCore.FactorBase
+namespace GNFSCore.Factors
 {
-	using GNFSCore.Polynomial;
-	using GNFSCore.Polynomial.Internal;
+	using Polynomial;
+	using Polynomial.Internal;
 
 	public static class Normal
 	{

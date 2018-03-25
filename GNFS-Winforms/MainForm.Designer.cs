@@ -42,9 +42,9 @@
 			this.btnFindSquares = new System.Windows.Forms.Button();
 			this.btnMatrix = new System.Windows.Forms.Button();
 			this.panelButtons = new System.Windows.Forms.Panel();
-			this.panelFunctions = new System.Windows.Forms.Panel();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.btnSerialize = new System.Windows.Forms.Button();
+			this.panelFunctions = new System.Windows.Forms.Panel();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.btnPrintRelations = new System.Windows.Forms.Button();
 			this.btnPurgeRough = new System.Windows.Forms.Button();
@@ -59,8 +59,8 @@
 			this.label6 = new System.Windows.Forms.Label();
 			this.tbRelationValueRange = new System.Windows.Forms.TextBox();
 			this.panelButtons.SuspendLayout();
-			this.panelFunctions.SuspendLayout();
 			this.groupBox4.SuspendLayout();
+			this.panelFunctions.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -72,7 +72,7 @@
 			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbOutput.Location = new System.Drawing.Point(-4, 246);
+			this.tbOutput.Location = new System.Drawing.Point(4, 246);
 			this.tbOutput.Multiline = true;
 			this.tbOutput.Name = "tbOutput";
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -209,19 +209,6 @@
 			this.panelButtons.Size = new System.Drawing.Size(338, 214);
 			this.panelButtons.TabIndex = 14;
 			// 
-			// panelFunctions
-			// 
-			this.panelFunctions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.panelFunctions.Controls.Add(this.groupBox3);
-			this.panelFunctions.Controls.Add(this.groupBox2);
-			this.panelFunctions.Controls.Add(this.groupBox1);
-			this.panelFunctions.Enabled = false;
-			this.panelFunctions.Location = new System.Drawing.Point(8, 49);
-			this.panelFunctions.Name = "panelFunctions";
-			this.panelFunctions.Size = new System.Drawing.Size(324, 156);
-			this.panelFunctions.TabIndex = 16;
-			// 
 			// groupBox4
 			// 
 			this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -246,6 +233,19 @@
 			this.btnSerialize.Text = "Save";
 			this.btnSerialize.UseVisualStyleBackColor = true;
 			this.btnSerialize.Click += new System.EventHandler(this.btnSerialize_Click);
+			// 
+			// panelFunctions
+			// 
+			this.panelFunctions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.panelFunctions.Controls.Add(this.groupBox3);
+			this.panelFunctions.Controls.Add(this.groupBox2);
+			this.panelFunctions.Controls.Add(this.groupBox1);
+			this.panelFunctions.Enabled = false;
+			this.panelFunctions.Location = new System.Drawing.Point(8, 49);
+			this.panelFunctions.Name = "panelFunctions";
+			this.panelFunctions.Size = new System.Drawing.Size(324, 156);
+			this.panelFunctions.TabIndex = 16;
 			// 
 			// groupBox3
 			// 
@@ -418,8 +418,8 @@
 			this.Name = "MainForm";
 			this.Text = "GNFS";
 			this.panelButtons.ResumeLayout(false);
-			this.panelFunctions.ResumeLayout(false);
 			this.groupBox4.ResumeLayout(false);
+			this.panelFunctions.ResumeLayout(false);
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);

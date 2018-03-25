@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 using System.Xml.Schema;
 using System.Threading;
 
-using GNFSCore.FactorBase;
+using GNFSCore.Factors;
 using GNFSCore.Polynomial;
 using GNFSCore.IntegerMath;
 

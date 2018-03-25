@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace GNFSCore
 {
-	public class PrimeBase
+	public class FactorBase
 	{
-		public BigInteger RationalFactorBase { get; internal set; }
-		public BigInteger AlgebraicFactorBase { get; internal set; }
-		public BigInteger QuadraticFactorBaseMin { get; internal set; }
-		public BigInteger QuadraticFactorBaseMax { get; internal set; }
+		public BigInteger MaxRationalFactorBase { get; internal set; }
+		public BigInteger MaxAlgebraicFactorBase { get; internal set; }
+		public BigInteger MinQuadraticFactorBase { get; internal set; }
+		public BigInteger MaxQuadraticFactorBase { get; internal set; }
 
 		[JsonIgnore]
-		public List<BigInteger> RationalPrimeBase { get; internal set; }
+		public List<BigInteger> RationalFactorBase { get; internal set; }
 		[JsonIgnore]
-		public List<BigInteger> AlgebraicPrimeBase { get; internal set; }
+		public List<BigInteger> AlgebraicFactorBase { get; internal set; }
 		[JsonIgnore]
-		public List<BigInteger> QuadraticPrimeBase { get; internal set; }
+		public List<BigInteger> QuadraticFactorBase { get; internal set; }
 	}
 }

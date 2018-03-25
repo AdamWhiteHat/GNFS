@@ -1,4 +1,4 @@
-﻿using GNFSCore.FactorBase;
+﻿using GNFSCore.Factors;
 using GNFSCore.IntegerMath;
 using System;
 using System.Collections.Generic;
@@ -36,209 +36,51 @@ namespace GNFSCore.Matrix
 			M = new List<bool[]>();
 
 
-			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeBase.RationalFactorBase) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeBase.AlgebraicFactorBase) + _gnfs.QFB.Count() + 3;
-
+			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.MaxRationalFactorBase) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.MaxAlgebraicFactorBase) + _gnfs.QFB.Count() + 3;
 
 			relations = rels.ToArray();
 
-			//foreach (Relation rel in relations)
-			//{
-			//	rel.MatrixInitialize();
-			//}
-
-			//relations = relations.Where(rel => rel.AlgebraicWeight != 0 && rel.RationalWeight != 0);
-			//relations = relations.OrderByDescending(rel => rel.AlgebraicWeight).ThenByDescending(rel => rel.RationalWeight);
-
-
-			List<PrimeFactorization> rationalNormFactorizations = new List<PrimeFactorization>();
-			foreach (Relation rel in relations)
-			{
-				rationalNormFactorizations.Add(new PrimeFactorization(rel.RationalNorm, _gnfs.PrimeBase.RationalFactorBase, true));
-			}
-
-			List<PrimeFactorization> algebraicNormFactorizations = new List<PrimeFactorization>();
-			foreach (Relation rel in relations)
-			{
-				algebraicNormFactorizations.Add(new PrimeFactorization(rel.AlgebraicNorm, _gnfs.PrimeBase.AlgebraicFactorBase, true));
-			}
-
-			BigInteger rationalMaxPrimeFactor = rationalNormFactorizations.Max(lst => lst.Any() ? lst.Max(factor => factor.Prime) : 0);
-			BigInteger algebraicMaxPrimeFactor = algebraicNormFactorizations.Max(lst => lst.Any() ? lst.Max(factor => factor.Prime) : 0);
-
-
 			int maxIndex = relations.Length - 1;
 
-			int index = 0;
-			while (index < maxIndex)
-			{
-				rationalNormFactorizations[index].RestrictFactors(rationalMaxPrimeFactor);
-				algebraicNormFactorizations[index].RestrictFactors(algebraicMaxPrimeFactor);
+			List<GaussianRow> relationsAsRows = new List<GaussianRow>();
 
-				index++;
+			foreach (Relation rel in relations)
+			{
+				GaussianRow row = new GaussianRow(_gnfs, rel);
+
+				relationsAsRows.Add(row);
 			}
 
+			List<GaussianRow> orderedRows = relationsAsRows.OrderBy(row1 => row1.LastIndexOfAlgebraic).ThenBy(row2 => row2.LastIndexOfQuadratic).ToList();
 
-			List<Tuple<Relation, GaussianRow>> gaussianTuples = new List<Tuple<Relation, GaussianRow>>();
+			List<GaussianRow> selectedRows = orderedRows.Take(maxRelationsToSelect).ToList();
 
-			index = 0;
-			while (index < maxIndex)
-			{
-				Relation rel = relations[index];
-				//var binaryRow = GetMatrixRow(rel, rationalNormFactorizations[index], algebraicNormFactorizations[index], rationalMaxPrimeFactor, algebraicMaxPrimeFactor);
+			int maxIndexRat = selectedRows.Select(row => row.LastIndexOfRational).Max();
+			int maxIndexAlg = selectedRows.Select(row => row.LastIndexOfAlgebraic).Max();
+			int maxIndexQua = selectedRows.Select(row => row.LastIndexOfQuadratic).Max();
 
-				GaussianRow row = new GaussianRow(rel, rationalNormFactorizations[index], algebraicNormFactorizations[index], _gnfs.QFB, rationalMaxPrimeFactor, algebraicMaxPrimeFactor);
-
-				gaussianTuples.Add(new Tuple<Relation, GaussianRow>(rel, row));
-
-				index++;
-			}
-
-			List<GaussianRow> gaussianRows = gaussianTuples.Select(tup => tup.Item2).ToList();
-
-			int maxIndexRat = gaussianRows.Select(row => row.LastIndexOfRational).Max();
-			int maxIndexAlg = gaussianRows.Select(row => row.LastIndexOfAlgebraic).Max();
-			int maxIndexQua = gaussianRows.Select(row => row.LastIndexOfQuadratic).Max();
-
-			foreach (GaussianRow row in gaussianRows)
+			foreach (GaussianRow row in selectedRows)
 			{
 				row.ResizeRationalPart(maxIndexRat);
 				row.ResizeAlgebraicPart(maxIndexAlg);
 				row.ResizeQuadraticPart(maxIndexQua);
 			}
 
-			foreach (Tuple<Relation, GaussianRow> tuple in gaussianTuples)
+			GaussianRow exampleRow = selectedRows.First();
+			int newLength = exampleRow.GetBoolArray().Count();
+
+			newLength++;
+
+			selectedRows = selectedRows.Take(newLength).ToList();
+
+
+			foreach (GaussianRow row in selectedRows)
 			{
-				relationMatrixTuple.Add(new Tuple<Relation, bool[]>(tuple.Item1, tuple.Item2.GetBoolArray()));
-			}
-
-			//foreach (Relation rel in relations/*.Take(maxRelationsToSelect)*/)
-			//{
-			//	relationMatrixTuple.Add(new Tuple<Relation, bool[]>(rel, rel.GetMatrixRow()));
-			//}
-
-
-		}
-
-
-
-
-
-		//private bool[] GetMatrixRow(Relation rel, PrimeFactorization rationalFactorization, PrimeFactorization algebraicFactorization, BigInteger rationalMaxValue, BigInteger algebraicMaxValue)
-		//{
-		//	bool sign = false;
-		//	if (rel.RationalNorm.Sign == -1)
-		//	{
-		//		sign = true;
-		//	}
-
-		//	bool[] rational = GetVector(rationalFactorization, rationalMaxValue);
-		//	bool[] algebraic = GetVector(algebraicFactorization, algebraicMaxValue);
-		//	//bool[] quadratic = _gnfs.QFB.Select(qf => QuadraticResidue.GetQuadraticCharacter(rel, qf)).ToArray();
-
-		//	List<bool> result = new List<bool>() { sign };
-		//	result.AddRange(rational);
-		//	result.AddRange(algebraic);
-		//	//result.AddRange(quadratic);
-		//	result.Add(true);
-		//	return result.ToArray();
-		//}
-
-
-		public class GaussianRow
-		{
-			public bool Sign { get; set; }
-
-			public List<bool> RationalPart { get; set; }
-			public List<bool> AlgebraicPart { get; set; }
-			public List<bool> QuadraticPart { get; set; }
-
-
-			public int LastIndexOfRational { get { return RationalPart.LastIndexOf(true); } }
-			public int LastIndexOfAlgebraic { get { return AlgebraicPart.LastIndexOf(true); } }
-			public int LastIndexOfQuadratic { get { return QuadraticPart.LastIndexOf(true); } }
-
-			public int RationalLength { get { return RationalPart.Count() - 1; } }
-			public int AlgebraicLength { get { return AlgebraicPart.Count() - 1; } }
-			public int QuadraticLength { get { return QuadraticPart.Count() - 1; } }
-
-			public GaussianRow(GNFS gnfs, Relation relation)
-			{
-				if (relation.RationalNorm.Sign == -1)
-				{
-					Sign = true;
-				}
-				else
-				{
-					Sign = false;
-				}
-
-				FactorCollection qfb = gnfs.QFB;
-
-				BigInteger rationalMaxValue = gnfs.PrimeBase.RationalFactorBase;
-				BigInteger algebraicMaxValue = gnfs.PrimeBase.AlgebraicFactorBase;
-
-				PrimeFactorization rationalFactorization = new PrimeFactorization(relation.RationalNorm, rationalMaxValue, true);
-				PrimeFactorization algebraicFactorization = new PrimeFactorization(relation.AlgebraicNorm, algebraicMaxValue, true);
-
-				RationalPart = GetVector(rationalFactorization, rationalMaxValue).ToList();
-				AlgebraicPart = GetVector(algebraicFactorization, algebraicMaxValue).ToList();
-				QuadraticPart = qfb.Select(qf => QuadraticResidue.GetQuadraticCharacter(relation, qf)).ToList();
-			}
-
-			public GaussianRow(Relation rel, PrimeFactorization rationalFactorization, PrimeFactorization algebraicFactorization, FactorCollection qfb, BigInteger rationalMaxValue, BigInteger algebraicMaxValue)
-			{
-				if (rel.RationalNorm.Sign == -1)
-				{
-					Sign = true;
-				}
-				else
-				{
-					Sign = false;
-				}
-
-				RationalPart = GetVector(rationalFactorization, rationalMaxValue).ToList();
-				AlgebraicPart = GetVector(algebraicFactorization, algebraicMaxValue).ToList();
-				QuadraticPart = qfb.Select(qf => QuadraticResidue.GetQuadraticCharacter(rel, qf)).ToList();
-			}
-
-			public bool[] GetBoolArray()
-			{
-				List<bool> result = new List<bool>() { Sign };
-				result.AddRange(RationalPart);
-				result.AddRange(AlgebraicPart);
-				result.AddRange(QuadraticPart);
-				//result.Add(false);
-				return result.ToArray();
-			}
-
-			public void ResizeRationalPart(int size)
-			{
-				RationalPart = RationalPart.Take(size + 1).ToList();
-			}
-
-			public void ResizeAlgebraicPart(int size)
-			{
-				AlgebraicPart = AlgebraicPart.Take(size + 1).ToList();
-			}
-
-			public void ResizeQuadraticPart(int size)
-			{
-				QuadraticPart = QuadraticPart.Take(size + 1).ToList();
+				relationMatrixTuple.Add(new Tuple<Relation, bool[]>(row.SourceRelation, row.GetBoolArray()));
 			}
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
+	
 
 
 		protected static bool[] GetVector(PrimeFactorization primeFactorization, BigInteger maxValue)
@@ -261,12 +103,7 @@ namespace GNFSCore.Matrix
 
 			return result.Take(primeIndex).ToArray();
 		}
-
-
-
-
-
-
+				
 
 		public void DontTransposeAppend()
 		{
@@ -302,18 +139,11 @@ namespace GNFSCore.Matrix
 			int numRows = relationMatrixTuple[0].Item2.Length;
 			while (index < numRows)
 			{
+				ColumnIndexRelationDictionary.Add(index, relationMatrixTuple[index].Item1);
+
 				List<bool> newRow = relationMatrixTuple.Select(bv => bv.Item2[index]).ToList();
 				newRow.Add(false);
 				result.Add(newRow.ToArray());
-
-				index++;
-			}
-
-			index = 0;
-			int numColumns = relationMatrixTuple.Count;
-			while (index < numColumns)
-			{
-				ColumnIndexRelationDictionary.Add(index, relationMatrixTuple[index].Item1);
 
 				index++;
 			}
@@ -417,25 +247,6 @@ namespace GNFSCore.Matrix
 			return result.ToArray();
 		}
 
-		public Relation[] GetSolutionSet2()
-		{
-			int index = 0;
-			int max = ColumnIndexRelationDictionary.Count;
-
-			List<Relation> result = new List<Relation>();
-			while (index < max)
-			{
-				if (freeCols[index] == true)
-				{
-					result.Add(ColumnIndexRelationDictionary[index]);
-				}
-
-				index++;
-			}
-
-			return result.ToArray();
-		}
-
 		public bool[] GetSolutionFlags(int numSolutions)
 		{
 			if (!eliminationStep)
@@ -494,12 +305,7 @@ namespace GNFSCore.Matrix
 
 			return result;
 		}
-
-
-
-
-
-
+				
 
 
 		public static bool[] Add(bool[] left, bool[] right)
@@ -519,10 +325,8 @@ namespace GNFSCore.Matrix
 			return result;
 		}
 
-
-
-
-
+		
+		
 
 
 		public static string VectorToString(bool[] vector)
@@ -538,6 +342,79 @@ namespace GNFSCore.Matrix
 		public override string ToString()
 		{
 			return MatrixToString(M);
+		}
+
+
+
+		public class GaussianRow
+		{
+			public bool Sign { get; set; }
+
+			public List<bool> RationalPart { get; set; }
+			public List<bool> AlgebraicPart { get; set; }
+			public List<bool> QuadraticPart { get; set; }
+
+			public int LastIndexOfRational { get { return RationalPart.LastIndexOf(true); } }
+			public int LastIndexOfAlgebraic { get { return AlgebraicPart.LastIndexOf(true); } }
+			public int LastIndexOfQuadratic { get { return QuadraticPart.LastIndexOf(true); } }
+
+			public int RationalLength { get { return RationalPart.Count() - 1; } }
+			public int AlgebraicLength { get { return AlgebraicPart.Count() - 1; } }
+			public int QuadraticLength { get { return QuadraticPart.Count() - 1; } }
+
+			public Relation SourceRelation { get; private set; }
+
+			public GaussianRow(GNFS gnfs, Relation relation)
+			{
+				SourceRelation = relation;
+
+				if (relation.RationalNorm.Sign == -1)
+				{
+					Sign = true;
+				}
+				else
+				{
+					Sign = false;
+				}
+
+				FactorCollection qfb = gnfs.QFB;
+
+				BigInteger rationalMaxValue = gnfs.PrimeFactorBase.MaxRationalFactorBase;
+				BigInteger algebraicMaxValue = gnfs.PrimeFactorBase.MaxAlgebraicFactorBase;
+
+				PrimeFactorization rationalFactorization = new PrimeFactorization(relation.RationalNorm, rationalMaxValue, true);
+				PrimeFactorization algebraicFactorization = new PrimeFactorization(relation.AlgebraicNorm, algebraicMaxValue, true);
+
+				RationalPart = GetVector(rationalFactorization, rationalMaxValue).ToList();
+				AlgebraicPart = GetVector(algebraicFactorization, algebraicMaxValue).ToList();
+				QuadraticPart = qfb.Select(qf => QuadraticResidue.GetQuadraticCharacter(relation, qf)).ToList();
+			}
+
+
+			public bool[] GetBoolArray()
+			{
+				List<bool> result = new List<bool>() { Sign };
+				result.AddRange(RationalPart);
+				result.AddRange(AlgebraicPart);
+				result.AddRange(QuadraticPart);
+				//result.Add(false);
+				return result.ToArray();
+			}
+
+			public void ResizeRationalPart(int size)
+			{
+				RationalPart = RationalPart.Take(size + 1).ToList();
+			}
+
+			public void ResizeAlgebraicPart(int size)
+			{
+				AlgebraicPart = AlgebraicPart.Take(size + 1).ToList();
+			}
+
+			public void ResizeQuadraticPart(int size)
+			{
+				QuadraticPart = QuadraticPart.Take(size + 1).ToList();
+			}
 		}
 	}
 }

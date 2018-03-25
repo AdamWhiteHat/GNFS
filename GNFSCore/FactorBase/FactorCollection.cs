@@ -10,7 +10,7 @@ using GNFSCore.IntegerMath;
 using System.IO;
 using System.Threading;
 
-namespace GNFSCore.FactorBase
+namespace GNFSCore.Factors
 {
 	public class FactorCollection : List<FactorPair>
 	{
@@ -32,13 +32,31 @@ namespace GNFSCore.FactorBase
 			_gnfs = gnfs;
 		}
 
+		public List<int> Primes
+		{
+			get
+			{
+				return this.Select(fp => fp.P).Distinct().ToList();
+			}
+		}
+
+		public override string ToString()
+		{
+			return string.Join("\t", this.Select(factr => factr.ToString()));
+		}
+
+		public string ToString(int take)
+		{
+			return string.Join("\t", this.Take(take).Select(factr => factr.ToString()));
+		}
+
 		public static class Factory
 		{
 			// array of (p, m % p) up to bound
 			// quantity = phi(bound)
 			public static FactorCollection BuildRationalFactorBase(GNFS gnfs)
 			{
-				IEnumerable<FactorPair> result = gnfs.PrimeBase.RationalPrimeBase.Select(p => new FactorPair(p, (gnfs.CurrentPolynomial.Base % p))).Distinct();
+				IEnumerable<FactorPair> result = gnfs.PrimeFactorBase.RationalFactorBase.Select(p => new FactorPair(p, (gnfs.CurrentPolynomial.Base % p))).Distinct();
 				return new FactorCollection(gnfs, result.ToList());
 			}
 
@@ -46,7 +64,7 @@ namespace GNFSCore.FactorBase
 			// quantity = 2-3 times RFB.quantity
 			public static FactorCollection BuildAlgebraicFactorBase(GNFS gnfs)
 			{
-				return new FactorCollection(gnfs, FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeBase.AlgebraicPrimeBase, 0, gnfs.PrimeBase.AlgebraicFactorBase, 2000));
+				return new FactorCollection(gnfs, FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.AlgebraicFactorBase, 0, gnfs.PrimeFactorBase.MaxAlgebraicFactorBase, 2000));
 			}
 
 			// array of (p, r) where ƒ(r) % p == 0
@@ -54,7 +72,7 @@ namespace GNFSCore.FactorBase
 			// magnitude p > AFB.Last().p
 			public static FactorCollection BuildQuadradicFactorBase(GNFS gnfs)
 			{
-				return new FactorCollection(gnfs, FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeBase.QuadraticPrimeBase, 2, gnfs.PrimeBase.QuadraticFactorBaseMin, 100));
+				return new FactorCollection(gnfs, FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.QuadraticFactorBase, 2, gnfs.PrimeFactorBase.MinQuadraticFactorBase, 100));
 			}
 
 			private delegate BigInteger BigIntegerEvaluateDelegate(BigInteger x);
@@ -66,7 +84,7 @@ namespace GNFSCore.FactorBase
 				BigInteger Cdd = BigInteger.Pow(Cd, (gnfs.CurrentPolynomial.Degree - 1));
 				DoubleEvaluateDelegate evalDelegate = gnfs.CurrentPolynomial.Evaluate;
 
-				IEnumerable<FactorPair> results = gnfs.PrimeBase.RationalPrimeBase.Select(p => new FactorPair(p, BigInteger.Multiply(evalDelegate(BigInteger.Divide(p, Cd)), Cdd))).Distinct();
+				IEnumerable<FactorPair> results = gnfs.PrimeFactorBase.RationalFactorBase.Select(p => new FactorPair(p, BigInteger.Multiply(evalDelegate(BigInteger.Divide(p, Cd)), Cdd))).Distinct();
 				return new FactorCollection(gnfs, results.ToList());
 			}
 		}
@@ -93,16 +111,6 @@ namespace GNFSCore.FactorBase
 			}
 
 			return result.OrderBy(tup => tup.P).ToList();
-		}
-
-		public override string ToString()
-		{
-			return string.Join("\t", this.Select(factr => factr.ToString()));
-		}
-
-		public string ToString(int take)
-		{
-			return string.Join("\t", this.Take(take).Select(factr => factr.ToString()));
 		}
 
 		public static void Serialize(string filePath, FactorCollection factorCollection)

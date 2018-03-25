@@ -4,11 +4,13 @@ using System.Numerics;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using GNFSCore.IntegerMath;
+
 
 namespace GNFSCore.Polynomial
 {
+	using GNFSCore;
 	using Internal;
+	using IntegerMath;
 
 	public class SkewSymmetricPolynomial
 	{

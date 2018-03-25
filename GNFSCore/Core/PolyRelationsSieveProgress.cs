@@ -32,7 +32,7 @@ namespace GNFSCore
 		[JsonIgnore]
 		public List<Relation> UnFactored { get; private set; }
 
-		public PrimeBase PrimeBase { get; private set; }
+		public FactorBase PrimeBase { get; private set; }
 
 		private GNFS _gnfs;
 
@@ -72,14 +72,14 @@ namespace GNFSCore
 			SmoothRelations = new List<Relation>();
 			RoughRelations = new List<RoughPair>();
 			UnFactored = new List<Relation>();
-			PrimeBase = new PrimeBase();
+			PrimeBase = new FactorBase();
 
-			PrimeBase = gnfs.PrimeBase;
+			PrimeBase = gnfs.PrimeFactorBase;
 		}
 
 		public PolyRelationsSieveProgress(GNFS gnfs, string polynomialSaveDirectory, int b, int quantity, int valueRange, List<Relation> smooth, List<RoughPair> rough, List<Relation> unfactored)
 		{
-			PrimeBase = new PrimeBase();
+			PrimeBase = new FactorBase();
 			_gnfs = gnfs;
 
 			B = b;
@@ -90,7 +90,7 @@ namespace GNFSCore
 			UnFactored = unfactored;
 			Polynomial_SaveDirectory = polynomialSaveDirectory;
 
-			PrimeBase = gnfs.PrimeBase;
+			PrimeBase = gnfs.PrimeFactorBase;
 
 			CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(gnfs.CancelToken);
 			CancelToken = cancellationSource.Token;
@@ -186,13 +186,6 @@ namespace GNFSCore
 			}
 
 			return new List<Relation>(smoothRelations);
-		}
-
-		public BitMatrix GetRelationsMatrix()
-		{
-			var vectors = SmoothRelations.Select(rel => new BitVector(rel.AlgebraicNorm, rel.GetMatrixRow()));
-			BitMatrix result = new BitMatrix(vectors);
-			return result;
 		}
 
 		public void PurgePrimeRoughRelations()

@@ -11,7 +11,7 @@ namespace GNFS_Winforms
 {
 	using GNFSCore;
 	using GNFSCore.Polynomial;
-	using GNFSCore.FactorBase;
+	using GNFSCore.Factors;
 	using GNFSCore.IntegerMath;
 	using GNFSCore.Matrix;
 	using GNFSCore.Polynomial.Internal;
