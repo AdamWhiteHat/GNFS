@@ -44,9 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\CouveignesSquareRoot.cs" />
     <Compile Include="Core\FactorBase.cs" />
-    <Compile Include="Core\GNFSFactory.cs" />
+    <Compile Include="Core\DirectoryLocations.cs" />
     <Compile Include="Core\PolyRelationsSieveProgress.cs" />
     <Compile Include="Core\QuadraticResidue.cs" />
     <Compile Include="Core\Relation.cs" />
@@ -54,12 +53,12 @@
     <Compile Include="Core\Serializer.cs" />
     <Compile Include="Core\SquareFinder.cs" />
     <Compile Include="Core\SquaresMethod.cs" />
+    <Compile Include="Core\StaticRandom.cs" />
     <Compile Include="FactorBase\FactorCollection.cs" />
     <Compile Include="FactorBase\FactorPair.cs" />
+    <Compile Include="IntegerMath\ModularInverse.cs" />
     <Compile Include="IntegerMath\Normal.cs" />
     <Compile Include="IntegerMath\BigRange.cs" />
-    <Compile Include="IntegerMath\BigRational.cs" />
-    <Compile Include="IntegerMath\Fraction.cs" />
     <Compile Include="IntegerMath\Legendre.cs" />
     <Compile Include="IntegerMath\PrimeFactorization.cs" />
     <Compile Include="IntegerMath\PrimeFactory.cs" />
@@ -67,9 +66,6 @@
     <Compile Include="Polynomial\CommonPolynomial.cs" />
     <Compile Include="Polynomial\SkewSymmetricPolynomial.cs" />
     <Compile Include="Polynomial\RationalPolynomial.cs" />
-    <Compile Include="Matrix\BitMatrix.cs" />
-    <Compile Include="Matrix\BitPattern.cs" />
-    <Compile Include="Matrix\BitVector.cs" />
     <Compile Include="IntegerMath\Combinatorics.cs" />
     <Compile Include="Core\GNFS.cs" />
     <Compile Include="Core\ExtensionMethods\IEnumerableExtensionMethods.cs" />
@@ -79,7 +75,6 @@
     <Compile Include="IntegerMath\GCD.cs" />
     <Compile Include="Polynomial\AlgebraicPolynomial.cs" />
     <Compile Include="IntegerMath\FactorizationFactory.cs" />
-    <Compile Include="Matrix\MatrixSolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("GNFSCore")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A General Number Field Sieve implementation in C#")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Adam Rakaska")]
 [assembly: AssemblyProduct("GNFSCore")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCopyright("Made by Adam Rakaska")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

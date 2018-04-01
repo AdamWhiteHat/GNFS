@@ -4,7 +4,6 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
-using ExtendedNumerics;
 using GNFSCore.Polynomial;
 using GNFSCore.IntegerMath;
 using System.IO;

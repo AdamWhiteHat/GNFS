@@ -11,11 +11,6 @@ namespace GNFSCore
 	{
 		private static BigInteger Fifteen = new BigInteger(15);
 
-		//public static BigInteger Mod(BigInteger l, BigInteger r)
-		//{
-		//	return BigInteger.Subtract(l, BigInteger.Multiply(BigInteger.Divide(l, r), r));
-		//}
-
 		public static bool IsSquare(this BigInteger source)
 		{
 			if (source == null || source == BigInteger.Zero)
@@ -24,6 +19,11 @@ namespace GNFSCore
 			}
 
 			BigInteger input = BigInteger.Abs(source);
+
+			if (input < 4)
+			{
+				return false;
+			}		
 
 			int base16 = (int)(input & Fifteen); // Convert to base 16 number
 			if (base16 > 9)

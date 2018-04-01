@@ -1,14 +1,13 @@
-﻿using GNFSCore.Factors;
-using GNFSCore.IntegerMath;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GNFSCore.Matrix
 {
+	using GNFSCore.Factors;
+	using GNFSCore.IntegerMath;
+
 	public class Gaussian
 	{
 		public List<bool[]> Matrix { get { return M; } }
@@ -36,7 +35,7 @@ namespace GNFSCore.Matrix
 			M = new List<bool[]>();
 
 
-			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.MaxRationalFactorBase) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.MaxAlgebraicFactorBase) + _gnfs.QFB.Count() + 3;
+			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.MaxRationalFactorBase) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.MaxAlgebraicFactorBase) + _gnfs.QFB.Count + 3;
 
 			relations = rels.ToArray();
 
@@ -51,9 +50,9 @@ namespace GNFSCore.Matrix
 				relationsAsRows.Add(row);
 			}
 
-			List<GaussianRow> orderedRows = relationsAsRows.OrderBy(row1 => row1.LastIndexOfAlgebraic).ThenBy(row2 => row2.LastIndexOfQuadratic).ToList();
+			//List<GaussianRow> orderedRows = relationsAsRows.OrderBy(row1 => row1.LastIndexOfAlgebraic).ThenBy(row2 => row2.LastIndexOfQuadratic).ToList();
 
-			List<GaussianRow> selectedRows = orderedRows.Take(maxRelationsToSelect).ToList();
+			List<GaussianRow> selectedRows = relationsAsRows.Take(maxRelationsToSelect).ToList();
 
 			int maxIndexRat = selectedRows.Select(row => row.LastIndexOfRational).Max();
 			int maxIndexAlg = selectedRows.Select(row => row.LastIndexOfAlgebraic).Max();
@@ -67,7 +66,7 @@ namespace GNFSCore.Matrix
 			}
 
 			GaussianRow exampleRow = selectedRows.First();
-			int newLength = exampleRow.GetBoolArray().Count();
+			int newLength = exampleRow.GetBoolArray().Length;
 
 			newLength++;
 
@@ -87,7 +86,7 @@ namespace GNFSCore.Matrix
 		{
 			int primeIndex = PrimeFactory.GetIndexFromValue(maxValue);
 
-			bool[] result = new bool[primeIndex + 1];
+			bool[] result = new bool[primeIndex];
 			if (primeFactorization.Any())
 			{
 				foreach (Factor oddFactor in primeFactorization.Where(f => f.ExponentMod2 == 1))
@@ -358,9 +357,9 @@ namespace GNFSCore.Matrix
 			public int LastIndexOfAlgebraic { get { return AlgebraicPart.LastIndexOf(true); } }
 			public int LastIndexOfQuadratic { get { return QuadraticPart.LastIndexOf(true); } }
 
-			public int RationalLength { get { return RationalPart.Count() - 1; } }
-			public int AlgebraicLength { get { return AlgebraicPart.Count() - 1; } }
-			public int QuadraticLength { get { return QuadraticPart.Count() - 1; } }
+			public int RationalLength { get { return RationalPart.Count - 1; } }
+			public int AlgebraicLength { get { return AlgebraicPart.Count - 1; } }
+			public int QuadraticLength { get { return QuadraticPart.Count - 1; } }
 
 			public Relation SourceRelation { get; private set; }
 

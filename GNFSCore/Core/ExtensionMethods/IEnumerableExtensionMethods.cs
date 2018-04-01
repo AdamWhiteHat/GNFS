@@ -53,25 +53,11 @@ namespace GNFSCore
 			}
 
 			string nl = newLine ? Environment.NewLine : "";
-			string tab = newLine ? "\t" : "";
+			string tab = "".PadLeft(padding);
 			string delim = "," + nl;
 			return $"{{{nl}" +
 					string.Join(delim, input.Select(i => $"{tab}{i.ToString().PadLeft(padding)}")) +
 					$"{nl}}}";
-		}
-
-		//public static string FormatString<T>(this IEnumerable<T> input, int padLength = 0)
-		//{
-		//	if (input == null || input.Count() < 1)
-		//	{
-		//		return $"{{{Environment.NewLine}}}{Environment.NewLine}";
-		//	}
-		//	return
-		//		$"{{{Environment.NewLine}" +
-		//		string.Join(Environment.NewLine, input.Select(i => $"\t{i.ToString().PadLeft(padLength)}")) +
-		//		$"{Environment.NewLine}}}{Environment.NewLine}";
-		//}
-
-
+		}		
 	}
 }

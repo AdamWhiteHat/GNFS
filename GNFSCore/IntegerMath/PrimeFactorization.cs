@@ -27,6 +27,8 @@ namespace GNFSCore.IntegerMath
 
 	public class PrimeFactorization : List<Factor>
 	{
+		public BigInteger Number;
+
 		public PrimeFactorization()
 			: base()
 		{ }
@@ -45,21 +47,7 @@ namespace GNFSCore.IntegerMath
 			{
 				this.AddRange(factorization);
 			}
-		}
-
-		public BigInteger Number;
-
-		//public PrimeFactorization(BigInteger toFactor, BigInteger maxValue)
-		//{
-		//	Number = toFactor;
-		//	this.AddRange(FactorizationFactory.GetPrimeFactorization(toFactor, maxValue));
-		//}
-
-
-		//public static implicit operator PrimeFactorization(IEnumerable<Factor> ienum)
-		//{
-		//	return new PrimeFactorization(ienum.ToList());
-		//}
+		}		
 
 		public void RestrictFactors(BigInteger maxFactor)
 		{
