@@ -33,6 +33,8 @@ namespace GNFS_Winforms
 					mainForm.LogOutput(gnfs.CurrentRelationsProgress.FormatRelations(smoothRelations.OrderByDescending(rel => rel.A * rel.B).Take(5)));
 					mainForm.LogOutput("(restricted result set to top 5)");
 					mainForm.LogOutput();
+					mainForm.LogOutput($"{smoothRelations.Count()} relations found this round.");
+					mainForm.LogOutput();
 				}
 
 				if (oneRound)
@@ -46,7 +48,7 @@ namespace GNFS_Winforms
 				//	knownRough.AddRange(rough);
 				//
 				//	mainForm.LogOutput($"Rough numbers (Relations with remainders, i.e. not fully factored):");
-				//	mainForm.LogOutput(rough/*.Skip(gnfs.RoughNumbers.Count()-5)*/.FormatString());
+				//	mainForm.LogOutput(rough/*.Skip(gnfs.RoughNumbers.Count-5)*/.FormatString());
 				//	//mainForm.LogOutput("(restricted result set to top 5)");
 				//	mainForm.LogOutput();
 				//}
@@ -62,7 +64,7 @@ namespace GNFS_Winforms
 
 					int max = roughGroups.Count;
 					int c2 = newRelations.Count;
-					int c3 = stillRough.Count();
+					int c3 = stillRough.Count;
 
 					max = Math.Min(max, Math.Min(c2, c3));
 

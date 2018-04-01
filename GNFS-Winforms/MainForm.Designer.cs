@@ -146,7 +146,7 @@
 			this.btnCreateGnfs.Name = "btnCreateGnfs";
 			this.btnCreateGnfs.Size = new System.Drawing.Size(96, 23);
 			this.btnCreateGnfs.TabIndex = 7;
-			this.btnCreateGnfs.Text = "Create";
+			this.btnCreateGnfs.Text = "Load/Create";
 			this.btnCreateGnfs.UseVisualStyleBackColor = true;
 			this.btnCreateGnfs.Click += new System.EventHandler(this.btnCreateGnfs_Click);
 			// 

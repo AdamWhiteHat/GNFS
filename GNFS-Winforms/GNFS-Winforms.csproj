@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="CreateGnfs.cs" />
     <Compile Include="ControlBridge.cs" />
-    <Compile Include="RelationFactorizationDictionary.cs" />
     <Compile Include="FindRelations.cs" />
     <Compile Include="FindSquares.cs" />
     <Compile Include="GnfsUiBridge.cs" />

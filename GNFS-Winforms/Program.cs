@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace GNFS_Winforms
 {
-	static class Program
+	public static class Program
 	{
 		/// <summary>
 		/// The main entry point for the application.
@@ -18,5 +18,16 @@ namespace GNFS_Winforms
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainForm());
 		}
-	}
+
+		public static bool IsDebug()
+		{
+			bool result = false;
+
+#if DEBUG
+			result = true;
+#endif
+
+			return result;
+		}
+	}	
 }
