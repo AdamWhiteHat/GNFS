@@ -74,7 +74,7 @@ namespace GNFSCore
 			CancelToken = cancelToken;
 			N = n;
 
-			SaveLocations = new DirectoryLocations(GenerateSaveDirectory(N));
+			SaveLocations = new DirectoryLocations(N);
 
 			if (!Directory.Exists(SaveLocations.SaveDirectory))
 			{
@@ -160,21 +160,6 @@ namespace GNFSCore
 
 			// Load Relations
 			CurrentRelationsProgress = PolyRelationsSieveProgress.LoadProgress(this, SaveLocations.Polynomial_SaveDirectory);
-		}
-
-		private static readonly int showDigits = 22;
-		private static readonly string elipse = "[...]";
-		private static readonly string saveRootDirectory = "C:\\GNFS";
-
-		public static string GenerateSaveDirectory(BigInteger n)
-		{
-			string result = n.ToString();
-
-			if (result.Length >= (showDigits * 2) + elipse.Length)
-			{
-				result = result.Substring(0, showDigits) + elipse + result.Substring(result.Length - showDigits, showDigits);
-			}
-			return Path.Combine(saveRootDirectory, result);
 		}
 
 		public void SavePolynomial(IPolynomial poly)

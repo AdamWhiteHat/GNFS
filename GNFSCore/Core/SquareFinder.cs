@@ -10,7 +10,7 @@ namespace GNFSCore.SquareRoot
 	using Polynomial;
 	using IntegerMath;
 
-	public class SquareFinder
+	public partial class SquareFinder
 	{
 		public Relation[] RelationsSet;
 
@@ -246,9 +246,6 @@ namespace GNFSCore.SquareRoot
 		public override string ToString()
 		{
 			StringBuilder result = new StringBuilder();
-
-
-			result.AppendLine(string.Join(" + ", AlgebraicComplexSet));
 
 			/*
 			result.AppendLine($"IsRationalIrreducible  ? {IsRationalIrreducible}");
