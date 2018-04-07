@@ -1,10 +1,7 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace GNFSCore
 {
@@ -15,11 +12,8 @@ namespace GNFSCore
 		public BigInteger MinQuadraticFactorBase { get; internal set; }
 		public BigInteger MaxQuadraticFactorBase { get; internal set; }
 
-		[JsonIgnore]
 		public List<BigInteger> RationalFactorBase { get; internal set; }
-		[JsonIgnore]
 		public List<BigInteger> AlgebraicFactorBase { get; internal set; }
-		[JsonIgnore]
 		public List<BigInteger> QuadraticFactorBase { get; internal set; }
 	}
 }

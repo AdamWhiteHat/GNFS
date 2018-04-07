@@ -1,31 +1,26 @@
 ﻿using System;
+using System.IO;
+using System.Xml;
 using System.Linq;
 using System.Text;
 using System.Numerics;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Xml.Schema;
 using System.Threading;
-using Newtonsoft.Json;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+using System.Collections.Generic;
 
 namespace GNFSCore
 {
 	using Factors;
 	using Polynomial;
 	using IntegerMath;
+
 	public partial class GNFS : IXmlSerializable
 	{
 		public BigInteger N { get; set; }
 		public List<IPolynomial> PolynomialCollection;
-
-		[JsonIgnore]
 		public IPolynomial CurrentPolynomial { get; private set; }
-		[JsonIgnore]
 		public PolyRelationsSieveProgress CurrentRelationsProgress { get; set; }
-		[JsonIgnore]
 		public CancellationToken CancelToken { get; set; }
 
 		public FactorBase PrimeFactorBase { get; set; }
@@ -34,12 +29,9 @@ namespace GNFSCore
 		public FactorCollection AFB { get; set; } = null;
 		public FactorCollection QFB { get; set; } = null;
 
-		[JsonIgnore]
 		public DirectoryLocations SaveLocations { get; set; }
 
-		[JsonIgnore]
 		private BigInteger m;
-		[JsonIgnore]
 		private int degree = 2;
 
 		public GNFS()

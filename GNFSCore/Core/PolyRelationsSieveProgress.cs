@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Linq;
-using System.Numerics;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.IO;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
+using System.Linq;
+using System.Text;
+using System.Numerics;
 using System.Xml.Linq;
-using Newtonsoft.Json;
+using System.Threading;
+using System.Collections.Generic;
 
 using GNFSCore.IntegerMath;
-using GNFSCore.Matrix;
-using System.Text;
 
 namespace GNFSCore
 {
@@ -23,14 +17,12 @@ namespace GNFSCore
 		private int Quantity;
 		private int ValueRange;
 		//private int IndexOfUnFactored;
-		[JsonIgnore]
+
 		public CancellationToken CancelToken;
 
 		public List<Relation[]> FreeRelations { get; private set; }
 		public List<Relation> SmoothRelations { get; private set; }
-		[JsonIgnore]
 		public List<RoughPair> RoughRelations { get; private set; }
-		[JsonIgnore]
 		public List<Relation> UnFactored { get; private set; }
 
 		public FactorBase PrimeBase { get; private set; }
