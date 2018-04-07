@@ -20,8 +20,8 @@ namespace GNFSCore
 		{
 			A = relation.A;
 			B = relation.B;
-			AlgebraicQuotient = relation.AlgebraicQuotient;
-			RationalQuotient = relation.RationalQuotient;
+			AlgebraicQuotient = BigInteger.Abs(relation.AlgebraicQuotient);
+			RationalQuotient = BigInteger.Abs(relation.RationalQuotient);
 		}
 
 		public RoughPair(string line)
@@ -40,11 +40,6 @@ namespace GNFSCore
 		public Relation Combine(RoughPair rough)
 		{
 			throw new NotImplementedException();
-		}
-
-		public bool HasPrime()
-		{
-			return FactorizationFactory.IsPrime(AlgebraicQuotient) || FactorizationFactory.IsPrime(AlgebraicQuotient);
 		}
 
 		public override string ToString()

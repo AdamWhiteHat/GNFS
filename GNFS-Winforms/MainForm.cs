@@ -291,15 +291,7 @@ namespace GNFS_Winforms
 		private void btnSerialize_Click(object sender, EventArgs e)
 		{
 			string savePath = $"C:\\GNFS\\{gnfs.N}";
-			Serializer.JSON.Serialize(gnfs, savePath + ".gnfs");
-
-			/*
-			Serializer.JSON.Serialize(gnfs.CurrentPolynomial, savePath + ".polynomial");
-			Serializer.JSON.Serialize(gnfs.AFB, savePath + ".AFB");
-			Serializer.JSON.Serialize(gnfs.RFB, savePath + ".RFB");
-			Serializer.JSON.Serialize(gnfs.QFB, savePath + ".QFB");
-			Serializer.JSON.Serialize(gnfs.CurrentRelationsProgress.SmoothRelations, savePath + ".SmoothRelations");
-			*/
+			gnfs.SaveGnfsProgress();			
 		}
 
 		private void btnPrintRelations_Click(object sender, EventArgs e)

@@ -25,12 +25,18 @@ namespace GNFSCore
 	public class Relation
 	{
 		public int A { get; private set; }
+
+		/// <summary>
+		/// Root of f(x) in algebraic field
+		/// </summary>
 		public int B { get; private set; }
-		public BigInteger C { get; private set; }
 
 		public BigInteger AlgebraicNorm { get; private set; }
 		public BigInteger RationalNorm { get; private set; }
 		public BigInteger NormProduct { get { return BigInteger.Multiply(AlgebraicNorm, RationalNorm); } }
+
+		public CountDictionary AlgebraicFactorization { get; private set; }
+		public CountDictionary RationalFactorization { get; private set; }
 
 		internal BigInteger AlgebraicQuotient { get; private set; }
 		internal BigInteger RationalQuotient { get; private set; }
@@ -39,7 +45,7 @@ namespace GNFSCore
 		{
 			get
 			{
-				return BigInteger.Abs(AlgebraicQuotient) == 1 && BigInteger.Abs(RationalQuotient) == 1;
+				return (AlgebraicQuotient == 1 || AlgebraicQuotient == 0) && (RationalQuotient == 1 || RationalQuotient == 0);
 			}
 		}
 
@@ -48,38 +54,44 @@ namespace GNFSCore
 			return new Tuple<BigInteger, BigInteger>(AlgebraicQuotient, RationalQuotient);
 		}
 
-		private GNFS _gnfs;
-
 		public Relation(GNFS gnfs, int a, int b)
 		{
+			AlgebraicFactorization = new CountDictionary();
+			RationalFactorization = new CountDictionary();
+
 			A = a;
 			B = b;
 
 			AlgebraicNorm = Normal.Algebraic(A, B, gnfs.CurrentPolynomial); // b^deg * f( a/b )
 			RationalNorm = Normal.Rational(A, B, gnfs.CurrentPolynomial.Base); // a + bm
 
-			AlgebraicQuotient = AlgebraicNorm;
-			RationalQuotient = RationalNorm;
+			AlgebraicQuotient = BigInteger.Abs(AlgebraicNorm);
+			RationalQuotient = BigInteger.Abs(RationalNorm);
 
-			BigInteger rationalEval = gnfs.CurrentPolynomial.Evaluate(RationalNorm);
-			C = (rationalEval % gnfs.N);
+			if (AlgebraicNorm.Sign == -1)
+			{
+				AlgebraicFactorization.Add(BigInteger.MinusOne);
+			}
 
-			_gnfs = gnfs;
+			if (RationalNorm.Sign == -1)
+			{
+				RationalFactorization.Add(BigInteger.MinusOne);
+			}
 		}
 
-		public Relation(GNFS gnfs, int a, int b, BigInteger c, BigInteger algebraicNorm, BigInteger rationalNorm)
+		public Relation(int a, int b, BigInteger algebraicNorm, BigInteger rationalNorm, CountDictionary algebraicFactorization, CountDictionary rationalFactorization)
 		{
 			A = a;
 			B = b;
-			C = c;
 
 			AlgebraicNorm = algebraicNorm;
 			RationalNorm = rationalNorm;
 
-			AlgebraicQuotient = 0;
-			RationalQuotient = 0;
+			AlgebraicQuotient = 1;
+			RationalQuotient = 1;
 
-			_gnfs = gnfs;
+			AlgebraicFactorization = algebraicFactorization;
+			RationalFactorization = rationalFactorization;
 		}
 
 		public BigInteger Apply(BigInteger x)
@@ -89,115 +101,66 @@ namespace GNFSCore
 
 		public void Sieve(PolyRelationsSieveProgress relationsSieve)
 		{
-			AlgebraicQuotient = Factor(relationsSieve.PrimeBase.AlgebraicFactorBase, AlgebraicNorm, AlgebraicQuotient);
-			RationalQuotient = Factor(relationsSieve.PrimeBase.RationalFactorBase, RationalNorm, RationalQuotient);
+			BigInteger algResult  = Factor(relationsSieve.PrimeBase.AlgebraicFactorBase, AlgebraicNorm, AlgebraicQuotient, AlgebraicFactorization);
+			BigInteger ratReslult = Factor(relationsSieve.PrimeBase.RationalFactorBase, RationalNorm, RationalQuotient, RationalFactorization);
+
+			AlgebraicQuotient = algResult;
+			RationalQuotient = ratReslult;
 		}
 
-		private static BigInteger Factor(IEnumerable<BigInteger> primeFactors, BigInteger norm, BigInteger quotient)
+		private static BigInteger Factor(IEnumerable<BigInteger> primeFactors, BigInteger normValue, BigInteger quotientValue, CountDictionary dictionary)
 		{
-			BigInteger sqrt = BigInteger.Abs(norm).SquareRoot();
+			if (quotientValue.Sign == -1 || primeFactors.Any(f => f.Sign == -1))
+			{
+				throw new Exception("There shouldn't be any negative values either in the quotient or the factors");
+			}
 
-			BigInteger result = quotient;
+			BigInteger sqrt = BigInteger.Abs(normValue).SquareRoot();
+			BigInteger result = quotientValue;
+
 			foreach (BigInteger factor in primeFactors)
 			{
-				if (result == 0 || result == -1 || result == 1 || factor > sqrt)
+				if (factor > sqrt)
 				{
-					break;
-				}
-				while (result % factor == 0 && result != 1 && result != -1)
-				{
-					result /= factor;
-
-					BigInteger absResult = BigInteger.Abs(result);
-					if (absResult > 1 /*&& absResult < int.MaxValue - 1*/)
+					if (primeFactors.Contains(result))
 					{
-						//int intValue = (int)absResult;
-						if (primeFactors.Contains(absResult))
+						dictionary.Add(result);
+						return 1;
+					}
+				}
+
+				if (result == 0 || result == 1)
+				{
+					return result;
+				}			
+
+				while (result % factor == 0 && result != 1)
+				{
+					BigInteger q = BigInteger.Divide(result, factor);
+					result = q;
+
+					dictionary.Add(factor);
+
+					if (result > 1)
+					{
+						if (primeFactors.Contains(result))
 						{
-							result = 1;
+							dictionary.Add(result);
+							return 1;
 						}
 					}
 				}
 			}
+
 			return result;
 		}
 
-		public int RationalWeight { get { return _rationalFactorization.Any() ? _rationalFactorization.Count : 0; } }
-		public int AlgebraicWeight { get { return _algebraicFactorization.Any() ? _algebraicFactorization.Count : 0; } }
 
-
-
-
-
-		private PrimeFactorization _algebraicFactorization = new PrimeFactorization();
-		private PrimeFactorization _rationalFactorization = new PrimeFactorization();
-
-		public PrimeFactorization AlgebraicFactorization { get { checkMatrixInitialization(); return _algebraicFactorization; } }
-		public PrimeFactorization RationalFactorization { get { checkMatrixInitialization(); return _rationalFactorization; } }
-
-		public void MatrixInitialize()
-		{
-			_rationalFactorization = new PrimeFactorization(RationalNorm, _gnfs.PrimeFactorBase.MaxRationalFactorBase, true);
-			_algebraicFactorization = new PrimeFactorization(AlgebraicNorm, _gnfs.PrimeFactorBase.MaxAlgebraicFactorBase, true);
-		}
-
-		private void checkMatrixInitialization()
-		{
-			if (!_algebraicFactorization.Any() && !_rationalFactorization.Any())
-			{
-				MatrixInitialize();
-			}
-		}
-
-		public bool[] GetRationalMatrixRow()
-		{
-			checkMatrixInitialization();
-
-			bool[] rational = GetVector(_rationalFactorization, _gnfs.PrimeFactorBase.MaxRationalFactorBase);
-
-			bool sign = (RationalNorm.Sign == -1);
-			return new bool[] { sign }.Concat(rational).ToArray();
-		}
-
-		public bool[] GetAlgebraicMatrixRow()
-		{
-			checkMatrixInitialization();
-
-			bool[] algebraic = GetVector(_algebraicFactorization, _gnfs.PrimeFactorBase.MaxAlgebraicFactorBase);
-
-			bool sign = (AlgebraicNorm.Sign == -1);
-			return new bool[] { sign }.Concat(algebraic).ToArray();
-		}
-
-		private bool[] GetVector(PrimeFactorization primeFactorization, BigInteger maxValue)
-		{
-			int primeIndex = PrimeFactory.GetIndexFromValue(maxValue);
-
-			bool[] result = new bool[primeIndex + 1];
-			if (primeFactorization.Any())
-			{
-				foreach (Factor oddFactor in primeFactorization.Where(f => f.ExponentMod2 == 1))
-				{
-					if (oddFactor.Prime > maxValue)
-					{
-						throw new Exception();
-					}
-					int index = PrimeFactory.GetIndexFromValue(oddFactor.Prime);
-					result[index] = true;
-				}
-			}
-
-			return result.Take(primeIndex).ToArray();
-		}
-
-		
 		public override string ToString()
 		{
 			return
 				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t"
-				+ $"[ƒ(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)} (AlgebraicNorm) IsSquare: {AlgebraicNorm.IsSquare()},\ta+b*m={RationalNorm.ToString().PadLeft(4)} (RationalNorm) IsSquare: {RationalNorm.IsSquare()}]\t"
-				//+ $"ƒ({RationalNorm}) =".PadRight(8) + $"{C.ToString().PadLeft(6)}"
-				;
+				+ $"[ƒ(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)} (AlgebraicNorm) IsSquare: {AlgebraicNorm.IsSquare()},\ta+b*m={RationalNorm.ToString().PadLeft(4)} (RationalNorm) IsSquare: {RationalNorm.IsSquare()}]\t";
 		}
 
 		public static List<Relation> LoadUnfactoredFile(GNFS gnfs, string filename)
@@ -214,37 +177,54 @@ namespace GNFSCore
 			File.WriteAllLines(filename, relations.Select(rel => $"{rel.A},{rel.B}"));
 		}
 
-		public void Save(string filename, GNFS gnfs)
+		public void Save(string filename)
 		{
-			SerializeToFile(this, gnfs, filename);// $"{directory}\\{relation.A}_{relation.B}.relation"
+			SerializeToFile(this, filename);// $"{directory}\\{relation.A}_{relation.B}.relation"
 		}
 
-		public static void SerializeToFile(Relation rel, GNFS gnfs, string filename)
+		public static void SerializeToFile(Relation rel, string filename)
 		{
 			new XDocument(
 				new XElement("Relation",
 					new XElement("A", rel.A),
 					new XElement("B", rel.B),
-					new XElement("C", rel.C),
 					new XElement("AlgebraicNorm", rel.AlgebraicNorm),
 					new XElement("RationalNorm", rel.RationalNorm),
-					new XElement("AlgebraicFactorization", FactorizationFactory.GetPrimeFactorization(rel.AlgebraicNorm, gnfs.PrimeFactorBase.MaxAlgebraicFactorBase).ToString()),
-					new XElement("RationalFactorization", FactorizationFactory.GetPrimeFactorization(rel.RationalNorm, gnfs.PrimeFactorBase.MaxRationalFactorBase).ToString()),
-					new XElement("AlgebraicMatrixRow", string.Join(",", rel.GetAlgebraicMatrixRow().Select(b => b ? '1' : '0')))
+					rel.AlgebraicFactorization.SerializeToXElement("AlgebraicFactorization"),
+					rel.RationalFactorization.SerializeToXElement("RationalFactorization")				
 				)
 			).Save(filename);
 		}
 
-		public static Relation LoadFromFile(GNFS gnfs, string filename)
+		public static Relation LoadFromFile(string filename)
 		{
 			XElement rel = XElement.Load(filename);
 			int a = int.Parse(rel.Element("A").Value);
 			int b = int.Parse(rel.Element("B").Value);
-			BigInteger c = BigInteger.Parse(rel.Element("C").Value);
 			BigInteger an = BigInteger.Parse(rel.Element("AlgebraicNorm").Value);
 			BigInteger rn = BigInteger.Parse(rel.Element("RationalNorm").Value);
+			CountDictionary algebraicFactorization = CountDictionary.DeserializeFromXElement(rel.Element("AlgebraicFactorization"));
+			CountDictionary rationalFactorization = CountDictionary.DeserializeFromXElement(rel.Element("RationalFactorization"));
 
-			return new Relation(gnfs, a, b, c, an, rn);
+			return new Relation(a, b, an, rn, algebraicFactorization, rationalFactorization);
+		}
+
+		public override bool Equals(object obj)
+		{
+			Relation other = obj as Relation;
+
+			if (other == null)
+			{
+				return false;
+			}
+			else
+			{
+				return (this.A == other.A && this.B == other.B);
+			}
+		}
+		public override int GetHashCode()
+		{
+			return Tuple.Create(this.A, this.B).GetHashCode();
 		}
 	}
 }

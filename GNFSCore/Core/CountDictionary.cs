@@ -35,8 +35,12 @@ namespace GNFSCore
 
 		public void Add(BigInteger key)
 		{
-			if (!internalDictionary.ContainsKey(key)) { internalDictionary.Add(key, 1); }
-			else { internalDictionary[key] += 1; }
+			this.Add(key, 1);
+		}
+		private void Add(BigInteger key, BigInteger value)
+		{
+			if (!ContainsKey(key)) { internalDictionary.Add(key, value); }
+			else { internalDictionary[key] += value; }
 		}
 
 		public bool ContainsKey(BigInteger key)
@@ -50,6 +54,14 @@ namespace GNFSCore
 			internalDictionary = orderedDictionary.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 		}
 
+		public void Combine(CountDictionary dictionary)
+		{
+			foreach (var kvp in dictionary.internalDictionary)
+			{
+				Add(kvp.Key, kvp.Value);
+			}
+		}
+
 		public Dictionary<BigInteger, BigInteger> ToDictionary()
 		{
 			return internalDictionary.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -57,13 +69,13 @@ namespace GNFSCore
 
 		public XElement SerializeToXElement(string elementName)
 		{
-			XElement result =	new XElement(elementName);
+			XElement result = new XElement(elementName);
 
 			foreach (KeyValuePair<BigInteger, BigInteger> kvp in internalDictionary)
 			{
 				result.Add(
 					new XElement("KeyValuePair",
-						new XElement("Key",kvp.Key),
+						new XElement("Key", kvp.Key),
 						new XElement("Value", kvp.Value)
 					)
 				);
@@ -75,7 +87,7 @@ namespace GNFSCore
 		public static CountDictionary DeserializeFromXElement(XElement element)
 		{
 			CountDictionary result = new CountDictionary();
-			
+
 			IEnumerable<XElement> keyValuePairs = element.Elements("KeyValuePair");
 
 			BigInteger key = -1;
@@ -105,6 +117,16 @@ namespace GNFSCore
 			}
 			result.Append("}");
 
+			return result.ToString();
+		}
+
+		public string FormatStringAsFactorization()
+		{
+			Order();
+			StringBuilder result = new StringBuilder();
+			result.Append("Factorization -> {\t");
+			result.Append(string.Join(" * ", internalDictionary.Select(kvp => $"{ kvp.Key}^{ kvp.Value}")));
+			result.Append("\t};");
 			return result.ToString();
 		}
 	}

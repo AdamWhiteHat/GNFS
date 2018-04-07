@@ -1,5 +1,4 @@
-﻿using ExtendedNumerics;
-using GNFSCore.IntegerMath;
+﻿using GNFSCore.IntegerMath;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,35 +90,22 @@ namespace GNFSCore.Polynomial
 				return result;
 			}
 
-			public static BigRational Evaluate(IPolynomial polynomial, BigRational baseM)
+			public static BigInteger Evaluate(IPolynomial polynomial, BigInteger baseM)
 			{
-				BigRational result = new BigRational(0);
-
-				int d = polynomial.Degree;
-				while (d >= 0)
-				{
-					BigRational placeValue = BigRational.Pow(baseM, d);
-
-					BigRational addValue = BigRational.Multiply(new BigRational(polynomial.Terms[d]), placeValue);
-
-					result = BigRational.Add(result, addValue);
-
-					d--;
-				}
-
-				return result;
+				return Evaluate(polynomial.Degree, polynomial.Terms, baseM);
 			}
 
-			public static BigInteger Evaluate(IPolynomial polynomial, BigInteger baseM)
+			public static BigInteger Evaluate(int degree, BigInteger[] terms, BigInteger baseM)
 			{
 				BigInteger result = 0;
 
-				int d = polynomial.Degree;
+				int d = degree;
+				BigInteger[] localTerms = terms.ToArray();
 				while (d >= 0)
 				{
 					BigInteger placeValue = BigInteger.Pow(baseM, d);
 
-					BigInteger addValue = BigInteger.Multiply(polynomial.Terms[d], placeValue);
+					BigInteger addValue = BigInteger.Multiply(localTerms[d], placeValue);
 
 					result = BigInteger.Add(result, addValue);
 

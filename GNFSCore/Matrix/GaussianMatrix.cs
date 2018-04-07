@@ -8,7 +8,7 @@ namespace GNFSCore.Matrix
 	using GNFSCore.Factors;
 	using GNFSCore.IntegerMath;
 
-	public class Gaussian
+	public class GaussianMatrix
 	{
 		public List<bool[]> Matrix { get { return M; } }
 		public bool[] FreeVariables { get { return freeCols; } }
@@ -26,7 +26,7 @@ namespace GNFSCore.Matrix
 		private List<Tuple<Relation, bool[]>> relationMatrixTuple;
 
 
-		public Gaussian(GNFS gnfs, List<Relation> rels)
+		public GaussianMatrix(GNFS gnfs, List<Relation> rels)
 		{
 			_gnfs = gnfs;
 			relationMatrixTuple = new List<Tuple<Relation, bool[]>>();
@@ -79,30 +79,6 @@ namespace GNFSCore.Matrix
 			}
 		}
 
-	
-
-
-		protected static bool[] GetVector(PrimeFactorization primeFactorization, BigInteger maxValue)
-		{
-			int primeIndex = PrimeFactory.GetIndexFromValue(maxValue);
-
-			bool[] result = new bool[primeIndex];
-			if (primeFactorization.Any())
-			{
-				foreach (Factor oddFactor in primeFactorization.Where(f => f.ExponentMod2 == 1))
-				{
-					if (oddFactor.Prime > maxValue)
-					{
-						throw new Exception();
-					}
-					int index = PrimeFactory.GetIndexFromValue(oddFactor.Prime);
-					result[index] = true;
-				}
-			}
-
-			return result.Take(primeIndex).ToArray();
-		}
-				
 
 		public void DontTransposeAppend()
 		{
@@ -304,7 +280,7 @@ namespace GNFSCore.Matrix
 
 			return result;
 		}
-				
+
 
 
 		public static bool[] Add(bool[] left, bool[] right)
@@ -324,8 +300,8 @@ namespace GNFSCore.Matrix
 			return result;
 		}
 
-		
-		
+
+
 
 
 		public static string VectorToString(bool[] vector)
@@ -341,79 +317,6 @@ namespace GNFSCore.Matrix
 		public override string ToString()
 		{
 			return MatrixToString(M);
-		}
-
-
-
-		public class GaussianRow
-		{
-			public bool Sign { get; set; }
-
-			public List<bool> RationalPart { get; set; }
-			public List<bool> AlgebraicPart { get; set; }
-			public List<bool> QuadraticPart { get; set; }
-
-			public int LastIndexOfRational { get { return RationalPart.LastIndexOf(true); } }
-			public int LastIndexOfAlgebraic { get { return AlgebraicPart.LastIndexOf(true); } }
-			public int LastIndexOfQuadratic { get { return QuadraticPart.LastIndexOf(true); } }
-
-			public int RationalLength { get { return RationalPart.Count - 1; } }
-			public int AlgebraicLength { get { return AlgebraicPart.Count - 1; } }
-			public int QuadraticLength { get { return QuadraticPart.Count - 1; } }
-
-			public Relation SourceRelation { get; private set; }
-
-			public GaussianRow(GNFS gnfs, Relation relation)
-			{
-				SourceRelation = relation;
-
-				if (relation.RationalNorm.Sign == -1)
-				{
-					Sign = true;
-				}
-				else
-				{
-					Sign = false;
-				}
-
-				FactorCollection qfb = gnfs.QFB;
-
-				BigInteger rationalMaxValue = gnfs.PrimeFactorBase.MaxRationalFactorBase;
-				BigInteger algebraicMaxValue = gnfs.PrimeFactorBase.MaxAlgebraicFactorBase;
-
-				PrimeFactorization rationalFactorization = new PrimeFactorization(relation.RationalNorm, rationalMaxValue, true);
-				PrimeFactorization algebraicFactorization = new PrimeFactorization(relation.AlgebraicNorm, algebraicMaxValue, true);
-
-				RationalPart = GetVector(rationalFactorization, rationalMaxValue).ToList();
-				AlgebraicPart = GetVector(algebraicFactorization, algebraicMaxValue).ToList();
-				QuadraticPart = qfb.Select(qf => QuadraticResidue.GetQuadraticCharacter(relation, qf)).ToList();
-			}
-
-
-			public bool[] GetBoolArray()
-			{
-				List<bool> result = new List<bool>() { Sign };
-				result.AddRange(RationalPart);
-				result.AddRange(AlgebraicPart);
-				result.AddRange(QuadraticPart);
-				//result.Add(false);
-				return result.ToArray();
-			}
-
-			public void ResizeRationalPart(int size)
-			{
-				RationalPart = RationalPart.Take(size + 1).ToList();
-			}
-
-			public void ResizeAlgebraicPart(int size)
-			{
-				AlgebraicPart = AlgebraicPart.Take(size + 1).ToList();
-			}
-
-			public void ResizeQuadraticPart(int size)
-			{
-				QuadraticPart = QuadraticPart.Take(size + 1).ToList();
-			}
 		}
 	}
 }

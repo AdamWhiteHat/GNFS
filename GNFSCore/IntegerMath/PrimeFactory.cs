@@ -12,24 +12,24 @@ namespace GNFSCore.IntegerMath
 	public static class PrimeFactory
 	{
 		private static BigInteger MaxValue;
-		private static IEnumerable<BigInteger> primes = new BigInteger[] { 2, 3, 5, 7, 11, 13 };
+		private static List<BigInteger> primes = new List<BigInteger>() { 2, 3, 5, 7, 11, 13 };
 		private static BigInteger lastPrime;
 
 		static PrimeFactory()
 		{
-			MaxValue = 10000;
+			MaxValue = 100000;
 			SetPrimes();
 		}
 
 		private static void SetPrimes()
 		{
-			primes = Eratosthenes.Sieve((Int32)MaxValue);
+			primes = Eratosthenes.Sieve((Int32)MaxValue).ToList();
 			lastPrime = primes.Last();
 		}
 
 		public static IEnumerable<BigInteger> GetPrimes()
 		{
-			return primes;
+			return primes.AsEnumerable();
 		}
 
 		public static IEnumerable<BigInteger> GetPrimes(BigInteger maxValue)
@@ -44,11 +44,11 @@ namespace GNFSCore.IntegerMath
 		public static IEnumerable<BigInteger> GetPrimeEnumerator(BigInteger startValue)
 		{
 			int index = GetIndexFromValue(startValue);
-			BigInteger stopIndex = primes.Count() - 1;
+			BigInteger stopIndex = primes.Count - 1;
 
 			while (index < stopIndex)
 			{
-				yield return primes.ElementAt(index);
+				yield return primes[index];
 				index++;
 			}
 
@@ -81,13 +81,13 @@ namespace GNFSCore.IntegerMath
 
 			BigInteger primeValue = primes.First(p => p >= value);
 
-			int index = Array.IndexOf<BigInteger>(primes.ToArray(), primeValue);
+			int index = primes.IndexOf(primeValue)+1;
 			return index;
 		}
 
 		public static BigInteger GetValueFromIndex(int index)
 		{
-			while ((primes.LongCount() - 1) < index)
+			while ((primes.Count - 1) < index)
 			{
 				IncreaseMaxValue();
 			}
@@ -127,7 +127,7 @@ namespace GNFSCore.IntegerMath
 				result += 1;
 			}
 
-			while (!FactorizationFactory.IsPrime(result))
+			while (!FactorizationFactory.IsProbablePrime(result))
 			{
 				result += 2;
 			}

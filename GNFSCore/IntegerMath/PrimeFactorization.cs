@@ -33,6 +33,17 @@ namespace GNFSCore.IntegerMath
 			: base()
 		{ }
 
+		public PrimeFactorization(CountDictionary relationFactorizationDictionary, BigInteger maxValue)
+		{
+			var results =
+				relationFactorizationDictionary
+				.ToDictionary()
+				.Where(kvp => kvp.Key <= maxValue && kvp.Key != -1)
+				.Select(kvp => new Factor(kvp.Key, kvp.Value));
+			
+			this.AddRange(results);
+		}
+
 		public PrimeFactorization(BigInteger number, BigInteger maxValue, bool mod2only = false)
 		{
 			Number = number;
@@ -47,7 +58,7 @@ namespace GNFSCore.IntegerMath
 			{
 				this.AddRange(factorization);
 			}
-		}		
+		}
 
 		public void RestrictFactors(BigInteger maxFactor)
 		{

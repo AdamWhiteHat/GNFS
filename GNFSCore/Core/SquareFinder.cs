@@ -25,10 +25,12 @@ namespace GNFSCore.SquareRoot
 		public bool IsRationalIrreducible;
 
 		public BigInteger AlgebraicProduct;
-		public BigInteger AlgebraicSquare;
+		public BigInteger AlgebraicProductMod;
 		public BigInteger AlgebraicSquareResidue;
 		public bool IsAlgebraicSquare;
 		public bool IsAlgebraicIrreducible;
+
+		public List<Complex> AlgebraicComplexSet;
 
 		public BigInteger Y2;
 		public BigInteger Y2_S;
@@ -39,25 +41,18 @@ namespace GNFSCore.SquareRoot
 		private Func<BigInteger, BigInteger> f;
 		private IEnumerable<BigInteger> rationalSet;
 		private IEnumerable<BigInteger> algebraicSet;
-		private Random rand;
 
 		public SquareFinder(GNFS sieve, List<Relation> relations)
 		{
 			RationalSquareRootResidue = -1;
-
-			rand = new Random();
-
-			int counter = 100;
-			while (counter-- > 0)
-			{
-				rand.Next();
-			}
 
 			gnfs = sieve;
 			N = gnfs.N;
 			polyBase = gnfs.CurrentPolynomial.Base;
 			f = (x) => gnfs.CurrentPolynomial.Evaluate(x);
 
+
+			AlgebraicComplexSet = new List<Complex>();
 			RelationsSet = relations.ToArray();
 			PolynomialDerivative = gnfs.CurrentPolynomial.Derivative(gnfs.CurrentPolynomial.Base);
 			PolynomialDerivativeSquared = BigInteger.Multiply(PolynomialDerivative, PolynomialDerivative);
@@ -72,8 +67,8 @@ namespace GNFSCore.SquareRoot
 		// y = ( √  S(m) * f'(m)^2 ) mod N
 		//
 		// y = 2860383 (for example)
-		// 
-		// 
+
+
 		// S(x) mod f(x)
 		// 
 		// a*x^3+b*x^2+c*x^1+d*x^0
@@ -96,11 +91,13 @@ namespace GNFSCore.SquareRoot
 			algebraicSet = RelationsSet.Select(rel => rel.AlgebraicNorm);
 
 			AlgebraicProduct = algebraicSet.Product();
-			AlgebraicSquare = BigInteger.Multiply(AlgebraicProduct, PolynomialDerivative);
-			AlgebraicSquareResidue = AlgebraicSquare % N;
+			AlgebraicProductMod = AlgebraicProduct % f(polyBase);
+			AlgebraicSquareResidue = AlgebraicProductMod % N;
 
 			IsAlgebraicIrreducible = IsIrreducible(algebraicSet); // Irreducible check
 			IsAlgebraicSquare = AlgebraicSquareResidue.IsSquare();
+
+			AlgebraicComplexSet = RelationsSet.Select(rel => new Complex(rel.A, rel.B)).ToList();
 		}
 
 		public List<Tuple<int, BigInteger[], BigInteger, BigInteger, BigInteger>> CalculateRootProducts()
@@ -141,140 +138,121 @@ namespace GNFSCore.SquareRoot
 			return result;
 		}
 
-		public BigInteger NewtonDirectSqrt()
+
+
+
+
+
+		public static class SquareRoot
 		{
-			// Set S, Y
-			int d = gnfs.CurrentPolynomial.Degree;
-			BigInteger S = RationalProduct;
-			BigInteger Y = RationalSquareRootResidue;
-			Y2 = BigInteger.Multiply(Y, Y);
-			Y2_S = BigInteger.Subtract(Y2, S);
-
-			// Find q,R such that (S * R^2) ≡ 1 mod q^2			
-			BigInteger q = N;
-			BigInteger R = BigInteger.Zero;
-			bool congruenceFound = false;
-			do
+			private static Func<BigInteger, BigInteger, BigInteger, BigInteger> eval = (n, increment, prime) =>
 			{
-				// Choose q		
-				do
-				{
-					q = PrimeFactory.GetNextPrime(q * 3);
-				}
-				while (GCD.FindGCD(q, N) != 1);
+				return 1 + (n * prime * increment);
+			};
 
-				// Choose R
-				RationalPolynomial randomPolynomial = new RationalPolynomial(N, 2, rand.Next(), N);
-				BigInteger R0 = randomPolynomial.Evaluate(q); // RandomPolynomial
-
-
-				// Compute (R - Y)^( q^(d-1) / 2 ) % (Y^2 - S)
-				BigInteger R_Y = BigInteger.Subtract(R0, Y);
-				//BigInteger qd_1_2 = BigInteger.Divide(BigInteger.Pow(q, d - 1), 2);
-
-				double logQ = BigInteger.Log10(q);
-
-				double logExponent = logQ * (d - 1); // Equivalent to exponentiation by d-1
-				logExponent -= BigInteger.Log10(2);  // Equivalent to division by 2
-
-				BigInteger expTotal = LogExpand(10, logExponent);
-				double logBase = BigInteger.Log10(BigInteger.Abs(R_Y));
-
-				double logTotal = logBase * (double)expTotal;
-				BigInteger leftTotal = LogExpand(10, logTotal);
-
-				BigInteger R1 = leftTotal % Y2_S;
-				R = R1;
-
-				// Check S * R1^2 % f(x) == 1
-				BigInteger R1S_N = BigInteger.Multiply(BigInteger.Multiply(R1, R1), S) % N;
-
-				congruenceFound = (R1S_N == 1);
-			}
-			while (!congruenceFound);
-
-			int k = 0;
-			BigInteger Rk = R;
-			do
+			public static List<BigInteger> Newtons(Func<BigInteger, BigInteger> f,
+													Func<BigInteger, BigInteger> fD,
+													BigInteger toSquareRoot,
+													BigInteger numberToFactor,
+													Relation[] relations,
+													BigInteger relationPolynomial,
+													int polynomialDegree,
+													int maxIterations
+												   )
 			{
-				k += 1;
-				Rk = NewtonIteration(Rk, S, q, k);
-			}
-			while (BigInteger.Pow(BigInteger.Multiply(Rk, S), 2) != S);
+				int k = 1;
+				int counter = -1;
+				BigInteger mod = 1;
+				BigInteger rational = -1;
+				BigInteger lastValue = 1;
+				BigInteger m = toSquareRoot;
+				BigInteger N = numberToFactor;
+				BigInteger currentValue = 400;
+				int degree = polynomialDegree;
+				BigInteger S = relationPolynomial;
+				List<BigInteger> results = new List<BigInteger>();
+				if (maxIterations < 1) maxIterations = UInt16.MaxValue;
 
-			BigInteger Q2 = BigInteger.Multiply(q, q);
+				// Check
+				do { rational = (eval(N, k++, 2)) % f(m); } while (rational != 1 && counter++ <= maxIterations);
 
-			BigInteger sX1 = BigInteger.Multiply(S, Rk) % Q2;
-			BigInteger sX2 = BigInteger.Negate(sX1) % Q2;
 
-			BigInteger sX = sX1;
+				// compute the (p ^ d - 1) / 2 power of r - y modulo y ^ 2 - S, with each coefficient of y reduced modulo f and p.
 
-			bool last = false;
-			bool escape = false;
-			do
-			{
-				BigInteger X = BigInteger.Multiply(sX, PolynomialDerivativeSquared) % N;
 
-				BigInteger gcd1 = GCD.FindGCD(N, BigInteger.Subtract(X, Y));
-				BigInteger gcd2 = GCD.FindGCD(N, BigInteger.Subtract(Y, X));
+				BigInteger n = 0;
+				BigInteger r = 0;
+				BigInteger p = 0;
+				BigInteger R_0 = 0;
+				BigInteger value = 0;
+				BigInteger exponent = 0;
+				BigInteger prime128 = 0;
+				BigInteger sizeOf127bits = BigInteger.Pow(2, 127);
+				BigInteger sizeOf128bits = BigInteger.Pow(2, 128);
 
-				if (gcd1 != 1 && gcd1 != N)
+				RandomPolynomial randomPolynomial = new RandomPolynomial(degree, 0, sizeOf128bits);
+
+				counter = -1;
+				while (counter++ <= maxIterations && currentValue != 0)
 				{
-					return gcd1;
-				}
-				else if (gcd2 != 1 && gcd2 != N)
-				{
-					return gcd2;
-				}
-				else
-				{
-					if (!last)
+					lastValue = currentValue;
+
+					prime128 = StaticRandom.NextBigInteger(sizeOf127bits, sizeOf128bits);
+
+					randomPolynomial.RandomizeCoefficients();
+
+
+
+					Relation rel = relations[StaticRandom.Next(relations.Length)];
+					BigInteger Y = rel.B;
+					rel = relations[StaticRandom.Next(relations.Length)];
+					r = randomPolynomial.Evaluate(m);
+
+
+					mod = (BigInteger.Pow(Y, 2) - S);
+					exponent = BigInteger.Divide(BigInteger.Pow(prime128, degree - 1), 2);
+
+
+					value = BigInteger.ModPow(r - Y, exponent, mod);
+
+
+					// (r-y)^((p^d-1)/2) % (y^2 - S)
+					R_0 = (value % mod) % f(m); ;
+
+
+					results.Add(currentValue);
+
+
+
+					p = BigInteger.Pow(prime128, counter);
+
+					currentValue = BigInteger.Pow(R_0 % p, 2);
+
+
+					if (currentValue == S)
 					{
-						sX = sX2;
-						last = true;
+						break;
 					}
-					else
-					{
-						escape = true;
-					}
-				}
-			}
-			while (!escape);
 
-			return BigInteger.MinusOne;
+
+				}
+
+				return results;
+			}
 		}
 
-		private Func<BigInteger, int, BigInteger> _newtonModQ = (q, k) => BigInteger.Pow(q, (int)BigInteger.Pow(2, k));
-		private Func<BigInteger, BigInteger, BigInteger> _newtonSqrS = (s, r) => BigInteger.Multiply(s, BigInteger.Multiply(r, r));
 
-		private BigInteger NewtonIteration(BigInteger r, BigInteger S, BigInteger q, int k)
-		{
-			//  R[k](x) = R[k-1](x) * (3 - prod(x)*R[k-1](x)^2) / 2 mod (q^(2^k))
-
-			BigInteger prod = N;
-
-			BigInteger left =
-				BigInteger.Divide(
-					BigInteger.Multiply(
-						S,
-						BigInteger.Subtract(
-							3,
-							_newtonSqrS.Invoke(prod, S)
-						)
-					),
-					2
-				);
-
-			BigInteger right = _newtonModQ.Invoke(q, k);
-
-
-			BigInteger result = left % right;
-			return result;
-		}
 
 		public override string ToString()
 		{
 			StringBuilder result = new StringBuilder();
+
+
+			result.AppendLine(string.Join(" + ", AlgebraicComplexSet));
+
+			/*
+			result.AppendLine($"IsRationalIrreducible  ? {IsRationalIrreducible}");
+			result.AppendLine($"IsAlgebraicIrreducible ? {IsAlgebraicIrreducible}");
 
 			result.AppendLine("Square finder, Rational:");
 			result.AppendLine($"γ² = √(  Sᵣ(m)  *  ƒ'(m)²  )");
@@ -282,37 +260,41 @@ namespace GNFSCore.SquareRoot
 			result.AppendLine($"γ² = √( {RationalSquare} )");
 			result.AppendLine($"γ  =    {RationalSquareRoot} mod N");
 			result.AppendLine($"γ  =    {RationalSquareRootResidue}"); // δ mod N 
-																	   //result.AppendLine();
-																	   //result.AppendLine($"IsSquare(Rational) ? {IsRationalSquare}");
-																	   //result.AppendLine($"IsIrreducible(Rational) ? {IsRationalIrreducible}");
+
 			result.AppendLine();
 			result.AppendLine();
 			result.AppendLine("Square finder, Algebraic:");
 			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicProduct} * {PolynomialDerivative}");
 			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicSquare}");
 			result.AppendLine($"χ = Sₐ(m) * ƒ'(m) mod N = {AlgebraicSquareResidue}");
-			//result.AppendLine($"IsAlgebraicSquare ? {IsAlgebraicSquare}");
-			//result.AppendLine($"IsAlgebraicIrreducible ? {IsAlgebraicIrreducible}");
+			*/
+
+			result.AppendLine($"γ = {RationalSquareRootResidue}");
+			result.AppendLine($"χ = {AlgebraicSquareResidue}");
+
+			result.AppendLine($"IsRationalSquare  ? {IsRationalSquare}");
+			result.AppendLine($"IsAlgebraicSquare ? {IsAlgebraicSquare}");
 
 
-			BigInteger max = BigInteger.Max(RationalSquareRoot, AlgebraicSquareResidue);
+
 			BigInteger min = BigInteger.Min(RationalSquareRoot, AlgebraicSquareResidue);
+			BigInteger max = BigInteger.Max(RationalSquareRoot, AlgebraicSquareResidue);
 
+			BigInteger add = max + min;
+			BigInteger sub = max - min;
 
-			BigInteger A = max + min;
-			BigInteger B = max - min;
+			BigInteger gcdAdd = GCD.FindGCD(N, add);
+			BigInteger gcdSub = GCD.FindGCD(N, sub);
 
-			BigInteger gcdA = GCD.FindGCD(N, A);
-			BigInteger gcdB = GCD.FindGCD(N, A);
-
-			BigInteger answer = BigInteger.Max(gcdA, gcdB);
+			BigInteger answer = BigInteger.Max(gcdAdd, gcdSub);
 
 
 			result.AppendLine();
-			result.AppendLine($"GCD(N, A+B) = {gcdA}");
-			result.AppendLine($"GCD(N, A-B) = {gcdB}");
+			result.AppendLine($"GCD(N, γ+χ) = {gcdAdd}");
+			result.AppendLine($"GCD(N, γ-χ) = {gcdSub}");
 			result.AppendLine();
 			result.AppendLine($"Solution? {(answer != 1).ToString().ToUpper()}");
+
 			if (answer != 1)
 			{
 				result.AppendLine();
@@ -325,6 +307,7 @@ namespace GNFSCore.SquareRoot
 				result.AppendLine();
 				result.AppendLine();
 			}
+
 			result.AppendLine();
 
 

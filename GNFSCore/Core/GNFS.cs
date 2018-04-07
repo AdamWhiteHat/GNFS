@@ -131,7 +131,7 @@ namespace GNFSCore
 			PrimeFactorBase.MinQuadraticFactorBase = input.PrimeFactorBase.MinQuadraticFactorBase;
 			PrimeFactorBase.MaxQuadraticFactorBase = input.PrimeFactorBase.MaxQuadraticFactorBase;
 
-			int base10 = N.ToString().Count();
+			int base10 = N.ToString().Length;
 			int quadraticBaseSize = CalculateQuadraticBaseSize(polyDegree);
 
 			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxRationalFactorBase).ToList();
@@ -177,19 +177,15 @@ namespace GNFSCore
 			return Path.Combine(saveRootDirectory, result);
 		}
 
-		//public void SaveAllPolynomials() { foreach (IPolynomial poly in PolynomialCollection) { SavePolynomial(poly); } }
-
-
 		public void SavePolynomial(IPolynomial poly)
 		{
 			SaveLocations.SetPolynomialPath(poly);
-			string polynomialDirectory = SaveLocations.Polynomial_SaveDirectory;
 
-			if (!Directory.Exists(polynomialDirectory))
+			if (!Directory.Exists(SaveLocations.Polynomial_SaveDirectory))
 			{
-				Directory.CreateDirectory(polynomialDirectory);
+				Directory.CreateDirectory(SaveLocations.Polynomial_SaveDirectory);
 			}
-			Serializer.Serialize(Path.Combine(polynomialDirectory, SaveLocations.Polynomial_Filename), poly);
+			Serializer.Serialize(SaveLocations.Polynomial_SaveFile, poly);
 		}
 
 		// Values were obtained from the paper:
@@ -198,7 +194,7 @@ namespace GNFSCore
 		private static int CalculateDegree(BigInteger n)
 		{
 			int result = 2;
-			int base10 = n.ToString().Count();
+			int base10 = n.ToString().Length;
 
 			if (base10 < 65)
 			{
@@ -228,7 +224,7 @@ namespace GNFSCore
 		{
 			BigInteger bound = new BigInteger();
 
-			int base10 = N.ToString().Count(); //N.NthRoot(10, ref remainder);
+			int base10 = N.ToString().Length; //N.NthRoot(10, ref remainder);
 			if (base10 <= 10)
 			{
 				bound = 100;//(int)((int)N.NthRoot(_degree, ref remainder) * 1.5); // 60;

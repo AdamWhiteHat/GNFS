@@ -11,121 +11,120 @@ namespace GNFS_Winforms
 {
 	using GNFSCore;
 	using GNFSCore.Matrix;
-	using GNFSCore.Polynomial;
 	using GNFSCore.Factors;
 	using GNFSCore.IntegerMath;
-	using GNFSCore.Polynomial.Internal;
 
 	public partial class GnfsUiBridge
 	{
 
 		public GNFS MatrixSolveGaussian(CancellationToken cancelToken, GNFS gnfs)
 		{
-			List<Relation> orderedSmoothRelations = gnfs.CurrentRelationsProgress.SmoothRelations.ToList();
+			List<Relation> smoothRelations = gnfs.CurrentRelationsProgress.SmoothRelations.ToList();
 
-			
-			if (orderedSmoothRelations.Count % 2 != 0)
+			int smoothCount = smoothRelations.Count;
+
+			int maxRelationsToSelect =
+				PrimeFactory.GetIndexFromValue(gnfs.PrimeFactorBase.MaxRationalFactorBase)
+				+ PrimeFactory.GetIndexFromValue(gnfs.PrimeFactorBase.MaxAlgebraicFactorBase)
+				+ gnfs.QFB.Count
+				+ 3;
+
+
+			mainForm.LogOutput($"Total relations: {smoothCount}");
+			mainForm.LogOutput($"MaxRelationsToSelect: {maxRelationsToSelect}");
+			mainForm.LogOutput($"ttl / max = {smoothCount / maxRelationsToSelect}");
+
+			List<BigInteger> allAlgebraicProducts = new List<BigInteger>();
+			List<BigInteger> allRationalProducts = new List<BigInteger>();
+
+			List<Relation[]> allSolutionGroups = new List<Relation[]>();
+			List<Tuple<BigInteger, BigInteger>> allSolutionTuples = new List<Tuple<BigInteger, BigInteger>>();
+			while (smoothRelations.Count >= maxRelationsToSelect)
 			{
-				orderedSmoothRelations.RemoveAt(orderedSmoothRelations.Count - 1);
+
+				// Randomly select n relations from smoothRelations
+				List<Relation> selectedRelations = new List<Relation>();
+				while (selectedRelations.Count != maxRelationsToSelect)
+				{
+					int randomIndex = StaticRandom.Next(0, smoothRelations.Count);
+					selectedRelations.Add(smoothRelations[randomIndex]);
+					smoothRelations.RemoveAt(randomIndex);
+				}
+
+				// Force number of relations to be even
+				if (selectedRelations.Count % 2 != 0)
+				{
+					selectedRelations.RemoveAt(selectedRelations.Count - 1);
+				}
+
+
+				GaussianMatrix gaussianReduction = new GaussianMatrix(gnfs, selectedRelations);
+				gaussianReduction.TransposeAppend();
+				gaussianReduction.Elimination();
+
+
+				int number = 1;
+				int solutionCount = gaussianReduction.FreeVariables.Count(b => b) - 1;
+				List<Relation[]> solution = new List<Relation[]>();
+				while (number <= solutionCount)
+				{
+					Relation[] relations = gaussianReduction.GetSolutionSet(number);
+					number++;
+										
+					BigInteger algebraic = relations.Select(rel => rel.AlgebraicNorm).Product();
+					//BigInteger algebraicFactorization = relations.Select(rel => rel.AlgebraicFactorization.ToDictionary().Select(kvp => BigInteger.Pow(kvp.Key, (int)kvp.Value)).Product()).Product();
+					BigInteger rational = relations.Select(rel => rel.RationalNorm).Product();
+
+					CountDictionary algCountDict = new CountDictionary();
+					foreach (var rel in relations)
+					{
+						algCountDict.Combine(rel.AlgebraicFactorization);
+					}
+
+					bool isAlgebraicSquare = algebraic.IsSquare();
+					bool isRationalSquare = rational.IsSquare();
+
+					mainForm.LogOutput("---");
+					mainForm.LogOutput($"Relations count: {relations.Length}");
+					mainForm.LogOutput($"(a,b) pairs: {string.Join(" ", relations.Select(rel => $"({rel.A},{rel.B})"))}");
+					mainForm.LogOutput($"Rational  ∏(a+mb): IsSquare? {isRationalSquare} : {rational}");
+					mainForm.LogOutput($"Algebraic ∏ƒ(a/b): IsSquare? {isAlgebraicSquare} : {algebraic}");
+					mainForm.LogOutput($"Algebraic (factorization): {algCountDict.FormatStringAsFactorization()}");
+
+					if (isAlgebraicSquare && isRationalSquare)
+					{
+						solution.Add(relations);
+					}
+				}
+
+				var productTuples =
+					solution
+						.Select(relList =>
+							new Tuple<BigInteger, BigInteger>(
+								relList.Select(rel => rel.AlgebraicNorm).Product(),
+								relList.Select(rel => rel.RationalNorm).Product()
+							)
+						)
+						.ToList();
+
+
+				allSolutionGroups.AddRange(solution);
+				allSolutionTuples.AddRange(productTuples);
 			}
 
-			Gaussian gaussianReduction = new Gaussian(gnfs, orderedSmoothRelations);
-			gaussianReduction.DontTransposeAppend();
+			gnfs.CurrentRelationsProgress.SetFreeRelations(allSolutionGroups);
 
-			string matrixBeforeTranspose = gaussianReduction.ToString();
-
-			mainForm.LogOutput("Matrix BEFORE transpose:");
-			mainForm.LogOutput($"  rows: {gaussianReduction.RowCount}");
-			mainForm.LogOutput($"  cols: {gaussianReduction.ColumnCount}");
-			mainForm.LogOutput(matrixBeforeTranspose);
-			mainForm.LogOutput();
-
-			gaussianReduction = new Gaussian(gnfs, orderedSmoothRelations);
-			gaussianReduction.TransposeAppend();
-
-			string matrixAfterTranspose = gaussianReduction.ToString();
-
-			mainForm.LogOutput("Matrix after transpose:");
-			mainForm.LogOutput($"  rows: {gaussianReduction.RowCount}");
-			mainForm.LogOutput($"  cols: {gaussianReduction.ColumnCount}");
-			mainForm.LogOutput(matrixAfterTranspose);
-			mainForm.LogOutput();
-
-			gaussianReduction.Elimination();
-
-			string matrixAfterElimination = gaussianReduction.ToString();
-			string freeVariables = Gaussian.VectorToString(gaussianReduction.FreeVariables);
-
-			mainForm.LogOutput("Matrix after elimination:");
-			mainForm.LogOutput(matrixAfterElimination);
-			mainForm.LogOutput();
-			mainForm.LogOutput("Free variables:");
-			mainForm.LogOutput(freeVariables);
-			mainForm.LogOutput();
-
-
-
-			int number = 1;
-			int max = gaussianReduction.FreeVariables.Where(fv => fv == true).Count();
-			List<string> solutionFlagStrings = new List<string>();
-
-			while (number <= max)
-			{
-				solutionFlagStrings.Add(Gaussian.VectorToString(gaussianReduction.GetSolutionFlags(number)));
-
-				number++;
-			}
-
-			mainForm.LogOutput("Solution flags:");
-			mainForm.LogOutput(string.Join(Environment.NewLine, solutionFlagStrings));
-			mainForm.LogOutput();
-
-
-			List<Relation> result = gaussianReduction.GetSolutionSet(1).ToList();
-
-			BigInteger currentPolynomialDerivative = gnfs.CurrentPolynomial.Derivative(gnfs.CurrentPolynomial.Base);
-
-			BigInteger rationalNormProduct = result.Select(rel => rel.RationalNorm).Product();
-			BigInteger algebraicNormProduct = result.Select(rel => rel.AlgebraicNorm).Product();
-
+			//mainForm.LogOutput();
+			//mainForm.LogOutput("All solution set products:");
+			//mainForm.LogOutput(allSolutionTuples.Select(p => $"IsSquare: {p.Item1.IsSquare().ToString().PadLeft(5)} {p.Item1}{Environment.NewLine}IsSquare: {p.Item2.IsSquare().ToString().PadLeft(5)} {p.Item2}{Environment.NewLine}").FormatString(true, 0));
+			//mainForm.LogOutput();
+			//var reducedSolutionTuples = allSolutionTuples.Select(p => new Tuple<BigInteger, BigInteger>(p.Item1 % gnfs.N, p.Item2 % gnfs.N)).ToList();
+			//mainForm.LogOutput();
+			//mainForm.LogOutput("All products mod N:");
+			//mainForm.LogOutput(string.Join(Environment.NewLine, reducedSolutionTuples.Select(p => $"{p.Item1}{Environment.NewLine}{p.Item2}")));
 
 			mainForm.LogOutput();
-			mainForm.LogOutput("Square relations (Solution):");
-			mainForm.LogOutput(result.FormatString());
 			mainForm.LogOutput();
-
-			mainForm.LogOutput($"Algebraic Product: {algebraicNormProduct}");
-			mainForm.LogOutput($"Is square? {algebraicNormProduct.IsSquare()}");
-			mainForm.LogOutput();
-			mainForm.LogOutput($"Rational Product: {rationalNormProduct}");
-			mainForm.LogOutput($"Is square? {rationalNormProduct.IsSquare()}");
-			mainForm.LogOutput();
-			mainForm.LogOutput();
-
-			if (algebraicNormProduct.IsSquare() && rationalNormProduct.IsSquare())
-			{
-				mainForm.LogOutput("CurrentPolynomial.Derivative(gnfs.CurrentPolynomial.Base):");
-				mainForm.LogOutput(currentPolynomialDerivative.ToString());
-				mainForm.LogOutput();
-
-				BigInteger rationalSquare = rationalNormProduct * currentPolynomialDerivative;
-				BigInteger algebraicSquare = algebraicNormProduct * currentPolynomialDerivative;
-
-				BigInteger rationalSquareRt = rationalSquare.SquareRoot();
-				BigInteger algebraicSquareRt = algebraicSquare.SquareRoot();
-
-				mainForm.LogOutput("rationalNormProduct* currentPolynomialDerivative:");
-				mainForm.LogOutput(rationalSquare.ToString());
-				mainForm.LogOutput("algebraidNormProduct* currentPolynomialDerivative:");
-				mainForm.LogOutput(algebraicSquare.ToString());
-				mainForm.LogOutput();
-
-				mainForm.LogOutput("rationalSquareRt:");
-				mainForm.LogOutput(rationalSquareRt.ToString());
-				mainForm.LogOutput("algebraicSquareRt:");
-				mainForm.LogOutput(algebraicSquareRt.ToString());
-				mainForm.LogOutput();
-			}
 
 			return gnfs;
 		}

@@ -25,7 +25,7 @@ namespace GNFSCore.Polynomial
 			N = gnfs.N;
 			Degree = degree;
 
-			if (N.ToString().Count() < 10)
+			if (N.ToString().Length < 10)
 			{
 				throw new Exception("Call the other constructor overloads if log10(N) < 10");
 			}

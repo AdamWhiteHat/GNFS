@@ -9,7 +9,6 @@ using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using GNFSCore.IntegerMath;
-using ExtendedNumerics;
 
 namespace GNFSCore.Polynomial
 {
@@ -63,16 +62,6 @@ namespace GNFSCore.Polynomial
 					BigInteger remainder = 0;
 					BigInteger quotient = BigInteger.DivRem(toAdd, placeValue, out remainder);
 
-					//Fraction fractionRemainder = new Fraction(remainder, placeValue);
-
-					//bool roundUp = (Fraction.Abs(fractionRemainder) > Fraction.OneHalf);
-
-					//if (roundUp)
-					//{
-					//	int adjustment = fractionRemainder.Sign;
-					//	quotient += adjustment;
-					//}
-
 					if (quotient > placeValue)
 					{
 						quotient = placeValue;
@@ -93,11 +82,6 @@ namespace GNFSCore.Polynomial
 		}
 
 		public BigInteger Evaluate(BigInteger baseM)
-		{
-			return CommonPolynomial.Evaluate(this, baseM);
-		}
-
-		public BigRational Evaluate(BigRational baseM)
 		{
 			return CommonPolynomial.Evaluate(this, baseM);
 		}

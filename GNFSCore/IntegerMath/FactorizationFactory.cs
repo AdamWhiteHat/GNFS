@@ -143,7 +143,7 @@ namespace GNFSCore.IntegerMath
 
 			if (BigInteger.Abs(toFactor) != 1)
 			{
-				if (FactorizationFactory.IsPrime(toFactor))
+				if (PrimeFactory.IsPrime(toFactor))
 				{
 					factors.Add(toFactor);
 				}
@@ -194,7 +194,7 @@ namespace GNFSCore.IntegerMath
 		}
 
 		private static BigInteger[] primeCheckBases = new BigInteger[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47 };
-		public static bool IsPrime(BigInteger input)
+		public static bool IsProbablePrime(BigInteger input)
 		{
 			if (input == 2 || input == 3)
 			{
