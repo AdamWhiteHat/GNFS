@@ -43,10 +43,25 @@ namespace GNFS_Winforms
 		private static readonly BigInteger RSA_129 = BigInteger.Parse("114381625757888867669235779976146612010218296721242362562561842935706935245733897830597123563958705058989075147599290026879543541");
 		private static readonly BigInteger RSA_130 = BigInteger.Parse("1807082088687404805951656164405905566278102516769401349170127021450056662540244048387341127590812303371781887966563182013214880557");
 
+
+		private GNFS gnfs;
+		private int degree;
+		private BigInteger n;
+		private BigInteger polyBase;
+		private BigInteger primeBound;
+
+		private string logFilename;
+
+		private bool IsWorking = false;
+		private CancellationToken cancellationToken;
+		private CancellationTokenSource cancellationTokenSource;
+
+
 		public MainForm()
 		{
 			InitializeComponent();
 			IsWorking = false;
+			logFilename = "";
 			gnfs = null;
 
 			gnfsBridge = new GnfsUiBridge(this);
@@ -76,18 +91,6 @@ namespace GNFS_Winforms
 			gnfsBridge = new GnfsUiBridge(this);
 		}
 
-
-
-
-		private GNFS gnfs;
-		private int degree;
-		private BigInteger n;
-		private BigInteger polyBase;
-		private BigInteger primeBound;
-
-		private bool IsWorking = false;
-		private CancellationToken cancellationToken;
-		private CancellationTokenSource cancellationTokenSource;
 
 		private void SetGnfs(MainForm form, GNFS nfs)
 		{
@@ -158,7 +161,14 @@ namespace GNFS_Winforms
 			{
 				if (!this.IsDisposed)
 				{
-					tbOutput.AppendText(message + Environment.NewLine);
+					string toLog = message + Environment.NewLine;
+
+					tbOutput.AppendText(toLog);
+
+					if (!string.IsNullOrWhiteSpace(logFilename) && File.Exists(logFilename))
+					{
+						File.AppendAllText(logFilename, toLog);
+					}
 				}
 			}
 		}
@@ -182,6 +192,24 @@ namespace GNFS_Winforms
 
 				int relationQuantity = int.Parse(tbRelationQuantity.Text);
 				int relationValueRange = int.Parse(tbRelationValueRange.Text);
+
+				
+				logFilename = DirectoryLocations.GenerateFileNameFromBigInteger(n) + ".LOG.txt";
+				if (File.Exists(logFilename))
+				{
+					if (!Directory.Exists(DirectoryLocations.GenerateSaveDirectory(n)))
+					{
+						File.Delete(logFilename);
+					}
+				}
+
+				if (!File.Exists(logFilename))
+				{
+					string logHeader = $"Log created: {DateTime.Now}";
+					string line = new string(Enumerable.Repeat('-', logHeader.Length).ToArray());
+
+					File.WriteAllLines(logFilename, new string[] { logHeader, line, Environment.NewLine });
+				}
 
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
@@ -291,7 +319,7 @@ namespace GNFS_Winforms
 		private void btnSerialize_Click(object sender, EventArgs e)
 		{
 			string savePath = $"C:\\GNFS\\{gnfs.N}";
-			gnfs.SaveGnfsProgress();			
+			gnfs.SaveGnfsProgress();
 		}
 
 		private void btnPrintRelations_Click(object sender, EventArgs e)
