@@ -31,33 +31,12 @@ namespace GNFS_Winforms
 			Func<BigInteger, BigInteger> f = poly.Evaluate;
 			Func<BigInteger, BigInteger> fD = poly.Derivative;
 
-
 			List<Relation> freeRelations = gnfs.CurrentRelationsProgress.FreeRelations.First().ToList();
 
 			SquareFinder squareRootFinder = new SquareFinder(gnfs, freeRelations);
 			squareRootFinder.CalculateRationalSide();
 			squareRootFinder.CalculateAlgebraicSide();
 
-			BigInteger Y = squareRootFinder.AlgebraicProductMod;
-			BigInteger S = squareRootFinder.AlgebraicProductMod;
-
-			mainForm.LogOutput($"f'(m)  = {squareRootFinder.PolynomialDerivative}");
-			mainForm.LogOutput($"f'(m)^2= {squareRootFinder.PolynomialDerivativeSquared}");
-			mainForm.LogOutput($"γ²     = {squareRootFinder.RationalProduct}");
-			mainForm.LogOutput($"γ      = {squareRootFinder.RationalSquareRootResidue}");
-			mainForm.LogOutput($"S(a,b) = {squareRootFinder.AlgebraicProduct}");
-			mainForm.LogOutput($"Sₐ(m)  = {squareRootFinder.AlgebraicProductMod}");
-			mainForm.LogOutput($"S (x)  = {squareRootFinder.AlgebraicSquareResidue}");
-			mainForm.LogOutput();
-			
-
-			AlgebraicPolynomial Srat = new AlgebraicPolynomial(squareRootFinder.RationalProduct, N, (poly.Degree - 1));
-			AlgebraicPolynomial Salg1 = new AlgebraicPolynomial(N, poly.Base, (poly.Degree - 1));
-			AlgebraicPolynomial Salg2 = new AlgebraicPolynomial(squareRootFinder.AlgebraicProduct, squareRootFinder.AlgebraicProduct.SquareRoot(), (poly.Degree - 1));
-
-			mainForm.LogOutput("Polynomial RationalProduct     = " + Srat.ToString());
-			mainForm.LogOutput("Polynomial AlgebraicProductMod = " + Salg1.ToString());
-			mainForm.LogOutput("Polynomial AlgebraicProduct    = " + Salg2.ToString());
 
 
 			mainForm.LogOutput();
@@ -67,35 +46,81 @@ namespace GNFS_Winforms
 			mainForm.LogOutput();
 			mainForm.LogOutput("AlgebraicNorms: " + string.Join(" * ", freeRelations.Select(rel => $"{rel.AlgebraicNorm}")));
 			mainForm.LogOutput();
+			mainForm.LogOutput("AlgebraicNorms (mod N): " + string.Join(" * ", freeRelations.Select(rel => $"{rel.AlgebraicNorm % N}")));
+			mainForm.LogOutput();
+			mainForm.LogOutput();
+			mainForm.LogOutput($"Sum of rationalNorms: {freeRelations.Select(rel => rel.RationalNorm).Sum()}");
+			mainForm.LogOutput();
+			mainForm.LogOutput($"Sum  of algebraicNorms (mod N) {freeRelations.Select(rel => rel.AlgebraicNorm % N).Sum()}");
+			mainForm.LogOutput();
+
+
+			Complex cplxAlgSum = squareRootFinder.AlgebraicComplexSet.Sum();
+			Complex cplxAlgProd = squareRootFinder.AlgebraicComplexSet.Product();
+			mainForm.LogOutput();
+			mainForm.LogOutput("AlgebraicComplexSet:");
+			mainForm.LogOutput(string.Join(" + ", squareRootFinder.AlgebraicComplexSet.Select(cmplx => $"({cmplx.Real} + {cmplx.Imaginary}i)")));
+			mainForm.LogOutput();
+			mainForm.LogOutput("Sum:");
+			mainForm.LogOutput($"{cplxAlgSum}");
+			mainForm.LogOutput();
+			mainForm.LogOutput("Product:");
+			mainForm.LogOutput($"{cplxAlgProd}");
+			mainForm.LogOutput();
+
+			Complex sqrdCplxAlgSum = Complex.Abs(cplxAlgSum); //Complex.Pow(cplxAlgSum, 2);
+			Complex sqrdCplxAlgProd = Complex.Abs(cplxAlgProd); //Complex.Pow(cplxAlgProd, 2);
+			mainForm.LogOutput();
+			mainForm.LogOutput("Sum squared:");
+			mainForm.LogOutput($"{sqrdCplxAlgSum}");
+			mainForm.LogOutput();
+			mainForm.LogOutput("Product squared:");
+			mainForm.LogOutput($"{sqrdCplxAlgProd}");
+			mainForm.LogOutput();
+			
+			//squareRootFinder.AlgebraicSquareRoot();
+			//BigInteger S = squareRootFinder.S.Evaluate(poly.Base);
 
 			mainForm.LogOutput();
-			mainForm.LogOutput($"Product(roots): {squareRootFinder.RelationsSet.Select(rel => rel.B).Product()}");
-			mainForm.LogOutput($"Roots (Norms): {string.Join(", ", squareRootFinder.RelationsSet.Select(rel => rel.B))}");
+			mainForm.LogOutput($"f'(m)  = {squareRootFinder.PolynomialDerivative}");
+			mainForm.LogOutput($"f'(m)^2= {squareRootFinder.PolynomialDerivativeSquared}");
+			mainForm.LogOutput($"γ²     = {squareRootFinder.RationalProduct}");
+			mainForm.LogOutput($"γ      = {squareRootFinder.RationalSquareRootResidue}");
+			mainForm.LogOutput($"S(a,b) = {squareRootFinder.AlgebraicProduct}");
+			mainForm.LogOutput($"Sₐ(m)  = {squareRootFinder.AlgebraicSquare}");
+			mainForm.LogOutput($"S (x)  = {squareRootFinder.AlgebraicSquareResidue}");
 			mainForm.LogOutput();
-			mainForm.LogOutput($"Y^2 - S: {BigInteger.Pow(Y, 2) - S} % N = {(BigInteger.Pow(Y, 2) - S) % N} ");
+
+
+
+
+			BigInteger gcd1 = GCD.FindGCD(N, squareRootFinder.RationalSquareRootResidue + squareRootFinder.AlgebraicSquareResidue);
+			BigInteger gcd2 = GCD.FindGCD(N, squareRootFinder.RationalSquareRootResidue - squareRootFinder.AlgebraicSquareResidue);
+
+			mainForm.LogOutput("GCD: " + gcd1);
+			mainForm.LogOutput("GCD: " + gcd2);
 			mainForm.LogOutput();
 
-
-			var a1 = squareRootFinder.RelationsSet.Where(rel => rel.B == 1).Select(rel => rel.A).ToList();
-			var a3 = squareRootFinder.RelationsSet.Where(rel => rel.B == 3).Select(rel => rel.A);
-			var a5 = squareRootFinder.RelationsSet.Where(rel => rel.B == 5).Select(rel => rel.A);
-
-			a1.Remove(0);
-
-			mainForm.LogOutput($"");
-			mainForm.LogOutput($"{a1.Product()}: {string.Join(", ", a1)}");
-			mainForm.LogOutput($"{a3.Product()}: {string.Join(", ", a3)}");
-			mainForm.LogOutput($"{a5.Product()}: {string.Join(", ", a5)}");
-			mainForm.LogOutput($"");
-
-
-			mainForm.LogOutput(string.Join(" + ", squareRootFinder.AlgebraicComplexSet));
+			if (gcd1 != 1 || gcd2 != 1)
+			{
+				mainForm.LogOutput();
+				mainForm.LogOutput("################");
+				mainForm.LogOutput("##  SUCCESS!  ##");
+				mainForm.LogOutput("################");
+				mainForm.LogOutput();
+			}
 
 
 
-			// (Zp[x]/f(x))[y]/(y^2 − S)
-			// compute the ((p^d)-1)/2  power of r(x) modulo (y^2 − S)
-			// (r(x) − y) ^ ((p^d)-1)/2) 
+			//   ƒ(r) ≡ 0(mod p)
+
+			//   ƒ(-p / r) * -p ^ deg
+
+			//squareRootFinder.AlgebraicComplexSet.Product()
+
+			//   (Zp[x]/f(x))[y]/(y^2 − S)
+			//   compute the ((p^d)-1)/2  power of r(x) modulo (y^2 − S)
+			//   (r(x) − y) ^ ((p^d)-1)/2) 
 
 
 			return gnfs;

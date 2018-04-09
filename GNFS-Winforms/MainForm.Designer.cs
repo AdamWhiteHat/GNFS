@@ -48,9 +48,7 @@
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.btnPrintRelations = new System.Windows.Forms.Button();
 			this.btnPurgeRough = new System.Windows.Forms.Button();
-			this.btnLatticeSieve = new System.Windows.Forms.Button();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.btnCollectSquares = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.panelCancel = new System.Windows.Forms.Panel();
 			this.btnCancel = new System.Windows.Forms.Button();
@@ -254,7 +252,6 @@
 			this.groupBox3.Controls.Add(this.btnPrintRelations);
 			this.groupBox3.Controls.Add(this.btnPurgeRough);
 			this.groupBox3.Controls.Add(this.btnFindRelations);
-			this.groupBox3.Controls.Add(this.btnLatticeSieve);
 			this.groupBox3.Location = new System.Drawing.Point(3, 3);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(316, 40);
@@ -284,23 +281,10 @@
 			this.btnPurgeRough.UseVisualStyleBackColor = true;
 			this.btnPurgeRough.Click += new System.EventHandler(this.btnPurgeRough_Click);
 			// 
-			// btnLatticeSieve
-			// 
-			this.btnLatticeSieve.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
-			this.btnLatticeSieve.Enabled = false;
-			this.btnLatticeSieve.Location = new System.Drawing.Point(99, 15);
-			this.btnLatticeSieve.Name = "btnLatticeSieve";
-			this.btnLatticeSieve.Size = new System.Drawing.Size(78, 23);
-			this.btnLatticeSieve.TabIndex = 12;
-			this.btnLatticeSieve.Text = "Lattice sieve";
-			this.btnLatticeSieve.UseVisualStyleBackColor = true;
-			this.btnLatticeSieve.Click += new System.EventHandler(this.btnLatticeSieve_Click);
-			// 
 			// groupBox2
 			// 
 			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBox2.Controls.Add(this.btnCollectSquares);
 			this.groupBox2.Controls.Add(this.btnMatrix);
 			this.groupBox2.Location = new System.Drawing.Point(3, 47);
 			this.groupBox2.Name = "groupBox2";
@@ -308,18 +292,6 @@
 			this.groupBox2.TabIndex = 19;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "3) Matrix";
-			// 
-			// btnCollectSquares
-			// 
-			this.btnCollectSquares.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
-			this.btnCollectSquares.Enabled = false;
-			this.btnCollectSquares.Location = new System.Drawing.Point(112, 16);
-			this.btnCollectSquares.Name = "btnCollectSquares";
-			this.btnCollectSquares.Size = new System.Drawing.Size(96, 23);
-			this.btnCollectSquares.TabIndex = 14;
-			this.btnCollectSquares.Text = "CollectSquares";
-			this.btnCollectSquares.UseVisualStyleBackColor = true;
-			this.btnCollectSquares.Click += new System.EventHandler(this.btnCollectSquares_Click);
 			// 
 			// groupBox1
 			// 
@@ -453,8 +425,6 @@
 		private System.Windows.Forms.Button btnPurgeRough;
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.GroupBox groupBox1;
-		private System.Windows.Forms.Button btnCollectSquares;
-		private System.Windows.Forms.Button btnLatticeSieve;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.TextBox tbRelationQuantity;
 		private System.Windows.Forms.Label label6;

@@ -1,5 +1,6 @@
 ﻿using GNFSCore.IntegerMath;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -15,8 +16,7 @@ namespace GNFSCore.Polynomial
 		BigInteger[] Terms { get; }
 
 		BigInteger Evaluate(BigInteger baseM);
-		BigInteger Derivative(BigInteger baseM);
-		List<BigInteger> GetRootsMod(BigInteger baseM, IEnumerable<BigInteger> modList);
+		BigInteger Derivative(BigInteger baseM);		
 	}
 
 	public enum SearchDirection
@@ -134,9 +134,46 @@ namespace GNFSCore.Polynomial
 					result += addValue;
 
 					d--;
+					d1--;
 				}
 
 				return result;
+			}
+			
+			public static IPolynomial GetDerivativePolynomial(IPolynomial poly)
+			{
+				int d = poly.Degree + 1;
+
+				BigInteger[] terms = new BigInteger[d - 1];
+				while (d >= 0)
+				{
+					d--;
+
+					if (d < 1)
+					{
+						continue;
+					}
+
+					BigInteger item = poly.Terms[d];
+
+					BigInteger value = d * item;
+					terms[d - 1] = value;
+				}
+
+				IPolynomial result = new AlgebraicPolynomial(terms.ToArray(), poly.Base);
+				return result;
+			}
+			
+			public static IPolynomial RandomPolynomial(int degree, BigInteger polynomialBase, BigInteger minimumCoefficentValue, BigInteger maximumCoefficentValue)
+			{
+				List<BigInteger> terms = new List<BigInteger>();
+
+				for (int index = 0; index <= degree; index++)
+				{
+					terms.Add(StaticRandom.NextBigInteger(minimumCoefficentValue, maximumCoefficentValue));
+				}
+
+				return new AlgebraicPolynomial(terms.ToArray(), polynomialBase);
 			}
 
 			public static void MakeCoefficientsSmaller(IPolynomial polynomial)

@@ -52,7 +52,6 @@
     <Compile Include="Core\RoughPair.cs" />
     <Compile Include="Core\Serializer.cs" />
     <Compile Include="Core\SquareFinder.cs" />
-    <Compile Include="Core\SquaresMethod.cs" />
     <Compile Include="Core\StaticRandom.cs" />
     <Compile Include="FactorBase\FactorCollection.cs" />
     <Compile Include="FactorBase\FactorPair.cs" />

@@ -22,19 +22,32 @@ namespace GNFS_Winforms
 
 	public partial class MainForm : Form
 	{
-		public ControlBridge BridgeTextboxN;
-		public ControlBridge BridgeTextboxDegree;
-		public ControlBridge BridgeTextboxBase;
-		public ControlBridge BridgeButtonGnfs;
-		public ControlBridge BridgeButtonSquares;
-		public ControlBridge BridgeButtonRelation;
-		public ControlBridge BridgeButtonBound;
+		#region Private Members		
+
+		private GNFS gnfs;
+		private int degree;
+		private BigInteger n;
+		private BigInteger polyBase;
+		private BigInteger primeBound;
 		private GnfsUiBridge gnfsBridge;
 
-		public static string FindSquaresButtonText = "Find Squares";
-		public static string FindRelationsButtonText = "Find Relations";
-		public static string CreateGnfsButtonText = "Create/Load";
-		public static string CancelButtonText = "Cancel";
+		private string logFilename;
+		private bool IsWorking = false;
+		private CancellationToken cancellationToken;
+		private CancellationTokenSource cancellationTokenSource;
+
+		private ControlBridge BridgeTextboxN;
+		private ControlBridge BridgeTextboxDegree;
+		private ControlBridge BridgeTextboxBase;
+		private ControlBridge BridgeButtonGnfs;
+		private ControlBridge BridgeButtonSquares;
+		private ControlBridge BridgeButtonRelation;
+		private ControlBridge BridgeButtonBound;
+
+		private static string FindSquaresButtonText = "Find Squares";
+		private static string FindRelationsButtonText = "Find Relations";
+		private static string CreateGnfsButtonText = "Create/Load";
+		private static string CancelButtonText = "Cancel";
 
 		private static readonly BigInteger PerLeslieJensen = BigInteger.Parse("3218147");
 		private static readonly BigInteger RSA_100 = BigInteger.Parse("1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139");
@@ -43,19 +56,9 @@ namespace GNFS_Winforms
 		private static readonly BigInteger RSA_129 = BigInteger.Parse("114381625757888867669235779976146612010218296721242362562561842935706935245733897830597123563958705058989075147599290026879543541");
 		private static readonly BigInteger RSA_130 = BigInteger.Parse("1807082088687404805951656164405905566278102516769401349170127021450056662540244048387341127590812303371781887966563182013214880557");
 
+		#endregion
 
-		private GNFS gnfs;
-		private int degree;
-		private BigInteger n;
-		private BigInteger polyBase;
-		private BigInteger primeBound;
-
-		private string logFilename;
-
-		private bool IsWorking = false;
-		private CancellationToken cancellationToken;
-		private CancellationTokenSource cancellationTokenSource;
-
+		#region Winforms Methods
 
 		public MainForm()
 		{
@@ -91,7 +94,6 @@ namespace GNFS_Winforms
 			gnfsBridge = new GnfsUiBridge(this);
 		}
 
-
 		private void SetGnfs(MainForm form, GNFS nfs)
 		{
 			if (form.InvokeRequired)
@@ -124,10 +126,9 @@ namespace GNFS_Winforms
 
 		private void HaultAllProcessing()
 		{
-			if (cancellationTokenSource != null && IsWorking)//(!cancellationTokenSource.IsCancellationRequested)
+			if (cancellationTokenSource != null && IsWorking)
 			{
 				cancellationToken = cancellationTokenSource.Token;
-				//cancellationToken.Register(new Action(() => RestoreAllButtons()));
 				cancellationTokenSource.Cancel();
 			}
 		}
@@ -173,8 +174,9 @@ namespace GNFS_Winforms
 			}
 		}
 
+		#endregion
 
-
+		#region Button Methods
 
 		private void btnCreateGnfs_Click(object sender, EventArgs e)
 		{
@@ -193,7 +195,7 @@ namespace GNFS_Winforms
 				int relationQuantity = int.Parse(tbRelationQuantity.Text);
 				int relationValueRange = int.Parse(tbRelationValueRange.Text);
 
-				
+
 				logFilename = DirectoryLocations.GenerateFileNameFromBigInteger(n) + ".LOG.txt";
 				if (File.Exists(logFilename))
 				{
@@ -285,24 +287,6 @@ namespace GNFS_Winforms
 			}
 		}
 
-		//private void btnResume_Click(object sender, EventArgs e)
-		//{
-		//	string directory = string.Empty;
-		//	using (FolderBrowserDialog browseDialog = new FolderBrowserDialog())
-		//	{
-		//		if (browseDialog.ShowDialog() == DialogResult.OK)
-		//		{
-		//			directory = browseDialog.SelectedPath;
-		//		}
-		//	}
-
-		//	if (!string.IsNullOrWhiteSpace(directory) && Directory.Exists(directory))
-		//	{
-		//		cancellationTokenSource = new CancellationTokenSource();
-		//		gnfs = new GNFS(cancellationTokenSource.Token, directory);
-		//	}
-		//}
-
 		private void btnPurgeRough_Click(object sender, EventArgs e)
 		{
 			int before = gnfs.CurrentRelationsProgress.RoughRelations.Count;
@@ -330,14 +314,6 @@ namespace GNFS_Winforms
 			}
 		}
 
-		private void btnCollectSquares_Click(object sender, EventArgs e)
-		{
-
-		}
-
-		private void btnLatticeSieve_Click(object sender, EventArgs e)
-		{
-
-		}
+		#endregion
 	}
 }

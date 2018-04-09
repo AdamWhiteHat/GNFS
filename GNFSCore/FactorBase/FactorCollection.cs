@@ -8,6 +8,7 @@ using GNFSCore.Polynomial;
 using GNFSCore.IntegerMath;
 using System.IO;
 using System.Threading;
+using GNFSCore.Polynomial.Internal;
 
 namespace GNFSCore.Factors
 {
@@ -101,7 +102,7 @@ namespace GNFSCore.Factors
 				}
 
 				IEnumerable<BigInteger> modList = primes.Where(p => p > r);
-				List<BigInteger> roots = polynomial.GetRootsMod(r, modList);
+				List<BigInteger> roots = CommonPolynomial.GetRootsMod(polynomial, r, modList);
 				if (roots.Any())
 				{
 					result.AddRange(roots.Select(p => new FactorPair(p, r)));

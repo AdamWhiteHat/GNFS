@@ -18,8 +18,7 @@ namespace GNFSCore.Polynomial
 	public class AlgebraicPolynomial : IPolynomial, IXmlSerializable
 	{
 		public int Degree { get; private set; }
-		public BigInteger N { get; private set; }
-		public BigInteger Base { get; private set; }
+		public BigInteger Base { get; set; }
 
 		[XmlArrayItem("Terms")]
 		public BigInteger[] Terms { get; private set; }
@@ -27,26 +26,31 @@ namespace GNFSCore.Polynomial
 		public AlgebraicPolynomial()
 		{ }
 
+		public AlgebraicPolynomial(BigInteger[] terms, BigInteger polynomialBase)
+		{
+			Base = polynomialBase;
+			Terms = terms;
+			Degree = terms.Length - 1;
+		}
+
 		public AlgebraicPolynomial(BigInteger n, BigInteger polynomialBase, int degree)
 		{
-			N = n;
-			Base = polynomialBase;
 			Degree = degree;
-
+			Base = polynomialBase;
 			Initialize();
+
+			SetPolynomialValue(n);
 		}
 
 		private void Initialize()
 		{
 			Terms = Enumerable.Repeat(BigInteger.Zero, Degree + 1).ToArray();
-			SetPolynomialValue(N);
 		}
 
 		private void SetPolynomialValue(BigInteger value)
 		{
-			N = value;
 			int d = Degree;
-			BigInteger toAdd = N;
+			BigInteger toAdd = value;
 
 			// Build out Terms[]
 			while (d >= 0)
@@ -124,7 +128,6 @@ namespace GNFSCore.Polynomial
 
 		public void WriteXml(XmlWriter writer)
 		{
-			writer.WriteElementString("N", N.ToString());
 			writer.WriteElementString("Base", Base.ToString());
 			writer.WriteElementString("Degree", Degree.ToString());
 			writer.WriteStartElement("Terms");
@@ -138,7 +141,6 @@ namespace GNFSCore.Polynomial
 			reader.MoveToContent();
 			reader.ReadStartElement();
 
-			N = BigInteger.Parse(reader.ReadElementString("N"));
 			Base = BigInteger.Parse(reader.ReadElementString("Base"));
 			Degree = int.Parse(reader.ReadElementString("Degree"));
 
