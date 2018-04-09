@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("GNFSCore")]
+[assembly: AssemblyTitle("GNFS Core Library")]
 [assembly: AssemblyDescription("A General Number Field Sieve implementation in C#")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Adam Rakaska")]
-[assembly: AssemblyProduct("GNFSCore")]
+[assembly: AssemblyProduct("GNFS Core Library")]
 [assembly: AssemblyCopyright("Made by Adam Rakaska")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("https://github.com/AdamRakaska")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

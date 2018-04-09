@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("GNFS-Winforms")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("GNFS Winforms")]
+[assembly: AssemblyDescription("A General Number Field Sieve implementation in C# - GUI Launcher")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("http://www.csharpprogramming.tips")]
-[assembly: AssemblyProduct("GNFS-Winforms")]
-[assembly: AssemblyCopyright("Copyright © 2017 Adam Rakaska")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("Adam Rakaska")]
+[assembly: AssemblyProduct("GNFS Winforms")]
+[assembly: AssemblyCopyright("Made by Adam Rakaska")]
+[assembly: AssemblyTrademark("https://github.com/AdamRakaska")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
