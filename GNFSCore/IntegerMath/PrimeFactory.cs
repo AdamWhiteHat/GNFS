@@ -120,7 +120,7 @@ namespace GNFSCore.IntegerMath
 
 		public static BigInteger GetNextPrime(BigInteger fromValue)
 		{
-			BigInteger result = fromValue;
+			BigInteger result = fromValue + 1;
 
 			if (result.IsEven)
 			{
