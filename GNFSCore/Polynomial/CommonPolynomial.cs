@@ -16,7 +16,7 @@ namespace GNFSCore.Polynomial
 		BigInteger[] Terms { get; }
 
 		BigInteger Evaluate(BigInteger baseM);
-		BigInteger Derivative(BigInteger baseM);		
+		BigInteger Derivative(BigInteger baseM);
 	}
 
 	public enum SearchDirection
@@ -139,7 +139,7 @@ namespace GNFSCore.Polynomial
 
 				return result;
 			}
-			
+
 			public static IPolynomial GetDerivativePolynomial(IPolynomial poly)
 			{
 				int d = poly.Degree + 1;
@@ -163,7 +163,7 @@ namespace GNFSCore.Polynomial
 				IPolynomial result = new AlgebraicPolynomial(terms.ToArray(), poly.Base);
 				return result;
 			}
-			
+
 			public static IPolynomial RandomPolynomial(int degree, BigInteger polynomialBase, BigInteger minimumCoefficentValue, BigInteger maximumCoefficentValue)
 			{
 				List<BigInteger> terms = new List<BigInteger>();
@@ -198,6 +198,21 @@ namespace GNFSCore.Polynomial
 					pos++;
 				}
 			}
+
+			public static void MakeMonic(IPolynomial polynomial)
+			{
+				int deg = polynomial.Degree;
+
+				if (BigInteger.Abs(polynomial.Terms[deg]) > 1)
+				{
+					BigInteger toAdd = (polynomial.Terms[deg] - 1) * polynomial.Base;
+										
+					polynomial.Terms[deg] = 1;
+					
+					polynomial.Terms[deg - 1] += toAdd;
+				}
+			}
+
 
 			public static string FormatString(IPolynomial polynomial)
 			{
