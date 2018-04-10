@@ -52,6 +52,7 @@
     <Compile Include="Core\RoughPair.cs" />
     <Compile Include="Core\Serializer.cs" />
     <Compile Include="Core\SquareFinder.cs" />
+    <!--Compile Include="Core\SquareFinder.Experiments.cs" /-->
     <Compile Include="Core\StaticRandom.cs" />
     <Compile Include="FactorBase\FactorCollection.cs" />
     <Compile Include="FactorBase\FactorPair.cs" />
@@ -64,6 +65,8 @@
     <Compile Include="Matrix\GaussianMatrix.cs" />
     <Compile Include="Matrix\GaussianRow.cs" />
     <Compile Include="Polynomial\CommonPolynomial.cs" />
+    <Compile Include="Polynomial\IPolynomial.cs" />
+    <!--Compile Include="Polynomial\PolynomialArithmetic.cs" /-->
     <Compile Include="Polynomial\SkewSymmetricPolynomial.cs" />
     <Compile Include="Polynomial\RationalPolynomial.cs" />
     <Compile Include="IntegerMath\Combinatorics.cs" />
