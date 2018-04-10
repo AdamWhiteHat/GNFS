@@ -9,16 +9,6 @@ using System.Threading.Tasks;
 
 namespace GNFSCore.Polynomial
 {
-	public interface IPolynomial
-	{
-		int Degree { get; }
-		BigInteger Base { get; }
-		BigInteger[] Terms { get; }
-
-		BigInteger Evaluate(BigInteger baseM);
-		BigInteger Derivative(BigInteger baseM);
-	}
-
 	public enum SearchDirection
 	{
 		Increment,
@@ -160,7 +150,7 @@ namespace GNFSCore.Polynomial
 					terms[d - 1] = value;
 				}
 
-				IPolynomial result = new AlgebraicPolynomial(terms.ToArray(), poly.Base);
+				IPolynomial result = new AlgebraicPolynomial(terms.ToArray());
 				return result;
 			}
 
@@ -173,10 +163,10 @@ namespace GNFSCore.Polynomial
 					terms.Add(StaticRandom.NextBigInteger(minimumCoefficentValue, maximumCoefficentValue));
 				}
 
-				return new AlgebraicPolynomial(terms.ToArray(), polynomialBase);
+				return new AlgebraicPolynomial(terms.ToArray());
 			}
 
-			public static void MakeCoefficientsSmaller(IPolynomial polynomial)
+			public static void MakeCoefficientsSmaller(IPolynomial polynomial, BigInteger polynomialBase)
 			{
 				int pos = 0;
 				int deg = polynomial.Degree;
@@ -188,10 +178,10 @@ namespace GNFSCore.Polynomial
 						return;
 					}
 
-					if (polynomial.Terms[pos] > polynomial.Base &&
+					if (polynomial.Terms[pos] > polynomialBase &&
 						polynomial.Terms[pos] > polynomial.Terms[pos + 1])
 					{
-						polynomial.Terms[pos] -= polynomial.Base;
+						polynomial.Terms[pos] -= polynomialBase;
 						polynomial.Terms[pos + 1] += 1;
 					}
 
@@ -199,52 +189,128 @@ namespace GNFSCore.Polynomial
 				}
 			}
 
-			public static void MakeMonic(IPolynomial polynomial)
+			public static void MakeMonic(IPolynomial polynomial, BigInteger polynomialBase)
 			{
 				int deg = polynomial.Degree;
 
 				if (BigInteger.Abs(polynomial.Terms[deg]) > 1)
 				{
-					BigInteger toAdd = (polynomial.Terms[deg] - 1) * polynomial.Base;
-										
+					BigInteger toAdd = (polynomial.Terms[deg] - 1) * polynomialBase;
+
 					polynomial.Terms[deg] = 1;
-					
+
 					polynomial.Terms[deg - 1] += toAdd;
 				}
+			}
+
+			public static IPolynomial Mod(IPolynomial left, IPolynomial right)
+			{
+				IPolynomial remainder = new AlgebraicPolynomial();
+				Divide(left, right, out remainder);
+				return remainder;
+			}
+
+			public static IPolynomial Divide(IPolynomial left, IPolynomial right, out IPolynomial remainder)
+			{
+				if (left == null) throw new ArgumentNullException(nameof(left));
+				if (right == null) throw new ArgumentNullException(nameof(right));
+
+				if (right.Degree >= left.Degree)
+				{
+					throw new InvalidOperationException();
+				}
+
+				int i = 0;
+				int leftDegree = left.Degree;
+				int rightDegree = right.Degree;
+				BigInteger leadingCoefficent = right.Terms[rightDegree];
+				// the leading coefficient is the only number we ever divide by
+				// (so if right is monic, polynomial division does not involve division at all!)
+
+				BigInteger[] rem = left.Terms.ToArray();
+
+				//rem = new BigInteger[leftDegree + 1];
+				//for (i = 0; i < rem.Length; i++)
+				//{
+				//	rem[i] = left.Terms[i];
+				//}
+
+				BigInteger[] quotient = new BigInteger[leftDegree - rightDegree + 1];
+				for (i = quotient.Length - 1; i >= 0; i--)
+				{
+					quotient[i] = (rem[rightDegree + i] / leadingCoefficent);
+					rem[rightDegree + i] = BigInteger.Zero;
+					for (int j = rightDegree + i - 1; j >= i; j--)
+					{
+						rem[j] = rem[j] - (quotient[i] * right.Terms[j - i]);
+					}
+				}
+
+				// form the remainder and quotient polynomials from the arrays
+				remainder = new AlgebraicPolynomial(rem);
+				return new AlgebraicPolynomial(quotient);
 			}
 
 
 			public static string FormatString(IPolynomial polynomial)
 			{
+				string variable = "X";
+
 				List<string> stringTerms = new List<string>();
 
+				bool firstPass = true;
 				int degree = polynomial.Terms.Length - 1;
 				while (degree >= 0)
 				{
-					if (degree > 1)
+					BigInteger term = polynomial.Terms[degree];
+
+					if (firstPass)
 					{
-						if (polynomial.Terms[degree] == 1)
+						firstPass = false;
+					}
+					else
+					{
+						if (term.Sign == -1)
 						{
-							stringTerms.Add($"{polynomial.Base}^{degree}");
+							stringTerms.Add(" - ");
 						}
 						else
 						{
-							stringTerms.Add($"{polynomial.Terms[degree]} * {polynomial.Base}^{degree}");
+							stringTerms.Add(" + ");
+						}
+					}
+
+					if (degree < polynomial.Terms.Length - 1)
+					{
+						term = BigInteger.Abs(term);
+					}
+
+					if (degree > 1)
+					{
+						if (term == 1)
+						{
+							stringTerms.Add($"{variable}^{degree}");
+						}
+						else
+						{
+							stringTerms.Add($"{term} * {variable}^{degree}");
 						}
 					}
 					else if (degree == 1)
 					{
-						stringTerms.Add($"{polynomial.Terms[degree]} * {polynomial.Base}");
+						stringTerms.Add($"{term} * {variable}");
 					}
 					else if (degree == 0)
 					{
-						stringTerms.Add($"{polynomial.Terms[degree]}");
+						stringTerms.Add($"{term}");
 					}
+
+
 
 					degree--;
 				}
 
-				return string.Join(" + ", stringTerms);
+				return string.Join(string.Empty, stringTerms);
 			}
 		}
 	}

@@ -28,6 +28,8 @@ namespace GNFS_Winforms
 
 			BigInteger N = gnfs.N;
 			IPolynomial poly = gnfs.CurrentPolynomial;
+			BigInteger polyBase = gnfs.PolynomialBase;
+
 			Func<BigInteger, BigInteger> f = poly.Evaluate;
 			Func<BigInteger, BigInteger> fD = poly.Derivative;
 
@@ -77,25 +79,25 @@ namespace GNFS_Winforms
 			mainForm.LogOutput("Product squared:");
 			mainForm.LogOutput($"{sqrdCplxAlgProd}");
 			mainForm.LogOutput();
-			
-			//squareRootFinder.AlgebraicSquareRoot();
-			//BigInteger S = squareRootFinder.S.Evaluate(poly.Base);
+
+			squareRootFinder.AlgebraicSquareRoot();
+			BigInteger S = squareRootFinder.S.Evaluate(polyBase);
 
 			mainForm.LogOutput();
 			mainForm.LogOutput($"f'(m)  = {squareRootFinder.PolynomialDerivative}");
 			mainForm.LogOutput($"f'(m)^2= {squareRootFinder.PolynomialDerivativeSquared}");
 			mainForm.LogOutput($"γ²     = {squareRootFinder.RationalProduct}");
 			mainForm.LogOutput($"γ      = {squareRootFinder.RationalSquareRootResidue}");
-			mainForm.LogOutput($"S(a,b) = {squareRootFinder.AlgebraicProduct}");
-			mainForm.LogOutput($"Sₐ(m)  = {squareRootFinder.AlgebraicSquare}");
-			mainForm.LogOutput($"S (x)  = {squareRootFinder.AlgebraicSquareResidue}");
+			mainForm.LogOutput($"S(a,b) = {S}");
+			mainForm.LogOutput($"Sₐ(m)  = {S}");
+			mainForm.LogOutput($"S (x)  = {S % N}");//{squareRootFinder.AlgebraicSquareResidue}");
 			mainForm.LogOutput();
 
+			BigInteger X = S % N;
+			BigInteger Y = squareRootFinder.RationalSquareRootResidue;
 
-
-
-			BigInteger gcd1 = GCD.FindGCD(N, squareRootFinder.RationalSquareRootResidue + squareRootFinder.AlgebraicSquareResidue);
-			BigInteger gcd2 = GCD.FindGCD(N, squareRootFinder.RationalSquareRootResidue - squareRootFinder.AlgebraicSquareResidue);
+			BigInteger gcd1 = GCD.FindGCD(N, Y + S);
+			BigInteger gcd2 = GCD.FindGCD(N, Y - S);
 
 			mainForm.LogOutput("GCD: " + gcd1);
 			mainForm.LogOutput("GCD: " + gcd2);
@@ -109,7 +111,6 @@ namespace GNFS_Winforms
 				mainForm.LogOutput("################");
 				mainForm.LogOutput();
 			}
-
 
 
 			//   ƒ(r) ≡ 0(mod p)

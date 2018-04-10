@@ -63,7 +63,7 @@ namespace GNFSCore
 			B = b;
 
 			AlgebraicNorm = Normal.Algebraic(A, B, gnfs.CurrentPolynomial); // b^deg * f( a/b )
-			RationalNorm = Normal.Rational(A, B, gnfs.CurrentPolynomial.Base); // a + bm
+			RationalNorm = Normal.Rational(A, B, gnfs.PolynomialBase); // a + bm
 
 			AlgebraicQuotient = BigInteger.Abs(AlgebraicNorm);
 			RationalQuotient = BigInteger.Abs(RationalNorm);
@@ -101,7 +101,7 @@ namespace GNFSCore
 
 		public void Sieve(PolyRelationsSieveProgress relationsSieve)
 		{
-			BigInteger algResult  = Factor(relationsSieve.PrimeBase.AlgebraicFactorBase, AlgebraicNorm, AlgebraicQuotient, AlgebraicFactorization);
+			BigInteger algResult = Factor(relationsSieve.PrimeBase.AlgebraicFactorBase, AlgebraicNorm, AlgebraicQuotient, AlgebraicFactorization);
 			BigInteger ratReslult = Factor(relationsSieve.PrimeBase.RationalFactorBase, RationalNorm, RationalQuotient, RationalFactorization);
 
 			AlgebraicQuotient = algResult;
@@ -132,7 +132,7 @@ namespace GNFSCore
 				if (result == 0 || result == 1)
 				{
 					return result;
-				}			
+				}
 
 				while (result % factor == 0 && result != 1)
 				{
@@ -191,7 +191,7 @@ namespace GNFSCore
 					new XElement("AlgebraicNorm", rel.AlgebraicNorm),
 					new XElement("RationalNorm", rel.RationalNorm),
 					rel.AlgebraicFactorization.SerializeToXElement("AlgebraicFactorization"),
-					rel.RationalFactorization.SerializeToXElement("RationalFactorization")				
+					rel.RationalFactorization.SerializeToXElement("RationalFactorization")
 				)
 			).Save(filename);
 		}

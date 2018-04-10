@@ -56,7 +56,7 @@ namespace GNFSCore.Factors
 			// quantity = phi(bound)
 			public static FactorCollection BuildRationalFactorBase(GNFS gnfs)
 			{
-				IEnumerable<FactorPair> result = gnfs.PrimeFactorBase.RationalFactorBase.Select(p => new FactorPair(p, (gnfs.CurrentPolynomial.Base % p))).Distinct();
+				IEnumerable<FactorPair> result = gnfs.PrimeFactorBase.RationalFactorBase.Select(p => new FactorPair(p, (gnfs.PolynomialBase % p))).Distinct();
 				return new FactorCollection(gnfs, result.ToList());
 			}
 

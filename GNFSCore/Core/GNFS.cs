@@ -29,10 +29,10 @@ namespace GNFSCore
 		public FactorCollection AFB { get; set; } = null;
 		public FactorCollection QFB { get; set; } = null;
 
-		public DirectoryLocations SaveLocations { get; set; }
+		public DirectoryLocations SaveLocations { get; private set; }
 
-		private BigInteger m;
-		private int degree = 2;
+		public BigInteger PolynomialBase { get; private set; }
+		public int PolynomialDegree { get; private set; }
 
 		public GNFS()
 		{
@@ -75,18 +75,18 @@ namespace GNFSCore
 
 				if (polyDegree == -1)
 				{
-					this.degree = CalculateDegree(n);
+					this.PolynomialDegree = CalculateDegree(n);
 				}
 				else
 				{
-					this.degree = polyDegree;
+					this.PolynomialDegree = polyDegree;
 				}
 
 
 
 				CaclulatePrimeBounds(primeBound);
-				ConstructNewPolynomial(polynomialBase, this.degree);
-				m = polynomialBase;
+				ConstructNewPolynomial(polynomialBase, this.PolynomialDegree);
+				this.PolynomialBase = polynomialBase;
 
 				CurrentRelationsProgress = new PolyRelationsSieveProgress(this, CancelToken, SaveLocations.Polynomial_SaveDirectory, relationQuantity, relationValueRange);
 
@@ -114,9 +114,9 @@ namespace GNFSCore
 		public void LoadGnfsProgress(GNFS input)
 		{
 			N = input.N;
-			m = input.m;
-			int polyDegree = input.degree;
-			
+			PolynomialBase = input.PolynomialBase;
+			int polyDegree = input.PolynomialDegree;
+
 
 			PrimeFactorBase.MaxRationalFactorBase = input.PrimeFactorBase.MaxRationalFactorBase;
 			PrimeFactorBase.MaxAlgebraicFactorBase = input.PrimeFactorBase.MaxAlgebraicFactorBase;
@@ -156,7 +156,7 @@ namespace GNFSCore
 
 		public void SavePolynomial(IPolynomial poly)
 		{
-			SaveLocations.SetPolynomialPath(poly);
+			SaveLocations.SetPolynomialPath(PolynomialBase, PolynomialDegree);
 
 			if (!Directory.Exists(SaveLocations.Polynomial_SaveDirectory))
 			{
@@ -242,7 +242,7 @@ namespace GNFSCore
 
 			int quadraticBaseSize = 0;
 
-			if (degree <= 3)
+			if (PolynomialDegree <= 3)
 			{
 				int tempQ = (PrimeFactorBase.RationalFactorBase.Count + PrimeFactorBase.AlgebraicFactorBase.Count + 1);
 				tempQ = tempQ / 10;
@@ -251,11 +251,11 @@ namespace GNFSCore
 			}
 			else
 			{
-				quadraticBaseSize = CalculateQuadraticBaseSize(degree);
+				quadraticBaseSize = CalculateQuadraticBaseSize(PolynomialDegree);
 			}
 
 			PrimeFactorBase.MinQuadraticFactorBase = BigInteger.Multiply(bound, 3) + BigInteger.Divide(bound, 2);
-			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesFrom(PrimeFactorBase.MinQuadraticFactorBase).Take((quadraticBaseSize*2)+1).ToList();
+			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesFrom(PrimeFactorBase.MinQuadraticFactorBase).Take((quadraticBaseSize * 2) + 1).ToList();
 
 			PrimeFactorBase.MaxQuadraticFactorBase = PrimeFactorBase.QuadraticFactorBase.Last();
 
@@ -385,7 +385,7 @@ namespace GNFSCore
 
 			result.AppendLine($"N = {N}");
 			result.AppendLine();
-			result.AppendLine($"Polynomial(degree: {degree}, base: {CurrentPolynomial.Base}):");
+			result.AppendLine($"Polynomial(degree: {PolynomialDegree}, base: {PolynomialBase}):");
 			result.AppendLine("ƒ(m) = " + CurrentPolynomial.ToString());
 			result.AppendLine();
 			result.AppendLine("Prime Factor Base Bounds:");
@@ -423,8 +423,8 @@ namespace GNFSCore
 		public void WriteXml(XmlWriter writer)
 		{
 			writer.WriteElementString("N", N.ToString());
-			writer.WriteElementString("M", m.ToString());
-			writer.WriteElementString("Degree", this.degree.ToString());
+			writer.WriteElementString("M", PolynomialBase.ToString());
+			writer.WriteElementString("Degree", this.PolynomialDegree.ToString());
 			writer.WriteElementString("RationalFactorBase", PrimeFactorBase.MaxRationalFactorBase.ToString());
 			writer.WriteElementString("AlgebraicFactorBase", PrimeFactorBase.MaxAlgebraicFactorBase.ToString());
 			writer.WriteElementString("QuadraticFactorBaseMin", PrimeFactorBase.MinQuadraticFactorBase.ToString());
@@ -447,8 +447,8 @@ namespace GNFSCore
 			reader.ReadEndElement();
 
 			N = BigInteger.Parse(nString);
-			m = BigInteger.Parse(mString);
-			this.degree = int.Parse(degreeString);
+			PolynomialBase = BigInteger.Parse(mString);
+			this.PolynomialDegree = int.Parse(degreeString);
 			PrimeFactorBase.MaxRationalFactorBase = int.Parse(rationalFactorBaseString);
 			PrimeFactorBase.MaxAlgebraicFactorBase = int.Parse(algebraicFactorBaseString);
 			PrimeFactorBase.MinQuadraticFactorBase = int.Parse(quadraticFactorBaseMinString);

@@ -54,14 +54,14 @@ namespace GNFSCore.SquareRoot
 
 			gnfs = sieve;
 			N = gnfs.N;
-			polyBase = gnfs.CurrentPolynomial.Base;
+			polyBase = gnfs.PolynomialBase;
 			f = (x) => gnfs.CurrentPolynomial.Evaluate(x);
 
 
 			AlgebraicComplexSet = new List<Complex>();
 			RelationsSet = relations.ToArray();
 			AlgebraicRelationsSet = RelationsSet;//.Where(rel => rel.B == 1).ToArray();
-			PolynomialDerivative = gnfs.CurrentPolynomial.Derivative(gnfs.CurrentPolynomial.Base);
+			PolynomialDerivative = gnfs.CurrentPolynomial.Derivative(gnfs.PolynomialBase);
 			PolynomialDerivativeSquared = BigInteger.Pow(PolynomialDerivative, 2);
 		}
 

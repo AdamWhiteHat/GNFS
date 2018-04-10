@@ -26,9 +26,9 @@ namespace GNFSCore.Polynomial
 		public AlgebraicPolynomial()
 		{ }
 
-		public AlgebraicPolynomial(BigInteger[] terms, BigInteger polynomialBase)
+		public AlgebraicPolynomial(BigInteger[] terms)
 		{
-			Base = polynomialBase;
+			Base = -1;
 			Terms = terms;
 			Degree = terms.Length - 1;
 		}

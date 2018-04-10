@@ -56,11 +56,11 @@ namespace GNFSCore
 			return _polynomial;
 		}
 
-		public void SetPolynomialPath(IPolynomial poly)
+		public void SetPolynomialPath(BigInteger polynomialBase, BigInteger polynomialDegree)
 		{
-			_polynomial = Path.Combine(SaveDirectory, $"Poly_B[{poly.Base}]_D[{poly.Degree}]");
+			_polynomial = Path.Combine(SaveDirectory, $"Poly_B[{polynomialBase}]_D[{polynomialDegree}]");
 		}
-		
+
 		public static string GenerateSaveDirectory(BigInteger n)
 		{
 			string directoryFilename = GenerateFileNameFromBigInteger(n);
