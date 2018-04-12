@@ -189,18 +189,45 @@ namespace GNFSCore.Polynomial
 				}
 			}
 
-			public static void MakeMonic(IPolynomial polynomial, BigInteger polynomialBase)
+			public static IPolynomial MakeMonic(IPolynomial polynomial, BigInteger polynomialBase)
 			{
-				int deg = polynomial.Degree;
+				IPolynomial result = new AlgebraicPolynomial(polynomial.Terms.ToArray());
 
-				if (BigInteger.Abs(polynomial.Terms[deg]) > 1)
+				int deg = result.Degree;
+
+				if (BigInteger.Abs(result.Terms[deg]) > 1)
 				{
-					BigInteger toAdd = (polynomial.Terms[deg] - 1) * polynomialBase;
+					BigInteger toAdd = (result.Terms[deg] - 1) * polynomialBase;
 
-					polynomial.Terms[deg] = 1;
+					result.Terms[deg] = 1;
 
-					polynomial.Terms[deg - 1] += toAdd;
+					result.Terms[deg - 1] += toAdd;
 				}
+
+				return result;
+			}
+
+			public static IPolynomial GCD(IPolynomial left, IPolynomial right)
+			{
+				IPolynomial a = new AlgebraicPolynomial(left.Terms.ToArray());
+				IPolynomial b = new AlgebraicPolynomial(right.Terms.ToArray());
+
+
+				if (b.Degree > a.Degree)
+				{
+					IPolynomial swap = b;
+					b = a;
+					a = swap;
+				}
+
+				while (!(b.Terms.Length == 1 && b.Terms[0] == 0))
+				{
+					IPolynomial temp = a;
+					a = b;
+					b = Mod(temp, b);
+				}
+
+				return new AlgebraicPolynomial(a.Terms.ToArray());
 			}
 
 			public static IPolynomial Mod(IPolynomial left, IPolynomial right)
@@ -210,12 +237,26 @@ namespace GNFSCore.Polynomial
 				return remainder;
 			}
 
+			public static BigInteger[] RemoveZeros(BigInteger[] terms)
+			{
+				List<BigInteger> result = terms.ToList();
+
+				int i = result.Count - 1;
+				while (result[i] == 0)
+				{
+					result.RemoveAt(i);
+					i--;
+				}
+
+				return result.ToArray();
+			}
+
 			public static IPolynomial Divide(IPolynomial left, IPolynomial right, out IPolynomial remainder)
 			{
 				if (left == null) throw new ArgumentNullException(nameof(left));
 				if (right == null) throw new ArgumentNullException(nameof(right));
 
-				if (right.Degree >= left.Degree)
+				if (right.Degree > left.Degree)
 				{
 					throw new InvalidOperationException();
 				}
@@ -229,12 +270,6 @@ namespace GNFSCore.Polynomial
 
 				BigInteger[] rem = left.Terms.ToArray();
 
-				//rem = new BigInteger[leftDegree + 1];
-				//for (i = 0; i < rem.Length; i++)
-				//{
-				//	rem[i] = left.Terms[i];
-				//}
-
 				BigInteger[] quotient = new BigInteger[leftDegree - rightDegree + 1];
 				for (i = quotient.Length - 1; i >= 0; i--)
 				{
@@ -246,11 +281,57 @@ namespace GNFSCore.Polynomial
 					}
 				}
 
+
+				rem = RemoveZeros(rem);
+				quotient = RemoveZeros(quotient);
+
+
 				// form the remainder and quotient polynomials from the arrays
 				remainder = new AlgebraicPolynomial(rem);
 				return new AlgebraicPolynomial(quotient);
 			}
 
+			public static IPolynomial Add(IPolynomial left, IPolynomial right)
+			{
+				if (left == null) throw new ArgumentNullException(nameof(left));
+				if (right == null) throw new ArgumentNullException(nameof(right));
+
+				BigInteger[] terms = new BigInteger[Math.Max(left.Degree, right.Degree) + 1];
+				for (int i = 0; i < terms.Length; i++)
+				{
+					terms[i] = (left.Terms[i] + right.Terms[i]);
+				}
+				return new AlgebraicPolynomial(terms);
+			}
+
+			public static IPolynomial Subtract(IPolynomial left, IPolynomial right)
+			{
+				if (left == null) throw new ArgumentNullException(nameof(left));
+				if (right == null) throw new ArgumentNullException(nameof(right));
+
+				BigInteger[] terms = new BigInteger[Math.Max(left.Degree, right.Degree) + 1];
+				for (int i = 0; i < terms.Length; i++)
+				{
+					terms[i] = (left.Terms[i] - right.Terms[i]);
+				}
+				return new AlgebraicPolynomial(terms);
+			}
+
+			public static IPolynomial Multiply(IPolynomial left, IPolynomial right)
+			{
+				if (left == null) throw new ArgumentNullException(nameof(left));
+				if (right == null) throw new ArgumentNullException(nameof(right));
+
+				BigInteger[] terms = new BigInteger[left.Degree + right.Degree + 1];
+				for (int i = 0; i <= left.Degree; i++)
+				{
+					for (int j = 0; j <= right.Degree; j++)
+					{
+						terms[i + j] += (left.Terms[i] * right.Terms[j]);
+					}
+				}
+				return new AlgebraicPolynomial(terms);
+			}
 
 			public static string FormatString(IPolynomial polynomial)
 			{
