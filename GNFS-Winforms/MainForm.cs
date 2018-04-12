@@ -141,7 +141,7 @@ namespace GNFS_Winforms
 			ControlBridge.SetControlVisibleState(panelButtons, true);
 		}
 
-		private void tbOutput_KeyUp(object sender, KeyEventArgs e)
+		private void tbOutput_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.Control)
 			{

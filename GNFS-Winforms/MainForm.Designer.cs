@@ -67,21 +67,21 @@
 			// 
 			// tbOutput
 			// 
-			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+			| System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.tbOutput.Location = new System.Drawing.Point(4, 246);
 			this.tbOutput.Multiline = true;
 			this.tbOutput.Name = "tbOutput";
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
 			this.tbOutput.Size = new System.Drawing.Size(718, 241);
 			this.tbOutput.TabIndex = 0;
-			this.tbOutput.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbOutput_KeyUp);
+			this.tbOutput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbOutput_KeyDown);
 			// 
 			// tbN
 			// 
-			this.tbN.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbN.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.tbN.Location = new System.Drawing.Point(20, 4);
 			this.tbN.Name = "tbN";
 			this.tbN.Size = new System.Drawing.Size(702, 20);
@@ -89,8 +89,8 @@
 			// 
 			// tbBase
 			// 
-			this.tbBase.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbBase.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.tbBase.Location = new System.Drawing.Point(117, 52);
 			this.tbBase.Name = "tbBase";
 			this.tbBase.Size = new System.Drawing.Size(258, 20);
@@ -98,8 +98,8 @@
 			// 
 			// tbBound
 			// 
-			this.tbBound.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbBound.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.tbBound.Location = new System.Drawing.Point(117, 26);
 			this.tbBound.Name = "tbBound";
 			this.tbBound.Size = new System.Drawing.Size(258, 20);
@@ -138,8 +138,8 @@
 			// 
 			// btnCreateGnfs
 			// 
-			this.btnCreateGnfs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnCreateGnfs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.btnCreateGnfs.Location = new System.Drawing.Point(16, 15);
 			this.btnCreateGnfs.Name = "btnCreateGnfs";
 			this.btnCreateGnfs.Size = new System.Drawing.Size(96, 23);
@@ -160,8 +160,8 @@
 			// 
 			// tbDegree
 			// 
-			this.tbDegree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbDegree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.tbDegree.Location = new System.Drawing.Point(117, 72);
 			this.tbDegree.Name = "tbDegree";
 			this.tbDegree.Size = new System.Drawing.Size(18, 20);
@@ -209,8 +209,8 @@
 			// 
 			// groupBox4
 			// 
-			this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox4.Controls.Add(this.btnSerialize);
 			this.groupBox4.Controls.Add(this.btnCreateGnfs);
 			this.groupBox4.Location = new System.Drawing.Point(11, 6);
@@ -222,8 +222,8 @@
 			// 
 			// btnSerialize
 			// 
-			this.btnSerialize.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnSerialize.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.btnSerialize.Location = new System.Drawing.Point(214, 15);
 			this.btnSerialize.Name = "btnSerialize";
 			this.btnSerialize.Size = new System.Drawing.Size(96, 23);
@@ -234,8 +234,8 @@
 			// 
 			// panelFunctions
 			// 
-			this.panelFunctions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.panelFunctions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.panelFunctions.Controls.Add(this.groupBox3);
 			this.panelFunctions.Controls.Add(this.groupBox2);
 			this.panelFunctions.Controls.Add(this.groupBox1);
@@ -247,8 +247,8 @@
 			// 
 			// groupBox3
 			// 
-			this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox3.Controls.Add(this.btnPrintRelations);
 			this.groupBox3.Controls.Add(this.btnPurgeRough);
 			this.groupBox3.Controls.Add(this.btnFindRelations);
@@ -283,8 +283,8 @@
 			// 
 			// groupBox2
 			// 
-			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox2.Controls.Add(this.btnMatrix);
 			this.groupBox2.Location = new System.Drawing.Point(3, 47);
 			this.groupBox2.Name = "groupBox2";
@@ -295,8 +295,8 @@
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox1.Controls.Add(this.btnFindSquares);
 			this.groupBox1.Location = new System.Drawing.Point(3, 91);
 			this.groupBox1.Name = "groupBox1";
@@ -338,8 +338,8 @@
 			// 
 			// tbRelationQuantity
 			// 
-			this.tbRelationQuantity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbRelationQuantity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.tbRelationQuantity.Location = new System.Drawing.Point(117, 98);
 			this.tbRelationQuantity.Name = "tbRelationQuantity";
 			this.tbRelationQuantity.Size = new System.Drawing.Size(258, 20);
@@ -358,8 +358,8 @@
 			// 
 			// tbRelationValueRange
 			// 
-			this.tbRelationValueRange.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbRelationValueRange.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+			| System.Windows.Forms.AnchorStyles.Right)));
 			this.tbRelationValueRange.Location = new System.Drawing.Point(117, 118);
 			this.tbRelationValueRange.Name = "tbRelationValueRange";
 			this.tbRelationValueRange.Size = new System.Drawing.Size(258, 20);
