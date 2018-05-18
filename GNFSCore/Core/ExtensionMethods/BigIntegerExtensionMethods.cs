@@ -11,6 +11,12 @@ namespace GNFSCore
 	{
 		private static BigInteger Fifteen = new BigInteger(15);
 
+		public static BigInteger Clone(this BigInteger source)
+		{
+			BigInteger result = new BigInteger(source.ToByteArray());
+			return result;
+		}
+		
 		public static bool IsSquare(this BigInteger source)
 		{
 			if (source == null || source == BigInteger.Zero)

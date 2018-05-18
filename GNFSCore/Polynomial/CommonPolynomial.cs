@@ -1,11 +1,10 @@
-﻿using GNFSCore.IntegerMath;
-using System;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Numerics;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using GNFSCore.IntegerMath;
 
 namespace GNFSCore.Polynomial
 {
@@ -264,7 +263,8 @@ namespace GNFSCore.Polynomial
 				int i = 0;
 				int leftDegree = left.Degree;
 				int rightDegree = right.Degree;
-				BigInteger leadingCoefficent = right.Terms[rightDegree];
+				BigInteger leadingCoefficent = right.Terms[rightDegree].Clone();
+
 				// the leading coefficient is the only number we ever divide by
 				// (so if right is monic, polynomial division does not involve division at all!)
 
@@ -273,22 +273,27 @@ namespace GNFSCore.Polynomial
 				BigInteger[] quotient = new BigInteger[leftDegree - rightDegree + 1];
 				for (i = quotient.Length - 1; i >= 0; i--)
 				{
-					quotient[i] = (rem[rightDegree + i] / leadingCoefficent);
-					rem[rightDegree + i] = BigInteger.Zero;
+					quotient[i] = BigInteger.Divide(rem[rightDegree + i], leadingCoefficent);
+					rem[rightDegree + i] = new BigInteger(0);
 					for (int j = rightDegree + i - 1; j >= i; j--)
 					{
-						rem[j] = rem[j] - (quotient[i] * right.Terms[j - i]);
+						rem[j] = BigInteger.Subtract(rem[j], BigInteger.Multiply(quotient[i], right.Terms[j - i]));
 					}
 				}
-
 
 				rem = RemoveZeros(rem);
 				quotient = RemoveZeros(quotient);
 
 
 				// form the remainder and quotient polynomials from the arrays
-				remainder = new AlgebraicPolynomial(rem);
-				return new AlgebraicPolynomial(quotient);
+				remainder = new AlgebraicPolynomial(rem.ToArray());
+				return new AlgebraicPolynomial(quotient.ToArray());
+			}
+
+			public static IPolynomial Divide(IPolynomial poly, BigInteger divisor)
+			{
+				BigInteger[] coefficientQuotients = poly.Terms.Select(term => BigInteger.Divide(term, divisor)).ToArray();
+				return new AlgebraicPolynomial(coefficientQuotients);
 			}
 
 			public static IPolynomial Add(IPolynomial left, IPolynomial right)
@@ -299,7 +304,7 @@ namespace GNFSCore.Polynomial
 				BigInteger[] terms = new BigInteger[Math.Max(left.Degree, right.Degree) + 1];
 				for (int i = 0; i < terms.Length; i++)
 				{
-					terms[i] = (left.Terms[i] + right.Terms[i]);
+					terms[i] = BigInteger.Add(left.Terms[i], right.Terms[i]);
 				}
 				return new AlgebraicPolynomial(terms);
 			}
@@ -312,7 +317,7 @@ namespace GNFSCore.Polynomial
 				BigInteger[] terms = new BigInteger[Math.Max(left.Degree, right.Degree) + 1];
 				for (int i = 0; i < terms.Length; i++)
 				{
-					terms[i] = (left.Terms[i] - right.Terms[i]);
+					terms[i] = BigInteger.Subtract(left.Terms[i], right.Terms[i]);
 				}
 				return new AlgebraicPolynomial(terms);
 			}
@@ -327,10 +332,26 @@ namespace GNFSCore.Polynomial
 				{
 					for (int j = 0; j <= right.Degree; j++)
 					{
-						terms[i + j] += (left.Terms[i] * right.Terms[j]);
+						terms[i + j] += BigInteger.Multiply(left.Terms[i], right.Terms[j]);
 					}
 				}
 				return new AlgebraicPolynomial(terms);
+			}
+
+			public static IPolynomial Inverse(IPolynomial poly)
+			{
+				return new AlgebraicPolynomial(poly.Terms.Select(coeff => BigInteger.Negate(coeff)).ToArray());
+			}
+
+			public static BigInteger Content(IPolynomial poly)
+			{
+				return IntegerMath.GCD.FindGCD(poly.Terms);
+			}
+
+			public static IPolynomial PrimitivePart(IPolynomial poly)
+			{
+				BigInteger content = Content(poly);
+				return Divide(poly, content);
 			}
 
 			public static string FormatString(IPolynomial polynomial)

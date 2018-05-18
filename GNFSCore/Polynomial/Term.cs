@@ -13,6 +13,13 @@ namespace GNFSCore.Polynomial
 		public char Variable { get; set; }
 		public int Degree { get; set; }
 
+		public Term(BigInteger coefficient, int degree)
+		{
+			Coefficient = coefficient;
+			Degree = degree;
+			Variable = 'X';
+		}
+
 		public BigInteger Evaluate(BigInteger variableValue)
 		{
 			return BigInteger.Multiply(Coefficient, BigInteger.Pow(variableValue, Degree));
