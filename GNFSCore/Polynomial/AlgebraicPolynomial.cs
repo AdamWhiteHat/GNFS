@@ -28,9 +28,15 @@ namespace GNFSCore.Polynomial
 
 		public AlgebraicPolynomial(BigInteger[] terms)
 		{
+			BigInteger[] safeTerms = terms.ToArray();
+			if (safeTerms.Last() == 0)
+			{
+				safeTerms = CommonPolynomial.RemoveZeros(safeTerms);
+			}
+
 			Base = -1;
-			Terms = terms;
-			Degree = terms.Length - 1;
+			Terms = safeTerms;
+			Degree = safeTerms.Length - 1;
 		}
 
 		public AlgebraicPolynomial(BigInteger n, BigInteger polynomialBase, int degree)

@@ -4,12 +4,21 @@ using System.Numerics;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GNFSCore;
+using GNFSCore.Polynomial;
 
 namespace TestArithmetic
 {
 	[TestClass]
 	public class TestMisc
 	{
+		[ClassInitialize]
+		public static void Initialize(TestContext context) { }
+		public void WriteOutput(string message = " ") { WriteOutput("{0}", message); }
+		public void WriteOutput(string message, params object[] args) { TestContext.WriteLine(message, args); }
+		private TestContext testContextInstance;
+		public TestContext TestContext { get { return testContextInstance; } set { testContextInstance = value; } }
+
+
 		[TestMethod]
 		public void TestBigIntegerClone()
 		{
@@ -19,8 +28,6 @@ namespace TestArithmetic
 			BigInteger zero = new BigInteger(0);
 			BigInteger negativeOne = new BigInteger(-1);
 			BigInteger negativeLarge = BigInteger.Negate(positiveLarge);
-
-
 
 			BigInteger clonedPositiveLarge = positiveLarge.Clone();
 			BigInteger clonedOne = one.Clone();
@@ -33,6 +40,30 @@ namespace TestArithmetic
 			Assert.AreEqual(zero, clonedZero, "zero");
 			Assert.AreEqual(negativeOne, clonedNegativeOne, "negativeOne");
 			Assert.AreEqual(negativeLarge, clonedNegativeLarge, "negativeLarge");
+		}
+
+		[TestMethod]
+		public void TestPolynomialToString()
+		{
+			BigInteger[] termsA = new BigInteger[] { 0, 0, 0, 0, -1 };
+			BigInteger[] termsB = new BigInteger[] { -1, 0, 0, 0, 0, -1 };
+			BigInteger[] termsC = new BigInteger[] { -1, 0, 0, 0, 0 };
+			BigInteger[] termsD = new BigInteger[] { 0, 0, 0, 0, 0 };
+			BigInteger[] termsE = new BigInteger[] { 0, 1, 0, -0, 0 };
+
+			IPolynomial polyA = new AlgebraicPolynomial(termsA);
+			IPolynomial polyB = new AlgebraicPolynomial(termsB);
+			IPolynomial polyC = new AlgebraicPolynomial(termsC);
+			IPolynomial polyD = new AlgebraicPolynomial(termsD);
+			IPolynomial polyE = new AlgebraicPolynomial(termsE);
+
+			WriteOutput($"PolyA: {polyA}");
+			WriteOutput($"PolyB: {polyB}");
+			WriteOutput($"PolyC: {polyC}");
+			WriteOutput($"PolyC.Terms: {polyC.Terms.FormatString(false)}");
+			WriteOutput($"PolyD: {polyD}");
+			WriteOutput($"PolyE: {polyE}");
+
 		}
 	}
 }

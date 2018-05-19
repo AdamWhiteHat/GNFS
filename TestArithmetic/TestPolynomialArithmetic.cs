@@ -19,7 +19,26 @@ namespace TestArithmetic
 		private TestContext testContextInstance;
 		public TestContext TestContext { get { return testContextInstance; } set { testContextInstance = value; } }
 
+		[TestMethod]
+		public void TestGCDPolynomials()
+		{
+			BigInteger[] expectedCoefficients = new BigInteger[] { 0, 1 };
+			BigInteger[] termsA = new BigInteger[] { 0,-10,5,3,11,3,5,2 };
+			BigInteger[] termsB = new BigInteger[] { 0,1,1,1 };
 
+			IPolynomial polyA = new AlgebraicPolynomial(termsA);
+			IPolynomial polyB = new AlgebraicPolynomial(termsB);
+
+			IPolynomial result = CommonPolynomial.GCD(polyA, polyB);
+			BigInteger[] resultCoefficients = result.Terms.ToArray();
+
+			WriteOutput($"PolyA: {polyA}");
+			WriteOutput($"PolyB: {polyB}");
+			WriteOutput($"Expected: {new AlgebraicPolynomial(expectedCoefficients)}");
+			WriteOutput($"Result  : {result}");
+
+			CollectionAssert.AreEqual(expectedCoefficients, resultCoefficients);
+		}
 
 		[TestMethod]
 		public void TestMultiplyPolynomials()

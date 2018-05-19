@@ -190,7 +190,7 @@ namespace GNFSCore.Polynomial
 
 			public static IPolynomial MakeMonic(IPolynomial polynomial, BigInteger polynomialBase)
 			{
-				IPolynomial result = new AlgebraicPolynomial(polynomial.Terms.ToArray());
+				IPolynomial result = polynomial.Clone();
 
 				int deg = result.Degree;
 
@@ -208,8 +208,8 @@ namespace GNFSCore.Polynomial
 
 			public static IPolynomial GCD(IPolynomial left, IPolynomial right)
 			{
-				IPolynomial a = new AlgebraicPolynomial(left.Terms.ToArray());
-				IPolynomial b = new AlgebraicPolynomial(right.Terms.ToArray());
+				IPolynomial a = left.Clone();
+				IPolynomial b = right.Clone();
 
 
 				if (b.Degree > a.Degree)
@@ -219,14 +219,14 @@ namespace GNFSCore.Polynomial
 					a = swap;
 				}
 
-				while (!(b.Terms.Length == 1 && b.Terms[0] == 0))
+				while (!(b.Terms.Length == 0 || b.Terms[0] == 0))
 				{
 					IPolynomial temp = a;
 					a = b;
 					b = Mod(temp, b);
 				}
 
-				return new AlgebraicPolynomial(a.Terms.ToArray());
+				return a;
 			}
 
 			public static IPolynomial Mod(IPolynomial left, IPolynomial right)
@@ -241,7 +241,7 @@ namespace GNFSCore.Polynomial
 				List<BigInteger> result = terms.ToList();
 
 				int i = result.Count - 1;
-				while (result[i] == 0)
+				while (i > -1 && result[i] == 0)
 				{
 					result.RemoveAt(i);
 					i--;
@@ -376,9 +376,14 @@ namespace GNFSCore.Polynomial
 						{
 							stringTerms.Add(" - ");
 						}
-						else
+						else if (term.Sign == 1)
 						{
 							stringTerms.Add(" + ");
+						}
+						else if (term.Sign == 0)
+						{
+							degree--;
+							continue;
 						}
 					}
 
@@ -400,14 +405,19 @@ namespace GNFSCore.Polynomial
 					}
 					else if (degree == 1)
 					{
-						stringTerms.Add($"{term} * {variable}");
+						if (term == 1)
+						{
+							stringTerms.Add($"{variable}");
+						}
+						else
+						{
+							stringTerms.Add($"{term} * {variable}");
+						}
 					}
-					else if (degree == 0)
+					else
 					{
 						stringTerms.Add($"{term}");
 					}
-
-
 
 					degree--;
 				}
