@@ -26,11 +26,11 @@ namespace GNFSCore.Polynomial
 			SetPolynomialFromValue(fromValue, polyBase);
 		}
 
-		public RationalPolynomial(BigInteger n, int degree, BigInteger[] terms)
+		public RationalPolynomial(BigInteger n, BigInteger[] terms)
 		{
 			N = n;
-			Degree = degree;
 			Terms = terms;
+			Degree = terms.Length - 1;
 		}
 
 		private void SetPolynomialFromValue(BigInteger value, BigInteger polyBase)
@@ -79,6 +79,11 @@ namespace GNFSCore.Polynomial
 		public List<BigInteger> GetRootsMod(BigInteger baseM, IEnumerable<BigInteger> modList)
 		{
 			return CommonPolynomial.GetRootsMod(this, baseM, modList);
+		}
+
+		public IPolynomial Clone()
+		{
+			return new RationalPolynomial(N.Clone(), Terms.ToArray());
 		}
 
 		public override string ToString()

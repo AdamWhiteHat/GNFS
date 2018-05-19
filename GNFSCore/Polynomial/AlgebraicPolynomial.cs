@@ -121,6 +121,11 @@ namespace GNFSCore.Polynomial
 			yield break;
 		}
 
+		public IPolynomial Clone()
+		{
+			return new AlgebraicPolynomial(Terms.ToArray());
+		}
+			
 		public override string ToString()
 		{
 			return CommonPolynomial.FormatString(this);
