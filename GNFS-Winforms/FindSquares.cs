@@ -80,7 +80,6 @@ namespace GNFS_Winforms
 			mainForm.LogOutput($"{sqrdCplxAlgProd}");
 			mainForm.LogOutput();
 
-			squareRootFinder.AlgebraicSquareRoot();
 			BigInteger S = squareRootFinder.S.Evaluate(polyBase);
 
 			mainForm.LogOutput();
