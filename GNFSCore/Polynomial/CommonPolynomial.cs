@@ -232,8 +232,28 @@ namespace GNFSCore.Polynomial
 			public static IPolynomial Mod(IPolynomial left, IPolynomial right)
 			{
 				IPolynomial remainder = new AlgebraicPolynomial();
-				Divide(left, right, out remainder);
+				IPolynomial quotient = Divide(left, right, out remainder);
 				return remainder;
+			}
+
+			public static IPolynomial Modulus(IPolynomial poly, BigInteger mod)
+			{
+				IPolynomial clone = poly.Clone();
+				BigInteger[] terms = new BigInteger[clone.Degree + 1];
+
+				int i = 0;
+				for (i = 0; i <= clone.Degree; i++)
+				{
+					BigInteger remainder = 0;
+					BigInteger.DivRem(clone.Terms[i], mod, out remainder);
+					terms[i] = remainder;
+				}
+
+				// Recalculate the degree
+				terms = terms.SkipWhile(t => t.Sign == 0).ToArray();
+
+				IPolynomial result = new AlgebraicPolynomial(terms);
+				return result;
 			}
 
 			public static BigInteger[] RemoveZeros(BigInteger[] terms)
@@ -270,6 +290,8 @@ namespace GNFSCore.Polynomial
 
 				BigInteger[] rem = left.Terms.ToArray();
 
+				BigInteger[] rightTerms = right.Terms.ToArray();
+
 				BigInteger[] quotient = new BigInteger[leftDegree - rightDegree + 1];
 				for (i = quotient.Length - 1; i >= 0; i--)
 				{
@@ -277,7 +299,7 @@ namespace GNFSCore.Polynomial
 					rem[rightDegree + i] = new BigInteger(0);
 					for (int j = rightDegree + i - 1; j >= i; j--)
 					{
-						rem[j] = BigInteger.Subtract(rem[j], BigInteger.Multiply(quotient[i], right.Terms[j - i]));
+						rem[j] = BigInteger.Subtract(rem[j], BigInteger.Multiply(quotient[i], rightTerms[j - i]));
 					}
 				}
 
@@ -286,8 +308,8 @@ namespace GNFSCore.Polynomial
 
 
 				// form the remainder and quotient polynomials from the arrays
-				remainder = new AlgebraicPolynomial(rem.ToArray());
-				return new AlgebraicPolynomial(quotient.ToArray());
+				remainder = new AlgebraicPolynomial(rem);
+				return new AlgebraicPolynomial(quotient);
 			}
 
 			public static IPolynomial Divide(IPolynomial poly, BigInteger divisor)
@@ -317,7 +339,18 @@ namespace GNFSCore.Polynomial
 				BigInteger[] terms = new BigInteger[Math.Max(left.Degree, right.Degree) + 1];
 				for (int i = 0; i < terms.Length; i++)
 				{
-					terms[i] = BigInteger.Subtract(left.Terms[i], right.Terms[i]);
+					if (i > left.Degree)
+					{
+						terms[i] = BigInteger.Negate(right.Terms[i]);
+					}
+					else if (i > right.Degree)
+					{
+						terms[i] = left.Terms[i];
+					}
+					else
+					{
+						terms[i] = BigInteger.Subtract(left.Terms[i], right.Terms[i]);
+					}
 				}
 				return new AlgebraicPolynomial(terms);
 			}
@@ -356,73 +389,58 @@ namespace GNFSCore.Polynomial
 
 			public static string FormatString(IPolynomial polynomial)
 			{
-				string variable = "X";
-
 				List<string> stringTerms = new List<string>();
 
-				bool firstPass = true;
-				int degree = polynomial.Terms.Length - 1;
-				while (degree >= 0)
+				int degree = polynomial.Terms.Length;
+				while (--degree >= 0)
 				{
-					BigInteger term = polynomial.Terms[degree];
+					BigInteger termValue = polynomial.Terms[degree];
 
-					if (firstPass)
+					string term = "";
+
+					if (termValue == 0)
 					{
-						firstPass = false;
+						if (degree == 0)
+						{
+							if (stringTerms.Count == 0)
+							{
+								stringTerms.Add("0");
+							}
+						}
+						continue;
 					}
-					else
+					else if (termValue > 1 || termValue < -1)
 					{
-						if (term.Sign == -1)
-						{
-							stringTerms.Add(" - ");
-						}
-						else if (term.Sign == 1)
-						{
-							stringTerms.Add(" + ");
-						}
-						else if (term.Sign == 0)
-						{
-							degree--;
-							continue;
-						}
+						term = $"{termValue}";
 					}
 
-					if (degree < polynomial.Terms.Length - 1)
+					switch (degree)
 					{
-						term = BigInteger.Abs(term);
-					}
+						case 0:
+							stringTerms.Add($"{termValue}");
+							break;
 
-					if (degree > 1)
-					{
-						if (term == 1)
-						{
-							stringTerms.Add($"{variable}^{degree}");
-						}
-						else
-						{
-							stringTerms.Add($"{term} * {variable}^{degree}");
-						}
-					}
-					else if (degree == 1)
-					{
-						if (term == 1)
-						{
-							stringTerms.Add($"{variable}");
-						}
-						else
-						{
-							stringTerms.Add($"{term} * {variable}");
-						}
-					}
-					else
-					{
-						stringTerms.Add($"{term}");
-					}
+						case 1:
+							if (termValue == 1)
+								stringTerms.Add("X");
+							else if (termValue == -1)
+								stringTerms.Add("-X");
+							else
+								stringTerms.Add($"{termValue} * X");
+							break;
 
-					degree--;
+						default:
+							if (termValue == 1)
+								stringTerms.Add($"X^{degree}");
+							else if (termValue == -1)
+								stringTerms.Add($"-X^{degree}");
+							else
+								stringTerms.Add($"{termValue} * X^{degree}");
+							break;
+					}
 				}
 
-				return string.Join(string.Empty, stringTerms);
+				return string.Join(" + ", stringTerms).Replace("+ -", "- ");
 			}
 		}
 	}

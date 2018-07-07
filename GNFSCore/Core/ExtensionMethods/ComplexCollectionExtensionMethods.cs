@@ -28,5 +28,21 @@ namespace GNFSCore
 			return result;
 		}
 
+		public static string FormatString(this Complex source)
+		{
+			string im = "";
+			string sign = "";
+			if (Math.Sign(source.Imaginary) == 1)
+			{
+				sign = " + ";
+				im = $"{source.Imaginary}i";
+			}
+			else if (Math.Sign(source.Imaginary) == -1)
+			{
+				sign = " - ";
+				im = $"{Math.Abs(source.Imaginary)}i";
+			}
+			return $"({source.Real}{sign}{im})";
+		}
 	}
 }

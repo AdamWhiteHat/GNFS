@@ -20,6 +20,8 @@ namespace GNFS_Winforms
 	{
 		public GNFS FindRelations(bool oneRound, GNFS gnfs, CancellationToken cancelToken)
 		{
+			int relationsDisplayLimit = 1;
+
 			while (!cancelToken.IsCancellationRequested)
 			{
 				//List<RoughPair> knownRough = gnfs.CurrentRelationsProgress.RoughRelations;
@@ -30,8 +32,8 @@ namespace GNFS_Winforms
 				}
 				if (smoothRelations.Any())
 				{
-					mainForm.LogOutput(gnfs.CurrentRelationsProgress.FormatRelations(smoothRelations.OrderByDescending(rel => rel.A * rel.B).Take(5)));
-					mainForm.LogOutput("(restricted result set to top 5)");
+					mainForm.LogOutput(gnfs.CurrentRelationsProgress.FormatRelations(smoothRelations.OrderByDescending(rel => rel.A * rel.B).Take(relationsDisplayLimit)));
+					mainForm.LogOutput($"(Result set restricted to only {relationsDisplayLimit}) relations");
 					mainForm.LogOutput();
 					mainForm.LogOutput($"{smoothRelations.Count()} relations found this round.");
 					mainForm.LogOutput();

@@ -25,7 +25,14 @@ namespace GNFSCore
 
 		public FactorBase PrimeFactorBase { get; set; }
 
+		/// <summary>
+		/// Array of (p, m % p)
+		/// </summary>
 		public FactorCollection RFB { get; set; } = null;
+
+		/// <summary>
+		/// Array of (p, r) where ƒ(r) % p == 0
+		/// </summary>
 		public FactorCollection AFB { get; set; } = null;
 		public FactorCollection QFB { get; set; } = null;
 
@@ -394,13 +401,13 @@ namespace GNFSCore
 			result.AppendLine($"QuadraticPrimeBase Range: {PrimeFactorBase.MinQuadraticFactorBase} - {PrimeFactorBase.MaxQuadraticFactorBase}");
 			result.AppendLine($"QuadraticPrimeBase Count: {PrimeFactorBase.QuadraticFactorBase.Count}");
 			result.AppendLine();
-			result.AppendLine($"RFB - Rational Factor Base (Count: {RFB.Count}):");
+			result.AppendLine($"RFB - Rational Factor Base - Count: {RFB.Count} - Array of (p, m % p) with prime p");
 			result.AppendLine(RFB.ToString(200));
 			result.AppendLine();
-			result.AppendLine($"AFB - Algebraic Factor Base (Count: {AFB.Count}):");
+			result.AppendLine($"AFB - Algebraic Factor Base - Count: {AFB.Count} - Array of (p, r) such that ƒ(r) ≡ 0 (mod p) and p is prime");
 			result.AppendLine(AFB.ToString(200));
 			result.AppendLine();
-			result.AppendLine($"QFB - Quadratic Factor Base (Count: {QFB.Count}):");
+			result.AppendLine($"QFB - Quadratic Factor Base - Count: {QFB.Count} - Array of (p, r) such that ƒ(r) ≡ 0 (mod p) and p is prime");
 			result.AppendLine(QFB.ToString());
 			result.AppendLine();
 

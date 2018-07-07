@@ -46,6 +46,9 @@ namespace GNFSCore
 			rand.NextBytes(bytes);
 		}
 
+		/// <summary>
+		///  Picks a random number from a range, where such numbers will be chosen uniformly across the entire range.
+		/// </summary>
 		public static BigInteger NextBigInteger(BigInteger lower, BigInteger upper)
 		{
 			if (lower > upper) { throw new ArgumentOutOfRangeException("Upper must be greater than upper"); }

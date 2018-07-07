@@ -1,26 +1,20 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Xml.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Schema;
-using System.IO;
+using System.Xml.Serialization;
 
 namespace GNFSCore
 {
 	using Factors;
 	using IntegerMath;
 	using Matrix;
-
-	public enum FactorBaseType
-	{
-		Algebraic,
-		Rational
-	}
+	using Polynomial;
 
 	public class Relation
 	{
@@ -31,9 +25,15 @@ namespace GNFSCore
 		/// </summary>
 		public int B { get; private set; }
 
+		/// <summary> ƒ(b) ≡ 0 (mod a); Calculated as: ƒ(-a/b) * -b^deg </summary>
 		public BigInteger AlgebraicNorm { get; private set; }
+		/// <summary>  a + bm </summary>
 		public BigInteger RationalNorm { get; private set; }
-		public BigInteger NormProduct { get { return BigInteger.Multiply(AlgebraicNorm, RationalNorm); } }
+
+		/// <summary> (a + bi) </summary>
+		public Complex Complex { get { return new Complex(A, B); } }
+		/// <summary> (a + bi)*(a - bi) </summary>
+		public Complex ComplexNorm { get { return Complex.Multiply(this.Complex, Complex.Conjugate(this.Complex)); } }
 
 		public CountDictionary AlgebraicFactorization { get; private set; }
 		public CountDictionary RationalFactorization { get; private set; }
@@ -108,7 +108,7 @@ namespace GNFSCore
 			RationalQuotient = ratReslult;
 		}
 
-		private static BigInteger Factor(IEnumerable<BigInteger> primeFactors, BigInteger normValue, BigInteger quotientValue, CountDictionary dictionary)
+		public static BigInteger Factor(IEnumerable<BigInteger> primeFactors, BigInteger normValue, BigInteger quotientValue, CountDictionary dictionary)
 		{
 			if (quotientValue.Sign == -1 || primeFactors.Any(f => f.Sign == -1))
 			{
@@ -160,7 +160,7 @@ namespace GNFSCore
 		{
 			return
 				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t"
-				+ $"[ƒ(b) ≡ 0 mod a:{AlgebraicNorm.ToString().PadLeft(10)} (AlgebraicNorm) IsSquare: {AlgebraicNorm.IsSquare()},\ta+b*m={RationalNorm.ToString().PadLeft(4)} (RationalNorm) IsSquare: {RationalNorm.IsSquare()}]\t";
+				+ $"[ƒ(b) ≡ 0 (mod a):{AlgebraicNorm.ToString().PadLeft(10)} (AlgebraicNorm) IsSquare: {AlgebraicNorm.IsSquare()},\ta+b*m={RationalNorm.ToString().PadLeft(4)} (RationalNorm) IsSquare: {RationalNorm.IsSquare()}]\t";
 		}
 
 		public static List<Relation> LoadUnfactoredFile(GNFS gnfs, string filename)

@@ -12,29 +12,51 @@ namespace GNFSCore.Factors
 		/// <summary>
 		///  a + bm
 		/// </summary>
-		/// <param name="a"></param>
-		/// <param name="b"></param>
-		/// <param name="polynomialBase">Base m of f(m) = N or m in the polynomial 2m^2 + 34m +1</param>
+		/// <param name="polynomialBase">Base m of f(m) = N</param>
 		/// <returns></returns>
 		public static BigInteger Rational(int a, int b, BigInteger polynomialBase)
 		{
 			return BigInteger.Add(a, BigInteger.Multiply(b, polynomialBase));
 		}
 
+		/// <summary>
+		/// a - bm
+		/// </summary>
+		public static BigInteger RationalSubtract(int a, int b, BigInteger polynomialBase)
+		{
+			return BigInteger.Subtract(a, BigInteger.Multiply(b, polynomialBase));
+		}
+
+		/// <summary>
+		/// g(-a/b) * -b^deg
+		/// where g(x) = x - m
+		/// </summary>		
+		public static BigInteger AlgebraicG(Relation rel, int degree, BigInteger m, Func<BigInteger, BigInteger, BigInteger> g)
+		{
+			//  g(-a/b) * -b^deg
+			BigInteger bneg = BigInteger.Negate(rel.B);
+
+			BigInteger remainder = new BigInteger();
+			BigInteger ab = BigInteger.DivRem(rel.A, bneg, out remainder);
+
+			BigInteger left = g.Invoke(ab, m);
+			BigInteger right = BigInteger.Pow(bneg, degree);
+
+			return BigInteger.Multiply(left, right);
+		}
 
 		/// <summary>
 		/// ƒ(b) ≡ 0 (mod a)
 		/// 
-		/// Calclulated as:
+		/// Calculated as:
 		/// ƒ(-a/b) * -b^deg
 		/// </summary>
 		/// <param name="a">Divisor in the equation ƒ(b) ≡ 0 (mod a)</param>
 		/// <param name="b">A root of f(x)</param>
-		/// <param name="poly">Base m of f(m) = N or m in the polynomial 2m^2 + 34m +1</param>
+		/// <param name="poly">Base m of f(m) = N</param>
 		/// <returns></returns>
 		public static BigInteger Algebraic(int a, int b, IPolynomial poly)
-		{		
-
+		{
 			int bneg = -b;
 			double ab = (double)a / (double)bneg;
 
@@ -42,14 +64,14 @@ namespace GNFSCore.Factors
 			//BigInteger quotient = BigInteger.DivRem(a, bneg, out remainder);
 			//double remainder = (double)remainder / (double)bneg;
 
-			double right = CommonPolynomial.Evaluate(poly, ab);
-			double left = Math.Pow(bneg, poly.Degree);
+			double left = CommonPolynomial.Evaluate(poly, ab);
+			double right = Math.Pow(bneg, poly.Degree);
 
-			double deci = right % 1;
-			double deciProduct = deci * left;
+			double deci = left % 1;
+			double deciProduct = deci * right;
 			deciProduct = Math.Round(deciProduct, MidpointRounding.ToEven);
 
-			BigInteger result = BigInteger.Multiply((BigInteger)right, (BigInteger)left);
+			BigInteger result = BigInteger.Multiply((BigInteger)left, (BigInteger)right);
 			result += (BigInteger)deciProduct;
 
 			return result;
@@ -63,7 +85,7 @@ namespace GNFSCore.Factors
 		/// </summary>
 		/// <param name="a">Divisor in the equation ƒ(b) ≡ 0 (mod a)</param>
 		/// <param name="b">A root of f(x)</param>
-		/// <param name="poly">Base m of f(m) = N or m in the polynomial 2m^2 + 34m +1</param>
+		/// <param name="poly">Base m of f(m) = N</param>
 		/// <returns></returns>
 		public static BigInteger Algebraic(BigInteger a, BigInteger b, IPolynomial poly)
 		{
@@ -72,10 +94,10 @@ namespace GNFSCore.Factors
 			BigInteger remainder = new BigInteger();
 			BigInteger ab = BigInteger.DivRem(a, bneg, out remainder);
 
-			BigInteger right = CommonPolynomial.Evaluate(poly, ab);
-			BigInteger left = BigInteger.Pow(bneg, poly.Degree);
+			BigInteger left = CommonPolynomial.Evaluate(poly, ab);
+			BigInteger right = BigInteger.Pow(bneg, poly.Degree);
 
-			BigInteger result = BigInteger.Multiply((BigInteger)right, (BigInteger)left);
+			BigInteger result = BigInteger.Multiply((BigInteger)left, (BigInteger)right);
 
 			return result;
 		}

@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace GNFSCore
+namespace GNFSCore.IntegerMath
 {
 	using Factors;
-	using IntegerMath;
 
 	public class QuadraticResidue
 	{

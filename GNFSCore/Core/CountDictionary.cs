@@ -124,9 +124,11 @@ namespace GNFSCore
 		{
 			Order();
 			StringBuilder result = new StringBuilder();
-			result.Append("Factorization -> {\t");
-			result.Append(string.Join(" * ", internalDictionary.Select(kvp => $"{ kvp.Key}^{ kvp.Value}")));
-			result.Append("\t};");
+			result.Append(
+				" -> {\t" +
+				string.Join(" * ", internalDictionary.Select(kvp => $"{ kvp.Key}^{ kvp.Value}")) +
+				"\t};"
+				);
 			return result.ToString();
 		}
 	}

@@ -21,7 +21,7 @@ namespace GNFSCore.Matrix
 		private bool eliminationStep;
 
 		private GNFS _gnfs;
-		private Relation[] relations;
+		private List<Relation> relations;
 		public Dictionary<int, Relation> ColumnIndexRelationDictionary;
 		private List<Tuple<Relation, bool[]>> relationMatrixTuple;
 
@@ -37,9 +37,9 @@ namespace GNFSCore.Matrix
 
 			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.MaxRationalFactorBase) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.MaxAlgebraicFactorBase) + _gnfs.QFB.Count + 3;
 
-			relations = rels.ToArray();
+			relations = rels;
 
-			int maxIndex = relations.Length - 1;
+			int maxIndex = relations.Count - 1;
 
 			List<GaussianRow> relationsAsRows = new List<GaussianRow>();
 
@@ -201,7 +201,7 @@ namespace GNFSCore.Matrix
 			eliminationStep = true;
 		}
 
-		public Relation[] GetSolutionSet(int numberOfSolutions)
+		public List<Relation> GetSolutionSet(int numberOfSolutions)
 		{
 			bool[] solutionSet = GetSolutionFlags(numberOfSolutions);
 
@@ -219,7 +219,7 @@ namespace GNFSCore.Matrix
 				index++;
 			}
 
-			return result.ToArray();
+			return result;
 		}
 
 		public bool[] GetSolutionFlags(int numSolutions)

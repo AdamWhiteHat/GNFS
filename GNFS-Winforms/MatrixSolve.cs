@@ -37,7 +37,7 @@ namespace GNFS_Winforms
 			List<BigInteger> allAlgebraicProducts = new List<BigInteger>();
 			List<BigInteger> allRationalProducts = new List<BigInteger>();
 
-			List<Relation[]> allSolutionGroups = new List<Relation[]>();
+			List<List<Relation>> allSolutionGroups = new List<List<Relation>>();
 			List<Tuple<BigInteger, BigInteger>> allSolutionTuples = new List<Tuple<BigInteger, BigInteger>>();
 			while (smoothRelations.Count >= maxRelationsToSelect)
 			{
@@ -65,12 +65,12 @@ namespace GNFS_Winforms
 
 				int number = 1;
 				int solutionCount = gaussianReduction.FreeVariables.Count(b => b) - 1;
-				List<Relation[]> solution = new List<Relation[]>();
+				List<List<Relation>> solution = new List<List<Relation>>();
 				while (number <= solutionCount)
 				{
-					Relation[] relations = gaussianReduction.GetSolutionSet(number);
+					List<Relation> relations = gaussianReduction.GetSolutionSet(number);
 					number++;
-										
+
 					BigInteger algebraic = relations.Select(rel => rel.AlgebraicNorm).Product();
 					//BigInteger algebraicFactorization = relations.Select(rel => rel.AlgebraicFactorization.ToDictionary().Select(kvp => BigInteger.Pow(kvp.Key, (int)kvp.Value)).Product()).Product();
 					BigInteger rational = relations.Select(rel => rel.RationalNorm).Product();
@@ -85,7 +85,7 @@ namespace GNFS_Winforms
 					bool isRationalSquare = rational.IsSquare();
 
 					mainForm.LogOutput("---");
-					mainForm.LogOutput($"Relations count: {relations.Length}");
+					mainForm.LogOutput($"Relations count: {relations.Count}");
 					mainForm.LogOutput($"(a,b) pairs: {string.Join(" ", relations.Select(rel => $"({rel.A},{rel.B})"))}");
 					mainForm.LogOutput($"Rational  ∏(a+mb): IsSquare? {isRationalSquare} : {rational}");
 					mainForm.LogOutput($"Algebraic ∏ƒ(a/b): IsSquare? {isAlgebraicSquare} : {algebraic}");

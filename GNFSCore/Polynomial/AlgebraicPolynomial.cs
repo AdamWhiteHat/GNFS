@@ -18,7 +18,6 @@ namespace GNFSCore.Polynomial
 	public class AlgebraicPolynomial : IPolynomial, IXmlSerializable
 	{
 		public int Degree { get; private set; }
-		public BigInteger Base { get; set; }
 
 		[XmlArrayItem("Terms")]
 		public BigInteger[] Terms { get; private set; }
@@ -34,38 +33,29 @@ namespace GNFSCore.Polynomial
 				safeTerms = CommonPolynomial.RemoveZeros(safeTerms);
 			}
 
-			Base = -1;
 			Terms = safeTerms;
-			Degree = safeTerms.Length - 1;
+			Degree = Terms.Length - 1;
 		}
 
 		public AlgebraicPolynomial(BigInteger n, BigInteger polynomialBase, int degree)
 		{
 			Degree = degree;
-			Base = polynomialBase;
-			Initialize();
-
-			SetPolynomialValue(n);
+			Terms = GetPolynomialTerms(n, polynomialBase, degree);
 		}
 
-		private void Initialize()
+		private static BigInteger[] GetPolynomialTerms(BigInteger value, BigInteger polynomialBase, int degree)
 		{
-			Terms = Enumerable.Repeat(BigInteger.Zero, Degree + 1).ToArray();
-		}
-
-		private void SetPolynomialValue(BigInteger value)
-		{
-			int d = Degree;
+			int d = degree;
 			BigInteger toAdd = value;
 
-			// Build out Terms[]
+			List<BigInteger> result = new List<BigInteger>();
 			while (d >= 0)
 			{
-				BigInteger placeValue = BigInteger.Pow(Base, d);
+				BigInteger placeValue = BigInteger.Pow(polynomialBase, d);
 
 				if (placeValue == 1)
 				{
-					Terms[d] = toAdd;
+					result.Add(toAdd);
 				}
 				else if (placeValue < BigInteger.Abs(toAdd))
 				{
@@ -77,13 +67,15 @@ namespace GNFSCore.Polynomial
 						quotient = placeValue;
 					}
 
-					Terms[d] = quotient;
+					result.Add(quotient);
 					BigInteger toSubtract = BigInteger.Multiply(quotient, placeValue);
 					toAdd -= toSubtract;
 				}
 
 				d--;
 			}
+
+			return result.ToArray();
 		}
 
 		public double Evaluate(double baseM)
@@ -99,11 +91,6 @@ namespace GNFSCore.Polynomial
 		public BigInteger Derivative(BigInteger baseM)
 		{
 			return CommonPolynomial.Derivative(this, baseM);
-		}
-
-		public BigInteger g(BigInteger x, int p)
-		{
-			return BigInteger.Subtract(BigInteger.Pow(x, p), x);
 		}
 
 		public List<BigInteger> GetRootsMod(BigInteger baseM, IEnumerable<BigInteger> modList)
@@ -131,7 +118,7 @@ namespace GNFSCore.Polynomial
 		{
 			return new AlgebraicPolynomial(Terms.ToArray());
 		}
-			
+
 		public override string ToString()
 		{
 			return CommonPolynomial.FormatString(this);
@@ -139,7 +126,6 @@ namespace GNFSCore.Polynomial
 
 		public void WriteXml(XmlWriter writer)
 		{
-			writer.WriteElementString("Base", Base.ToString());
 			writer.WriteElementString("Degree", Degree.ToString());
 			writer.WriteStartElement("Terms");
 			writer.WriteString(Environment.NewLine + "    " + string.Join(Environment.NewLine + "    ", Terms.Select(t => t.ToString())) + Environment.NewLine + "  ");
@@ -152,7 +138,6 @@ namespace GNFSCore.Polynomial
 			reader.MoveToContent();
 			reader.ReadStartElement();
 
-			Base = BigInteger.Parse(reader.ReadElementString("Base"));
 			Degree = int.Parse(reader.ReadElementString("Degree"));
 
 			reader.ReadStartElement("Terms");
@@ -163,18 +148,14 @@ namespace GNFSCore.Polynomial
 			}
 			reader.Read();
 			reader.ReadEndElement();
-			reader.Skip(); // Polynomial
-			reader.ReadEndElement();
 
 			string[] terms = val.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-			if (terms.Any())
+			if (!terms.Any())
 			{
-				Terms = terms.Select(s => BigInteger.Parse(s)).ToArray();
+				throw new XmlException("Failed to parse XML element during deserialization: 'Terms'");
 			}
-			else
-			{
-				Initialize();
-			}
+
+			Terms = terms.Select(s => BigInteger.Parse(s)).ToArray();
 		}
 
 		public XmlSchema GetSchema() { return null; }
