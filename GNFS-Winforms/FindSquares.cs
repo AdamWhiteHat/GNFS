@@ -51,21 +51,100 @@ namespace GNFS_Winforms
 				List<BigInteger> qNorms = squareRootFinder.QNorms;
 				BigInteger qNormsProduct = squareRootFinder.QNorms.Product();
 				BigInteger qNormsProductModN = qNormsProduct % N;
-				
-				
-				IPolynomial S = squareRootFinder.S;
 
-				BigInteger prodS = S.Evaluate(polyBase);
+
+				IPolynomial S = squareRootFinder.S;
+				IPolynomial SRingSquare = squareRootFinder.SRingSquare;
+
+				BigInteger prodS = SRingSquare.Evaluate(polyBase);
+
+				CommonPolynomial.GetDerivativePolynomial(poly);
 
 				IPolynomial reducedS = CommonPolynomial.Modulus(S, N);
+				IPolynomial reducedSRingSquare = CommonPolynomial.Modulus(SRingSquare, N);
 
-				BigInteger reducedProdS = (reducedS.Evaluate(polyBase) * squareRootFinder.PolynomialDerivative) % N;
+				BigInteger reducedProdS = reducedSRingSquare.Evaluate(polyBase) % N;
 
 				BigInteger totalProdS = squareRootFinder.TotalS.Evaluate(polyBase) * squareRootFinder.PolynomialDerivative;
 				BigInteger totalProdModN = totalProdS % N;
 
 				BigInteger X = prodS % N;
 				BigInteger Y = squareRootFinder.RationalSquareRootResidue;
+
+
+
+
+				mainForm.LogOutput();
+				mainForm.LogOutput($"∏ Sᵢ =");
+				mainForm.LogOutput($"{squareRootFinder.TotalS}");
+				//mainForm.LogOutput();
+				//mainForm.LogOutput($"∏ Sᵢ (mod ƒ) =");
+				//mainForm.LogOutput($"{reducedTotalS}");
+				mainForm.LogOutput();
+				mainForm.LogOutput("Polynomial ring:");
+				mainForm.LogOutput($"({string.Join(") * (", squareRootFinder.PolynomialRing.Select(ply => ply.ToString()))})");
+
+				mainForm.LogOutput();
+				mainForm.LogOutput("Quotient ring:");
+				mainForm.LogOutput($"({string.Join(") * (", squareRootFinder.QuotientRingModP.Select(ply => ply.ToString()))})");
+
+				mainForm.LogOutput();
+				mainForm.LogOutput("Reduced ring 001:");
+				mainForm.LogOutput($"{squareRootFinder.ReducedS1}");
+
+				mainForm.LogOutput();
+				mainForm.LogOutput("Reduced ring 002:");
+				mainForm.LogOutput($"{squareRootFinder.ReducedS2}");
+
+
+				mainForm.LogOutput();
+				mainForm.LogOutput("Primes:");
+				mainForm.LogOutput($"{string.Join(" * ", squareRootFinder.RelationsSet.Select(rel => rel.B).Distinct().OrderBy(relB => relB))}");
+				mainForm.LogOutput();
+				mainForm.LogOutput();
+				mainForm.LogOutput("Q norms:");
+				mainForm.LogOutput($"{String.Join(" * ", qNorms.Select(n => $"{n}"))}");
+				mainForm.LogOutput($"= {qNormsProduct} IsSquare? {qNormsProduct.IsSquare()}");
+				mainForm.LogOutput($"% N = {qNormsProductModN} IsSquare? {qNormsProductModN.IsSquare()}");
+				mainForm.LogOutput();
+				mainForm.LogOutput();
+				mainForm.LogOutput($"ƒ'(m)     = {squareRootFinder.PolynomialDerivative}");
+				mainForm.LogOutput($"ƒ'(m)^2   = {squareRootFinder.PolynomialDerivativeSquared}");
+				mainForm.LogOutput();
+				mainForm.LogOutput($"γ²        = {squareRootFinder.RationalProduct} IsSquare? {squareRootFinder.RationalProduct.IsSquare()}");
+				mainForm.LogOutput($"(γ  · ƒ'(m))^2 = {squareRootFinder.RationalSquare} IsSquare? {squareRootFinder.RationalSquare.IsSquare()}");
+				mainForm.LogOutput($"");
+				mainForm.LogOutput($"");
+				mainForm.LogOutput($"γ² / ƒ(m) = {squareRootFinder.AlgebraicProductModF}");
+				mainForm.LogOutput($"γ         = {squareRootFinder.RationalSquareRootResidue}  IsSquare? {squareRootFinder.RationalSquareRootResidue.IsSquare()}");
+				mainForm.LogOutput();
+				mainForm.LogOutput($"S(a,b)      = {S}");//reducedSRingSquare
+				mainForm.LogOutput($"S * ƒ'(X)^2 = {SRingSquare}");
+				mainForm.LogOutput($"S % ƒ       = {reducedS}");
+				mainForm.LogOutput($"S*f'^2 % ƒ  = {reducedSRingSquare}");
+				mainForm.LogOutput($"S % ƒ % N   = {reducedProdS}  IsSquare? {reducedProdS.IsSquare()}");
+				mainForm.LogOutput($"Sₐ(m)       = {prodS} IsSquare? {prodS.IsSquare()}");
+				mainForm.LogOutput($"S (x)       = {X}  IsSquare? {X.IsSquare()}");//{squareRootFinder.AlgebraicSquareResidue}");
+				mainForm.LogOutput();
+				mainForm.LogOutput("Roots of S(x):");
+				mainForm.LogOutput($"{{{string.Join(", ", squareRootFinder.RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");
+				mainForm.LogOutput();
+				mainForm.LogOutput();
+				mainForm.LogOutput($"TTL: {totalProdS} IsSquare? {totalProdS.IsSquare()}");
+				mainForm.LogOutput($"TTL%N: {totalProdModN}  IsSquare? {totalProdModN.IsSquare()}");
+				mainForm.LogOutput();
+				mainForm.LogOutput($"∏(a + mb) = {squareRootFinder.RationalProduct}");
+				mainForm.LogOutput($"∏ƒ(a/b)   = {squareRootFinder.AlgebraicProduct}");
+
+
+
+
+
+
+
+
+
+
 
 
 				BigInteger[] elements = new BigInteger[]
@@ -86,52 +165,6 @@ namespace GNFS_Winforms
 
 						if (DoesGcdFactor(gcdAdd) || DoesGcdFactor(gcdSub))
 						{
-
-							mainForm.LogOutput();
-							mainForm.LogOutput($"∏ Sᵢ =");
-							mainForm.LogOutput($"{squareRootFinder.TotalS}");
-							//mainForm.LogOutput();
-							//mainForm.LogOutput($"∏ Sᵢ (mod ƒ) =");
-							//mainForm.LogOutput($"{reducedTotalS}");
-							mainForm.LogOutput();
-							mainForm.LogOutput("Polynomial ring:");
-							mainForm.LogOutput($"({string.Join(") * (", squareRootFinder.PolynomialRing.Select(ply => ply.ToString()))})");
-							mainForm.LogOutput();
-							mainForm.LogOutput("Primes:");
-							mainForm.LogOutput($"{string.Join(" * ", squareRootFinder.RelationsSet.Select(rel => rel.B).Distinct().OrderBy(relB => relB))}");
-							mainForm.LogOutput();
-							mainForm.LogOutput();
-							mainForm.LogOutput("Q norms:");
-							mainForm.LogOutput($"{String.Join(" * ", qNorms.Select(n => $"{n}"))}");
-							mainForm.LogOutput($"= {qNormsProduct} IsSquare? {qNormsProduct.IsSquare()}");
-							mainForm.LogOutput($"% N = {qNormsProductModN} IsSquare? {qNormsProductModN.IsSquare()}");
-							mainForm.LogOutput();
-							mainForm.LogOutput();
-							mainForm.LogOutput($"ƒ'(m)     = {squareRootFinder.PolynomialDerivative}");
-							mainForm.LogOutput($"ƒ'(m)^2   = {squareRootFinder.PolynomialDerivativeSquared}");
-							mainForm.LogOutput();
-							mainForm.LogOutput($"γ²        = {squareRootFinder.RationalProduct} IsSquare? {squareRootFinder.RationalProduct.IsSquare()}");
-							mainForm.LogOutput($"(γ  · ƒ'(m))^2 = {squareRootFinder.RationalSquare} IsSquare? {squareRootFinder.RationalSquare.IsSquare()}");
-							mainForm.LogOutput($"");
-							mainForm.LogOutput($"");
-							mainForm.LogOutput($"γ² / ƒ(m) = {squareRootFinder.AlgebraicProductModF}");
-							mainForm.LogOutput($"γ         = {squareRootFinder.RationalSquareRootResidue}  IsSquare? {squareRootFinder.RationalSquareRootResidue.IsSquare()}");
-							mainForm.LogOutput();
-							mainForm.LogOutput($"S(a,b)    = {S}");
-							mainForm.LogOutput($"S % ƒ     = {reducedS}");
-							mainForm.LogOutput($"S % ƒ % N = {reducedProdS}  IsSquare? {reducedProdS.IsSquare()}");
-							mainForm.LogOutput($"Sₐ(m)     = {prodS} IsSquare? {prodS.IsSquare()}");
-							mainForm.LogOutput($"S (x)     = {X}  IsSquare? {X.IsSquare()}");//{squareRootFinder.AlgebraicSquareResidue}");
-							mainForm.LogOutput();
-							mainForm.LogOutput("Roots of S(x):");
-							mainForm.LogOutput($"{{{string.Join(", ", squareRootFinder.RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");
-							mainForm.LogOutput();
-							mainForm.LogOutput();
-							mainForm.LogOutput($"TTL: {totalProdS} IsSquare? {totalProdS.IsSquare()}");
-							mainForm.LogOutput($"TTL%N: {totalProdModN}  IsSquare? {totalProdModN.IsSquare()}");
-							mainForm.LogOutput();
-							mainForm.LogOutput($"∏(a + mb) = {squareRootFinder.RationalProduct}");
-							mainForm.LogOutput($"∏ƒ(a/b)   = {squareRootFinder.AlgebraicProduct}");
 
 
 							mainForm.LogOutput();

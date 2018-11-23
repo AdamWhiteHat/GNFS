@@ -196,7 +196,7 @@ namespace GNFSCore.Polynomial
 
 				if (BigInteger.Abs(result.Terms[deg]) > 1)
 				{
-					BigInteger toAdd = (result.Terms[deg] - 1) * polynomialBase;
+					BigInteger toAdd = (result.Terms[deg]) * polynomialBase;
 
 					result.Terms[deg] = 1;
 
@@ -251,7 +251,6 @@ namespace GNFSCore.Polynomial
 
 				// Recalculate the degree
 				terms = terms.SkipWhile(t => t.Sign == 0).ToArray();
-
 				IPolynomial result = new AlgebraicPolynomial(terms);
 				return result;
 			}
@@ -274,29 +273,23 @@ namespace GNFSCore.Polynomial
 			{
 				if (left == null) throw new ArgumentNullException(nameof(left));
 				if (right == null) throw new ArgumentNullException(nameof(right));
-
-				if (right.Degree > left.Degree)
-				{
-					throw new InvalidOperationException();
-				}
+				if (right.Degree > left.Degree) { throw new InvalidOperationException(); }
 
 				int i = 0;
 				int leftDegree = left.Degree;
 				int rightDegree = right.Degree;
 				BigInteger leadingCoefficent = right.Terms[rightDegree].Clone();
-
-				// the leading coefficient is the only number we ever divide by
-				// (so if right is monic, polynomial division does not involve division at all!)
-
 				BigInteger[] rem = left.Terms.ToArray();
-
 				BigInteger[] rightTerms = right.Terms.ToArray();
-
 				BigInteger[] quotient = new BigInteger[leftDegree - rightDegree + 1];
+
+				// The leading coefficient is the only number we ever divide by
+				// (so if right is monic, polynomial division does not involve division at all!)
 				for (i = quotient.Length - 1; i >= 0; i--)
 				{
 					quotient[i] = BigInteger.Divide(rem[rightDegree + i], leadingCoefficent);
 					rem[rightDegree + i] = new BigInteger(0);
+
 					for (int j = rightDegree + i - 1; j >= i; j--)
 					{
 						rem[j] = BigInteger.Subtract(rem[j], BigInteger.Multiply(quotient[i], rightTerms[j - i]));
@@ -305,10 +298,15 @@ namespace GNFSCore.Polynomial
 
 				rem = RemoveZeros(rem);
 				quotient = RemoveZeros(quotient);
-
-
-				// form the remainder and quotient polynomials from the arrays
-				remainder = new AlgebraicPolynomial(rem);
+				if (!rem.Any())
+				{
+					remainder = new AlgebraicPolynomial();
+				}
+				else
+				{
+					remainder = new AlgebraicPolynomial(rem); // Form the remainder and quotient polynomials from the arrays
+				}
+				
 				return new AlgebraicPolynomial(quotient);
 			}
 
@@ -391,10 +389,12 @@ namespace GNFSCore.Polynomial
 			{
 				List<string> stringTerms = new List<string>();
 
-				int degree = polynomial.Terms.Length;
+				BigInteger[] terms = polynomial.Terms.Reverse().ToArray();
+				
+				int degree = terms.Length;
 				while (--degree >= 0)
 				{
-					BigInteger termValue = polynomial.Terms[degree];
+					BigInteger termValue = terms[degree];
 
 					string term = "";
 

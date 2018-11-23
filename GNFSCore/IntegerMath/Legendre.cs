@@ -34,5 +34,30 @@ namespace GNFSCore.IntegerMath
 			}
 			return result;
 		}
+
+		/// <summary>
+		///  Find r such that (r | m) = goal, where  (r | m) is the Legendre symbol
+		/// </summary>
+		public static BigInteger SymbolSearch(BigInteger start, BigInteger modulus, BigInteger goal)
+		{
+			if (goal != -1 && goal != 0 && goal != 1)
+			{
+				throw new Exception($"Parameter '{nameof(goal)}' may only be -1, 0 or 1. It was {goal}.");
+			}
+
+			BigInteger counter = start;
+			do
+			{
+				if (Symbol(counter, modulus) == goal)
+				{
+					break;
+				}
+				counter++;
+			}
+			while (true);
+
+			return counter;
+		}
 	}
+
 }

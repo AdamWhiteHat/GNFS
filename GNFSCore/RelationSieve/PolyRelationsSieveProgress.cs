@@ -136,7 +136,7 @@ namespace GNFSCore
 					break;
 				}
 
-				List<int> coprimes = A.Where(a => CoPrime.IsCoprime(a, B)).ToList();
+				List<int> coprimes = A.Where(a => GCD.AreCoprime(a, B)).ToList();
 				List<Relation> unfactored = coprimes.Select(a => new Relation(_gnfs, a, B)).ToList();
 
 				newestRelations.AddRange(SieveRelations(cancelToken, _gnfs.CurrentRelationsProgress, unfactored));
@@ -206,25 +206,23 @@ namespace GNFSCore
 
 		public void PurgePrimeRoughRelations()
 		{
-			var toRemove = Relations.RoughRelations
-				.Where(r =>
-					!(
-						r.AlgebraicQuotient == 1
-						||
-						r.RationalQuotient == 1
-						||
-						FactorizationFactory.IsProbablePrime(r.AlgebraicQuotient)
-						||
-						FactorizationFactory.IsProbablePrime(r.RationalQuotient)
-					)
-				).ToList();
+			List<RoughPair> roughRelations = Relations.RoughRelations.ToList();
+			
+			IEnumerable<RoughPair> toRemoveAlg = roughRelations
+				.Where(r => r.AlgebraicQuotient != 1 && FactorizationFactory.IsProbablePrime(r.AlgebraicQuotient));
+				
+			roughRelations = roughRelations.Except(toRemoveAlg).ToList();
 
-			foreach (RoughPair pair in toRemove)
-			{
-				Relations.RoughRelations.Remove(pair);
-			}
-
+			Relations.RoughRelations = roughRelations;
 			SaveRoughRelations();
+
+			IEnumerable <RoughPair> toRemoveRational = roughRelations
+				.Where(r => r.RationalQuotient != 1 && FactorizationFactory.IsProbablePrime(r.RationalQuotient));
+
+			roughRelations = roughRelations.Except(toRemoveRational).ToList();
+
+			Relations.RoughRelations = roughRelations;
+			SaveRoughRelations();			
 		}
 
 
@@ -277,6 +275,23 @@ namespace GNFSCore
 				result.AppendLine($"Algebraic factorization (as prime ideals): {algCountDict.FormatStringAsFactorization()}");
 				result.AppendLine();
 
+				result.AppendLine();
+				result.AppendLine("");
+				result.AppendLine(string.Join(Environment.NewLine,
+					relations.Select(rel =>
+					{
+						BigInteger f = _gnfs.CurrentPolynomial.Evaluate(rel.A);
+						if (rel.B == 0)
+						{
+							return "";
+						}
+						return $"ƒ({rel.A}) ≡ {f} ≡ {(f % rel.B)} (mod {rel.B})";
+					}
+					)));
+				result.AppendLine();
+
+
+
 				return result.ToString();
 			}
 			else
@@ -328,6 +343,11 @@ namespace GNFSCore
 		{
 			if (Relations.RoughRelations.Any())
 			{
+				if (File.Exists(RoughRelations_Filename))
+				{
+					File.Delete(RoughRelations_Filename);
+				}
+
 				// Write out RoughRelations file
 				RoughPair.SaveToFile(RoughRelations_Filename, Relations.RoughRelations);
 			}

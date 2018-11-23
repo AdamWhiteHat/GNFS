@@ -120,35 +120,25 @@ namespace GNFSCore
 
 			foreach (BigInteger factor in primeFactors)
 			{
-				if (factor > sqrt)
+				if (result == 0 || result == 1)
+				{
+					return result;
+				}
+
+				if ((factor*factor) > result)
 				{
 					if (primeFactors.Contains(result))
 					{
 						dictionary.Add(result);
 						return 1;
 					}
-				}
-
-				if (result == 0 || result == 1)
-				{
 					return result;
 				}
-
-				while (result % factor == 0 && result != 1)
+							
+				while (result != 1 && result % factor == 0)
 				{
-					BigInteger q = BigInteger.Divide(result, factor);
-					result = q;
-
-					dictionary.Add(factor);
-
-					if (result > 1)
-					{
-						if (primeFactors.Contains(result))
-						{
-							dictionary.Add(result);
-							return 1;
-						}
-					}
+					result = BigInteger.Divide(result, factor);
+					dictionary.Add(factor);					
 				}
 			}
 

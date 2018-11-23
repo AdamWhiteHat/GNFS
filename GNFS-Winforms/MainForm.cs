@@ -49,6 +49,7 @@ namespace GNFS_Winforms
 		private static string CreateGnfsButtonText = "Create/Load";
 		private static string CancelButtonText = "Cancel";
 
+		private static readonly BigInteger MatthewBriggs = BigInteger.Parse("45113");
 		private static readonly BigInteger PerLeslieJensen = BigInteger.Parse("3218147");
 		private static readonly BigInteger RSA_100 = BigInteger.Parse("1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139");
 		private static readonly BigInteger RSA_110 = BigInteger.Parse("35794234179725868774991807832568455403003778024228226193532908190484670252364677411513516111204504060317568667");
@@ -79,9 +80,13 @@ namespace GNFS_Winforms
 			IEnumerable<BigInteger> primes = PrimeFactory.GetPrimes(10000);
 			BigInteger baseM = CommonPolynomial.SuggestPolynomialBase(n, degree, primes);
 
-			tbBase.Text = baseM.ToString();
+			//tbBase.Text = baseM.ToString();
 			tbBase.Text = "117";
 
+			tbBound.Text = "61";
+			tbRelationQuantity.Text = "70";
+			tbRelationValueRange.Text = "200";
+			
 			BridgeTextboxN = new ControlBridge(tbN);
 			BridgeTextboxDegree = new ControlBridge(tbDegree);
 			BridgeTextboxBase = new ControlBridge(tbBase);
@@ -184,9 +189,7 @@ namespace GNFS_Winforms
 			{
 				SetAsProcessing();
 				ControlBridge.SetControlEnabledState(btnCreateGnfs, false);
-
-				firstFindRelations = true;
-
+				
 				n = BigInteger.Parse(tbN.Text);
 				degree = int.Parse(tbDegree.Text);
 				polyBase = BigInteger.Parse(tbBase.Text);
@@ -197,9 +200,11 @@ namespace GNFS_Winforms
 
 
 				logFilename = DirectoryLocations.GenerateFileNameFromBigInteger(n) + ".LOG.txt";
-				if (File.Exists(logFilename))
+
+				if (!Directory.Exists(DirectoryLocations.GenerateSaveDirectory(n)))
 				{
-					if (!Directory.Exists(DirectoryLocations.GenerateSaveDirectory(n)))
+					firstFindRelations = true;
+					if (File.Exists(logFilename))
 					{
 						File.Delete(logFilename);
 					}

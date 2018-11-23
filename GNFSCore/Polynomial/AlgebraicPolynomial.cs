@@ -23,12 +23,15 @@ namespace GNFSCore.Polynomial
 		public BigInteger[] Terms { get; private set; }
 
 		public AlgebraicPolynomial()
-		{ }
+		{
+			Degree = 0;
+			Terms = new BigInteger[0];
+		}
 
 		public AlgebraicPolynomial(BigInteger[] terms)
 		{
 			BigInteger[] safeTerms = terms.ToArray();
-			if (safeTerms.Last() == 0)
+			if (safeTerms.Any() && safeTerms.Count() > 1 && safeTerms.Last() == 0)
 			{
 				safeTerms = CommonPolynomial.RemoveZeros(safeTerms);
 			}

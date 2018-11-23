@@ -40,5 +40,10 @@ namespace GNFSCore.IntegerMath
 		{
 			return BigInteger.GreatestCommonDivisor(left, right);
 		}
+
+		public static bool AreCoprime(params BigInteger[] numbers)
+		{
+			return (FindGCD(numbers.ToArray()) == 1);
+		}
 	}
 }

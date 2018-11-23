@@ -20,6 +20,9 @@ namespace GNFSCore.SquareRoot
 		public BigInteger PolynomialDerivative;
 		public BigInteger PolynomialDerivativeSquared;
 
+		public IPolynomial DerivativePolynomial;
+		public IPolynomial DerivativePolynomialSquared;
+
 		public BigInteger RationalProduct;
 		public BigInteger RationalSquare;
 		public BigInteger RationalSquareRoot;
@@ -36,13 +39,16 @@ namespace GNFSCore.SquareRoot
 
 		public List<Complex> AlgebraicComplexSet;
 		public List<IPolynomial> PolynomialRing;
-		public List<IPolynomial> PolynomialRingModP;
+		public List<IPolynomial> QuotientRingModP;
 
 		public BigInteger PrimeP;
 
 		public IPolynomial S;
-		public IPolynomial SModP;
+		public IPolynomial SRingSquare;
 		public IPolynomial TotalS;
+
+		public IPolynomial ReducedS1;
+		public IPolynomial ReducedS2;
 		public List<Tuple<BigInteger, BigInteger>> RootsOfS { get; set; }
 
 		public List<BigInteger> QNorms { get { return RelationsSet.Select(rel => Normal.AlgebraicG(rel, poly.Degree - 1, polyBase, q)).ToList(); } }
@@ -50,7 +56,7 @@ namespace GNFSCore.SquareRoot
 		public List<Complex> ComplexFactors { get { return RelationsSet.Select(rel => rel.Complex).ToList(); } }
 		public List<Complex> ComplexNorms { get { return RelationsSet.Select(rel => rel.ComplexNorm).ToList(); } }
 		public List<BigInteger> RationalNormPairs { get { return RelationsSet.SelectMany(rel => new BigInteger[] { Normal.Rational(rel.A, rel.B, polyBase), Normal.RationalSubtract(rel.A, rel.B, polyBase) }).ToList(); } }
-		
+
 
 		private GNFS gnfs;
 		private BigInteger N;
@@ -75,7 +81,11 @@ namespace GNFSCore.SquareRoot
 			RootsOfS = new List<Tuple<BigInteger, BigInteger>>();
 			AlgebraicComplexSet = new List<Complex>();
 			RelationsSet = relations;
-			PolynomialDerivative = gnfs.CurrentPolynomial.Derivative(gnfs.PolynomialBase);
+
+			DerivativePolynomial = CommonPolynomial.GetDerivativePolynomial(poly);
+			DerivativePolynomialSquared = CommonPolynomial.Mod(CommonPolynomial.Multiply(DerivativePolynomial, DerivativePolynomial), poly);
+
+			PolynomialDerivative = DerivativePolynomial.Evaluate(gnfs.PolynomialBase);
 			PolynomialDerivativeSquared = BigInteger.Pow(PolynomialDerivative, 2);
 		}
 
@@ -111,8 +121,9 @@ namespace GNFSCore.SquareRoot
 			{
 				// poly(x) = A + (B * x) // or (A * leadingCoefficient) + (B * x) ??
 
-				IPolynomial newPoly = new AlgebraicPolynomial(new BigInteger[] { rel.A, rel.B });
+				IPolynomial newPoly = new AlgebraicPolynomial(new BigInteger[] { rel.A, rel.B });				
 				PolynomialRing.Add(newPoly);
+
 
 				if (totalPoynomial == null)
 				{
@@ -144,8 +155,25 @@ namespace GNFSCore.SquareRoot
 
 			// Set the result to S
 			S = modPoynomial;
+
+			IPolynomial fullPolynomial = CommonPolynomial.Multiply(S, DerivativePolynomialSquared);
+
+			SRingSquare = CommonPolynomial.Mod(fullPolynomial, poly);
+
 			TotalS = totalPoynomial;
 
+			
+			ReducedS1 = PolynomialArithmetic.ReduceMod(fullPolynomial, N);
+			ReducedS2 = CommonPolynomial.Mod(ReducedS1, poly);
+						
+
+			QuotientRingModP = new List<IPolynomial>();
+			foreach (IPolynomial element in PolynomialRing)
+			{
+				IPolynomial remainderPoly = CommonPolynomial.Mod(poly, element);
+				QuotientRingModP.Add(remainderPoly);
+			}
+			
 			//CalculateAlgebraicSquareRoot();
 
 			algebraicNormCollection = RelationsSet.Select(rel => rel.AlgebraicNorm);

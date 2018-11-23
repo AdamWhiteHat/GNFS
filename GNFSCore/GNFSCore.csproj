@@ -43,22 +43,24 @@
   <ItemGroup>
     <Compile Include="Core\CountDictionary.cs" />
     <Compile Include="Core\ExtensionMethods\BigIntegerCollectionExtensionMethods.cs" />
-    <Compile Include="Core\ExtensionMethods\ComplexCollectionExtensionMethods.cs" />
+    <Compile Include="Core\ExtensionMethods\IEnumerableExtensionMethods.cs" />
     <Compile Include="Core\FactorBase.cs" />
     <Compile Include="Core\DirectoryLocations.cs" />
+    <Compile Include="Polynomial\BigIntegerArithmetic.cs" />
+    <Compile Include="Polynomial\SparsePolynomial.cs" />
     <Compile Include="RelationSieve\PolyRelationsSieveProgress.cs" />
     <Compile Include="IntegerMath\QuadraticResidue.cs" />
     <Compile Include="RelationSieve\Relation.cs" />
     <Compile Include="RelationSieve\RelationContainer.cs" />
     <Compile Include="RelationSieve\RoughPair.cs" />
     <Compile Include="Core\Serializer.cs" />
+    <!--Compile Include="SquareRoot\AlgebraicSquareRoot.cs" /-->
+    <Compile Include="SquareRoot\FiniteFieldArithmetic.cs" />
     <Compile Include="SquareRoot\SquareFinder.cs" />
-    <!--Compile Include="SquareRoot\SquareFinder.Experiments.cs" /-->
     <Compile Include="Core\StaticRandom.cs" />
     <Compile Include="FactorBase\FactorCollection.cs" />
     <Compile Include="FactorBase\FactorPair.cs" />
     <!--Compile Include="RelationSieve\OtherSeives\FermatEuclidSeive.cs" /-->
-    <Compile Include="IntegerMath\ModularInverse.cs" />
     <Compile Include="IntegerMath\Normal.cs" />
     <Compile Include="IntegerMath\BigRange.cs" />
     <Compile Include="IntegerMath\Legendre.cs" />
@@ -68,22 +70,14 @@
     <Compile Include="Matrix\GaussianRow.cs" />
     <!--Compile Include="Polynomial\BigIntegerArithmetic.cs" /-->
     <Compile Include="Polynomial\CommonPolynomial.cs" />
-    <!--Compile Include="Polynomial\Experimental.cs" /-->
     <Compile Include="Polynomial\IPolynomial.cs" />
-    <!--Compile Include="Polynomial\PolynomialArithmetic.cs" /-->
-    <!--Compile Include="Polynomial\PolynomialExpression.cs" /-->
-    <Compile Include="Polynomial\SkewSymmetricPolynomial.cs" />
-    <Compile Include="Polynomial\RationalPolynomial.cs" />
-    <Compile Include="IntegerMath\Combinatorics.cs" />
+    <Compile Include="Polynomial\PolynomialArithmetic.cs" />
     <Compile Include="Core\GNFS.cs" />
-    <Compile Include="Core\ExtensionMethods\IEnumerableExtensionMethods.cs" />
     <Compile Include="Core\ExtensionMethods\BigIntegerExtensionMethods.cs" />
-    <Compile Include="IntegerMath\CoPrime.cs" />
     <Compile Include="IntegerMath\Eratosthenes.cs" />
     <Compile Include="IntegerMath\GCD.cs" />
     <Compile Include="Polynomial\AlgebraicPolynomial.cs" />
     <Compile Include="IntegerMath\FactorizationFactory.cs" />
-    <Compile Include="Polynomial\Term.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

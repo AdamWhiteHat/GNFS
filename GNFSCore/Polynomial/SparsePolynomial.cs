@@ -20,7 +20,7 @@ namespace GNFSCore.Polynomial
 		BigInteger CoEfficient { get; set; }
 	}
 
-	public interface IPoly : ICloneable<IPoly>
+	public interface IPoly : ICloneable<IPoly>, IComparable
 	{
 		int Degree { get; }
 		ITerm[] Terms { get; }
@@ -41,14 +41,14 @@ namespace GNFSCore.Polynomial
 
 
 	[Serializable]
-	public class PolynomialTerm : ITerm
+	public class PolyTerm : ITerm
 	{
 		public int Exponent { get; private set; }
 		public BigInteger CoEfficient { get; set; }
 
 		private static string IndeterminateSymbol = "X";
 
-		public PolynomialTerm(BigInteger coefficient, int exponent)
+		public PolyTerm(BigInteger coefficient, int exponent)
 		{
 			Exponent = exponent;
 			CoEfficient = coefficient;
@@ -61,7 +61,7 @@ namespace GNFSCore.Polynomial
 			int degree = 0;
 			foreach (BigInteger term in terms)
 			{
-				results.Add(new PolynomialTerm(term, degree));
+				results.Add(new PolyTerm(term, degree));
 
 				degree += 1;
 			}
@@ -76,7 +76,7 @@ namespace GNFSCore.Polynomial
 
 		public ITerm Clone()
 		{
-			return new PolynomialTerm(this.CoEfficient, this.Exponent);
+			return new PolyTerm(this.CoEfficient, this.Exponent);
 		}
 
 		public override string ToString()
@@ -103,6 +103,10 @@ namespace GNFSCore.Polynomial
 	[Serializable]
 	public class SparsePolynomial : IXmlSerializable, IPoly
 	{
+		public static IPoly Zero = new SparsePolynomial(PolyTerm.GetTerms(new BigInteger[] { 0 }));
+		public static IPoly One = new SparsePolynomial(PolyTerm.GetTerms(new BigInteger[] { 1 }));
+		public static IPoly Two = new SparsePolynomial(PolyTerm.GetTerms(new BigInteger[] { 2 }));
+
 		[XmlArrayItem("Terms")]
 		public ITerm[] Terms { get { return _terms.ToArray(); } }
 		private List<ITerm> _terms;
@@ -131,7 +135,7 @@ namespace GNFSCore.Polynomial
 				{
 					if (value != BigInteger.Zero)
 					{
-						ITerm newTerm = new PolynomialTerm(value, degree);
+						ITerm newTerm = new PolyTerm(value, degree);
 						List<ITerm> terms = _terms;
 						terms.Add(newTerm);
 						SetTerms(terms);
@@ -186,12 +190,12 @@ namespace GNFSCore.Polynomial
 
 				if (placeValue == 1)
 				{
-					result.Add(new PolynomialTerm(toAdd, d));
+					result.Add(new PolyTerm(toAdd, d));
 					toAdd = 0;
 				}
 				else if (placeValue == toAdd)
 				{
-					result.Add(new PolynomialTerm(1, d));
+					result.Add(new PolyTerm(1, d));
 					toAdd -= placeValue;
 				}
 				else if (placeValue < BigInteger.Abs(toAdd))
@@ -204,7 +208,7 @@ namespace GNFSCore.Polynomial
 						quotient = placeValue;
 					}
 
-					result.Add(new PolynomialTerm(quotient, d));
+					result.Add(new PolyTerm(quotient, d));
 					BigInteger toSubtract = BigInteger.Multiply(quotient, placeValue);
 
 					toAdd -= toSubtract;
@@ -213,11 +217,6 @@ namespace GNFSCore.Polynomial
 				d--;
 			}
 			return result.ToList();
-		}
-
-		public static bool IsOne(IPoly poly)
-		{
-			return (poly.Degree == 1 & poly[0] == 1);
 		}
 
 		public BigInteger Evaluate(BigInteger indeterminateValue)
@@ -237,6 +236,30 @@ namespace GNFSCore.Polynomial
 			return result;
 		}
 
+		public double EvaluateDouble(double indeterminateValue)
+		{
+			return EvaluateDouble(Terms, indeterminateValue);
+		}
+
+		public static double EvaluateDouble(ITerm[] terms, double x)
+		{
+			double result = 0;
+
+			int d = terms.Count() - 1;
+			while (d >= 0)
+			{
+				double placeValue = Math.Pow(x, terms[d].Exponent);
+
+				double addValue = (double)(terms[d].CoEfficient) * placeValue;
+
+				result += addValue;
+
+				d--;
+			}
+
+			return result;
+		}
+
 		public static IPoly GetDerivativePolynomial(IPoly poly)
 		{
 			int d = 0;
@@ -248,10 +271,38 @@ namespace GNFSCore.Polynomial
 				{
 					continue;
 				}
-				terms.Add(new PolynomialTerm(term.CoEfficient * term.Exponent, d));
+				terms.Add(new PolyTerm(term.CoEfficient * term.Exponent, d));
 			}
 
-			return new SparsePolynomial(terms.ToArray());
+			IPoly result = new SparsePolynomial(terms.ToArray());
+			return result;
+		}
+
+		public static bool IsIrreducibleOverP(IPoly poly, BigInteger p)
+		{
+			List<BigInteger> coefficients = poly.Terms.Select(t => t.CoEfficient).ToList();
+
+			BigInteger leadingCoefficient = coefficients.Last();
+			BigInteger constantCoefficient = coefficients.First();
+
+			coefficients.Remove(leadingCoefficient);
+			coefficients.Remove(constantCoefficient);
+
+
+			BigInteger leadingRemainder = -1;
+			BigInteger.DivRem(leadingCoefficient, p, out leadingRemainder);
+
+			BigInteger constantRemainder = -1;
+			BigInteger.DivRem(constantCoefficient, p.Square(), out constantRemainder);
+
+			bool result = (leadingRemainder != 0); // p does not divide leading coefficient
+
+			result &= (constantRemainder != 0); // p^2 does not divide constant coefficient
+
+			coefficients.Add(p);
+			result &= (GNFSCore.IntegerMath.GCD.FindGCD(coefficients) == 1);
+
+			return result;
 		}
 
 		public static IPoly GCD(IPoly left, IPoly right)
@@ -275,7 +326,7 @@ namespace GNFSCore.Polynomial
 
 			if (a.Degree == 0)
 			{
-				return new SparsePolynomial(PolynomialTerm.GetTerms(new BigInteger[] { 1 }));
+				return SparsePolynomial.One;
 			}
 			else
 			{
@@ -283,10 +334,19 @@ namespace GNFSCore.Polynomial
 			}
 		}
 
+		public static IPoly ModMod(IPoly toReduce, IPoly modPoly, BigInteger modPrime)
+		{
+			return SparsePolynomial.Modulus(SparsePolynomial.Mod(toReduce, modPoly), modPrime);
+		}
+
 		public static IPoly Mod(IPoly left, IPoly right)
 		{
+			if (right.Degree > left.Degree)
+			{
+				return left;
+			}
 			IPoly remainder = new SparsePolynomial();
-			IPoly quotient = Divide(left, right, out remainder);
+			Divide(left, right, out remainder);
 			return remainder;
 		}
 
@@ -299,7 +359,7 @@ namespace GNFSCore.Polynomial
 			{
 				BigInteger remainder = 0;
 				BigInteger.DivRem(term.CoEfficient, mod, out remainder);
-				terms.Add(new PolynomialTerm(remainder, term.Exponent));
+				terms.Add(new PolyTerm(remainder, term.Exponent));
 			}
 
 			// Recalculate the degree
@@ -327,11 +387,11 @@ namespace GNFSCore.Polynomial
 			if (right.Degree > left.Degree) { throw new InvalidOperationException(); }
 
 			int rightDegree = right.Degree;
-			int quotientDegree = left.Degree - rightDegree + 1;
+			int quotientDegree = (left.Degree - rightDegree) + 1;
 			BigInteger leadingCoefficent = new BigInteger(right[rightDegree].ToByteArray());
 
 			IPoly rem = left.Clone();
-			IPoly quotient = new SparsePolynomial(new ITerm[] { });
+			IPoly quotient = SparsePolynomial.Zero;
 
 			// The leading coefficient is the only number we ever divide by
 			// (so if right is monic, polynomial division does not involve division at all!)
@@ -354,6 +414,23 @@ namespace GNFSCore.Polynomial
 			return quotient;
 		}
 
+		public static IPoly Multiply(IPoly left, IPoly right)
+		{
+			if (left == null) { throw new ArgumentNullException(nameof(left)); }
+			if (right == null) { throw new ArgumentNullException(nameof(right)); }
+
+			BigInteger[] terms = new BigInteger[left.Degree + right.Degree + 1];
+
+			for (int i = 0; i <= left.Degree; i++)
+			{
+				for (int j = 0; j <= right.Degree; j++)
+				{
+					terms[(i + j)] += BigInteger.Multiply(left[i], right[j]);
+				}
+			}
+			return new SparsePolynomial(PolyTerm.GetTerms(terms));
+		}
+
 		public static IPoly MultiplyMod(IPoly poly, BigInteger multiplier, BigInteger mod)
 		{
 			IPoly result = poly.Clone();
@@ -371,22 +448,29 @@ namespace GNFSCore.Polynomial
 			return result;
 		}
 
-
-		public static IPoly Multiply(IPoly left, IPoly right)
+		public static IPoly PowMod(IPoly poly, BigInteger exp, BigInteger mod)
 		{
-			if (left == null) { throw new ArgumentNullException(nameof(left)); }
-			if (right == null) { throw new ArgumentNullException(nameof(right)); }
+			IPoly result = poly.Clone();
 
-			BigInteger[] terms = new BigInteger[left.Degree + right.Degree + 1];
+			foreach (ITerm term in result.Terms)
+			{
+				BigInteger value = term.CoEfficient;
+				if (value != 0)
+				{
+					value = BigInteger.ModPow(value, exp, mod);
+					term.CoEfficient = value;
+				}
+			}
 
-			for (int i = 0; i <= left.Degree; i++)
-				for (int j = 0; j <= right.Degree; j++)
-					terms[(i + j)] += BigInteger.Multiply(left[i], right[j]);
-
-			return new SparsePolynomial(PolynomialTerm.GetTerms(terms));
+			return result;
 		}
 
-		public static IPoly Multiply(params IPoly[] polys)
+		public static IPoly Product(params IPoly[] polys)
+		{
+			return Product(polys.ToList());
+		}
+
+		public static IPoly Product(IEnumerable<IPoly> polys)
 		{
 			IPoly result = null;
 
@@ -418,7 +502,7 @@ namespace GNFSCore.Polynomial
 			}
 			else if (exponent == 0)
 			{
-				return new SparsePolynomial(new PolynomialTerm[] { new PolynomialTerm(1, 0) });
+				return new SparsePolynomial(new PolyTerm[] { new PolyTerm(1, 0) });
 			}
 			else if (exponent == 1)
 			{
@@ -441,6 +525,74 @@ namespace GNFSCore.Polynomial
 			return total;
 		}
 
+		public static IPoly ExponentiateMod(IPoly startPoly, BigInteger s2, IPoly f, BigInteger p)
+		{
+			IPoly result = SparsePolynomial.One;
+			if (s2 == 0) { return result; }
+
+			IPoly A = startPoly.Clone();
+
+			byte[] byteArray = s2.ToByteArray();
+			bool[] bitArray = new BitArray(byteArray).Cast<bool>().ToArray();
+
+			// Remove trailing zeros ?
+			if (bitArray[0] == true)
+			{
+				result = startPoly;
+			}
+
+			int i = 1;
+			int t = bitArray.Length;
+			while (i < t)
+			{
+				A = SparsePolynomial.ModMod(SparsePolynomial.Square(A), f, p);
+				if (bitArray[i] == true)
+				{
+					result = SparsePolynomial.ModMod(SparsePolynomial.Multiply(A, result), f, p);
+				}
+				i++;
+			}
+
+			return result;
+		}
+
+		public static IPoly ModPow(IPoly poly, BigInteger exponent, IPoly modulus)
+		{
+			if (exponent < 0)
+			{
+				throw new NotImplementedException("Raising a polynomial to a negative exponent not supported. Build this functionality if it is needed.");
+			}
+			else if (exponent == 0)
+			{
+				return SparsePolynomial.One;
+			}
+			else if (exponent == 1)
+			{
+				return poly.Clone();
+			}
+			else if (exponent == 2)
+			{
+				return Square(poly);
+			}
+
+			IPoly total = Square(poly);
+
+			BigInteger counter = exponent - 2;
+			while (counter != 0)
+			{
+				total = Multiply(poly, total);
+
+				if (total.CompareTo(modulus) < 0)
+				{
+					total = Mod(total, modulus);
+				}
+
+				counter -= 1;
+			}
+
+			return total;
+		}
+
 		public static IPoly Subtract(IPoly left, IPoly right)
 		{
 			if (left == null) throw new ArgumentNullException(nameof(left));
@@ -455,7 +607,31 @@ namespace GNFSCore.Polynomial
 				terms[i] = (l - r);
 			}
 
-			IPoly result = new SparsePolynomial(PolynomialTerm.GetTerms(terms.ToArray()));
+			IPoly result = new SparsePolynomial(PolyTerm.GetTerms(terms.ToArray()));
+
+			return result;
+		}
+
+		public static IPoly Sum(params IPoly[] polys)
+		{
+			return Sum(polys.ToList());
+		}
+
+		public static IPoly Sum(IEnumerable<IPoly> polys)
+		{
+			IPoly result = null;
+
+			foreach (IPoly p in polys)
+			{
+				if (result == null)
+				{
+					result = p;
+				}
+				else
+				{
+					result = SparsePolynomial.Add(result, p);
+				}
+			}
 
 			return result;
 		}
@@ -471,8 +647,107 @@ namespace GNFSCore.Polynomial
 				terms[i] = (left[i] + right[i]);
 			}
 
-			IPoly result = new SparsePolynomial(PolynomialTerm.GetTerms(terms.ToArray()));
+			IPoly result = new SparsePolynomial(PolyTerm.GetTerms(terms.ToArray()));
 			return result;
+		}
+
+		public int CompareTo(object obj)
+		{
+			if (obj == null)
+			{
+				throw new NullReferenceException();
+			}
+
+			IPoly other = obj as SparsePolynomial;
+
+			if (other == null)
+			{
+				throw new ArgumentException();
+			}
+
+
+			if (other.Degree != this.Degree)
+			{
+				if (other.Degree > this.Degree)
+				{
+					return -1;
+				}
+				else
+				{
+					return 1;
+				}
+			}
+			else
+			{
+				int counter = this.Degree;
+
+				while (counter >= 0)
+				{
+					BigInteger thisCoefficient = this[counter];
+					BigInteger otherCoefficient = other[counter];
+
+					if (thisCoefficient < otherCoefficient)
+					{
+						return -1;
+					}
+					else if (thisCoefficient > otherCoefficient)
+					{
+						return 1;
+					}
+
+					counter--;
+				}
+
+				return 0;
+			}
+		}
+
+		public static IPoly MakeMonic(IPoly polynomial, BigInteger polynomialBase)
+		{
+			int deg = polynomial.Degree;
+			IPoly result = new SparsePolynomial(polynomial.Terms.ToArray());
+			if (BigInteger.Abs(result.Terms[deg].CoEfficient) > 1)
+			{
+				BigInteger toAdd = (result.Terms[deg].CoEfficient - 1) * polynomialBase;
+				result.Terms[deg].CoEfficient = 1;
+				result.Terms[deg - 1].CoEfficient += toAdd;
+			}
+			return result;
+		}
+
+		public static void MakeCoefficientsSmaller(IPoly polynomial, BigInteger polynomialBase, BigInteger maxCoefficientSize = default(BigInteger))
+		{
+			BigInteger maxSize = maxCoefficientSize;
+
+			if (maxSize == default(BigInteger))
+			{
+				maxSize = polynomialBase;
+			}
+
+			int pos = 0;
+			int deg = polynomial.Degree;
+
+			while (pos < deg)
+			{
+				if (pos + 1 > deg)
+				{
+					return;
+				}
+
+				if (polynomial[pos] > maxSize &&
+					polynomial[pos] > polynomial[pos + 1])
+				{
+					BigInteger diff = polynomial[pos] - maxSize;
+
+					BigInteger toAdd = (diff / polynomialBase) + 1;
+					BigInteger toRemove = toAdd * polynomialBase;
+
+					polynomial[pos] -= toRemove;
+					polynomial[pos + 1] += toAdd;
+				}
+
+				pos++;
+			}
 		}
 
 		public IPoly Clone()
@@ -483,22 +758,6 @@ namespace GNFSCore.Polynomial
 		public override string ToString()
 		{
 			return SparsePolynomial.FormatString(this);
-		}
-
-		private static Dictionary<char, string> superscriptDictionary = new Dictionary<char, string>()
-		{ {'0',"⁰"}, {'1',"¹"}, {'2',"²"}, {'3',"³"}, {'4',"⁴"}, {'5',"⁵"}, {'6',"⁶"}, {'7',"⁷"}, {'8',"⁸"}, {'9',"⁹"} };
-
-		private static string GetSuperscript(BigInteger value)
-		{
-			string result = "";
-
-			string valueStr = value.ToString();
-			foreach (char c in valueStr)
-			{
-				result += superscriptDictionary[c];
-			}
-
-			return result;
 		}
 
 		public static string FormatString(IPoly polynomial)
@@ -536,21 +795,23 @@ namespace GNFSCore.Polynomial
 						break;
 
 					default:
-						if (term.CoEfficient == 1) stringTerms.Add($"X{GetSuperscript(term.Exponent)}");
-						else if (term.CoEfficient == -1) stringTerms.Add($"-X{GetSuperscript(term.Exponent)}");
-						else stringTerms.Add($"{term.CoEfficient}*X{GetSuperscript(term.Exponent)}");
+						if (term.CoEfficient == 1) stringTerms.Add($"X^{term.Exponent}");
+						else if (term.CoEfficient == -1) stringTerms.Add($"-X^{term.Exponent}");
+						else stringTerms.Add($"{term.CoEfficient}*X^{term.Exponent}");
 						break;
 				}
 			}
 			return string.Join(" + ", stringTerms).Replace("+ -", "- ");
 		}
 
+		#region IXmlSerializable
+
 		private static string spacer = $"{Environment.NewLine}    ";
 		public void WriteXml(XmlWriter writer)
 		{
 			writer.WriteElementString("Degree", Degree.ToString());
 			writer.WriteStartElement("Terms");
-			writer.WriteString($"{spacer}{string.Join(spacer, Terms.Select(trm => $"{trm}"))}{spacer}");
+			writer.WriteString($"{spacer}{string.Join(spacer, Terms.Select(term => $"{term}"))}{spacer}");
 			writer.WriteEndElement();
 			writer.WriteElementString("Polynomial", this.ToString());
 		}
@@ -580,12 +841,15 @@ namespace GNFSCore.Polynomial
 			IEnumerable<ITerm> terms = termLines.Select(str =>
 			{
 				string[] termParts = str.Split(new string[] { "*X^" }, StringSplitOptions.None);
-				return new PolynomialTerm(BigInteger.Parse(termParts[0]), int.Parse(termParts[1]));
+				return new PolyTerm(BigInteger.Parse(termParts[0]), int.Parse(termParts[1]));
 			});
 
 			_terms = terms.ToList();
 		}
 
 		public XmlSchema GetSchema() { return null; }
+
+		#endregion
+
 	}
 }
