@@ -9,8 +9,95 @@ namespace GNFSCore.SquareRoot
 {
 	using GNFSCore.Polynomial;
 	using GNFSCore.IntegerMath;
+
 	public static class FiniteFieldArithmetic
 	{
+		public static IPoly SquareRoot(IPoly startPolynomial, IPoly f, BigInteger p, int degree, BigInteger m)
+		{
+			BigInteger q = BigInteger.Pow(p, degree);
+			BigInteger s = q - 1;
+
+			int r = 0;
+			while (s.Mod(2) == 0)
+			{
+				s /= 2;
+				r++;
+			}
+
+			BigInteger order = BigInteger.Pow(2, r);
+
+			BigInteger halfS = ((s + 1) / 2);
+			if (r == 1 && q.Mod(4) == 3)
+			{
+				halfS = ((q + 1) / 4);
+			}
+
+			BigInteger quadraticNonResidue = Legendre.SymbolSearch(4, q, -1);
+			BigInteger theta = quadraticNonResidue;
+			BigInteger minusOne = BigInteger.ModPow(theta, ((q - 1) / 2), p);
+
+
+			IPoly omegaPoly = SparsePolynomial.ExponentiateMod(startPolynomial, halfS, f, p);
+			//if(omega[r - 1].Sign == -1) { omega = SparsePolynomial.ModularInverse(omega, p); }
+
+			//IPoly zetaPoly ;
+			//IPoly zetaSquaredPoly ;
+			//IPoly zetaInversePoly ;        
+			//$"ζ   = {zetaPoly} ≡ {zeta}".Dump();
+			//$"ζ²  = {zetaSquaredPoly} ≡ {zetaSquared}".Dump();
+			//$"ζ⁻² = {zetaInversePoly} ≡ {zetaInverse}".Dump();
+
+
+			BigInteger lambda = -1; // minusOne;
+			BigInteger zeta = 0;
+			BigInteger zetaSquared = 0;
+			BigInteger zetaInverse = 0;
+
+
+			string j = "";
+			int i = 0;
+			do
+			{
+				i++;
+				j = GetSub(i);
+
+				zeta = BigInteger.ModPow(theta, (i * s), p);
+
+				zetaSquared = zeta.Square().Mod(p);//BigInteger.ModPow(theta, (2 * i * s), p);  // BigInteger.ModPow(quadraticNonResidue, (i * s * 2), p);
+
+				zetaInverse = (p - zetaSquared);
+
+				lambda = (lambda * BigInteger.Pow(zeta, (int)Math.Pow(2, (r - i)))).Mod(p);
+
+				omegaPoly = SparsePolynomial.MultiplyMod(omegaPoly, BigInteger.Pow(zeta, (int)Math.Pow(2, ((r - i) - 1))), p);
+
+				IPoly nu = SparsePolynomial.MultiplyMod(omegaPoly, zetaInverse, p);
+			}
+			while (!((lambda == 1) || (i > (r))));
+
+			return omegaPoly;
+		}
+
+		private static string subscriptNumbers = "₀₁₂₃₄₅₆₇₈₉";
+		private static string GetSub(int number)
+		{
+			return subscriptNumbers[number].ToString();
+		}
+
+		// Finds X such that a*X = 1 (mod p)
+		public static BigInteger ModularMultiplicativeInverse(BigInteger a, BigInteger mod)
+		{
+			BigInteger b = a.Mod(mod);
+			for (int x = 1; x < mod; x++)
+			{
+				if ((b * x).Mod(mod) == 1)
+				{
+					return x;
+				}
+			}
+			return 1;
+		}
+
 		public static BigInteger SquareRootWithChineseRemainder(BigInteger n, List<BigInteger> values, List<BigInteger> primes)
 		{
 			BigInteger primeProduct = primes.Product();
@@ -20,7 +107,7 @@ namespace GNFSCore.SquareRoot
 			foreach (BigInteger pi in primes)
 			{
 				BigInteger Pj = primeProduct / pi;
-				BigInteger Aj = ModularMultiplicativeInverse(Pj, pi); // pi-(Pj % pi);
+				BigInteger Aj = ModularMultiplicativeInverse(Pj, pi); // pi-(Pj.Mod(pi));
 				BigInteger Xj = values[indx];
 				BigInteger AXPj = (Aj * Xj * Pj);
 
@@ -32,127 +119,11 @@ namespace GNFSCore.SquareRoot
 
 			BigInteger r = Z / primeProduct;
 			BigInteger rP = r * primeProduct;
-			BigInteger finalResult_sqrt = ((Z - rP) % n);
+			BigInteger finalResult_sqrt = ((Z - rP).Mod(n));
 
-			//$"\nZ  = {Z}\n\nZp = {r}\nrP = {rP}\n\n\n( z mod N ) - ( rP mod N ) = {Z % N} - {rP % N} = {finalResult_sqrt}".Dump();
+			//$"\nZ  = {Z}\n\nZp = {r}\nrP = {rP}\n\n\n( z mod N ) - ( rP mod N ) = {Z.Mod(N)} - {rP.Mod(N)} = {finalResult_sqrt}".Dump();
 
 			return finalResult_sqrt;
-		}
-
-		public static Tuple<IPoly, IPoly> GetPolynomialSquareRoot(int degree, BigInteger S8, IPoly startPolynomial, BigInteger prime)
-		{
-			BigInteger p = prime;
-			int liftingDegree = degree;
-			IPoly omega = startPolynomial;
-			BigInteger lambda = -1;
-			BigInteger zeta = S8;//1273; // ζ
-								 //BigInteger zInv = 8656; // ζ^-1
-
-			int mm = 1, e0 = 0, e1 = 0, e2 = 0, e3 = 0;
-			BigInteger temp = 1;
-			BigInteger zetaProduct = 1;
-			IPoly omegaProduct = null;
-
-			do
-			{
-				e2 = (liftingDegree - mm);
-				e1 = (liftingDegree - mm - 1);
-
-				if (e2 < -1)
-				{
-					break;
-				}
-				else if (e2 == -1)
-				{
-					zeta = p - zeta;
-					temp = zeta;
-				}
-				else
-				{
-					e0 = (int)BigInteger.Pow(2, e2);
-					temp = BigInteger.ModPow(zeta, e0, p);
-				}
-
-				//$"λ = {lambda} * {zeta}^(2^{e2}) % {p}".Dump();
-				lambda = (lambda * temp) % p;
-				//$"  = {lambda}\n".Dump();
-
-				if (lambda != -1)
-				{
-					if (e1 < -1)
-					{
-						break;
-					}
-					else if (e1 == -1)
-					{
-						zetaProduct = zeta;
-					}
-					else
-					{
-						e3 = (int)BigInteger.Pow(2, (int)e1);
-						//$"{e3} = 2^{e1}".Dump();
-						zetaProduct = BigInteger.ModPow(zeta, e3, p);
-					}
-
-					omegaProduct = SparsePolynomial.MultiplyMod(omega, zetaProduct, p);
-				}
-
-				//$@"ζ = {zetaProduct} = {zeta}^(2^{e1}) mod {p}
-				//ω = {omegaProduct} = ({omega} * {zetaProduct}) % {p}
-				//- - - - - - - - - - - - - - -".Dump();
-
-				omega = omegaProduct;
-				zeta = zetaProduct;
-				mm++;
-			}
-			while (BigInteger.Abs(lambda) != 1 && e1 > -1);
-
-			IPoly solution1 = omega.Clone();
-			IPoly solution2 = new SparsePolynomial(PolyTerm.GetTerms(solution1.Terms.Select(trm => p - trm.CoEfficient).ToArray()));
-
-			return new Tuple<IPoly, IPoly>(solution1, solution2);
-		}
-
-		public static Tuple<List<BigInteger>, List<BigInteger>> Sylow2Subgroup(BigInteger p, int degree)
-		{
-			BigInteger q = BigInteger.Pow(p, degree);
-			BigInteger order = BigInteger.Pow(2, degree);
-			BigInteger s = BigInteger.Divide(q - 1, order);
-			BigInteger qnr = Legendre.SymbolSearch(4, q, -1);
-
-			//$"\nq = p³ = {q}\n     S = {s}\n\n    1st quadratic non-residue > θ = {qnr}\n".Dump();
-
-			List<BigInteger> S8 = new List<BigInteger>();
-			List<BigInteger> S8Squared = new List<BigInteger>();
-
-			int i = 0;
-			while (i < order)
-			{
-				BigInteger Sn = BigInteger.ModPow(qnr, (i * s), p);
-				BigInteger Sn2 = BigInteger.ModPow(qnr, (i * s * 2), p);
-				//debug.Add($"{qnr}^({i}*{s}) ≡ {Sn} (mod {p})\n{qnr}^({i}*{s}*2) ≡ {Sn2} (mod {p})");
-
-				S8.Add(Sn);
-				S8Squared.Add(Sn2);
-				i++;
-			}
-
-			//string.Join(Environment.NewLine, debug).Dump();
-			return new Tuple<List<BigInteger>, List<BigInteger>>(S8, S8Squared);
-		}
-
-		// Finds X such that a*X = 1 (mod p)
-		public static BigInteger ModularMultiplicativeInverse(BigInteger a, BigInteger mod)
-		{
-			BigInteger b = a % mod;
-			for (int x = 1; x < mod; x++)
-			{
-				if ((b * x) % mod == 1)
-				{
-					return x;
-				}
-			}
-			return 1;
 		}
 	}
 }

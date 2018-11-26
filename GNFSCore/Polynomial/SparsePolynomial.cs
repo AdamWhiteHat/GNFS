@@ -108,6 +108,7 @@ namespace GNFSCore.Polynomial
 		public static IPoly Two = new SparsePolynomial(PolyTerm.GetTerms(new BigInteger[] { 2 }));
 
 		[XmlArrayItem("Terms")]
+
 		public ITerm[] Terms { get { return _terms.ToArray(); } }
 		private List<ITerm> _terms;
 		public int Degree { get; private set; }
@@ -300,7 +301,7 @@ namespace GNFSCore.Polynomial
 			result &= (constantRemainder != 0); // p^2 does not divide constant coefficient
 
 			coefficients.Add(p);
-			result &= (GNFSCore.IntegerMath.GCD.FindGCD(coefficients) == 1);
+			result &= (IntegerMath.GCD.FindGCD(coefficients) == 1);
 
 			return result;
 		}
@@ -334,19 +335,29 @@ namespace GNFSCore.Polynomial
 			}
 		}
 
+		public static IPoly ModularInverse(IPoly poly, BigInteger mod)
+		{
+			return new SparsePolynomial(PolyTerm.GetTerms(poly.Terms.Select(trm => (mod - trm.CoEfficient).Mod(mod)).ToArray()));
+		}
+
 		public static IPoly ModMod(IPoly toReduce, IPoly modPoly, BigInteger modPrime)
 		{
 			return SparsePolynomial.Modulus(SparsePolynomial.Mod(toReduce, modPoly), modPrime);
 		}
 
-		public static IPoly Mod(IPoly left, IPoly right)
+		public static IPoly Mod(IPoly poly, IPoly mod)
 		{
-			if (right.Degree > left.Degree)
+			if (mod.Degree > poly.Degree)
 			{
-				return left;
+				return poly;
 			}
 			IPoly remainder = new SparsePolynomial();
-			Divide(left, right, out remainder);
+			Divide(poly, mod, out remainder);
+
+			if (remainder.Evaluate(1).Sign == -1)
+			{
+				return SparsePolynomial.Add(remainder, mod);
+			}
 			return remainder;
 		}
 
@@ -359,6 +370,12 @@ namespace GNFSCore.Polynomial
 			{
 				BigInteger remainder = 0;
 				BigInteger.DivRem(term.CoEfficient, mod, out remainder);
+
+				if (remainder.Sign == -1)
+				{
+					remainder = (remainder + mod);
+				}
+
 				terms.Add(new PolyTerm(remainder, term.Exponent));
 			}
 
@@ -441,7 +458,7 @@ namespace GNFSCore.Polynomial
 				if (value != 0)
 				{
 					value = (value * multiplier);
-					term.CoEfficient = (value % mod);
+					term.CoEfficient = (value.Mod(mod));
 				}
 			}
 
@@ -803,6 +820,7 @@ namespace GNFSCore.Polynomial
 			}
 			return string.Join(" + ", stringTerms).Replace("+ -", "- ");
 		}
+
 
 		#region IXmlSerializable
 
