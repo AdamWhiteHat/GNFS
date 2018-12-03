@@ -34,24 +34,23 @@ namespace GNFSCore.SquareRoot
 		public BigInteger AlgebraicSquare;
 		public BigInteger AlgebraicProductModF;
 		public BigInteger AlgebraicSquareResidue;
+		public BigInteger AlgebraicSquareRootResidue;
+		public List<BigInteger> AlgebraicPrimes;
+		public List<BigInteger> AlgebraicResults;
 		public bool IsAlgebraicSquare;
 		public bool IsAlgebraicIrreducible;
 
 		public List<Complex> AlgebraicComplexSet;
-		public List<IPolynomial> PolynomialRing;
+		public List<IPoly> PolynomialRing;
 		public List<IPolynomial> QuotientRingModP;
 
 		public BigInteger PrimeP;
 
-		public IPolynomial S;
-		public IPolynomial SRingSquare;
-		public IPolynomial TotalS;
+		public IPoly S;
+		public IPoly SRingSquare;
+		public IPoly TotalS;
 
-		public IPolynomial ReducedS1;
-		public IPolynomial ReducedS2;
 		public List<Tuple<BigInteger, BigInteger>> RootsOfS { get; set; }
-
-		public List<BigInteger> QNorms { get { return RelationsSet.Select(rel => Normal.AlgebraicG(rel, poly.Degree - 1, polyBase, q)).ToList(); } }
 
 		public List<Complex> ComplexFactors { get { return RelationsSet.Select(rel => rel.Complex).ToList(); } }
 		public List<Complex> ComplexNorms { get { return RelationsSet.Select(rel => rel.ComplexNorm).ToList(); } }
@@ -111,126 +110,101 @@ namespace GNFSCore.SquareRoot
 		{
 			RootsOfS.AddRange(RelationsSet.Select(rel => new Tuple<BigInteger, BigInteger>(rel.A, rel.B)));
 
-			BigInteger leadingCoefficient = poly.Terms[poly.Degree];
-
-			IPolynomial totalPoynomial = null;
-			IPolynomial modPoynomial = null;
-
-			PolynomialRing = new List<IPolynomial>();
+			PolynomialRing = new List<IPoly>();
 			foreach (Relation rel in RelationsSet)
 			{
 				// poly(x) = A + (B * x) // or (A * leadingCoefficient) + (B * x) ??
 
-				IPolynomial newPoly = new AlgebraicPolynomial(new BigInteger[] { rel.A, rel.B });				
+				IPoly newPoly =
+					new SparsePolynomial(
+						new PolyTerm[]
+						{
+							new PolyTerm( rel.B, 1),
+							new PolyTerm( rel.A, 0)
+						}
+					);
+
 				PolynomialRing.Add(newPoly);
-
-
-				if (totalPoynomial == null)
-				{
-					totalPoynomial = newPoly;
-					modPoynomial = newPoly;
-				}
-				else
-				{
-					totalPoynomial = CommonPolynomial.Multiply(totalPoynomial, newPoly);
-					modPoynomial = CommonPolynomial.Multiply(modPoynomial, newPoly);
-
-					modPoynomial = ReduceIfNeeded(modPoynomial, poly);
-				}
 			}
 
-			// multiply the totalPoynomial by f'(x)
-			// This will guarantee that the square root of totalPoynomial 
-			// is an element of the number field defined by the algebraic polynomial
+			BigInteger m = polyBase;
+			SparsePolynomial f = new SparsePolynomial(PolyTerm.GetTerms(monicPoly.Terms));
+			int degree = f.Degree;
 
-			//IPolynomial fDerivative = CommonPolynomial.GetDerivativePolynomial(poly);
-			//totalPoynomial = CommonPolynomial.Multiply(totalPoynomial, fDerivative);
-			//modPoynomial = CommonPolynomial.Multiply(modPoynomial, fDerivative);
-
-			// Mod by the algebraic polynomial if degree or leading coefficient is greater
-			modPoynomial = ReduceIfNeeded(modPoynomial, poly);
-
-			IPolynomial totalModPoly = ReduceIfNeeded(totalPoynomial, poly);
-			IPolynomial totalModMonicPoly = ReduceIfNeeded(totalPoynomial, monicPoly);
+			IPoly fd = SparsePolynomial.GetDerivativePolynomial(f);
+			IPoly d3 = SparsePolynomial.Product(PolynomialRing);
+			IPoly derivativeSquared = SparsePolynomial.Square(fd);
+			IPoly d2 = SparsePolynomial.Multiply(d3, derivativeSquared);
+			IPoly dd = SparsePolynomial.Mod(d2, f);
 
 			// Set the result to S
-			S = modPoynomial;
-
-			IPolynomial fullPolynomial = CommonPolynomial.Multiply(S, DerivativePolynomialSquared);
-
-			SRingSquare = CommonPolynomial.Mod(fullPolynomial, poly);
-
-			TotalS = totalPoynomial;
-
-			
-			ReducedS1 = PolynomialArithmetic.ReduceMod(fullPolynomial, N);
-			ReducedS2 = CommonPolynomial.Mod(ReducedS1, poly);
-						
-
-			QuotientRingModP = new List<IPolynomial>();
-			foreach (IPolynomial element in PolynomialRing)
-			{
-				IPolynomial remainderPoly = CommonPolynomial.Mod(poly, element);
-				QuotientRingModP.Add(remainderPoly);
-			}
-			
-			//CalculateAlgebraicSquareRoot();
+			S = dd;
+			SRingSquare = dd;
+			TotalS = d2;
 
 			algebraicNormCollection = RelationsSet.Select(rel => rel.AlgebraicNorm);
-			AlgebraicProduct = algebraicNormCollection.Product();
-			AlgebraicSquare = AlgebraicProduct * PolynomialDerivative;
-			AlgebraicProductModF = AlgebraicSquare % poly.Evaluate(polyBase);
+			AlgebraicProduct = d2.Evaluate(m);
+			AlgebraicSquare = dd.Evaluate(m);
+			AlgebraicProductModF = dd.Evaluate(m).Mod(N);
 			AlgebraicSquareResidue = AlgebraicSquare % N;
 
 			IsAlgebraicIrreducible = IsPrimitive(algebraicNormCollection); // Irreducible check
 			IsAlgebraicSquare = AlgebraicSquareResidue.IsSquare();
+						
+			List<BigInteger> primes = new List<BigInteger>();
+			List<BigInteger> results = new List<BigInteger>();
+			List<Tuple<BigInteger, BigInteger>> resultTuples = new List<Tuple<BigInteger, BigInteger>>();
 
-			AlgebraicComplexSet = RelationsSet.Select(rel => new Complex(rel.A, rel.B)).ToList();
+			BigInteger lastP = (N * 3) + 1;
+			do
+			{
+				lastP = PrimeFactory.GetNextPrime(lastP + 1);
+
+				Tuple<BigInteger, BigInteger> lastResult = AlgebraicSquareRoot(N, f, m, degree, dd, PolynomialRing, lastP);
+
+				if (lastResult.Item1 != 0)
+				{
+					primes.Add(lastP);
+					resultTuples.Add(lastResult);
+					results.Add(PickEven(lastResult.Item1, lastResult.Item2));
+				}
+			}			
+			while (primes.Count < degree);
+			AlgebraicPrimes = primes;
+			AlgebraicResults = results;
+
+			AlgebraicSquareRootResidue = FiniteFieldArithmetic.ChineseRemainder(N, results, primes);
 		}
 
-		private IPolynomial ReduceIfNeeded(IPolynomial polynomial, IPolynomial mod)
+		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(BigInteger N, SparsePolynomial f, BigInteger m, int degree, IPoly dd, List<IPoly> ideals, BigInteger p)
 		{
-			var pLc = BigInteger.Abs(polynomial.Terms[polynomial.Degree]);
-			var mLc = BigInteger.Abs(mod.Terms[mod.Degree]);
+			IPoly startPolynomial = SparsePolynomial.Modulus(dd, p);
 
-			if (polynomial.Degree > mod.Degree || (polynomial.Degree == mod.Degree && pLc >= mLc))
+			IPoly resultPoly1 = FiniteFieldArithmetic.SquareRoot(startPolynomial, f, p, degree, m);
+			IPoly resultPoly2 = SparsePolynomial.ModularInverse(resultPoly1, p);
+
+			BigInteger result1 = resultPoly1.Evaluate(m).Mod(p);
+			BigInteger result2 = resultPoly2.Evaluate(m).Mod(p);
+
+			IPoly resultSquared = SparsePolynomial.ModMod(SparsePolynomial.Square(resultPoly2), f, p);
+
+			return new Tuple<BigInteger, BigInteger>(result1, result2);
+		}
+
+		public static BigInteger PickEven(BigInteger a, BigInteger b)
+		{
+			if (a % 2 == 0)
 			{
-				return CommonPolynomial.Mod(polynomial, mod);
+				return a;
+			}
+			else if (b % 2 == 0)
+			{
+				return b;
 			}
 			else
 			{
-				return polynomial;
+				throw new Exception("Was expecting either a or b to be even");
 			}
-		}
-
-		private static BigInteger GenerateRandomPrime(BigInteger n)
-		{
-			BigInteger rangeMin = n + (n / 2) + StaticRandom.NextBigInteger(1000, 2000);
-			BigInteger rangeMax = n * 5;
-
-			bool done = false;
-			BigInteger result = 0;
-			do
-			{
-				result = PrimeFactory.GetNextPrime(StaticRandom.NextBigInteger(rangeMin, rangeMax));
-				done = (GCD.FindGCD(n, result) == 1);
-			}
-			while (!done);
-
-			return result;
-		}
-
-		private static IPolynomial GenerateRandomPolynomial(int degree, BigInteger maxCoefficientValue)
-		{
-			List<BigInteger> terms = new List<BigInteger>();
-
-			int counter = degree;
-			while (counter-- > 0)
-			{
-				terms.Add(StaticRandom.NextBigInteger(1, maxCoefficientValue - 1));
-			}
-
-			return new AlgebraicPolynomial(terms.ToArray());
 		}
 
 		public override string ToString()

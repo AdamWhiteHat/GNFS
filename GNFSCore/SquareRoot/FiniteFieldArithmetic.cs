@@ -26,29 +26,25 @@ namespace GNFSCore.SquareRoot
 
 			BigInteger order = BigInteger.Pow(2, r);
 
+			BigInteger k = 0;
 			BigInteger halfS = ((s + 1) / 2);
 			if (r == 1 && q.Mod(4) == 3)
 			{
+				k = (q - 3) / 4;
 				halfS = ((q + 1) / 4);
 			}
+			else
+			{
+				k = (q - 1) / 4;
+			}
 
-			BigInteger quadraticNonResidue = Legendre.SymbolSearch(4, q, -1);
+			BigInteger quadraticNonResidue = Legendre.SymbolSearch(m + 1, q, -1);
 			BigInteger theta = quadraticNonResidue;
 			BigInteger minusOne = BigInteger.ModPow(theta, ((q - 1) / 2), p);
 
-
 			IPoly omegaPoly = SparsePolynomial.ExponentiateMod(startPolynomial, halfS, f, p);
-			//if(omega[r - 1].Sign == -1) { omega = SparsePolynomial.ModularInverse(omega, p); }
 
-			//IPoly zetaPoly ;
-			//IPoly zetaSquaredPoly ;
-			//IPoly zetaInversePoly ;        
-			//$"ζ   = {zetaPoly} ≡ {zeta}".Dump();
-			//$"ζ²  = {zetaSquaredPoly} ≡ {zetaSquared}".Dump();
-			//$"ζ⁻² = {zetaInversePoly} ≡ {zetaInverse}".Dump();
-
-
-			BigInteger lambda = -1; // minusOne;
+			BigInteger lambda = minusOne;
 			BigInteger zeta = 0;
 			BigInteger zetaSquared = 0;
 			BigInteger zetaInverse = 0;
@@ -98,7 +94,7 @@ namespace GNFSCore.SquareRoot
 			return 1;
 		}
 
-		public static BigInteger SquareRootWithChineseRemainder(BigInteger n, List<BigInteger> values, List<BigInteger> primes)
+		public static BigInteger ChineseRemainder(BigInteger n, List<BigInteger> values, List<BigInteger> primes)
 		{
 			BigInteger primeProduct = primes.Product();
 
@@ -111,8 +107,6 @@ namespace GNFSCore.SquareRoot
 				BigInteger Xj = values[indx];
 				BigInteger AXPj = (Aj * Xj * Pj);
 
-				//$"\nP{indx} = {pi}\nZ += (Aj * Xj * Pj)\nZ += ({Aj} * {Xj} * {Pj}) = {AXPj}".Dump();
-
 				Z += AXPj;
 				indx++;
 			}
@@ -121,9 +115,8 @@ namespace GNFSCore.SquareRoot
 			BigInteger rP = r * primeProduct;
 			BigInteger finalResult_sqrt = ((Z - rP).Mod(n));
 
-			//$"\nZ  = {Z}\n\nZp = {r}\nrP = {rP}\n\n\n( z mod N ) - ( rP mod N ) = {Z.Mod(N)} - {rP.Mod(N)} = {finalResult_sqrt}".Dump();
-
 			return finalResult_sqrt;
 		}
 	}
+
 }

@@ -28,24 +28,6 @@ namespace GNFSCore.Factors
 		}
 
 		/// <summary>
-		/// g(-a/b) * -b^deg
-		/// where g(x) = x - m
-		/// </summary>		
-		public static BigInteger AlgebraicG(Relation rel, int degree, BigInteger m, Func<BigInteger, BigInteger, BigInteger> g)
-		{
-			//  g(-a/b) * -b^deg
-			BigInteger bneg = BigInteger.Negate(rel.B);
-
-			BigInteger remainder = new BigInteger();
-			BigInteger ab = BigInteger.DivRem(rel.A, bneg, out remainder);
-
-			BigInteger left = g.Invoke(ab, m);
-			BigInteger right = BigInteger.Pow(bneg, degree);
-
-			return BigInteger.Multiply(left, right);
-		}
-
-		/// <summary>
 		/// ƒ(b) ≡ 0 (mod a)
 		/// 
 		/// Calculated as:

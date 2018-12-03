@@ -20,7 +20,7 @@ namespace GNFSCore.Polynomial
 		BigInteger CoEfficient { get; set; }
 	}
 
-	public interface IPoly : ICloneable<IPoly>, IComparable
+	public interface IPoly : ICloneable<IPoly>, IComparable<IPoly>
 	{
 		int Degree { get; }
 		ITerm[] Terms { get; }
@@ -354,10 +354,6 @@ namespace GNFSCore.Polynomial
 			IPoly remainder = new SparsePolynomial();
 			Divide(poly, mod, out remainder);
 
-			if (remainder.Evaluate(1).Sign == -1)
-			{
-				return SparsePolynomial.Add(remainder, mod);
-			}
 			return remainder;
 		}
 
@@ -711,8 +707,10 @@ namespace GNFSCore.Polynomial
 					{
 						return 1;
 					}
-
-					counter--;
+					else
+					{
+						counter--;
+					}
 				}
 
 				return 0;
@@ -766,11 +764,13 @@ namespace GNFSCore.Polynomial
 				pos++;
 			}
 		}
-
+		
 		public IPoly Clone()
 		{
 			return new SparsePolynomial(Terms.Select(pt => pt.Clone()).ToArray());
 		}
+
+		#region ToString / FormatString
 
 		public override string ToString()
 		{
@@ -821,6 +821,7 @@ namespace GNFSCore.Polynomial
 			return string.Join(" + ", stringTerms).Replace("+ -", "- ");
 		}
 
+		#endregion
 
 		#region IXmlSerializable
 
@@ -846,13 +847,17 @@ namespace GNFSCore.Polynomial
 			{
 				val = val.Replace(" ", "").Replace("\t", "").Replace("\r", "").Replace("\f", "");
 			}
+			else
+			{
+				throw new Exception("Element 'Terms' may not be blank or empty.");
+			}
 			reader.Read();
 			reader.ReadEndElement();
 
 			string[] termLines = val.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
 			if (!termLines.Any())
 			{
-				throw new XmlException("Failed to parse XML element during deserialization: 'Terms'");
+				throw new Exception("Failed to parse XML element during deserialization: 'Terms'");
 			}
 
 			// a*X^b
@@ -863,9 +868,64 @@ namespace GNFSCore.Polynomial
 			});
 
 			_terms = terms.ToList();
+
+			if (_terms.Count - 1 != Degree)
+			{
+				throw new Exception("Element Degree does not agree with number of terms. Degree should equal #terms - 1.");
+			}
 		}
 
 		public XmlSchema GetSchema() { return null; }
+
+		#endregion
+
+		#region IComparable<IPoly>
+
+		public int CompareTo(IPoly other)
+		{
+			if (other == null)
+			{
+				throw new ArgumentException();
+			}
+
+
+			if (other.Degree != this.Degree)
+			{
+				if (other.Degree > this.Degree)
+				{
+					return -1;
+				}
+				else
+				{
+					return 1;
+				}
+			}
+			else
+			{
+				int counter = this.Degree;
+
+				while (counter >= 0)
+				{
+					BigInteger thisCoefficient = this[counter];
+					BigInteger otherCoefficient = other[counter];
+
+					if (thisCoefficient < otherCoefficient)
+					{
+						return -1;
+					}
+					else if (thisCoefficient > otherCoefficient)
+					{
+						return 1;
+					}
+					else
+					{
+						counter--;
+					}
+				}
+
+				return 0;
+			}
+		}
 
 		#endregion
 

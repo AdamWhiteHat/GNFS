@@ -32,7 +32,7 @@ namespace GNFS_Winforms
 				}
 				if (smoothRelations.Any())
 				{
-					mainForm.LogOutput(gnfs.CurrentRelationsProgress.FormatRelations(smoothRelations.OrderByDescending(rel => rel.A * rel.B).Take(relationsDisplayLimit)));
+					//mainForm.LogOutput(gnfs.CurrentRelationsProgress.FormatRelations(smoothRelations.OrderByDescending(rel => rel.A * rel.B).Take(relationsDisplayLimit)));
 					mainForm.LogOutput($"(Result set restricted to only {relationsDisplayLimit}) relations");
 					mainForm.LogOutput();
 					mainForm.LogOutput($"{smoothRelations.Count()} relations found this round.");
