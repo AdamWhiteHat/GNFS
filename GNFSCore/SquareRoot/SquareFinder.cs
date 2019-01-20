@@ -15,56 +15,47 @@ namespace GNFSCore.SquareRoot
 
 	public partial class SquareFinder
 	{
-		public List<Relation> RelationsSet;
+		public List<Relation> RelationsSet { get; set; }
 
-		public BigInteger PolynomialDerivative;
-		public BigInteger PolynomialDerivativeSquared;
+		public BigInteger PolynomialDerivative { get; set; }
+		public BigInteger PolynomialDerivativeSquared { get; set; }
 
-		public IPolynomial DerivativePolynomial;
-		public IPolynomial DerivativePolynomialSquared;
+		public IPolynomial DerivativePolynomial { get; set; }
+		public IPolynomial DerivativePolynomialSquared { get; set; }
 
-		public BigInteger RationalProduct;
-		public BigInteger RationalSquare;
-		public BigInteger RationalSquareRoot;
-		public BigInteger RationalSquareRootResidue;
-		public bool IsRationalSquare;
-		public bool IsRationalIrreducible;
+		public BigInteger RationalProduct { get; set; }
+		public BigInteger RationalSquare { get; set; }
+		public BigInteger RationalSquareRoot { get; set; }
+		public BigInteger RationalSquareRootResidue { get; set; }
+		public bool IsRationalSquare { get; set; }
+		public bool IsRationalIrreducible { get; set; }
 
-		public BigInteger AlgebraicProduct;
-		public BigInteger AlgebraicSquare;
-		public BigInteger AlgebraicProductModF;
-		public BigInteger AlgebraicSquareResidue;
-		public BigInteger AlgebraicSquareRootResidue;
-		public List<BigInteger> AlgebraicPrimes;
-		public List<BigInteger> AlgebraicResults;
-		public bool IsAlgebraicSquare;
-		public bool IsAlgebraicIrreducible;
+		public BigInteger AlgebraicProduct { get; set; }
+		public BigInteger AlgebraicSquare { get; set; }
+		public BigInteger AlgebraicProductModF { get; set; }
+		public BigInteger AlgebraicSquareResidue { get; set; }
+		public BigInteger AlgebraicSquareRootResidue { get; set; }
+		public List<BigInteger> AlgebraicPrimes { get; set; }
+		public List<BigInteger> AlgebraicResults { get; set; }
+		public bool IsAlgebraicSquare { get; set; }
+		public bool IsAlgebraicIrreducible { get; set; }
 
-		public List<Complex> AlgebraicComplexSet;
-		public List<IPoly> PolynomialRing;
-		public List<IPolynomial> QuotientRingModP;
+		public List<Complex> AlgebraicComplexSet { get; set; }
+		public List<IPoly> PolynomialRing { get; set; }
 
-		public BigInteger PrimeP;
-
-		public IPoly S;
-		public IPoly SRingSquare;
-		public IPoly TotalS;
+		public IPoly S { get; set; }
+		public IPoly SRingSquare { get; set; }
+		public IPoly TotalS { get; set; }
 
 		public List<Tuple<BigInteger, BigInteger>> RootsOfS { get; set; }
 
-		public List<Complex> ComplexFactors { get { return RelationsSet.Select(rel => rel.Complex).ToList(); } }
-		public List<Complex> ComplexNorms { get { return RelationsSet.Select(rel => rel.ComplexNorm).ToList(); } }
-		public List<BigInteger> RationalNormPairs { get { return RelationsSet.SelectMany(rel => new BigInteger[] { Normal.Rational(rel.A, rel.B, polyBase), Normal.RationalSubtract(rel.A, rel.B, polyBase) }).ToList(); } }
-
-
-		private GNFS gnfs;
-		private BigInteger N;
-		private IPolynomial poly;
-		private IPolynomial monicPoly;
-		private BigInteger polyBase;
-		private IEnumerable<BigInteger> rationalSet;
-		private IEnumerable<BigInteger> algebraicNormCollection;
-		private static BigInteger q(BigInteger ab, BigInteger m) { BigInteger m2 = m * m; return BigInteger.Subtract(m2, m); }
+		private GNFS gnfs { get; set; }
+		private BigInteger N { get; set; }
+		private IPolynomial poly { get; set; }
+		private IPolynomial monicPoly { get; set; }
+		private BigInteger polyBase { get; set; }
+		private IEnumerable<BigInteger> rationalSet { get; set; }
+		private IEnumerable<BigInteger> algebraicNormCollection { get; set; }
 
 		public SquareFinder(GNFS sieve, List<Relation> relations)
 		{
@@ -100,21 +91,20 @@ namespace GNFSCore.SquareRoot
 			RationalProduct = rationalSet.Product();
 			RationalSquare = BigInteger.Multiply(RationalProduct, PolynomialDerivativeSquared);
 			RationalSquareRoot = RationalSquare.SquareRoot();
-			RationalSquareRootResidue = (RationalSquareRoot % N);
+			RationalSquareRootResidue = RationalSquareRoot.Mod(N);
 
 			IsRationalIrreducible = IsPrimitive(rationalSet);
 			IsRationalSquare = RationalSquareRootResidue.IsSquare();
 		}
 
-		public void CalculateAlgebraicSide()
+		public bool CalculateAlgebraicSide()
 		{
 			RootsOfS.AddRange(RelationsSet.Select(rel => new Tuple<BigInteger, BigInteger>(rel.A, rel.B)));
 
 			PolynomialRing = new List<IPoly>();
 			foreach (Relation rel in RelationsSet)
 			{
-				// poly(x) = A + (B * x) // or (A * leadingCoefficient) + (B * x) ??
-
+				// poly(x) = A + (B * x)
 				IPoly newPoly =
 					new SparsePolynomial(
 						new PolyTerm[]
@@ -146,16 +136,17 @@ namespace GNFSCore.SquareRoot
 			AlgebraicProduct = d2.Evaluate(m);
 			AlgebraicSquare = dd.Evaluate(m);
 			AlgebraicProductModF = dd.Evaluate(m).Mod(N);
-			AlgebraicSquareResidue = AlgebraicSquare % N;
+			AlgebraicSquareResidue = AlgebraicSquare.Mod(N);
 
 			IsAlgebraicIrreducible = IsPrimitive(algebraicNormCollection); // Irreducible check
 			IsAlgebraicSquare = AlgebraicSquareResidue.IsSquare();
-						
+
 			List<BigInteger> primes = new List<BigInteger>();
-			List<BigInteger> results = new List<BigInteger>();
 			List<Tuple<BigInteger, BigInteger>> resultTuples = new List<Tuple<BigInteger, BigInteger>>();
 
-			BigInteger lastP = (N * 3) + 1;
+			BigInteger primeProduct = 1;
+
+			BigInteger lastP = ((N * 3) + 1).NthRoot(3); //gnfs.QFB.Select(fp => fp.P).Max();
 			do
 			{
 				lastP = PrimeFactory.GetNextPrime(lastP + 1);
@@ -166,14 +157,43 @@ namespace GNFSCore.SquareRoot
 				{
 					primes.Add(lastP);
 					resultTuples.Add(lastResult);
-					results.Add(PickEven(lastResult.Item1, lastResult.Item2));
+					primeProduct *= BigInteger.Min(lastResult.Item1, lastResult.Item2);
 				}
-			}			
-			while (primes.Count < degree);
+			}
+			while (primeProduct < N || primes.Count < degree);
 			AlgebraicPrimes = primes;
-			AlgebraicResults = results;
 
-			AlgebraicSquareRootResidue = FiniteFieldArithmetic.ChineseRemainder(N, results, primes);
+			IEnumerable<IEnumerable<BigInteger>> permutations =
+				Combinatorics.CartesianProduct(resultTuples.Select(tup => new List<BigInteger>() { tup.Item1, tup.Item2 }));
+
+			BigInteger rationalSquareRoot = RationalSquareRootResidue;
+			BigInteger algebraicSquareRoot = 1;
+
+			bool solutionFound = false;
+			foreach (List<BigInteger> X in permutations)
+			{
+				algebraicSquareRoot = FiniteFieldArithmetic.ChineseRemainder(N, X, primes);
+
+				BigInteger min = BigInteger.Min(rationalSquareRoot, algebraicSquareRoot);
+				BigInteger max = BigInteger.Max(rationalSquareRoot, algebraicSquareRoot);
+
+				BigInteger A = max + min;
+				BigInteger B = max - min;
+
+				BigInteger U = GCD.FindGCD(N, A);
+				BigInteger V = GCD.FindGCD(N, B);
+
+				if (U > 1 && V > 1)
+				{
+					solutionFound = true;
+					AlgebraicResults = X;
+					AlgebraicSquareRootResidue = algebraicSquareRoot;
+
+					break;
+				}
+			}
+
+			return solutionFound;
 		}
 
 		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(BigInteger N, SparsePolynomial f, BigInteger m, int degree, IPoly dd, List<IPoly> ideals, BigInteger p)
@@ -186,31 +206,25 @@ namespace GNFSCore.SquareRoot
 			BigInteger result1 = resultPoly1.Evaluate(m).Mod(p);
 			BigInteger result2 = resultPoly2.Evaluate(m).Mod(p);
 
-			IPoly resultSquared = SparsePolynomial.ModMod(SparsePolynomial.Square(resultPoly2), f, p);
+			IPoly resultSquared1 = SparsePolynomial.ModMod(SparsePolynomial.Square(resultPoly1), f, p);
+			IPoly resultSquared2 = SparsePolynomial.ModMod(SparsePolynomial.Square(resultPoly2), f, p);
 
-			return new Tuple<BigInteger, BigInteger>(result1, result2);
-		}
+			bool resultSquaredEqualsInput = (startPolynomial.CompareTo(resultSquared1) == 0);
+			bool bothResultsAgree = (resultSquared1.CompareTo(resultSquared2) == 0);
 
-		public static BigInteger PickEven(BigInteger a, BigInteger b)
-		{
-			if (a % 2 == 0)
+			if (resultSquaredEqualsInput && bothResultsAgree)
 			{
-				return a;
-			}
-			else if (b % 2 == 0)
-			{
-				return b;
+				return new Tuple<BigInteger, BigInteger>(result1, result2);
 			}
 			else
 			{
-				throw new Exception("Was expecting either a or b to be even");
+				return new Tuple<BigInteger, BigInteger>(BigInteger.Zero, BigInteger.Zero);
 			}
 		}
 
 		public override string ToString()
 		{
 			StringBuilder result = new StringBuilder();
-
 
 			result.AppendLine($"IsRationalIrreducible  ? {IsRationalIrreducible}");
 			result.AppendLine($"IsAlgebraicIrreducible ? {IsAlgebraicIrreducible}");
@@ -268,8 +282,6 @@ namespace GNFSCore.SquareRoot
 			}
 
 			result.AppendLine();
-
-
 
 			return result.ToString();
 		}
