@@ -35,7 +35,7 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.btnCreateGnfs = new System.Windows.Forms.Button();
+			this.btnCreate = new System.Windows.Forms.Button();
 			this.label4 = new System.Windows.Forms.Label();
 			this.tbDegree = new System.Windows.Forms.TextBox();
 			this.btnFindRelations = new System.Windows.Forms.Button();
@@ -43,7 +43,7 @@
 			this.btnMatrix = new System.Windows.Forms.Button();
 			this.panelButtons = new System.Windows.Forms.Panel();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
-			this.btnSerialize = new System.Windows.Forms.Button();
+			this.btnSave = new System.Windows.Forms.Button();
 			this.panelFunctions = new System.Windows.Forms.Panel();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.btnPrintRelations = new System.Windows.Forms.Button();
@@ -56,6 +56,7 @@
 			this.tbRelationQuantity = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.tbRelationValueRange = new System.Windows.Forms.TextBox();
+			this.btnLoad = new System.Windows.Forms.Button();
 			this.panelButtons.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			this.panelFunctions.SuspendLayout();
@@ -136,17 +137,17 @@
 			this.label3.Text = "Smoothness Bound";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// btnCreateGnfs
+			// btnCreate
 			// 
-			this.btnCreateGnfs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+			this.btnCreate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCreateGnfs.Location = new System.Drawing.Point(16, 15);
-			this.btnCreateGnfs.Name = "btnCreateGnfs";
-			this.btnCreateGnfs.Size = new System.Drawing.Size(96, 23);
-			this.btnCreateGnfs.TabIndex = 0;
-			this.btnCreateGnfs.Text = "Load/Create";
-			this.btnCreateGnfs.UseVisualStyleBackColor = true;
-			this.btnCreateGnfs.Click += new System.EventHandler(this.btnCreateGnfs_Click);
+			this.btnCreate.Location = new System.Drawing.Point(111, 15);
+			this.btnCreate.Name = "btnCreate";
+			this.btnCreate.Size = new System.Drawing.Size(96, 23);
+			this.btnCreate.TabIndex = 0;
+			this.btnCreate.Text = "Create";
+			this.btnCreate.UseVisualStyleBackColor = true;
+			this.btnCreate.Click += new System.EventHandler(this.btnCreate_Click);
 			// 
 			// label4
 			// 
@@ -211,8 +212,9 @@
 			// 
 			this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBox4.Controls.Add(this.btnSerialize);
-			this.groupBox4.Controls.Add(this.btnCreateGnfs);
+			this.groupBox4.Controls.Add(this.btnLoad);
+			this.groupBox4.Controls.Add(this.btnSave);
+			this.groupBox4.Controls.Add(this.btnCreate);
 			this.groupBox4.Location = new System.Drawing.Point(11, 6);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Size = new System.Drawing.Size(316, 40);
@@ -220,17 +222,17 @@
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "1) Create Polynomial, Factor Bases && Roots";
 			// 
-			// btnSerialize
+			// btnSave
 			// 
-			this.btnSerialize.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+			this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnSerialize.Location = new System.Drawing.Point(214, 15);
-			this.btnSerialize.Name = "btnSerialize";
-			this.btnSerialize.Size = new System.Drawing.Size(96, 23);
-			this.btnSerialize.TabIndex = 1;
-			this.btnSerialize.Text = "Save";
-			this.btnSerialize.UseVisualStyleBackColor = true;
-			this.btnSerialize.Click += new System.EventHandler(this.btnSerialize_Click);
+			this.btnSave.Location = new System.Drawing.Point(216, 15);
+			this.btnSave.Name = "btnSave";
+			this.btnSave.Size = new System.Drawing.Size(96, 23);
+			this.btnSave.TabIndex = 1;
+			this.btnSave.Text = "Save";
+			this.btnSave.UseVisualStyleBackColor = true;
+			this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
 			// 
 			// panelFunctions
 			// 
@@ -366,6 +368,16 @@
 			this.tbRelationValueRange.TabIndex = 5;
 			this.tbRelationValueRange.Text = "200";
 			// 
+			// btnLoad
+			// 
+			this.btnLoad.Location = new System.Drawing.Point(6, 15);
+			this.btnLoad.Name = "btnLoad";
+			this.btnLoad.Size = new System.Drawing.Size(96, 23);
+			this.btnLoad.TabIndex = 2;
+			this.btnLoad.Text = "Load";
+			this.btnLoad.UseVisualStyleBackColor = true;
+			this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -410,7 +422,7 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Button btnCreateGnfs;
+		private System.Windows.Forms.Button btnCreate;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.TextBox tbDegree;
 		private System.Windows.Forms.Button btnFindRelations;
@@ -420,7 +432,7 @@
 		private System.Windows.Forms.Panel panelCancel;
 		private System.Windows.Forms.Button btnCancel;
 		private System.Windows.Forms.Panel panelFunctions;
-		private System.Windows.Forms.Button btnSerialize;
+		private System.Windows.Forms.Button btnSave;
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.Button btnPurgeRough;
 		private System.Windows.Forms.GroupBox groupBox2;
@@ -431,6 +443,7 @@
 		private System.Windows.Forms.TextBox tbRelationValueRange;
 		private System.Windows.Forms.Button btnPrintRelations;
 		private System.Windows.Forms.GroupBox groupBox4;
+		private System.Windows.Forms.Button btnLoad;
 	}
 }
 

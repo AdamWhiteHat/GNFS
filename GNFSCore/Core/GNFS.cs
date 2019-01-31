@@ -108,6 +108,25 @@ namespace GNFSCore
 			}
 		}
 
+		public GNFS(CancellationToken cancelToken, BigInteger n)
+			: this()
+		{
+			CancelToken = cancelToken;
+			N = n;
+
+			SaveLocations = new DirectoryLocations(N);
+
+			if (Directory.Exists(SaveLocations.SaveDirectory))
+			{
+				GNFS gnfs = (GNFS)Serializer.Deserialize(SaveLocations.GnfsParameters_SaveFile, typeof(GNFS));
+				LoadGnfsProgress(gnfs);
+			}
+			else
+			{
+				throw new Exception($"Directory does not exists: \"{SaveLocations.SaveDirectory}\". Only call this constructor to load previously saved factoring job.");
+			}
+		}
+
 		public bool IsFactor(BigInteger toCheck)
 		{
 			return ((N % toCheck) == 0);

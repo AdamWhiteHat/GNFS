@@ -15,8 +15,8 @@ namespace GNFSCore
 	public class PolyRelationsSieveProgress
 	{
 		private int B;
-		private int Quantity;
-		private int ValueRange;
+		public int Quantity { get; private set; }
+		public int ValueRange { get; private set; }
 		//private int IndexOfUnFactored;
 
 		public CancellationToken CancelToken;
@@ -64,10 +64,10 @@ namespace GNFSCore
 			B = 1;
 			Quantity = quantity;
 			ValueRange = valueRange;
-			if (ValueRange > 400 && gnfs.N < 5000000)
-			{
-				ValueRange = 400;
-			}
+			//if (ValueRange > 400 && gnfs.N < 5000000)
+			//{
+			//	ValueRange = 400;
+			//}
 
 			Relations = new RelationContainer();
 		}

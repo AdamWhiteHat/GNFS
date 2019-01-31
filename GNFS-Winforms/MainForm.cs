@@ -33,6 +33,7 @@ namespace GNFS_Winforms
 
 		private string logFilename;
 		private bool IsWorking = false;
+		private bool firstFindRelations = false;
 		private CancellationToken cancellationToken;
 		private CancellationTokenSource cancellationTokenSource;
 
@@ -86,12 +87,12 @@ namespace GNFS_Winforms
 			tbBound.Text = "61";
 			tbRelationQuantity.Text = "70";
 			tbRelationValueRange.Text = "200";
-			
+
 			BridgeTextboxN = new ControlBridge(tbN);
 			BridgeTextboxDegree = new ControlBridge(tbDegree);
 			BridgeTextboxBase = new ControlBridge(tbBase);
 
-			BridgeButtonGnfs = new ControlBridge(btnCreateGnfs);
+			BridgeButtonGnfs = new ControlBridge(btnCreate);
 			BridgeButtonRelation = new ControlBridge(btnFindRelations);
 			BridgeButtonSquares = new ControlBridge(btnFindSquares);
 			BridgeButtonBound = new ControlBridge(tbBound);
@@ -99,7 +100,7 @@ namespace GNFS_Winforms
 			gnfsBridge = new GnfsUiBridge(this);
 		}
 
-		private void SetGnfs(MainForm form, GNFS nfs)
+		private static void SetGnfs(MainForm form, GNFS nfs)
 		{
 			if (form.InvokeRequired)
 			{
@@ -110,6 +111,13 @@ namespace GNFS_Winforms
 			else
 			{
 				form.gnfs = nfs;
+
+				form.tbDegree.Text = nfs.CurrentPolynomial.Degree.ToString();
+				form.tbBase.Text = nfs.PolynomialBase.ToString();
+				form.tbBound.Text = nfs.PrimeFactorBase.MaxRationalFactorBase.ToString();
+
+				form.tbRelationQuantity.Text = nfs.CurrentRelationsProgress.Quantity.ToString();
+				form.tbRelationValueRange.Text = nfs.CurrentRelationsProgress.ValueRange.ToString();
 			}
 		}
 
@@ -179,58 +187,40 @@ namespace GNFS_Winforms
 			}
 		}
 
+		/// <summary>
+		/// Creates a base folder and log file if no such structures exist.
+		/// </summary>
+		/// <returns>True if a previous save folder was found and loaded. This is so we know to populate the UI with loaded values.</returns>
+		private bool CreateLogFileIfNotExists(string logFilename)
+		{
+			bool load = true;
+
+			string directory = Path.GetDirectoryName(logFilename);
+
+			if (!Directory.Exists(directory))
+			{
+				firstFindRelations = true;
+				if (File.Exists(logFilename))
+				{
+					File.Delete(logFilename);
+				}
+			}
+
+			if (!File.Exists(logFilename))
+			{
+				string logHeader = $"Log created: {DateTime.Now}";
+				string line = new string(Enumerable.Repeat('-', logHeader.Length).ToArray());
+
+				File.WriteAllLines(logFilename, new string[] { logHeader, line, Environment.NewLine });
+			}
+
+			return load;
+		}
+
 		#endregion
 
 		#region Button Methods
 
-		private void btnCreateGnfs_Click(object sender, EventArgs e)
-		{
-			if (!IsWorking)
-			{
-				SetAsProcessing();
-				ControlBridge.SetControlEnabledState(btnCreateGnfs, false);
-				
-				n = BigInteger.Parse(tbN.Text);
-				degree = int.Parse(tbDegree.Text);
-				polyBase = BigInteger.Parse(tbBase.Text);
-				primeBound = BigInteger.Parse(tbBound.Text);
-
-				int relationQuantity = int.Parse(tbRelationQuantity.Text);
-				int relationValueRange = int.Parse(tbRelationValueRange.Text);
-
-
-				logFilename = DirectoryLocations.GenerateFileNameFromBigInteger(n) + ".LOG.txt";
-
-				if (!Directory.Exists(DirectoryLocations.GenerateSaveDirectory(n)))
-				{
-					firstFindRelations = true;
-					if (File.Exists(logFilename))
-					{
-						File.Delete(logFilename);
-					}
-				}
-
-				if (!File.Exists(logFilename))
-				{
-					string logHeader = $"Log created: {DateTime.Now}";
-					string line = new string(Enumerable.Repeat('-', logHeader.Length).ToArray());
-
-					File.WriteAllLines(logFilename, new string[] { logHeader, line, Environment.NewLine });
-				}
-
-				CancellationToken token = cancellationTokenSource.Token;
-				new Thread(() =>
-				{
-					GNFS localGnfs = gnfsBridge.CreateGnfs(n, polyBase, degree, primeBound, relationQuantity, relationValueRange, token);
-					SetGnfs(this, localGnfs);
-					HaultAllProcessing();
-					ControlBridge.SetControlEnabledState(panelFunctions, true);
-
-				}).Start();
-			}
-		}
-
-		private bool firstFindRelations = false;
 		private void btnFindRelations_Click(object sender, EventArgs e)
 		{
 			if (!IsWorking)
@@ -305,12 +295,6 @@ namespace GNFS_Winforms
 			MessageBox.Show($"Purged {quantityRemoved} rough relations whom were prime.");
 		}
 
-		private void btnSerialize_Click(object sender, EventArgs e)
-		{
-			string savePath = $"C:\\GNFS\\{gnfs.N}";
-			gnfs.SaveGnfsProgress();
-		}
-
 		private void btnPrintRelations_Click(object sender, EventArgs e)
 		{
 			if (gnfs.CurrentRelationsProgress.SmoothRelations.Any())
@@ -320,5 +304,71 @@ namespace GNFS_Winforms
 		}
 
 		#endregion
+
+		#region Create / Load / Save
+
+		private void btnSave_Click(object sender, EventArgs e)
+		{
+			string savePath = $"C:\\GNFS\\{gnfs.N}";
+			gnfs.SaveGnfsProgress();
+		}
+
+		private void btnLoad_Click(object sender, EventArgs e)
+		{
+			if (!IsWorking)
+			{
+				SetAsProcessing();
+				ControlBridge.SetControlEnabledState(btnCreate, false);
+
+				n = BigInteger.Parse(tbN.Text);
+
+				logFilename = DirectoryLocations.GenerateFileNameFromBigInteger(n) + ".LOG.txt";
+				CreateLogFileIfNotExists(logFilename);
+
+				CancellationToken token = cancellationTokenSource.Token;
+				new Thread(() =>
+				{
+					GNFS localGnfs = gnfsBridge.CreateGnfs(token, n);
+					SetGnfs(this, localGnfs);
+					HaultAllProcessing();
+					ControlBridge.SetControlEnabledState(panelFunctions, true);
+
+				}).Start();
+			}
+		}
+
+		private void btnCreate_Click(object sender, EventArgs e)
+		{
+			if (!IsWorking)
+			{
+				SetAsProcessing();
+				ControlBridge.SetControlEnabledState(btnCreate, false);
+
+				n = BigInteger.Parse(tbN.Text);
+				degree = int.Parse(tbDegree.Text);
+				polyBase = BigInteger.Parse(tbBase.Text);
+				primeBound = BigInteger.Parse(tbBound.Text);
+
+				int relationQuantity = int.Parse(tbRelationQuantity.Text);
+				int relationValueRange = int.Parse(tbRelationValueRange.Text);
+
+				logFilename = DirectoryLocations.GenerateFileNameFromBigInteger(n) + ".LOG.txt";
+
+				CreateLogFileIfNotExists(logFilename);
+
+				CancellationToken token = cancellationTokenSource.Token;
+				new Thread(() =>
+				{
+					GNFS localGnfs = gnfsBridge.CreateGnfs(token, n, polyBase, degree, primeBound, relationQuantity, relationValueRange);
+					SetGnfs(this, localGnfs);
+					HaultAllProcessing();
+					ControlBridge.SetControlEnabledState(panelFunctions, true);
+
+				}).Start();
+			}
+		}
+
+		#endregion
+
 	}
 }
