@@ -47,7 +47,7 @@ namespace GNFSCore
 			if (base16 != 2 && base16 != 3 && base16 != 5 && base16 != 6 && base16 != 7 && base16 != 8)
 			{
 				BigInteger remainder = new BigInteger();
-				BigInteger sqrt = input.NthRoot(2, out remainder);
+				input.NthRoot(2, out remainder);
 
 				return (remainder == 0);
 				// - OR -

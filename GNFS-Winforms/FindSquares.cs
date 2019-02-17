@@ -29,11 +29,7 @@ namespace GNFS_Winforms
 			}
 
 			N = gnfs.N;
-			IPolynomial poly = gnfs.CurrentPolynomial;
 			BigInteger polyBase = gnfs.PolynomialBase;
-
-			Func<BigInteger, BigInteger> f = poly.Evaluate;
-			Func<BigInteger, BigInteger> fD = poly.Derivative;
 
 			List<List<Relation>> freeRelations = gnfs.CurrentRelationsProgress.FreeRelations;
 
@@ -90,11 +86,16 @@ namespace GNFS_Winforms
 			mainForm.LogOutput($"AlgebraicPrimes: {squareRootFinder.AlgebraicPrimes.FormatString(false)}");
 			mainForm.LogOutput($"AlgebraicResults: {squareRootFinder.AlgebraicResults.FormatString(false)}");
 			mainForm.LogOutput($"");
+			mainForm.LogOutput($"*****************************");
+			mainForm.LogOutput($"");
 			mainForm.LogOutput($"AlgebraicSquareRootResidue: {squareRootFinder.AlgebraicSquareRootResidue}");
 			mainForm.LogOutput($"");
+			mainForm.LogOutput($"AlgebraicNumberFieldSquareRoots: {algebraicNumberFieldSquareRoots.FormatString(false)}");
 			mainForm.LogOutput($"");
+			mainForm.LogOutput($" RationalSquareRoot : {rationalSquareRoot}");
+			mainForm.LogOutput($" AlgebraicSquareRoot: {algebraicSquareRoot} ");
 			mainForm.LogOutput($"");
-
+			mainForm.LogOutput($"*****************************");
 			mainForm.LogOutput($"S (x)       = {prodSmodN}  IsSquare? {prodSmodN.IsSquare()}");//{squareRootFinder.AlgebraicSquareResidue}");
 			mainForm.LogOutput();
 			mainForm.LogOutput("Roots of S(x):");
@@ -130,11 +131,6 @@ namespace GNFS_Winforms
 			mainForm.LogOutput();
 			
 			return gnfs;
-		}
-
-		private bool DoesGcdFactor(BigInteger gcd)
-		{
-			return (gcd != 1 && gcd != N);
 		}
 	}
 }

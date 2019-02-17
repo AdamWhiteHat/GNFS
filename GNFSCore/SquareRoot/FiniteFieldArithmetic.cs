@@ -24,18 +24,10 @@ namespace GNFSCore.SquareRoot
 				r++;
 			}
 
-			BigInteger order = BigInteger.Pow(2, r);
-
-			BigInteger k = 0;
 			BigInteger halfS = ((s + 1) / 2);
 			if (r == 1 && q.Mod(4) == 3)
 			{
-				k = (q - 3) / 4;
 				halfS = ((q + 1) / 4);
-			}
-			else
-			{
-				k = (q - 1) / 4;
 			}
 
 			BigInteger quadraticNonResidue = Legendre.SymbolSearch(m + 1, q, -1);
@@ -46,38 +38,21 @@ namespace GNFSCore.SquareRoot
 
 			BigInteger lambda = minusOne;
 			BigInteger zeta = 0;
-			BigInteger zetaSquared = 0;
-			BigInteger zetaInverse = 0;
 
-
-			string j = "";
 			int i = 0;
 			do
 			{
-				i++;
-				j = GetSub(i);
+				i++;				
 
 				zeta = BigInteger.ModPow(theta, (i * s), p);
 
-				zetaSquared = zeta.Square().Mod(p);//BigInteger.ModPow(theta, (2 * i * s), p);  // BigInteger.ModPow(quadraticNonResidue, (i * s * 2), p);
-
-				zetaInverse = (p - zetaSquared);
-
 				lambda = (lambda * BigInteger.Pow(zeta, (int)Math.Pow(2, (r - i)))).Mod(p);
 
-				omegaPoly = SparsePolynomial.MultiplyMod(omegaPoly, BigInteger.Pow(zeta, (int)Math.Pow(2, ((r - i) - 1))), p);
-
-				IPoly nu = SparsePolynomial.MultiplyMod(omegaPoly, zetaInverse, p);
+				omegaPoly = SparsePolynomial.MultiplyMod(omegaPoly, BigInteger.Pow(zeta, (int)Math.Pow(2, ((r - i) - 1))), p);								
 			}
 			while (!((lambda == 1) || (i > (r))));
 
 			return omegaPoly;
-		}
-
-		private static string subscriptNumbers = "₀₁₂₃₄₅₆₇₈₉";
-		private static string GetSub(int number)
-		{
-			return subscriptNumbers[number].ToString();
 		}
 
 		// Finds X such that a*X = 1 (mod p)
@@ -103,7 +78,7 @@ namespace GNFSCore.SquareRoot
 			foreach (BigInteger pi in primes)
 			{
 				BigInteger Pj = primeProduct / pi;
-				BigInteger Aj = ModularMultiplicativeInverse(Pj, pi); // pi-(Pj.Mod(pi));
+				BigInteger Aj = ModularMultiplicativeInverse(Pj, pi);
 				BigInteger Xj = values[indx];
 				BigInteger AXPj = (Aj * Xj * Pj);
 
@@ -118,5 +93,4 @@ namespace GNFSCore.SquareRoot
 			return finalResult_sqrt;
 		}
 	}
-
 }

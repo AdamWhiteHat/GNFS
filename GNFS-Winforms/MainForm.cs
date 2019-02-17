@@ -37,19 +37,6 @@ namespace GNFS_Winforms
 		private CancellationToken cancellationToken;
 		private CancellationTokenSource cancellationTokenSource;
 
-		private ControlBridge BridgeTextboxN;
-		private ControlBridge BridgeTextboxDegree;
-		private ControlBridge BridgeTextboxBase;
-		private ControlBridge BridgeButtonGnfs;
-		private ControlBridge BridgeButtonSquares;
-		private ControlBridge BridgeButtonRelation;
-		private ControlBridge BridgeButtonBound;
-
-		private static string FindSquaresButtonText = "Find Squares";
-		private static string FindRelationsButtonText = "Find Relations";
-		private static string CreateGnfsButtonText = "Create/Load";
-		private static string CancelButtonText = "Cancel";
-
 		private static readonly BigInteger MatthewBriggs = BigInteger.Parse("45113");
 		private static readonly BigInteger PerLeslieJensen = BigInteger.Parse("3218147");
 		private static readonly BigInteger RSA_100 = BigInteger.Parse("1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139");
@@ -79,23 +66,12 @@ namespace GNFS_Winforms
 			degree = int.Parse(tbDegree.Text);
 
 			IEnumerable<BigInteger> primes = PrimeFactory.GetPrimes(10000);
-			BigInteger baseM = CommonPolynomial.SuggestPolynomialBase(n, degree, primes);
 
-			//tbBase.Text = baseM.ToString();
 			tbBase.Text = "117";
 
 			tbBound.Text = "61";
 			tbRelationQuantity.Text = "70";
 			tbRelationValueRange.Text = "200";
-
-			BridgeTextboxN = new ControlBridge(tbN);
-			BridgeTextboxDegree = new ControlBridge(tbDegree);
-			BridgeTextboxBase = new ControlBridge(tbBase);
-
-			BridgeButtonGnfs = new ControlBridge(btnCreate);
-			BridgeButtonRelation = new ControlBridge(btnFindRelations);
-			BridgeButtonSquares = new ControlBridge(btnFindSquares);
-			BridgeButtonBound = new ControlBridge(tbBound);
 
 			gnfsBridge = new GnfsUiBridge(this);
 		}
@@ -309,7 +285,6 @@ namespace GNFS_Winforms
 
 		private void btnSave_Click(object sender, EventArgs e)
 		{
-			string savePath = $"C:\\GNFS\\{gnfs.N}";
 			gnfs.SaveGnfsProgress();
 		}
 

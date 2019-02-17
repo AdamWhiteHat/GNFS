@@ -214,9 +214,6 @@ namespace GNFSCore.IntegerMath
 				s += 1;
 			}
 
-			double logS = BigInteger.Log(d, 2);
-			int logs = (int)logS;
-
 			foreach (BigInteger a in primeCheckBases)
 			{
 				BigInteger x = BigInteger.ModPow(a, d, input);

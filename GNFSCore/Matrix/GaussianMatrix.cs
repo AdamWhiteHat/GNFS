@@ -39,8 +39,6 @@ namespace GNFSCore.Matrix
 
 			relations = rels;
 
-			int maxIndex = relations.Count - 1;
-
 			List<GaussianRow> relationsAsRows = new List<GaussianRow>();
 
 			foreach (Relation rel in relations)

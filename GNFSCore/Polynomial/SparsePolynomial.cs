@@ -243,7 +243,6 @@ namespace GNFSCore.Polynomial
 				return false;
 			}
 
-			BigInteger fieldValue = reducedField.Evaluate(m);
 			IPoly gcd = SparsePolynomial.GCDMod(f, reducedField, m);
 			return (gcd.CompareTo(SparsePolynomial.One) == 0);
 		}
@@ -1024,7 +1023,6 @@ namespace GNFSCore.Polynomial
 			int degree = polynomial.Terms.Length;
 			while (--degree >= 0)
 			{
-				string termString = "";
 				ITerm term = polynomial.Terms[degree];
 
 				if (term.CoEfficient == 0)
@@ -1034,10 +1032,6 @@ namespace GNFSCore.Polynomial
 						if (stringTerms.Count == 0) { stringTerms.Add("0"); }
 					}
 					continue;
-				}
-				else if (term.CoEfficient > 1 || term.CoEfficient < -1)
-				{
-					termString = $"{term.CoEfficient}";
 				}
 
 				switch (term.Exponent)

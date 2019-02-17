@@ -114,12 +114,10 @@ namespace GNFSCore.Polynomial
 			BigInteger leadingCoefficient = clone.Terms[d].Clone();
 
 			BigInteger[] terms = new BigInteger[d + 1];
-			int resultDegree = 0;
 
 			if (leadingCoefficient != 1)
 			{
 				leadingCoefficient = BigIntegerArithmetic.ModInv(leadingCoefficient, mod);
-				resultDegree = d;
 				terms[d] = 1;
 				for (i = 0; i < d; i++)
 				{

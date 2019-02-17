@@ -14,8 +14,6 @@ namespace GNFSCore.Factors
 {
 	public class FactorCollection : List<FactorPair>
 	{
-		private GNFS _gnfs;
-
 		public FactorCollection()
 			: base()
 		{
@@ -24,12 +22,6 @@ namespace GNFSCore.Factors
 		public FactorCollection(IEnumerable<FactorPair> collection)
 			: base(collection)
 		{
-		}
-
-		private FactorCollection(GNFS gnfs, List<FactorPair> collection)
-			: base(collection)
-		{
-			_gnfs = gnfs;
 		}
 
 		public List<int> Primes
@@ -57,14 +49,14 @@ namespace GNFSCore.Factors
 			public static FactorCollection BuildRationalFactorBase(GNFS gnfs)
 			{
 				IEnumerable<FactorPair> result = gnfs.PrimeFactorBase.RationalFactorBase.Select(p => new FactorPair(p, (gnfs.PolynomialBase % p))).Distinct();
-				return new FactorCollection(gnfs, result.ToList());
+				return new FactorCollection(result.ToList());
 			}
 
 			// array of (p, r) where ƒ(r) % p == 0
 			// quantity = 2-3 times RFB.quantity
 			public static FactorCollection BuildAlgebraicFactorBase(GNFS gnfs)
 			{
-				return new FactorCollection(gnfs, FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.AlgebraicFactorBase, 0, gnfs.PrimeFactorBase.MaxAlgebraicFactorBase, 2000));
+				return new FactorCollection(FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.AlgebraicFactorBase, 0, gnfs.PrimeFactorBase.MaxAlgebraicFactorBase, 2000));
 			}
 
 			// array of (p, r) where ƒ(r) % p == 0
@@ -72,7 +64,7 @@ namespace GNFSCore.Factors
 			// magnitude p > AFB.Last().p
 			public static FactorCollection BuildQuadradicFactorBase(GNFS gnfs)
 			{
-				return new FactorCollection(gnfs, FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.QuadraticFactorBase, 2, gnfs.PrimeFactorBase.MinQuadraticFactorBase, 100));
+				return new FactorCollection(FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.QuadraticFactorBase, 2, gnfs.PrimeFactorBase.MinQuadraticFactorBase, 100));
 			}
 
 			private delegate BigInteger BigIntegerEvaluateDelegate(BigInteger x);
@@ -85,7 +77,7 @@ namespace GNFSCore.Factors
 				DoubleEvaluateDelegate evalDelegate = gnfs.CurrentPolynomial.Evaluate;
 
 				IEnumerable<FactorPair> results = gnfs.PrimeFactorBase.RationalFactorBase.Select(p => new FactorPair(p, BigInteger.Multiply(evalDelegate(BigInteger.Divide(p, Cd)), Cdd))).Distinct();
-				return new FactorCollection(gnfs, results.ToList());
+				return new FactorCollection(results.ToList());
 			}
 		}
 

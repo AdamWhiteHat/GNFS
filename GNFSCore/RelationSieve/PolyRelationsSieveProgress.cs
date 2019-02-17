@@ -42,8 +42,10 @@ namespace GNFSCore
 
 		public PolyRelationsSieveProgress(GNFS gnfs, CancellationToken cancelToken, string polynomialSaveDirectory, int quantity, int valueRange)
 		{
-			CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
-			CancelToken = cancellationSource.Token;
+			using (CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken))
+			{
+				CancelToken = cancellationSource.Token;
+			}
 
 			Polynomial_SaveDirectory = polynomialSaveDirectory;
 
@@ -91,8 +93,10 @@ namespace GNFSCore
 
 			PrimeBase = gnfs.PrimeFactorBase;
 
-			CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(gnfs.CancelToken);
-			CancelToken = cancellationSource.Token;
+			using (CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(gnfs.CancelToken))
+			{				
+				CancelToken = cancellationSource.Token;
+			}
 		}
 
 		public List<Relation> GenerateRelations(CancellationToken cancelToken)

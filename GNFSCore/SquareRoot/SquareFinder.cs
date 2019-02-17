@@ -151,7 +151,7 @@ namespace GNFSCore.SquareRoot
 			{
 				lastP = PrimeFactory.GetNextPrime(lastP + 1);
 
-				Tuple<BigInteger, BigInteger> lastResult = AlgebraicSquareRoot(N, f, m, degree, dd, PolynomialRing, lastP);
+				Tuple<BigInteger, BigInteger> lastResult = AlgebraicSquareRoot(f, m, degree, dd, lastP);
 
 				if (lastResult.Item1 != 0)
 				{
@@ -196,7 +196,7 @@ namespace GNFSCore.SquareRoot
 			return solutionFound;
 		}
 
-		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(BigInteger N, SparsePolynomial f, BigInteger m, int degree, IPoly dd, List<IPoly> ideals, BigInteger p)
+		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(SparsePolynomial f, BigInteger m, int degree, IPoly dd, BigInteger p)
 		{
 			IPoly startPolynomial = SparsePolynomial.Modulus(dd, p);
 

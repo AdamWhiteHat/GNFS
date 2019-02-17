@@ -12,8 +12,7 @@ namespace GNFSCore.IntegerMath
 	public static class PrimeFactory
 	{
 		private static BigInteger MaxValue;
-		private static List<BigInteger> primes = new List<BigInteger>() { 2, 3, 5, 7, 11, 13 };
-		private static BigInteger lastPrime;
+		private static List<BigInteger> primes = new List<BigInteger>() { 2, 3, 5, 7, 11, 13 };		
 
 		static PrimeFactory()
 		{
@@ -24,7 +23,6 @@ namespace GNFSCore.IntegerMath
 		private static void SetPrimes()
 		{
 			primes = Eratosthenes.Sieve((Int32)MaxValue).ToList();
-			lastPrime = primes.Last();
 		}
 
 		public static IEnumerable<BigInteger> GetPrimes()

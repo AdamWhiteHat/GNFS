@@ -149,7 +149,6 @@ namespace GNFSCore
 			PrimeFactorBase.MinQuadraticFactorBase = input.PrimeFactorBase.MinQuadraticFactorBase;
 			PrimeFactorBase.MaxQuadraticFactorBase = input.PrimeFactorBase.MaxQuadraticFactorBase;
 
-			int base10 = N.ToString().Length;
 			int quadraticBaseSize = CalculateQuadraticBaseSize(polyDegree);
 
 			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxRationalFactorBase).ToList();
@@ -360,7 +359,7 @@ namespace GNFSCore
 		public static List<RoughPair[]> GroupRoughNumbers(List<RoughPair> roughNumbers)
 		{
 			IEnumerable<RoughPair> input1 = roughNumbers.OrderBy(rp => rp.AlgebraicQuotient).ThenBy(rp => rp.RationalQuotient);
-			IEnumerable<RoughPair> input2 = roughNumbers.OrderBy(rp => rp.RationalQuotient).ThenBy(rp => rp.AlgebraicQuotient);
+			//IEnumerable<RoughPair> input2 = roughNumbers.OrderBy(rp => rp.RationalQuotient).ThenBy(rp => rp.AlgebraicQuotient);
 
 			RoughPair lastItem = null;
 			List<RoughPair[]> results = new List<RoughPair[]>();
@@ -435,9 +434,7 @@ namespace GNFSCore
 			prms.AddRange(AFB.Primes);
 			prms.AddRange(QFB.Primes);
 			prms = prms.Distinct().ToList();
-
-			BigInteger maxPrime = prms.Max();
-
+						
 			result.AppendLine();
 			result.AppendLine("Distinct primes (from factor bases):");
 			result.AppendLine(prms.FormatString(false));

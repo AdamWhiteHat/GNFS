@@ -16,7 +16,7 @@ namespace GNFSCore.Polynomial
 
 			IPolynomial mod = modulus.Clone();
 			BigInteger exponent = p.Clone();
-			exponent = BigInteger.Pow(exponent, mod.Degree);
+			exponent = BigInteger.Pow(exponent, (int)d);
 
 			IPolynomial x = new AlgebraicPolynomial(new BigInteger[] { 0, 1 });
 			IPolynomial res = new AlgebraicPolynomial(x.Terms);

@@ -49,8 +49,6 @@ namespace GNFSCore
 
 		public static List<RoughPair> LoadFromFile(string filepath)
 		{
-			List<RoughPair> result = new List<RoughPair>();
-
 			string[] lines = File.ReadAllLines(filepath);
 
 			return lines.Select(ln => new RoughPair(ln)).ToList();

@@ -101,23 +101,21 @@ namespace GNFSCore
 
 		public void Sieve(PolyRelationsSieveProgress relationsSieve)
 		{
-			BigInteger algResult = Factor(relationsSieve.PrimeBase.AlgebraicFactorBase, AlgebraicNorm, AlgebraicQuotient, AlgebraicFactorization);
-			BigInteger ratReslult = Factor(relationsSieve.PrimeBase.RationalFactorBase, RationalNorm, RationalQuotient, RationalFactorization);
+			BigInteger algResult = Factor(relationsSieve.PrimeBase.AlgebraicFactorBase, AlgebraicQuotient, AlgebraicFactorization);
+			BigInteger ratReslult = Factor(relationsSieve.PrimeBase.RationalFactorBase, RationalQuotient, RationalFactorization);
 
 			AlgebraicQuotient = algResult;
 			RationalQuotient = ratReslult;
 		}
 
-		public static BigInteger Factor(IEnumerable<BigInteger> primeFactors, BigInteger normValue, BigInteger quotientValue, CountDictionary dictionary)
+		public static BigInteger Factor(IEnumerable<BigInteger> primeFactors,BigInteger quotientValue, CountDictionary dictionary)
 		{
 			if (quotientValue.Sign == -1 || primeFactors.Any(f => f.Sign == -1))
 			{
 				throw new Exception("There shouldn't be any negative values either in the quotient or the factors");
 			}
-
-			BigInteger sqrt = BigInteger.Abs(normValue).SquareRoot();
+						
 			BigInteger result = quotientValue;
-
 			foreach (BigInteger factor in primeFactors)
 			{
 				if (result == 0 || result == 1)
