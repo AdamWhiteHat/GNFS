@@ -33,9 +33,6 @@ namespace GNFS_Winforms
 
 			List<List<Relation>> freeRelations = gnfs.CurrentRelationsProgress.FreeRelations;
 
-			mainForm.LogOutput();
-			mainForm.LogOutput($"# of solution sets: {freeRelations.Count}");
-			mainForm.LogOutput();
 
 			SquareFinder squareRootFinder = new SquareFinder(gnfs, freeRelations.First()); // relationSet
 
@@ -59,6 +56,9 @@ namespace GNFS_Winforms
 			BigInteger algebraicSquareRoot = squareRootFinder.AlgebraicSquareRootResidue;
 
 			mainForm.LogOutput();
+			mainForm.LogOutput($"# of solution sets: {freeRelations.Count}");
+			mainForm.LogOutput();
+			mainForm.LogOutput();
 			mainForm.LogOutput($"∏ Sᵢ =");
 			mainForm.LogOutput($"{squareRootFinder.TotalS}");
 			mainForm.LogOutput();
@@ -69,7 +69,7 @@ namespace GNFS_Winforms
 			mainForm.LogOutput($"({string.Join(") * (", squareRootFinder.PolynomialRing.Select(ply => ply.ToString()))})");
 			mainForm.LogOutput();
 			mainForm.LogOutput("Primes:");
-			mainForm.LogOutput($"{string.Join(" * ", squareRootFinder.RelationsSet.Select(rel => rel.B).Distinct().OrderBy(relB => relB))}");
+			mainForm.LogOutput($"{string.Join(" * ", squareRootFinder.AlgebraicPrimes)}"); // .RelationsSet.Select(rel => rel.B).Distinct().OrderBy(relB => relB))
 			mainForm.LogOutput();
 			mainForm.LogOutput($"ƒ'(m)     = {squareRootFinder.PolynomialDerivative}");
 			mainForm.LogOutput($"ƒ'(m)^2   = {squareRootFinder.PolynomialDerivativeSquared}");
@@ -77,10 +77,8 @@ namespace GNFS_Winforms
 			mainForm.LogOutput($"γ²        = {squareRootFinder.RationalProduct} IsSquare? {squareRootFinder.RationalProduct.IsSquare()}");
 			mainForm.LogOutput($"(γ  · ƒ'(m))^2 = {squareRootFinder.RationalSquare} IsSquare? {squareRootFinder.RationalSquare.IsSquare()}");
 			mainForm.LogOutput($"");
-			mainForm.LogOutput($"^2 = {squareRootFinder.AlgebraicSquareResidue}");
 			mainForm.LogOutput($"");
-			mainForm.LogOutput($"X² / ƒ(m) = {squareRootFinder.AlgebraicProductModF}");
-			mainForm.LogOutput($"X         = {squareRootFinder.AlgebraicSquareRootResidue}  IsSquare? {squareRootFinder.AlgebraicSquareResidue.IsSquare()}");
+			mainForm.LogOutput($"X² / ƒ(m) = {squareRootFinder.AlgebraicProductModF}  IsSquare? {squareRootFinder.AlgebraicProductModF.IsSquare()}");
 			mainForm.LogOutput();
 			mainForm.LogOutput($"");
 			mainForm.LogOutput($"AlgebraicPrimes: {squareRootFinder.AlgebraicPrimes.FormatString(false)}");
@@ -96,7 +94,7 @@ namespace GNFS_Winforms
 			mainForm.LogOutput($" AlgebraicSquareRoot: {algebraicSquareRoot} ");
 			mainForm.LogOutput($"");
 			mainForm.LogOutput($"*****************************");
-			mainForm.LogOutput($"S (x)       = {prodSmodN}  IsSquare? {prodSmodN.IsSquare()}");//{squareRootFinder.AlgebraicSquareResidue}");
+			mainForm.LogOutput($"S (x)       = {prodSmodN}  IsSquare? {prodSmodN.IsSquare()}");
 			mainForm.LogOutput();
 			mainForm.LogOutput("Roots of S(x):");
 			mainForm.LogOutput($"{{{string.Join(", ", squareRootFinder.RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");

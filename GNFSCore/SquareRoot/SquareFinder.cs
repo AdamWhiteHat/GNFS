@@ -146,6 +146,8 @@ namespace GNFSCore.SquareRoot
 
 			BigInteger primeProduct = 1;
 
+
+
 			BigInteger lastP = ((N * 3) + 1).NthRoot(3); //gnfs.QFB.Select(fp => fp.P).Max();
 			do
 			{
@@ -199,6 +201,7 @@ namespace GNFSCore.SquareRoot
 		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(SparsePolynomial f, BigInteger m, int degree, IPoly dd, BigInteger p)
 		{
 			IPoly startPolynomial = SparsePolynomial.Modulus(dd, p);
+			IPoly startInversePolynomial = SparsePolynomial.ModularInverse(startPolynomial, p);
 
 			IPoly resultPoly1 = FiniteFieldArithmetic.SquareRoot(startPolynomial, f, p, degree, m);
 			IPoly resultPoly2 = SparsePolynomial.ModularInverse(resultPoly1, p);
@@ -209,17 +212,23 @@ namespace GNFSCore.SquareRoot
 			IPoly resultSquared1 = SparsePolynomial.ModMod(SparsePolynomial.Square(resultPoly1), f, p);
 			IPoly resultSquared2 = SparsePolynomial.ModMod(SparsePolynomial.Square(resultPoly2), f, p);
 
-			bool resultSquaredEqualsInput = (startPolynomial.CompareTo(resultSquared1) == 0);
 			bool bothResultsAgree = (resultSquared1.CompareTo(resultSquared2) == 0);
-
-			if (resultSquaredEqualsInput && bothResultsAgree)
+			if (bothResultsAgree)
 			{
-				return new Tuple<BigInteger, BigInteger>(result1, result2);
+				bool resultSquaredEqualsInput1 = (startPolynomial.CompareTo(resultSquared1) == 0);
+				bool resultSquaredEqualsInput2 = (startInversePolynomial.CompareTo(resultSquared1) == 0);
+				
+				if (resultSquaredEqualsInput1)
+				{
+					return new Tuple<BigInteger, BigInteger>(result1, result2);
+				}
+				else if (resultSquaredEqualsInput2)
+				{
+					return new Tuple<BigInteger, BigInteger>(result2, result1);
+				}
 			}
-			else
-			{
-				return new Tuple<BigInteger, BigInteger>(BigInteger.Zero, BigInteger.Zero);
-			}
+			
+			return new Tuple<BigInteger, BigInteger>(BigInteger.Zero, BigInteger.Zero);			
 		}
 
 		public override string ToString()
@@ -241,17 +250,17 @@ namespace GNFSCore.SquareRoot
 			result.AppendLine("Square finder, Algebraic:");
 			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicProduct} * {PolynomialDerivative}");
 			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicSquare}");
-			result.AppendLine($"χ = Sₐ(m) * ƒ'(m) mod N = {AlgebraicSquareResidue}");
+			result.AppendLine($"χ = Sₐ(m) * ƒ'(m) mod N = {AlgebraicSquareRootResidue}");
 
 
 			result.AppendLine($"γ = {RationalSquareRootResidue}");
-			result.AppendLine($"χ = {AlgebraicSquareResidue}");
+			result.AppendLine($"χ = {AlgebraicSquareRootResidue}");
 
 			result.AppendLine($"IsRationalSquare  ? {IsRationalSquare}");
 			result.AppendLine($"IsAlgebraicSquare ? {IsAlgebraicSquare}");
 
-			BigInteger min = BigInteger.Min(RationalSquareRoot, AlgebraicSquareResidue);
-			BigInteger max = BigInteger.Max(RationalSquareRoot, AlgebraicSquareResidue);
+			BigInteger min = BigInteger.Min(RationalSquareRoot, AlgebraicSquareRootResidue);
+			BigInteger max = BigInteger.Max(RationalSquareRoot, AlgebraicSquareRootResidue);
 
 			BigInteger add = max + min;
 			BigInteger sub = max - min;
