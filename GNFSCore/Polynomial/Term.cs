@@ -4,17 +4,22 @@ using System.Numerics;
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace GNFSCore.Polynomials
 {
 	[Serializable]
-	public class Term : ITerm
+	public class Term : ITerm, IXmlSerializable
 	{
 		public static Term Zero = new Term(BigInteger.Zero, 0);
 
-		public int Exponent { get; private set; }
+		public int Exponent { get; set; }
 		public BigInteger CoEfficient { get; set; }
 		private static string IndeterminateSymbol = "X";
+
+		public Term()
+		{
+		}
 
 		public Term(BigInteger coefficient, int exponent)
 		{
@@ -57,6 +62,7 @@ namespace GNFSCore.Polynomials
 			writer.WriteElementString("CoEfficient", CoEfficient.ToString());
 			writer.WriteElementString("Exponent", Exponent.ToString());
 		}
+
 		public void ReadXml(XmlReader reader)
 		{
 			reader.MoveToContent();
@@ -64,6 +70,7 @@ namespace GNFSCore.Polynomials
 			CoEfficient = BigInteger.Parse(reader.ReadElementString("CoEfficient"));
 			Exponent = int.Parse(reader.ReadElementString("Exponent"));
 		}
+
 		public XmlSchema GetSchema() { return null; }
 	}
 

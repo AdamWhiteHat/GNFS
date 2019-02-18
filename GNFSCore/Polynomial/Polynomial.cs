@@ -1159,9 +1159,18 @@ namespace GNFSCore.Polynomials
 		{
 			writer.WriteElementString("Degree", Degree.ToString());
 			writer.WriteStartElement("Terms");
-			writer.WriteString($"{spacer}{string.Join(spacer, Terms.Select(term => $"{term}"))}{spacer}");
+
+			Term type = (Term)this.Terms.First();
+			XmlSerializer termSerializer = new XmlSerializer(type.GetType());
+
+			foreach (Term term in Terms)
+			{
+				termSerializer.Serialize(writer, term);
+			}
+
+			//writer.WriteString($"{spacer}{string.Join(spacer, Terms.Select(term => $"{term.CoEfficient}"))}{spacer}");
 			writer.WriteEndElement();
-			writer.WriteElementString("Polynomial", this.ToString());
+			writer.WriteElementString("PolynomialString", this.ToString());
 		}
 
 		public void ReadXml(XmlReader reader)
@@ -1171,33 +1180,18 @@ namespace GNFSCore.Polynomials
 
 			Degree = int.Parse(reader.ReadElementString("Degree"));
 			reader.ReadStartElement("Terms");
-			string val = reader.Value;
-			if (!string.IsNullOrWhiteSpace(val))
+
+			List<Term> terms = new List<Term>();
+			do
 			{
-				val = val.Replace(" ", "").Replace("\t", "").Replace("\r", "").Replace("\f", "");
+				Term term = (Term)Serializer.Deserialize(reader, typeof(Term));
+				terms.Add(term);
 			}
-			else
-			{
-				throw new Exception("Element 'Terms' may not be blank or empty.");
-			}
-			reader.Read();
-			reader.ReadEndElement();
+			while (reader.ReadToNextSibling("Term")) ;
 
-			string[] termLines = val.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-			if (!termLines.Any())
-			{
-				throw new Exception("Failed to parse XML element during deserialization: 'Terms'");
-			}
+				reader.ReadEndElement();
 
-			// a*X^b
-			IEnumerable<ITerm> terms = termLines.Select(str =>
-			{
-				string[] termParts = str.Split(new string[] { "*X^" }, StringSplitOptions.None);
-				return new Term(BigInteger.Parse(termParts[0]), int.Parse(termParts[1]));
-			});
-
-			_terms = terms.ToList();
-
+			_terms = terms.Select(trm => (ITerm)trm).ToList();
 			if (_terms.Count - 1 != Degree)
 			{
 				throw new Exception("Element Degree does not agree with number of terms. Degree should equal #terms - 1.");

@@ -29,6 +29,14 @@ namespace GNFSCore
 				result = serializer.Deserialize(reader);
 			}
 			return result;
-		}		
+		}
+
+		public static object Deserialize(XmlReader reader, Type type)
+		{
+			object result = null;
+			XmlSerializer serializer = new XmlSerializer(type);
+			result = serializer.Deserialize(reader);
+			return result;
+		}
 	}
 }
