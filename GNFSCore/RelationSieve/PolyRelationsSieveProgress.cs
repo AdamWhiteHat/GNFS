@@ -284,7 +284,7 @@ namespace GNFSCore
 				result.AppendLine(string.Join(Environment.NewLine,
 					relations.Select(rel =>
 					{
-						BigInteger f = _gnfs.CurrentPolynomial.Evaluate(rel.A);
+						BigInteger f = _gnfs.CurrentPolynomial.Evaluate((BigInteger)rel.A);
 						if (rel.B == 0)
 						{
 							return "";

@@ -47,8 +47,8 @@
     <Compile Include="Core\FactorBase.cs" />
     <Compile Include="Core\DirectoryLocations.cs" />
     <Compile Include="IntegerMath\Combinatorics.cs" />
-    <Compile Include="Polynomial\BigIntegerArithmetic.cs" />
     <Compile Include="Polynomial\SparsePolynomial.cs" />
+    <Compile Include="Polynomial\Term.cs" />
     <Compile Include="RelationSieve\PolyRelationsSieveProgress.cs" />
     <Compile Include="IntegerMath\QuadraticResidue.cs" />
     <Compile Include="RelationSieve\Relation.cs" />
@@ -70,14 +70,11 @@
     <Compile Include="Matrix\GaussianMatrix.cs" />
     <Compile Include="Matrix\GaussianRow.cs" />
     <!--Compile Include="Polynomial\BigIntegerArithmetic.cs" /-->
-    <Compile Include="Polynomial\CommonPolynomial.cs" />
-    <Compile Include="Polynomial\IPolynomial.cs" />
-    <Compile Include="Polynomial\PolynomialArithmetic.cs" />
+    <Compile Include="Polynomial\Interfaces.cs" />
     <Compile Include="Core\GNFS.cs" />
     <Compile Include="Core\ExtensionMethods\BigIntegerExtensionMethods.cs" />
     <Compile Include="IntegerMath\Eratosthenes.cs" />
     <Compile Include="IntegerMath\GCD.cs" />
-    <Compile Include="Polynomial\AlgebraicPolynomial.cs" />
     <Compile Include="IntegerMath\FactorizationFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

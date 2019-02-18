@@ -5,7 +5,6 @@ using System.Numerics;
 namespace GNFSCore.Factors
 {
 	using Polynomial;
-	using Polynomial.Internal;
 
 	public static class Normal
 	{
@@ -37,7 +36,7 @@ namespace GNFSCore.Factors
 		/// <param name="b">A root of f(x)</param>
 		/// <param name="poly">Base m of f(m) = N</param>
 		/// <returns></returns>
-		public static BigInteger Algebraic(int a, int b, IPolynomial poly)
+		public static BigInteger Algebraic(int a, int b, IPoly poly)
 		{
 			int bneg = -b;
 			double ab = (double)a / (double)bneg;
@@ -46,7 +45,7 @@ namespace GNFSCore.Factors
 			//BigInteger quotient = BigInteger.DivRem(a, bneg, out remainder);
 			//double remainder = (double)remainder / (double)bneg;
 
-			double left = CommonPolynomial.Evaluate(poly, ab);
+			double left = poly.Evaluate(ab);
 			double right = Math.Pow(bneg, poly.Degree);
 
 			double deci = left % 1;
@@ -69,14 +68,14 @@ namespace GNFSCore.Factors
 		/// <param name="b">A root of f(x)</param>
 		/// <param name="poly">Base m of f(m) = N</param>
 		/// <returns></returns>
-		public static BigInteger Algebraic(BigInteger a, BigInteger b, IPolynomial poly)
+		public static BigInteger Algebraic(BigInteger a, BigInteger b, IPoly poly)
 		{
 			BigInteger bneg = BigInteger.Negate(b);
 
 			BigInteger remainder = new BigInteger();
 			BigInteger ab = BigInteger.DivRem(a, bneg, out remainder);
 
-			BigInteger left = CommonPolynomial.Evaluate(poly, ab);
+			BigInteger left = poly.Evaluate(ab);
 			BigInteger right = BigInteger.Pow(bneg, poly.Degree);
 
 			BigInteger result = BigInteger.Multiply((BigInteger)left, (BigInteger)right);
@@ -85,7 +84,7 @@ namespace GNFSCore.Factors
 		}
 
 
-		//public static BigRational AlgebraicRational(int a, int b, IPolynomial polynomial)
+		//public static BigRational AlgebraicRational(int a, int b, IPoly polynomial)
 		//{
 		//	ƒ(−a/b) ∙ −bᵈ 
 		// (−b)ᵈ ∙ ƒ(−a/b)

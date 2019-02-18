@@ -8,7 +8,6 @@ using GNFSCore.Polynomial;
 using GNFSCore.IntegerMath;
 using System.IO;
 using System.Threading;
-using GNFSCore.Polynomial.Internal;
 
 namespace GNFSCore.Factors
 {
@@ -72,7 +71,7 @@ namespace GNFSCore.Factors
 
 			public static FactorCollection BuildGFactorBase(GNFS gnfs)
 			{
-				BigInteger Cd = (gnfs.CurrentPolynomial.Terms.Last());
+				BigInteger Cd = (gnfs.CurrentPolynomial.Terms.Last().CoEfficient);
 				BigInteger Cdd = BigInteger.Pow(Cd, (gnfs.CurrentPolynomial.Degree - 1));
 				DoubleEvaluateDelegate evalDelegate = gnfs.CurrentPolynomial.Evaluate;
 
@@ -81,7 +80,7 @@ namespace GNFSCore.Factors
 			}
 		}
 
-		public static List<FactorPair> FindPolynomialRootsInRange(CancellationToken cancelToken, IPolynomial polynomial, IEnumerable<BigInteger> primes, BigInteger rangeFrom, BigInteger rangeTo, int totalFactorPairs)
+		public static List<FactorPair> FindPolynomialRootsInRange(CancellationToken cancelToken, IPoly polynomial, IEnumerable<BigInteger> primes, BigInteger rangeFrom, BigInteger rangeTo, int totalFactorPairs)
 		{
 			List<FactorPair> result = new List<FactorPair>();
 
@@ -94,7 +93,7 @@ namespace GNFSCore.Factors
 				}
 
 				IEnumerable<BigInteger> modList = primes.Where(p => p > r);
-				List<BigInteger> roots = CommonPolynomial.GetRootsMod(polynomial, r, modList);
+				List<BigInteger> roots = SparsePolynomial.GetRootsMod(polynomial, r, modList);
 				if (roots.Any())
 				{
 					result.AddRange(roots.Select(p => new FactorPair(p, r)));

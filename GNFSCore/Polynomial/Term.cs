@@ -1,53 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
+using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Schema;
-using System.Collections.Generic;
 
 namespace GNFSCore.Polynomial
 {
-	public interface IPolynomial : ICloneable<IPolynomial>
-	{
-		int Degree { get; }
-		//BigInteger Base { get; }
-		BigInteger[] Terms { get; }
-
-		BigInteger Evaluate(BigInteger baseM);
-		BigInteger Derivative(BigInteger baseM);
-	}
-
-	public interface ICloneable<T>
-	{
-		T Clone();
-	}
-
-	public interface ITerm : ICloneable<ITerm>
-	{
-		int Exponent { get; }
-		BigInteger CoEfficient { get; set; }
-	}
-
-	public interface IPoly
-		: ICloneable<IPoly>,
-			IComparable, IComparable<IPoly>,
-			IEquatable<IPoly>, IEquatable<SparsePolynomial>,
-			IEqualityComparer<IPoly>, IEqualityComparer<SparsePolynomial>,
-			IFormattable
-	{
-		int Degree { get; }
-		ITerm[] Terms { get; }
-
-		BigInteger this[int degree]
-		{
-			get;
-			set;
-		}
-
-		void RemoveZeros();
-		BigInteger Evaluate(BigInteger indeterminateValue);
-	}
-
 	[Serializable]
 	public class PolyTerm : ITerm
 	{
@@ -107,7 +66,6 @@ namespace GNFSCore.Polynomial
 		}
 		public XmlSchema GetSchema() { return null; }
 	}
-
 
 	public static class ITermExtensionMethods
 	{

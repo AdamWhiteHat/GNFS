@@ -12,8 +12,6 @@ using GNFSCore.IntegerMath;
 
 namespace GNFSCore.Polynomial
 {
-	using GNFSCore.IntegerMath;
-
 	[Serializable]
 	public class SparsePolynomial : IXmlSerializable, IPoly
 	{
@@ -175,6 +173,11 @@ namespace GNFSCore.Polynomial
 			return Evaluate(Terms, indeterminateValue);
 		}
 
+		public double Evaluate(double indeterminateValue)
+		{
+			return EvaluateDouble(Terms, indeterminateValue);
+		}
+
 		public static BigInteger Evaluate(ITerm[] terms, BigInteger indeterminateValue)
 		{
 			BigInteger result = new BigInteger(0);
@@ -185,11 +188,6 @@ namespace GNFSCore.Polynomial
 				result = BigInteger.Add(result, addValue);
 			}
 			return result;
-		}
-
-		public double EvaluateDouble(double indeterminateValue)
-		{
-			return EvaluateDouble(Terms, indeterminateValue);
 		}
 
 		public static double EvaluateDouble(ITerm[] terms, double x)
@@ -337,6 +335,13 @@ namespace GNFSCore.Polynomial
 				}
 			}
 			return BigInteger.One;
+		}
+
+		public static List<BigInteger> GetRootsMod(IPoly polynomial, BigInteger baseM, IEnumerable<BigInteger> modList)
+		{
+			BigInteger polyResult = polynomial.Evaluate(baseM);
+			IEnumerable<BigInteger> result = modList.Where(mod => (polyResult % mod) == 0);
+			return result.ToList();
 		}
 
 		public static void Swap(ref IPoly a, ref IPoly b)

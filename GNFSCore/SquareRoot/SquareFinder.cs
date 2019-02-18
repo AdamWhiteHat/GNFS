@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace GNFSCore.SquareRoot
 {
 	using Polynomial;
 	using IntegerMath;
-	using Polynomial.Internal;
-	using System.Collections;
-	using Factors;
 
 	public partial class SquareFinder
 	{
@@ -20,8 +16,8 @@ namespace GNFSCore.SquareRoot
 		public BigInteger PolynomialDerivative { get; set; }
 		public BigInteger PolynomialDerivativeSquared { get; set; }
 
-		public IPolynomial DerivativePolynomial { get; set; }
-		public IPolynomial DerivativePolynomialSquared { get; set; }
+		public IPoly DerivativePolynomial { get; set; }
+		public IPoly DerivativePolynomialSquared { get; set; }
 
 		public BigInteger RationalProduct { get; set; }
 		public BigInteger RationalSquare { get; set; }
@@ -51,8 +47,8 @@ namespace GNFSCore.SquareRoot
 
 		private GNFS gnfs { get; set; }
 		private BigInteger N { get; set; }
-		private IPolynomial poly { get; set; }
-		private IPolynomial monicPoly { get; set; }
+		private IPoly poly { get; set; }
+		private IPoly monicPoly { get; set; }
 		private BigInteger polyBase { get; set; }
 		private IEnumerable<BigInteger> rationalSet { get; set; }
 		private IEnumerable<BigInteger> algebraicNormCollection { get; set; }
@@ -66,14 +62,14 @@ namespace GNFSCore.SquareRoot
 			poly = gnfs.CurrentPolynomial;
 			polyBase = gnfs.PolynomialBase;
 
-			monicPoly = CommonPolynomial.MakeMonic(poly, polyBase);
+			monicPoly = SparsePolynomial.MakeMonic(poly, polyBase);
 
 			RootsOfS = new List<Tuple<BigInteger, BigInteger>>();
 			AlgebraicComplexSet = new List<Complex>();
 			RelationsSet = relations;
 
-			DerivativePolynomial = CommonPolynomial.GetDerivativePolynomial(poly);
-			DerivativePolynomialSquared = CommonPolynomial.Mod(CommonPolynomial.Multiply(DerivativePolynomial, DerivativePolynomial), poly);
+			DerivativePolynomial = SparsePolynomial.GetDerivativePolynomial(poly);
+			DerivativePolynomialSquared = SparsePolynomial.Mod(SparsePolynomial.Square(DerivativePolynomial), poly);
 
 			PolynomialDerivative = DerivativePolynomial.Evaluate(gnfs.PolynomialBase);
 			PolynomialDerivativeSquared = BigInteger.Pow(PolynomialDerivative, 2);
@@ -118,7 +114,7 @@ namespace GNFSCore.SquareRoot
 			}
 
 			BigInteger m = polyBase;
-			SparsePolynomial f = new SparsePolynomial(PolyTerm.GetTerms(monicPoly.Terms));
+			IPoly f = (SparsePolynomial)monicPoly.Clone();
 			int degree = f.Degree;
 
 			IPoly fd = SparsePolynomial.GetDerivativePolynomial(f);
@@ -148,7 +144,7 @@ namespace GNFSCore.SquareRoot
 
 
 
-			BigInteger lastP = ((N * 3) + 1).NthRoot(3); //gnfs.QFB.Select(fp => fp.P).Max();
+			BigInteger lastP = N / N.ToString().Length; //((N * 3) + 1).NthRoot(3); //gnfs.QFB.Select(fp => fp.P).Max();
 			do
 			{
 				lastP = PrimeFactory.GetNextPrime(lastP + 1);
@@ -198,7 +194,7 @@ namespace GNFSCore.SquareRoot
 			return solutionFound;
 		}
 
-		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(SparsePolynomial f, BigInteger m, int degree, IPoly dd, BigInteger p)
+		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(IPoly f, BigInteger m, int degree, IPoly dd, BigInteger p)
 		{
 			IPoly startPolynomial = SparsePolynomial.Modulus(dd, p);
 			IPoly startInversePolynomial = SparsePolynomial.ModularInverse(startPolynomial, p);

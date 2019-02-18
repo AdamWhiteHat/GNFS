@@ -18,8 +18,8 @@ namespace GNFSCore
 	public partial class GNFS : IXmlSerializable
 	{
 		public BigInteger N { get; set; }
-		public List<IPolynomial> PolynomialCollection;
-		public IPolynomial CurrentPolynomial { get; private set; }
+		public List<IPoly> PolynomialCollection;
+		public IPoly CurrentPolynomial { get; private set; }
 		public PolyRelationsSieveProgress CurrentRelationsProgress { get; set; }
 		public CancellationToken CancelToken { get; set; }
 
@@ -44,7 +44,7 @@ namespace GNFSCore
 		public GNFS()
 		{
 			PrimeFactorBase = new FactorBase();
-			PolynomialCollection = new List<IPolynomial>();
+			PolynomialCollection = new List<IPoly>();
 		}
 
 		public GNFS(CancellationToken cancelToken, string openDirectory)
@@ -163,7 +163,7 @@ namespace GNFSCore
 				{
 					foreach (string file in polynomialFiles)
 					{
-						AlgebraicPolynomial poly = (AlgebraicPolynomial)Serializer.Deserialize(file, typeof(AlgebraicPolynomial));
+						SparsePolynomial poly = (SparsePolynomial)Serializer.Deserialize(file, typeof(SparsePolynomial));
 						PolynomialCollection.Add(poly);
 					}
 
@@ -179,7 +179,7 @@ namespace GNFSCore
 			CurrentRelationsProgress = PolyRelationsSieveProgress.LoadProgress(this, SaveLocations.Polynomial_SaveDirectory);
 		}
 
-		public void SavePolynomial(IPolynomial poly)
+		public void SavePolynomial(IPoly poly)
 		{
 			SaveLocations.SetPolynomialPath(PolynomialBase, PolynomialDegree);
 
@@ -312,7 +312,7 @@ namespace GNFSCore
 
 		private void ConstructNewPolynomial(BigInteger polynomialBase, int polyDegree)
 		{
-			CurrentPolynomial = new AlgebraicPolynomial(N, polynomialBase, polyDegree);
+			CurrentPolynomial = new SparsePolynomial(N, polynomialBase, polyDegree);
 			PolynomialCollection.Add(CurrentPolynomial);
 			SavePolynomial(CurrentPolynomial);
 		}

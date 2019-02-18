@@ -14,7 +14,6 @@ namespace GNFS_Winforms
 	using GNFSCore.Factors;
 	using GNFSCore.IntegerMath;
 	using GNFSCore.Matrix;
-	using GNFSCore.Polynomial.Internal;
 
 	public partial class GnfsUiBridge
 	{

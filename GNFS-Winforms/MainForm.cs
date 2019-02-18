@@ -18,8 +18,6 @@ namespace GNFS_Winforms
 	using GNFSCore.SquareRoot;
 	using GNFSCore.IntegerMath;
 	using GNFSCore.Matrix;
-	using GNFSCore.Polynomial.Internal;
-
 	public partial class MainForm : Form
 	{
 		#region Private Members		
@@ -58,7 +56,7 @@ namespace GNFS_Winforms
 
 			gnfsBridge = new GnfsUiBridge(this);
 
-			tbN.Text = PerLeslieJensen.ToString();//RSA_100.ToString();
+			tbN.Text = MatthewBriggs.ToString(); //PerLeslieJensen.ToString();//RSA_100.ToString();
 			tbDegree.Text = "3"; //"5"; //"6"; //"7"						
 
 
@@ -67,11 +65,11 @@ namespace GNFS_Winforms
 
 			IEnumerable<BigInteger> primes = PrimeFactory.GetPrimes(10000);
 
-			tbBase.Text = "117";
-
-			tbBound.Text = "61";
-			tbRelationQuantity.Text = "70";
-			tbRelationValueRange.Text = "200";
+			tbBase.Text = "31";
+			
+			tbBound.Text = "29";
+			tbRelationQuantity.Text = "40";
+			tbRelationValueRange.Text = "1000";
 
 			gnfsBridge = new GnfsUiBridge(this);
 		}

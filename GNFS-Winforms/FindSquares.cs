@@ -10,12 +10,11 @@ using System.Collections.Generic;
 namespace GNFS_Winforms
 {
 	using GNFSCore;
-	using GNFSCore.Polynomial;
-	using GNFSCore.Factors;
-	using GNFSCore.IntegerMath;
 	using GNFSCore.Matrix;
-	using GNFSCore.Polynomial.Internal;
+	using GNFSCore.Factors;
+	using GNFSCore.Polynomial;
 	using GNFSCore.SquareRoot;
+	using GNFSCore.IntegerMath;
 
 	public partial class GnfsUiBridge
 	{
