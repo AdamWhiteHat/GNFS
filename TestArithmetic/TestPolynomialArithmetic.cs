@@ -3,9 +3,9 @@ using System.Linq;
 using System.Numerics;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using GNFSCore;
-using GNFSCore.Polynomial;
-using GNFSCore.Polynomial.Internal;
+using GNFSCore.Polynomials;
 
 namespace TestArithmetic
 {
@@ -23,18 +23,18 @@ namespace TestArithmetic
 		public void TestGCDPolynomials()
 		{
 			BigInteger[] expectedCoefficients = new BigInteger[] { 0, 1 };
-			BigInteger[] termsA = new BigInteger[] { 0,-10,5,3,11,3,5,2 };
-			BigInteger[] termsB = new BigInteger[] { 0,1,1,1 };
+			BigInteger[] termsA = new BigInteger[] { 0, -10, 5, 3, 11, 3, 5, 2 };
+			BigInteger[] termsB = new BigInteger[] { 0, 1, 1, 1 };
 
-			IPolynomial polyA = new AlgebraicPolynomial(termsA);
-			IPolynomial polyB = new AlgebraicPolynomial(termsB);
+			IPolynomial polyA = new Polynomial(Term.GetTerms(termsA));
+			IPolynomial polyB = new Polynomial(Term.GetTerms(termsB));
 
-			IPolynomial result = CommonPolynomial.GCD(polyA, polyB);
-			BigInteger[] resultCoefficients = result.Terms.ToArray();
+			IPolynomial result = Polynomial.GCD(polyA, polyB);
+			BigInteger[] resultCoefficients = result.Terms.Select(term => term.CoEfficient).ToArray();
 
 			WriteOutput($"PolyA: {polyA}");
 			WriteOutput($"PolyB: {polyB}");
-			WriteOutput($"Expected: {new AlgebraicPolynomial(expectedCoefficients)}");
+			WriteOutput($"Expected: {expectedCoefficients.FormatString(false)}");
 			WriteOutput($"Result  : {result}");
 
 			CollectionAssert.AreEqual(expectedCoefficients, resultCoefficients);
@@ -47,11 +47,11 @@ namespace TestArithmetic
 			BigInteger[] termsA = new BigInteger[] { 7, 2, 3 };
 			BigInteger[] termsB = new BigInteger[] { 1, 1, 1 };
 
-			IPolynomial polyA = new AlgebraicPolynomial(termsA);
-			IPolynomial polyB = new AlgebraicPolynomial(termsB);
+			IPolynomial polyA = new Polynomial(Term.GetTerms(termsA));
+			IPolynomial polyB = new Polynomial(Term.GetTerms(termsB));
 
-			IPolynomial result = CommonPolynomial.Multiply(polyA, polyB);
-			BigInteger[] resultCoefficients = result.Terms.ToArray();
+			IPolynomial result = Polynomial.Multiply(polyA, polyB);
+			BigInteger[] resultCoefficients = result.Terms.Select(term => term.CoEfficient).ToArray();
 
 			CollectionAssert.AreEqual(expectedCoefficients, resultCoefficients);
 
@@ -67,11 +67,11 @@ namespace TestArithmetic
 			BigInteger[] termsA = new BigInteger[] { 7, 2, 3 };
 			BigInteger[] termsB = new BigInteger[] { 1, 1, 1 };
 
-			IPolynomial polyA = new AlgebraicPolynomial(termsA);
-			IPolynomial polyB = new AlgebraicPolynomial(termsB);
+			IPolynomial polyA = new Polynomial(Term.GetTerms(termsA));
+			IPolynomial polyB = new Polynomial(Term.GetTerms(termsB));
 
-			IPolynomial result = CommonPolynomial.Mod(polyA, polyB);
-			BigInteger[] resultCoefficients = result.Terms.ToArray();
+			IPolynomial result = Polynomial.Mod(polyA, polyB);
+			BigInteger[] resultCoefficients = result.Terms.Select(term => term.CoEfficient).ToArray();
 
 			CollectionAssert.AreEqual(expectedCoefficients, resultCoefficients);
 
@@ -88,13 +88,13 @@ namespace TestArithmetic
 			BigInteger[] termsA = new BigInteger[] { 7, 2, 3 };
 			BigInteger[] termsB = new BigInteger[] { 1, 1, 1 };
 
-			IPolynomial polyA = new AlgebraicPolynomial(termsA);
-			IPolynomial polyB = new AlgebraicPolynomial(termsB);
+			IPolynomial polyA = new Polynomial(Term.GetTerms(termsA));
+			IPolynomial polyB = new Polynomial(Term.GetTerms(termsB));
 
 			IPolynomial resultRemainder = null;
-			IPolynomial result = CommonPolynomial.Divide(polyA, polyB, out resultRemainder);
-			BigInteger[] resultCoefficients = result.Terms.ToArray();
-			BigInteger[] resultRemainderCoefficients = resultRemainder.Terms.ToArray();
+			IPolynomial result = Polynomial.Divide(polyA, polyB, out resultRemainder);
+			BigInteger[] resultCoefficients = result.Terms.Select(term => term.CoEfficient).ToArray();
+			BigInteger[] resultRemainderCoefficients = result.Terms.Select(term => term.CoEfficient).ToArray();
 
 			CollectionAssert.AreEqual(expectedCoefficients, resultCoefficients);
 			CollectionAssert.AreEqual(expectedRemainderCoefficients, resultRemainderCoefficients);
@@ -112,11 +112,11 @@ namespace TestArithmetic
 			BigInteger[] termsA = new BigInteger[] { 7, 2, 3 };
 			BigInteger[] termsB = new BigInteger[] { 1, 1, 1 };
 
-			IPolynomial polyA = new AlgebraicPolynomial(termsA);
-			IPolynomial polyB = new AlgebraicPolynomial(termsB);
+			IPolynomial polyA = new Polynomial(Term.GetTerms(termsA));
+			IPolynomial polyB = new Polynomial(Term.GetTerms(termsB));
 
-			IPolynomial result = CommonPolynomial.Add(polyA, polyB);
-			BigInteger[] resultCoefficients = result.Terms.ToArray();
+			IPolynomial result = Polynomial.Add(polyA, polyB);
+			BigInteger[] resultCoefficients = result.Terms.Select(term => term.CoEfficient).ToArray();
 
 			CollectionAssert.AreEqual(expectedCoefficients, resultCoefficients);
 
@@ -132,11 +132,11 @@ namespace TestArithmetic
 			BigInteger[] termsA = new BigInteger[] { 7, 2, 3 };
 			BigInteger[] termsB = new BigInteger[] { 1, 1, 1 };
 
-			IPolynomial polyA = new AlgebraicPolynomial(termsA);
-			IPolynomial polyB = new AlgebraicPolynomial(termsB);
+			IPolynomial polyA = new Polynomial(Term.GetTerms(termsA));
+			IPolynomial polyB = new Polynomial(Term.GetTerms(termsB));
 
-			IPolynomial result = CommonPolynomial.Subtract(polyA, polyB);
-			BigInteger[] resultCoefficients = result.Terms.ToArray();
+			IPolynomial result = Polynomial.Subtract(polyA, polyB);
+			BigInteger[] resultCoefficients = result.Terms.Select(term => term.CoEfficient).ToArray();
 
 			CollectionAssert.AreEqual(expectedCoefficients, resultCoefficients);
 

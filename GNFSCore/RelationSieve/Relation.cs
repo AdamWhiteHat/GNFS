@@ -16,7 +16,7 @@ namespace GNFSCore
 	using Matrix;
 	using Polynomials;
 
-	public class Relation
+	public class Relation : IEquatable<Relation>, IEqualityComparer<Relation>, IFormattable, IXmlSerializable
 	{
 		public int A { get; private set; }
 
@@ -30,16 +30,14 @@ namespace GNFSCore
 		/// <summary>  a + bm </summary>
 		public BigInteger RationalNorm { get; private set; }
 
-		/// <summary> (a + bi) </summary>
-		public Complex Complex { get { return new Complex(A, B); } }
-		/// <summary> (a + bi)*(a - bi) </summary>
-		public Complex ComplexNorm { get { return Complex.Multiply(this.Complex, Complex.Conjugate(this.Complex)); } }
-
+		[XmlElement(ElementName = "AlgebraicFactorization")]
 		public CountDictionary AlgebraicFactorization { get; private set; }
+
+		[XmlElement(ElementName = "RationalFactorization")]
 		public CountDictionary RationalFactorization { get; private set; }
 
-		internal BigInteger AlgebraicQuotient { get; private set; }
-		internal BigInteger RationalQuotient { get; private set; }
+		internal BigInteger AlgebraicQuotient;
+		internal BigInteger RationalQuotient;
 
 		public bool IsSmooth
 		{
@@ -52,6 +50,10 @@ namespace GNFSCore
 		public Tuple<BigInteger, BigInteger> GetRoughRemainders()
 		{
 			return new Tuple<BigInteger, BigInteger>(AlgebraicQuotient, RationalQuotient);
+		}
+
+		public Relation()
+		{
 		}
 
 		public Relation(GNFS gnfs, int a, int b)
@@ -101,54 +103,40 @@ namespace GNFSCore
 
 		public void Sieve(PolyRelationsSieveProgress relationsSieve)
 		{
-			BigInteger algResult = Factor(relationsSieve.PrimeBase.AlgebraicFactorBase, AlgebraicQuotient, AlgebraicFactorization);
-			BigInteger ratReslult = Factor(relationsSieve.PrimeBase.RationalFactorBase, RationalQuotient, RationalFactorization);
-
-			AlgebraicQuotient = algResult;
-			RationalQuotient = ratReslult;
+			Sieve(relationsSieve.PrimeBase.AlgebraicFactorBase, ref AlgebraicQuotient, AlgebraicFactorization);
+			Sieve(relationsSieve.PrimeBase.RationalFactorBase, ref RationalQuotient, RationalFactorization);
 		}
 
-		public static BigInteger Factor(IEnumerable<BigInteger> primeFactors,BigInteger quotientValue, CountDictionary dictionary)
+		private static void Sieve(IEnumerable<BigInteger> primeFactors, ref BigInteger quotientValue, CountDictionary dictionary)
 		{
 			if (quotientValue.Sign == -1 || primeFactors.Any(f => f.Sign == -1))
 			{
 				throw new Exception("There shouldn't be any negative values either in the quotient or the factors");
 			}
-						
-			BigInteger result = quotientValue;
+
 			foreach (BigInteger factor in primeFactors)
 			{
-				if (result == 0 || result == 1)
+				if (quotientValue == 0 || quotientValue == 1)
 				{
-					return result;
+					return;
 				}
 
-				if ((factor*factor) > result)
+				if ((factor * factor) > quotientValue)
 				{
-					if (primeFactors.Contains(result))
+					if (primeFactors.Contains(quotientValue))
 					{
-						dictionary.Add(result);
-						return 1;
+						dictionary.Add(quotientValue);
+						quotientValue = 1;
 					}
-					return result;
+					return;
 				}
-							
-				while (result != 1 && result % factor == 0)
+
+				while (quotientValue != 1 && quotientValue % factor == 0)
 				{
-					result = BigInteger.Divide(result, factor);
-					dictionary.Add(factor);					
+					quotientValue = BigInteger.Divide(quotientValue, factor);
+					dictionary.Add(factor);
 				}
 			}
-
-			return result;
-		}
-
-
-		public override string ToString()
-		{
-			return
-				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t"
-				+ $"[ƒ(b) ≡ 0 (mod a):{AlgebraicNorm.ToString().PadLeft(10)} (AlgebraicNorm) IsSquare: {AlgebraicNorm.IsSquare()},\ta+b*m={RationalNorm.ToString().PadLeft(4)} (RationalNorm) IsSquare: {RationalNorm.IsSquare()}]\t";
 		}
 
 		public static List<Relation> LoadUnfactoredFile(GNFS gnfs, string filename)
@@ -167,35 +155,10 @@ namespace GNFSCore
 
 		public void Save(string filename)
 		{
-			SerializeToFile(this, filename);// $"{directory}\\{relation.A}_{relation.B}.relation"
+			Serializer.Serialize(filename, this); // $"{directory}\\{relation.A}_{relation.B}.relation"
 		}
 
-		public static void SerializeToFile(Relation rel, string filename)
-		{
-			new XDocument(
-				new XElement("Relation",
-					new XElement("A", rel.A),
-					new XElement("B", rel.B),
-					new XElement("AlgebraicNorm", rel.AlgebraicNorm),
-					new XElement("RationalNorm", rel.RationalNorm),
-					rel.AlgebraicFactorization.SerializeToXElement("AlgebraicFactorization"),
-					rel.RationalFactorization.SerializeToXElement("RationalFactorization")
-				)
-			).Save(filename);
-		}
-
-		public static Relation LoadFromFile(string filename)
-		{
-			XElement rel = XElement.Load(filename);
-			int a = int.Parse(rel.Element("A").Value);
-			int b = int.Parse(rel.Element("B").Value);
-			BigInteger an = BigInteger.Parse(rel.Element("AlgebraicNorm").Value);
-			BigInteger rn = BigInteger.Parse(rel.Element("RationalNorm").Value);
-			CountDictionary algebraicFactorization = CountDictionary.DeserializeFromXElement(rel.Element("AlgebraicFactorization"));
-			CountDictionary rationalFactorization = CountDictionary.DeserializeFromXElement(rel.Element("RationalFactorization"));
-
-			return new Relation(a, b, an, rn, algebraicFactorization, rationalFactorization);
-		}
+		#region IEquatable / IEqualityComparer
 
 		public override bool Equals(object obj)
 		{
@@ -207,12 +170,86 @@ namespace GNFSCore
 			}
 			else
 			{
-				return (this.A == other.A && this.B == other.B);
+				return this.Equals(other);
 			}
 		}
+
+		public bool Equals(Relation x, Relation y)
+		{
+			return x.Equals(y);
+		}
+
+		public bool Equals(Relation other)
+		{
+			return (this.A == other.A && this.B == other.B);
+		}
+
+		public int GetHashCode(Relation obj)
+		{
+			return obj.GetHashCode();
+		}
+
 		public override int GetHashCode()
 		{
 			return Tuple.Create(this.A, this.B).GetHashCode();
 		}
+
+		#endregion
+
+		#region IFormattable
+
+		public string ToString(string format, IFormatProvider formatProvider)
+		{
+			return ToString();
+		}
+
+		public override string ToString()
+		{
+			return
+				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t"
+				+ $"[ƒ(b) ≡ 0 (mod a):{AlgebraicNorm.ToString().PadLeft(10)} (AlgebraicNorm) IsSquare: {AlgebraicNorm.IsSquare()},\ta+b*m={RationalNorm.ToString().PadLeft(4)} (RationalNorm) IsSquare: {RationalNorm.IsSquare()}]\t";
+		}
+
+		#endregion
+
+		#region IXmlSerializable
+
+		private static XmlSerializer AlgebraicFactorizationXmlSerializer = new XmlSerializer(typeof(CountDictionary), new XmlRootAttribute("AlgebraicFactorization"));
+		private static XmlSerializer RationalFactorizationXmlSerializer = new XmlSerializer(typeof(CountDictionary), new XmlRootAttribute("RationalFactorization"));
+		public void WriteXml(XmlWriter writer)
+		{
+			writer.WriteElementString("A", A.ToString());
+			writer.WriteElementString("B", B.ToString());
+			writer.WriteElementString("AlgebraicNorm", AlgebraicNorm.ToString());
+			writer.WriteElementString("RationalNorm", RationalNorm.ToString());
+			writer.WriteElementString("AlgebraicQuotient", AlgebraicQuotient.ToString());
+			writer.WriteElementString("RationalQuotient", RationalQuotient.ToString());
+
+			AlgebraicFactorizationXmlSerializer.Serialize(writer, AlgebraicFactorization);
+
+			RationalFactorizationXmlSerializer.Serialize(writer, RationalFactorization);
+		}
+
+		public void ReadXml(XmlReader reader)
+		{
+			reader.MoveToContent();
+			reader.ReadStartElement();
+
+			A = int.Parse(reader.ReadElementString("A"));
+			B = int.Parse(reader.ReadElementString("B"));
+			AlgebraicNorm = BigInteger.Parse(reader.ReadElementString("AlgebraicNorm"));
+			RationalNorm = BigInteger.Parse(reader.ReadElementString("RationalNorm"));
+			AlgebraicQuotient = BigInteger.Parse(reader.ReadElementString("AlgebraicQuotient"));
+			RationalQuotient = BigInteger.Parse(reader.ReadElementString("RationalQuotient"));
+
+
+			AlgebraicFactorization = (CountDictionary)AlgebraicFactorizationXmlSerializer.Deserialize(reader);
+
+			RationalFactorization = (CountDictionary)RationalFactorizationXmlSerializer.Deserialize(reader);
+		}
+
+		public XmlSchema GetSchema() { return null; }
+
+		#endregion
 	}
 }

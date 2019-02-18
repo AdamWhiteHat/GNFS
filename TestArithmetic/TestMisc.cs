@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GNFSCore;
-using GNFSCore.Polynomial;
+using GNFSCore.Polynomials;
 
 namespace TestArithmetic
 {
@@ -17,7 +17,6 @@ namespace TestArithmetic
 		public void WriteOutput(string message, params object[] args) { TestContext.WriteLine(message, args); }
 		private TestContext testContextInstance;
 		public TestContext TestContext { get { return testContextInstance; } set { testContextInstance = value; } }
-
 
 		[TestMethod]
 		public void TestBigIntegerClone()
@@ -51,11 +50,11 @@ namespace TestArithmetic
 			BigInteger[] termsD = new BigInteger[] { 0, 0, 0, 0, 0 };
 			BigInteger[] termsE = new BigInteger[] { 0, 1, 0, -0, 0 };
 
-			IPolynomial polyA = new AlgebraicPolynomial(termsA);
-			IPolynomial polyB = new AlgebraicPolynomial(termsB);
-			IPolynomial polyC = new AlgebraicPolynomial(termsC);
-			IPolynomial polyD = new AlgebraicPolynomial(termsD);
-			IPolynomial polyE = new AlgebraicPolynomial(termsE);
+			IPolynomial polyA = new Polynomial(Term.GetTerms(termsA));
+			IPolynomial polyB = new Polynomial(Term.GetTerms(termsB));
+			IPolynomial polyC = new Polynomial(Term.GetTerms(termsC));
+			IPolynomial polyD = new Polynomial(Term.GetTerms(termsD));
+			IPolynomial polyE = new Polynomial(Term.GetTerms(termsE));
 
 			WriteOutput($"PolyA: {polyA}");
 			WriteOutput($"PolyB: {polyB}");
@@ -63,7 +62,6 @@ namespace TestArithmetic
 			WriteOutput($"PolyC.Terms: {polyC.Terms.FormatString(false)}");
 			WriteOutput($"PolyD: {polyD}");
 			WriteOutput($"PolyE: {polyE}");
-
 		}
 	}
 }

@@ -1154,21 +1154,17 @@ namespace GNFSCore.Polynomials
 
 		#region IXmlSerializable
 
-		private static string spacer = $"{Environment.NewLine}    ";
+		private static XmlSerializer TermXmlSerializer = new XmlSerializer(typeof(Term));
 		public void WriteXml(XmlWriter writer)
 		{
 			writer.WriteElementString("Degree", Degree.ToString());
 			writer.WriteStartElement("Terms");
 
-			Term type = (Term)this.Terms.First();
-			XmlSerializer termSerializer = new XmlSerializer(type.GetType());
-
 			foreach (Term term in Terms)
 			{
-				termSerializer.Serialize(writer, term);
+				TermXmlSerializer.Serialize(writer, term);
 			}
 
-			//writer.WriteString($"{spacer}{string.Join(spacer, Terms.Select(term => $"{term.CoEfficient}"))}{spacer}");
 			writer.WriteEndElement();
 			writer.WriteElementString("PolynomialString", this.ToString());
 		}
@@ -1187,9 +1183,9 @@ namespace GNFSCore.Polynomials
 				Term term = (Term)Serializer.Deserialize(reader, typeof(Term));
 				terms.Add(term);
 			}
-			while (reader.ReadToNextSibling("Term")) ;
+			while (reader.ReadToNextSibling("Term"));
 
-				reader.ReadEndElement();
+			reader.ReadEndElement();
 
 			_terms = terms.Select(trm => (ITerm)trm).ToList();
 			if (_terms.Count - 1 != Degree)

@@ -58,7 +58,7 @@ namespace GNFSCore.IntegerMath
 			IncreaseMaxValue(BigInteger.Zero);
 		}
 
-		private static void IncreaseMaxValue(BigInteger newMaxValue)
+		public static void IncreaseMaxValue(BigInteger newMaxValue)
 		{
 			// Increase bound
 			BigInteger temp = BigInteger.Max(newMaxValue + 1000, MaxValue + 100000 /*MaxValue*/);

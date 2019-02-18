@@ -69,7 +69,6 @@ namespace GNFS_Winforms
 					number++;
 
 					BigInteger algebraic = relations.Select(rel => rel.AlgebraicNorm).Product();
-					//BigInteger algebraicFactorization = relations.Select(rel => rel.AlgebraicFactorization.ToDictionary().Select(kvp => BigInteger.Pow(kvp.Key, (int)kvp.Value)).Product()).Product();
 					BigInteger rational = relations.Select(rel => rel.RationalNorm).Product();
 
 					CountDictionary algCountDict = new CountDictionary();
@@ -119,16 +118,7 @@ namespace GNFS_Winforms
 				}
 			}
 
-			gnfs.CurrentRelationsProgress.SetFreeRelations(allSolutionGroups);
-
-			//mainForm.LogOutput();
-			//mainForm.LogOutput("All solution set products:");
-			//mainForm.LogOutput(allSolutionTuples.Select(p => $"IsSquare: {p.Item1.IsSquare().ToString().PadLeft(5)} {p.Item1}{Environment.NewLine}IsSquare: {p.Item2.IsSquare().ToString().PadLeft(5)} {p.Item2}{Environment.NewLine}").FormatString(true, 0));
-			//mainForm.LogOutput();
-			//var reducedSolutionTuples = allSolutionTuples.Select(p => new Tuple<BigInteger, BigInteger>(p.Item1 % gnfs.N, p.Item2 % gnfs.N)).ToList();
-			//mainForm.LogOutput();
-			//mainForm.LogOutput("All products mod N:");
-			//mainForm.LogOutput(string.Join(Environment.NewLine, reducedSolutionTuples.Select(p => $"{p.Item1}{Environment.NewLine}{p.Item2}")));
+			gnfs.CurrentRelationsProgress.AddFreeRelations(allSolutionGroups);
 
 			mainForm.LogOutput();
 			mainForm.LogOutput();

@@ -46,6 +46,7 @@
     <Compile Include="Core\ExtensionMethods\IEnumerableExtensionMethods.cs" />
     <Compile Include="Core\FactorBase.cs" />
     <Compile Include="Core\DirectoryLocations.cs" />
+    <Compile Include="Core\SieveRangeEnumerable.cs" />
     <Compile Include="IntegerMath\Combinatorics.cs" />
     <Compile Include="Polynomial\Polynomial.cs" />
     <Compile Include="Polynomial\Term.cs" />
