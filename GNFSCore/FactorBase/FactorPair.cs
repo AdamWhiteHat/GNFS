@@ -3,7 +3,7 @@ using System.Linq;
 using System.Numerics;
 using System.Collections;
 using System.Threading.Tasks;
-using GNFSCore.Polynomial;
+using GNFSCore.Polynomials;
 using GNFSCore.IntegerMath;
 using System.Runtime.Serialization;
 

@@ -5,18 +5,18 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace GNFSCore.Polynomial
+namespace GNFSCore.Polynomials
 {
 	[Serializable]
-	public class PolyTerm : ITerm
+	public class Term : ITerm
 	{
-		public static PolyTerm Zero = new PolyTerm(BigInteger.Zero, 0);
+		public static Term Zero = new Term(BigInteger.Zero, 0);
 
 		public int Exponent { get; private set; }
 		public BigInteger CoEfficient { get; set; }
 		private static string IndeterminateSymbol = "X";
 
-		public PolyTerm(BigInteger coefficient, int exponent)
+		public Term(BigInteger coefficient, int exponent)
 		{
 			Exponent = exponent;
 			CoEfficient = coefficient;
@@ -29,7 +29,7 @@ namespace GNFSCore.Polynomial
 			int degree = 0;
 			foreach (BigInteger term in terms)
 			{
-				results.Add(new PolyTerm(term, degree));
+				results.Add(new Term(term, degree));
 
 				degree += 1;
 			}
@@ -44,7 +44,7 @@ namespace GNFSCore.Polynomial
 
 		public ITerm Clone()
 		{
-			return new PolyTerm(this.CoEfficient, this.Exponent);
+			return new Term(this.CoEfficient, this.Exponent);
 		}
 
 		public override string ToString()

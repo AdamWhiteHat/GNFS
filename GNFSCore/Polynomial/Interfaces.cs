@@ -5,7 +5,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Collections.Generic;
 
-namespace GNFSCore.Polynomial
+namespace GNFSCore.Polynomials
 {
 	public interface ICloneable<T>
 	{
@@ -18,11 +18,11 @@ namespace GNFSCore.Polynomial
 		BigInteger CoEfficient { get; set; }
 	}
 
-	public interface IPoly
-		: ICloneable<IPoly>,
-			IComparable, IComparable<IPoly>,
-			IEquatable<IPoly>, IEquatable<SparsePolynomial>,
-			IEqualityComparer<IPoly>, IEqualityComparer<SparsePolynomial>,
+	public interface IPolynomial
+		: ICloneable<IPolynomial>,
+			IComparable, IComparable<IPolynomial>,
+			IEquatable<IPolynomial>, IEquatable<Polynomial>,
+			IEqualityComparer<IPolynomial>, IEqualityComparer<Polynomial>,
 			IFormattable
 	{
 		int Degree { get; }

@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace GNFSCore.Factors
 {
-	using Polynomial;
+	using Polynomials;
 
 	public static class Normal
 	{
@@ -36,7 +36,7 @@ namespace GNFSCore.Factors
 		/// <param name="b">A root of f(x)</param>
 		/// <param name="poly">Base m of f(m) = N</param>
 		/// <returns></returns>
-		public static BigInteger Algebraic(int a, int b, IPoly poly)
+		public static BigInteger Algebraic(int a, int b, IPolynomial poly)
 		{
 			int bneg = -b;
 			double ab = (double)a / (double)bneg;
@@ -68,7 +68,7 @@ namespace GNFSCore.Factors
 		/// <param name="b">A root of f(x)</param>
 		/// <param name="poly">Base m of f(m) = N</param>
 		/// <returns></returns>
-		public static BigInteger Algebraic(BigInteger a, BigInteger b, IPoly poly)
+		public static BigInteger Algebraic(BigInteger a, BigInteger b, IPolynomial poly)
 		{
 			BigInteger bneg = BigInteger.Negate(b);
 

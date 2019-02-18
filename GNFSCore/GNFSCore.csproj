@@ -47,7 +47,7 @@
     <Compile Include="Core\FactorBase.cs" />
     <Compile Include="Core\DirectoryLocations.cs" />
     <Compile Include="IntegerMath\Combinatorics.cs" />
-    <Compile Include="Polynomial\SparsePolynomial.cs" />
+    <Compile Include="Polynomial\Polynomial.cs" />
     <Compile Include="Polynomial\Term.cs" />
     <Compile Include="RelationSieve\PolyRelationsSieveProgress.cs" />
     <Compile Include="IntegerMath\QuadraticResidue.cs" />

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace GNFS_Winforms
 {
 	using GNFSCore;
-	using GNFSCore.Polynomial;
+	using GNFSCore.Polynomials;
 	using GNFSCore.Factors;
 	using GNFSCore.IntegerMath;
 	using GNFSCore.Matrix;

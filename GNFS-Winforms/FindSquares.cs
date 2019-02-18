@@ -12,7 +12,7 @@ namespace GNFS_Winforms
 	using GNFSCore;
 	using GNFSCore.Matrix;
 	using GNFSCore.Factors;
-	using GNFSCore.Polynomial;
+	using GNFSCore.Polynomials;
 	using GNFSCore.SquareRoot;
 	using GNFSCore.IntegerMath;
 
@@ -38,12 +38,12 @@ namespace GNFS_Winforms
 			squareRootFinder.CalculateRationalSide();
 			squareRootFinder.CalculateAlgebraicSide();
 
-			IPoly S = squareRootFinder.S;
-			IPoly SRingSquare = squareRootFinder.SRingSquare;
+			IPolynomial S = squareRootFinder.S;
+			IPolynomial SRingSquare = squareRootFinder.SRingSquare;
 
 			BigInteger prodS = SRingSquare.Evaluate(polyBase);
 
-			IPoly reducedS = SparsePolynomial.Modulus(S, N);
+			IPolynomial reducedS = Polynomial.Modulus(S, N);
 
 			BigInteger totalProdS = squareRootFinder.TotalS.Evaluate(polyBase) * squareRootFinder.PolynomialDerivative;
 			BigInteger totalProdModN = totalProdS % N;

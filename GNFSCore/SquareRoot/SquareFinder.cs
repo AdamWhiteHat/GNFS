@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace GNFSCore.SquareRoot
 {
-	using Polynomial;
+	using Polynomials;
 	using IntegerMath;
 
 	public partial class SquareFinder
@@ -16,8 +16,8 @@ namespace GNFSCore.SquareRoot
 		public BigInteger PolynomialDerivative { get; set; }
 		public BigInteger PolynomialDerivativeSquared { get; set; }
 
-		public IPoly DerivativePolynomial { get; set; }
-		public IPoly DerivativePolynomialSquared { get; set; }
+		public IPolynomial DerivativePolynomial { get; set; }
+		public IPolynomial DerivativePolynomialSquared { get; set; }
 
 		public BigInteger RationalProduct { get; set; }
 		public BigInteger RationalSquare { get; set; }
@@ -37,18 +37,18 @@ namespace GNFSCore.SquareRoot
 		public bool IsAlgebraicIrreducible { get; set; }
 
 		public List<Complex> AlgebraicComplexSet { get; set; }
-		public List<IPoly> PolynomialRing { get; set; }
+		public List<IPolynomial> PolynomialRing { get; set; }
 
-		public IPoly S { get; set; }
-		public IPoly SRingSquare { get; set; }
-		public IPoly TotalS { get; set; }
+		public IPolynomial S { get; set; }
+		public IPolynomial SRingSquare { get; set; }
+		public IPolynomial TotalS { get; set; }
 
 		public List<Tuple<BigInteger, BigInteger>> RootsOfS { get; set; }
 
 		private GNFS gnfs { get; set; }
 		private BigInteger N { get; set; }
-		private IPoly poly { get; set; }
-		private IPoly monicPoly { get; set; }
+		private IPolynomial poly { get; set; }
+		private IPolynomial monicPoly { get; set; }
 		private BigInteger polyBase { get; set; }
 		private IEnumerable<BigInteger> rationalSet { get; set; }
 		private IEnumerable<BigInteger> algebraicNormCollection { get; set; }
@@ -62,14 +62,14 @@ namespace GNFSCore.SquareRoot
 			poly = gnfs.CurrentPolynomial;
 			polyBase = gnfs.PolynomialBase;
 
-			monicPoly = SparsePolynomial.MakeMonic(poly, polyBase);
+			monicPoly = Polynomial.MakeMonic(poly, polyBase);
 
 			RootsOfS = new List<Tuple<BigInteger, BigInteger>>();
 			AlgebraicComplexSet = new List<Complex>();
 			RelationsSet = relations;
 
-			DerivativePolynomial = SparsePolynomial.GetDerivativePolynomial(poly);
-			DerivativePolynomialSquared = SparsePolynomial.Mod(SparsePolynomial.Square(DerivativePolynomial), poly);
+			DerivativePolynomial = Polynomial.GetDerivativePolynomial(poly);
+			DerivativePolynomialSquared = Polynomial.Mod(Polynomial.Square(DerivativePolynomial), poly);
 
 			PolynomialDerivative = DerivativePolynomial.Evaluate(gnfs.PolynomialBase);
 			PolynomialDerivativeSquared = BigInteger.Pow(PolynomialDerivative, 2);
@@ -97,16 +97,16 @@ namespace GNFSCore.SquareRoot
 		{
 			RootsOfS.AddRange(RelationsSet.Select(rel => new Tuple<BigInteger, BigInteger>(rel.A, rel.B)));
 
-			PolynomialRing = new List<IPoly>();
+			PolynomialRing = new List<IPolynomial>();
 			foreach (Relation rel in RelationsSet)
 			{
 				// poly(x) = A + (B * x)
-				IPoly newPoly =
-					new SparsePolynomial(
-						new PolyTerm[]
+				IPolynomial newPoly =
+					new Polynomial(
+						new Term[]
 						{
-							new PolyTerm( rel.B, 1),
-							new PolyTerm( rel.A, 0)
+							new Term( rel.B, 1),
+							new Term( rel.A, 0)
 						}
 					);
 
@@ -114,14 +114,14 @@ namespace GNFSCore.SquareRoot
 			}
 
 			BigInteger m = polyBase;
-			IPoly f = (SparsePolynomial)monicPoly.Clone();
+			IPolynomial f = (Polynomial)monicPoly.Clone();
 			int degree = f.Degree;
 
-			IPoly fd = SparsePolynomial.GetDerivativePolynomial(f);
-			IPoly d3 = SparsePolynomial.Product(PolynomialRing);
-			IPoly derivativeSquared = SparsePolynomial.Square(fd);
-			IPoly d2 = SparsePolynomial.Multiply(d3, derivativeSquared);
-			IPoly dd = SparsePolynomial.Mod(d2, f);
+			IPolynomial fd = Polynomial.GetDerivativePolynomial(f);
+			IPolynomial d3 = Polynomial.Product(PolynomialRing);
+			IPolynomial derivativeSquared = Polynomial.Square(fd);
+			IPolynomial d2 = Polynomial.Multiply(d3, derivativeSquared);
+			IPolynomial dd = Polynomial.Mod(d2, f);
 
 			// Set the result to S
 			S = dd;
@@ -194,19 +194,19 @@ namespace GNFSCore.SquareRoot
 			return solutionFound;
 		}
 
-		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(IPoly f, BigInteger m, int degree, IPoly dd, BigInteger p)
+		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(IPolynomial f, BigInteger m, int degree, IPolynomial dd, BigInteger p)
 		{
-			IPoly startPolynomial = SparsePolynomial.Modulus(dd, p);
-			IPoly startInversePolynomial = SparsePolynomial.ModularInverse(startPolynomial, p);
+			IPolynomial startPolynomial = Polynomial.Modulus(dd, p);
+			IPolynomial startInversePolynomial = Polynomial.ModularInverse(startPolynomial, p);
 
-			IPoly resultPoly1 = FiniteFieldArithmetic.SquareRoot(startPolynomial, f, p, degree, m);
-			IPoly resultPoly2 = SparsePolynomial.ModularInverse(resultPoly1, p);
+			IPolynomial resultPoly1 = FiniteFieldArithmetic.SquareRoot(startPolynomial, f, p, degree, m);
+			IPolynomial resultPoly2 = Polynomial.ModularInverse(resultPoly1, p);
 
 			BigInteger result1 = resultPoly1.Evaluate(m).Mod(p);
 			BigInteger result2 = resultPoly2.Evaluate(m).Mod(p);
 
-			IPoly resultSquared1 = SparsePolynomial.ModMod(SparsePolynomial.Square(resultPoly1), f, p);
-			IPoly resultSquared2 = SparsePolynomial.ModMod(SparsePolynomial.Square(resultPoly2), f, p);
+			IPolynomial resultSquared1 = Polynomial.ModMod(Polynomial.Square(resultPoly1), f, p);
+			IPolynomial resultSquared2 = Polynomial.ModMod(Polynomial.Square(resultPoly2), f, p);
 
 			bool bothResultsAgree = (resultSquared1.CompareTo(resultSquared2) == 0);
 			if (bothResultsAgree)

@@ -12,7 +12,7 @@ namespace GNFS_Winforms
 	using GNFSCore;
 	using GNFSCore.Matrix;
 	using GNFSCore.Factors;
-	using GNFSCore.Polynomial;
+	using GNFSCore.Polynomials;
 	using GNFSCore.IntegerMath;
 
 	public partial class GnfsUiBridge

@@ -4,7 +4,7 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
-using GNFSCore.Polynomial;
+using GNFSCore.Polynomials;
 using GNFSCore.IntegerMath;
 using System.IO;
 using System.Threading;
@@ -80,7 +80,7 @@ namespace GNFSCore.Factors
 			}
 		}
 
-		public static List<FactorPair> FindPolynomialRootsInRange(CancellationToken cancelToken, IPoly polynomial, IEnumerable<BigInteger> primes, BigInteger rangeFrom, BigInteger rangeTo, int totalFactorPairs)
+		public static List<FactorPair> FindPolynomialRootsInRange(CancellationToken cancelToken, IPolynomial polynomial, IEnumerable<BigInteger> primes, BigInteger rangeFrom, BigInteger rangeTo, int totalFactorPairs)
 		{
 			List<FactorPair> result = new List<FactorPair>();
 
@@ -93,7 +93,7 @@ namespace GNFSCore.Factors
 				}
 
 				IEnumerable<BigInteger> modList = primes.Where(p => p > r);
-				List<BigInteger> roots = SparsePolynomial.GetRootsMod(polynomial, r, modList);
+				List<BigInteger> roots = Polynomial.GetRootsMod(polynomial, r, modList);
 				if (roots.Any())
 				{
 					result.AddRange(roots.Select(p => new FactorPair(p, r)));

@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace GNFSCore.SquareRoot
 {
-	using GNFSCore.Polynomial;
+	using GNFSCore.Polynomials;
 	using GNFSCore.IntegerMath;
 
 	public static class FiniteFieldArithmetic
 	{
-		public static IPoly SquareRoot(IPoly startPolynomial, IPoly f, BigInteger p, int degree, BigInteger m)
+		public static IPolynomial SquareRoot(IPolynomial startPolynomial, IPolynomial f, BigInteger p, int degree, BigInteger m)
 		{
 			BigInteger q = BigInteger.Pow(p, degree);
 			BigInteger s = q - 1;
@@ -34,7 +34,7 @@ namespace GNFSCore.SquareRoot
 			BigInteger theta = quadraticNonResidue;
 			BigInteger minusOne = BigInteger.ModPow(theta, ((q - 1) / 2), p);
 
-			IPoly omegaPoly = SparsePolynomial.ExponentiateMod(startPolynomial, halfS, f, p);
+			IPolynomial omegaPoly = Polynomial.ExponentiateMod(startPolynomial, halfS, f, p);
 
 			BigInteger lambda = minusOne;
 			BigInteger zeta = 0;
@@ -48,7 +48,7 @@ namespace GNFSCore.SquareRoot
 
 				lambda = (lambda * BigInteger.Pow(zeta, (int)Math.Pow(2, (r - i)))).Mod(p);
 
-				omegaPoly = SparsePolynomial.MultiplyMod(omegaPoly, BigInteger.Pow(zeta, (int)Math.Pow(2, ((r - i) - 1))), p);								
+				omegaPoly = Polynomial.MultiplyMod(omegaPoly, BigInteger.Pow(zeta, (int)Math.Pow(2, ((r - i) - 1))), p);								
 			}
 			while (!((lambda == 1) || (i > (r))));
 

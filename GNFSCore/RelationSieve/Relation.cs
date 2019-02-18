@@ -14,7 +14,7 @@ namespace GNFSCore
 	using Factors;
 	using IntegerMath;
 	using Matrix;
-	using Polynomial;
+	using Polynomials;
 
 	public class Relation
 	{

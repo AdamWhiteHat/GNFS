@@ -11,7 +11,7 @@ using System.Xml.Schema;
 using System.Threading;
 
 using GNFSCore.Factors;
-using GNFSCore.Polynomial;
+using GNFSCore.Polynomials;
 using GNFSCore.IntegerMath;
 
 namespace GNFSCore
