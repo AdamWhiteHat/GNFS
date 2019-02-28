@@ -73,7 +73,7 @@ namespace GNFSCore
 			CancelToken = cancelToken;
 			N = n;
 
-			SaveLocations = new DirectoryLocations(N);
+			SaveLocations = new DirectoryLocations(N, polynomialBase, polyDegree);
 
 			if (!Directory.Exists(SaveLocations.SaveDirectory))
 			{
@@ -89,13 +89,12 @@ namespace GNFSCore
 					this.PolynomialDegree = polyDegree;
 				}
 
-
-
-				CaclulatePrimeBounds(primeBound);
-				ConstructNewPolynomial(polynomialBase, this.PolynomialDegree);
 				this.PolynomialBase = polynomialBase;
 
-				CurrentRelationsProgress = new PolyRelationsSieveProgress(this, CancelToken, SaveLocations.Polynomial_SaveDirectory, relationQuantity, relationValueRange);
+				CaclulatePrimeBounds(primeBound);
+				ConstructNewPolynomial(this.PolynomialBase, this.PolynomialDegree);				
+
+				CurrentRelationsProgress = new PolyRelationsSieveProgress(this, relationQuantity, relationValueRange);
 
 				SaveGnfsProgress();
 
@@ -135,7 +134,7 @@ namespace GNFSCore
 		public void SaveGnfsProgress()
 		{
 			Serializer.Serialize(SaveLocations.GnfsParameters_SaveFile, this);
-			SavePolynomial(CurrentPolynomial);
+			SavePolynomial(CurrentPolynomial, PolynomialBase);
 			CurrentRelationsProgress.SaveProgress();
 		}
 
@@ -179,12 +178,12 @@ namespace GNFSCore
 			LoadFactorBases();
 
 			// Load Relations
-			CurrentRelationsProgress = PolyRelationsSieveProgress.LoadProgress(this, SaveLocations.Polynomial_SaveDirectory);
+			CurrentRelationsProgress = PolyRelationsSieveProgress.LoadProgress(this);
 		}
 
-		public void SavePolynomial(IPolynomial poly)
+		public void SavePolynomial(IPolynomial poly, BigInteger polynomialBase)
 		{
-			SaveLocations.SetPolynomialPath(PolynomialBase, PolynomialDegree);
+			SaveLocations.SetPolynomialPath(polynomialBase, poly.Degree);
 
 			if (!Directory.Exists(SaveLocations.Polynomial_SaveDirectory))
 			{
@@ -320,7 +319,7 @@ namespace GNFSCore
 		{
 			CurrentPolynomial = new Polynomial(N, polynomialBase, polyDegree);
 			PolynomialCollection.Add(CurrentPolynomial);
-			SavePolynomial(CurrentPolynomial);
+			SavePolynomial(CurrentPolynomial, polynomialBase);
 		}
 
 		private void LoadFactorBases()

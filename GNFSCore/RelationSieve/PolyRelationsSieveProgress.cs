@@ -31,81 +31,58 @@ namespace GNFSCore
 
 		public FactorBase PrimeBase { get; private set; }
 
-		private GNFS _gnfs;
+		internal GNFS _gnfs;
 
-		#region Internal Directory / FilePath  Information
+		internal DirectoryLocations _directoryLocations;
 
-		internal static string Polynomial_SaveDirectory { get; private set; }
-		public static string Relations_SaveDirectory { get { return Path.Combine(Polynomial_SaveDirectory, "Relations"); } }
-		internal static string RelationProgress_Filename { get { return Path.Combine(Relations_SaveDirectory, "Relations.Progress"); } }
-		internal static string UnfactoredProgress_Filename { get { return Path.Combine(Relations_SaveDirectory, "Unfactored.relations"); } }
-		internal static string RoughRelations_Filename { get { return Path.Combine(Relations_SaveDirectory, "Rough.relations"); } }
-		internal static string SmoothRelations_SaveDirectory { get { return Path.Combine(Relations_SaveDirectory, "SmoothRelations"); } }
-		internal static string FreeRelations_SaveDirectory { get { return Path.Combine(Relations_SaveDirectory, "FreeRelations"); } }
-
-		#endregion
 
 		#region Constructors
 
-		public PolyRelationsSieveProgress(GNFS gnfs, CancellationToken cancelToken, string polynomialSaveDirectory, int quantity, int valueRange)
+		public PolyRelationsSieveProgress(GNFS gnfs)
 		{
-			using (CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken))
+			_gnfs = gnfs;
+			_directoryLocations = gnfs.SaveLocations;
+
+			using (CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(_gnfs.CancelToken))
 			{
 				CancelToken = cancellationSource.Token;
 			}
 
-			Polynomial_SaveDirectory = polynomialSaveDirectory;
-
-			if (!Directory.Exists(Relations_SaveDirectory))
+			if (!Directory.Exists(_directoryLocations.Relations_SaveDirectory))
 			{
-				Directory.CreateDirectory(Relations_SaveDirectory);
+				Directory.CreateDirectory(_directoryLocations.Relations_SaveDirectory);
 			}
 
-			if (!Directory.Exists(SmoothRelations_SaveDirectory))
+			if (!Directory.Exists(_directoryLocations.SmoothRelations_SaveDirectory))
 			{
-				Directory.CreateDirectory(SmoothRelations_SaveDirectory);
+				Directory.CreateDirectory(_directoryLocations.SmoothRelations_SaveDirectory);
 			}
 
-			_gnfs = gnfs;
 			PrimeBase = new FactorBase();
-			PrimeBase = gnfs.PrimeFactorBase;
+			Relations = new RelationContainer();
 
+			PrimeBase = gnfs.PrimeFactorBase;
+		}
+
+		public PolyRelationsSieveProgress(GNFS gnfs, int quantity, int valueRange)
+			: this(gnfs)
+		{
 			A = 0;
 			B = 3;
 			Quantity = quantity;
-			ValueRange = valueRange;
-			//if (ValueRange > 400 && gnfs.N < 5000000)
-			//{
-			//	ValueRange = 400;
-			//}
-
-			Relations = new RelationContainer();
+			ValueRange = valueRange;			
 		}
 
-		public PolyRelationsSieveProgress(GNFS gnfs, string polynomialSaveDirectory, int a, int b, int quantity, int valueRange, List<List<Relation>> free, List<Relation> smooth, List<RoughPair> rough, List<Relation> unfactored)
+		public PolyRelationsSieveProgress(GNFS gnfs, int a, int b, int quantity, int valueRange, List<List<Relation>> free, List<Relation> smooth, List<RoughPair> rough, List<Relation> unfactored)
+			: this(gnfs, quantity, valueRange)
 		{
-			Polynomial_SaveDirectory = polynomialSaveDirectory;
-
-			PrimeBase = new FactorBase();
-			_gnfs = gnfs;
-
 			A = a;
 			B = b;
-			Quantity = quantity;
-			ValueRange = valueRange;
 
-			Relations = new RelationContainer();
 			Relations.FreeRelations = free;
 			Relations.SmoothRelations = smooth;
 			Relations.RoughRelations = rough;
-			Relations.UnFactored = unfactored;
-
-			PrimeBase = gnfs.PrimeFactorBase;
-
-			using (CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(gnfs.CancelToken))
-			{
-				CancelToken = cancellationSource.Token;
-			}
+			Relations.UnFactored = unfactored;			
 		}
 
 		#endregion
@@ -114,14 +91,14 @@ namespace GNFSCore
 
 		public void GenerateRelations(CancellationToken cancelToken)
 		{
-			if (!Directory.Exists(Relations_SaveDirectory))
+			if (!Directory.Exists(_directoryLocations.Relations_SaveDirectory))
 			{
-				Directory.CreateDirectory(Relations_SaveDirectory);
+				Directory.CreateDirectory(_directoryLocations.Relations_SaveDirectory);
 			}
 
-			if (!Directory.Exists(SmoothRelations_SaveDirectory))
+			if (!Directory.Exists(_directoryLocations.SmoothRelations_SaveDirectory))
 			{
-				Directory.CreateDirectory(SmoothRelations_SaveDirectory);
+				Directory.CreateDirectory(_directoryLocations.SmoothRelations_SaveDirectory);
 			}
 
 			if (Quantity == -1)
@@ -185,7 +162,7 @@ namespace GNFSCore
 						if (smooth)
 						{
 							_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Add(rel);
-							rel.Save($"{SmoothRelations_SaveDirectory}\\{rel.A}_{rel.B}.relation");
+							rel.Save($"{_directoryLocations.SmoothRelations_SaveDirectory}\\{rel.A}_{rel.B}.relation");
 						}
 						else
 						{
@@ -235,7 +212,7 @@ namespace GNFSCore
 		public void AddFreeRelations(List<List<Relation>> freeRelations)
 		{
 			Relations.FreeRelations.AddRange(freeRelations);
-			SaveFreeRelationSets(freeRelations, FreeRelations_SaveDirectory);
+			SaveFreeRelationSets(freeRelations, _directoryLocations.FreeRelations_SaveDirectory);
 		}
 
 		#endregion
@@ -244,9 +221,9 @@ namespace GNFSCore
 
 		public void SaveProgress()
 		{
-			if (!Directory.Exists(Relations_SaveDirectory))
+			if (!Directory.Exists(_directoryLocations.Relations_SaveDirectory))
 			{
-				Directory.CreateDirectory(Relations_SaveDirectory);
+				Directory.CreateDirectory(_directoryLocations.Relations_SaveDirectory);
 			}
 
 			new XDocument(
@@ -256,22 +233,22 @@ namespace GNFSCore
 					new XElement("Quantity", Quantity.ToString()),
 					new XElement("ValueRange", ValueRange.ToString())
 				)
-			).Save(RelationProgress_Filename);
+			).Save(_directoryLocations.RelationProgress_Filename);
 
-			SaveFreeRelationSets(Relations.FreeRelations, FreeRelations_SaveDirectory);
+			SaveFreeRelationSets(Relations.FreeRelations, _directoryLocations.FreeRelations_SaveDirectory);
 
-			SaveSmoothRelations(Relations.SmoothRelations, SmoothRelations_SaveDirectory);
+			SaveSmoothRelations(Relations.SmoothRelations, _directoryLocations.SmoothRelations_SaveDirectory);
 
 			SaveRoughRelations();
 
 			if (Relations.UnFactored.Any())
 			{
-				if (File.Exists(UnfactoredProgress_Filename))
+				if (File.Exists(_directoryLocations.UnfactoredProgress_Filename))
 				{
-					File.Delete(UnfactoredProgress_Filename);
+					File.Delete(_directoryLocations.UnfactoredProgress_Filename);
 				}
 
-				Relation.SerializeUnfactoredToFile(UnfactoredProgress_Filename, Relations.UnFactored);
+				Relation.SerializeUnfactoredToFile(_directoryLocations.UnfactoredProgress_Filename, Relations.UnFactored);
 			}
 		}
 
@@ -279,13 +256,13 @@ namespace GNFSCore
 		{
 			if (Relations.RoughRelations.Any())
 			{
-				if (File.Exists(RoughRelations_Filename))
+				if (File.Exists(_directoryLocations.RoughRelations_Filename))
 				{
-					File.Delete(RoughRelations_Filename);
+					File.Delete(_directoryLocations.RoughRelations_Filename);
 				}
 
 				// Write out RoughRelations file
-				RoughPair.SaveToFile(RoughRelations_Filename, Relations.RoughRelations);
+				RoughPair.SaveToFile(_directoryLocations.RoughRelations_Filename, Relations.RoughRelations);
 			}
 		}
 
@@ -343,20 +320,20 @@ namespace GNFSCore
 
 		#region Load
 
-		public static PolyRelationsSieveProgress LoadProgress(GNFS gnfs, string polynomialSaveDirectory)
+		public static PolyRelationsSieveProgress LoadProgress(GNFS gnfs)
 		{
 			int a = 0;
 			int b = 1;
 			int quantity = 200;
 			int valueRange = 200;
 
-			Polynomial_SaveDirectory = polynomialSaveDirectory;
+			DirectoryLocations directoryLocations = gnfs.SaveLocations;
 
-			if (Directory.Exists(Relations_SaveDirectory))
+			if (Directory.Exists(directoryLocations.Relations_SaveDirectory))
 			{
-				if (File.Exists(RelationProgress_Filename))
+				if (File.Exists(directoryLocations.RelationProgress_Filename))
 				{
-					XElement xml = XElement.Load(RelationProgress_Filename);
+					XElement xml = XElement.Load(directoryLocations.RelationProgress_Filename);
 					a = int.Parse(xml.Element("A").Value);
 					b = int.Parse(xml.Element("B").Value);
 					quantity = int.Parse(xml.Element("Quantity").Value);
@@ -368,21 +345,21 @@ namespace GNFSCore
 				List<RoughPair> roughRelations = new List<RoughPair>();
 				List<Relation> unFactored = new List<Relation>();
 
-				freeRelations = LoadFreeRelationSets(FreeRelations_SaveDirectory);
-				smoothRelations = LoadSmoothRelations(SmoothRelations_SaveDirectory);
+				freeRelations = LoadFreeRelationSets(directoryLocations.FreeRelations_SaveDirectory);
+				smoothRelations = LoadSmoothRelations(directoryLocations.SmoothRelations_SaveDirectory);
 
-				if (File.Exists(RoughRelations_Filename))
+				if (File.Exists(directoryLocations.RoughRelations_Filename))
 				{
-					roughRelations = RoughPair.LoadFromFile(RoughRelations_Filename);
+					roughRelations = RoughPair.LoadFromFile(directoryLocations.RoughRelations_Filename);
 				}
 				else
 				{
 					roughRelations = new List<RoughPair>();
 				}
 
-				if (File.Exists(UnfactoredProgress_Filename))
+				if (File.Exists(directoryLocations.UnfactoredProgress_Filename))
 				{
-					unFactored = Relation.LoadUnfactoredFile(gnfs, UnfactoredProgress_Filename);
+					unFactored = Relation.LoadUnfactoredFile(gnfs, directoryLocations.UnfactoredProgress_Filename);
 				}
 				else
 				{
@@ -390,7 +367,7 @@ namespace GNFSCore
 				}
 
 				PolyRelationsSieveProgress result = null;
-				result = new PolyRelationsSieveProgress(gnfs, Polynomial_SaveDirectory, a, b, quantity, valueRange, freeRelations, smoothRelations, roughRelations, unFactored);
+				result = new PolyRelationsSieveProgress(gnfs, a, b, quantity, valueRange, freeRelations, smoothRelations, roughRelations, unFactored);
 
 				result.FreeRelationsDirectoryCounter = freeRelations.Count;
 
@@ -398,7 +375,7 @@ namespace GNFSCore
 			}
 			else
 			{
-				return new PolyRelationsSieveProgress(gnfs, gnfs.CancelToken, gnfs.SaveLocations.Polynomial_SaveDirectory, quantity, valueRange);
+				return new PolyRelationsSieveProgress(gnfs, quantity, valueRange);
 			}
 		}
 

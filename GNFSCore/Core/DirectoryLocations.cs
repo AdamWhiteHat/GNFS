@@ -26,29 +26,44 @@ namespace GNFSCore
 		private static readonly string elipse = "[...]";
 		private static readonly string saveRootDirectory = "C:\\GNFS";
 
-		public string SaveDirectory { get { return _saveDirectory; } /*set { _saveDirectory = value; }*/ }
+		public string SaveDirectory { get { return _saveDirectory; } }
 
 		public string GnfsParameters_SaveFile { get { return Path.Combine(SaveDirectory, _parameters); } }
 
 		public string Polynomial_Filename { get { return "_Polynomial.Parameters"; } }
-		public string Polynomial_SaveDirectory { get { return _polynomial ?? GetPolynomialPath(); } }
+		public string Polynomial_SaveDirectory { get { return _polynomial ?? SearchPolynomialPaths(); } }
 
 		public string Polynomial_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, Polynomial_Filename); } }
 		public string RationalFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Rational.FactorBase"); } }
 		public string AlgebraicFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Algebraic.FactorBase"); } }
 		public string QuadradicFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Quadradic.FactorBase"); } }
 
+		public string Relations_SaveDirectory { get { return Path.Combine(Polynomial_SaveDirectory, "Relations"); } }
+		public string RelationProgress_Filename { get { return Path.Combine(Relations_SaveDirectory, "Relations.Progress"); } }
+		public string UnfactoredProgress_Filename { get { return Path.Combine(Relations_SaveDirectory, "Unfactored.relations"); } }
+		public string RoughRelations_Filename { get { return Path.Combine(Relations_SaveDirectory, "Rough.relations"); } }
+		public string SmoothRelations_SaveDirectory { get { return Path.Combine(Relations_SaveDirectory, "SmoothRelations"); } }
+		public string FreeRelations_SaveDirectory { get { return Path.Combine(Relations_SaveDirectory, "FreeRelations"); } }
+
 		public DirectoryLocations(string baseDirectory)
 		{
 			_saveDirectory = baseDirectory;
+			SearchPolynomialPaths();
 		}
 
 		public DirectoryLocations(BigInteger n)
 		{
 			_saveDirectory = GenerateSaveDirectory(n);
+			SearchPolynomialPaths();
 		}
 
-		public string GetPolynomialPath()
+		public DirectoryLocations(BigInteger n, BigInteger polynomialBase, BigInteger polynomialDegree)
+		{
+			_saveDirectory = GenerateSaveDirectory(n);
+			SetPolynomialPath(polynomialBase, polynomialDegree);
+		}
+
+		private string SearchPolynomialPaths()
 		{
 			IEnumerable<string> polyDirectoriesrelationFiles = Directory.EnumerateDirectories(SaveDirectory, "Poly_B[*", SearchOption.TopDirectoryOnly);
 
