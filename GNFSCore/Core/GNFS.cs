@@ -427,12 +427,6 @@ namespace GNFSCore
 			result.AppendLine(QFB.ToString());
 			result.AppendLine();
 
-			List<int> prms = new List<int>();
-			prms.AddRange(RFB.Primes);
-			prms.AddRange(AFB.Primes);
-			prms.AddRange(QFB.Primes);
-			prms = prms.Distinct().ToList();
-
 			result.AppendLine();
 			result.AppendLine();
 

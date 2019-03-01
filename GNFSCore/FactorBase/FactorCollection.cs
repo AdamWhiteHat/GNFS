@@ -23,14 +23,6 @@ namespace GNFSCore.Factors
 		{
 		}
 
-		public List<int> Primes
-		{
-			get
-			{
-				return this.Select(fp => fp.P).Distinct().ToList();
-			}
-		}
-
 		public override string ToString()
 		{
 			return string.Join("\t", this.Select(factr => factr.ToString()));
@@ -64,19 +56,6 @@ namespace GNFSCore.Factors
 			public static FactorCollection BuildQuadradicFactorBase(GNFS gnfs)
 			{
 				return new FactorCollection(FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.QuadraticFactorBase, 2, gnfs.PrimeFactorBase.MinQuadraticFactorBase, 100));
-			}
-
-			private delegate BigInteger BigIntegerEvaluateDelegate(BigInteger x);
-			private delegate BigInteger DoubleEvaluateDelegate(BigInteger x);
-
-			public static FactorCollection BuildGFactorBase(GNFS gnfs)
-			{
-				BigInteger Cd = (gnfs.CurrentPolynomial.Terms.Last().CoEfficient);
-				BigInteger Cdd = BigInteger.Pow(Cd, (gnfs.CurrentPolynomial.Degree - 1));
-				DoubleEvaluateDelegate evalDelegate = gnfs.CurrentPolynomial.Evaluate;
-
-				IEnumerable<FactorPair> results = gnfs.PrimeFactorBase.RationalFactorBase.Select(p => new FactorPair(p, BigInteger.Multiply(evalDelegate(BigInteger.Divide(p, Cd)), Cdd))).Distinct();
-				return new FactorCollection(results.ToList());
 			}
 		}
 

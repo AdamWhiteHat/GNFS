@@ -5,15 +5,10 @@ using System.Numerics;
 using System.Threading;
 using System.Windows.Forms;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace GNFS_Winforms
 {
 	using GNFSCore;
-	using GNFSCore.Polynomials;
-	using GNFSCore.Factors;
-	using GNFSCore.IntegerMath;
-	using GNFSCore.Matrix;
 
 	public partial class GnfsUiBridge
 	{
@@ -26,7 +21,7 @@ namespace GNFS_Winforms
 			return gnfs;
 		}
 
-		public GNFS CreateGnfs(CancellationToken cancelToken, BigInteger n)
+		public GNFS LoadGnfs(CancellationToken cancelToken, BigInteger n)
 		{
 			GNFS gnfs = new GNFS(cancelToken, n);
 

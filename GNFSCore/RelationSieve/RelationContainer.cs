@@ -11,11 +11,7 @@ using System.Xml.Serialization;
 
 namespace GNFSCore
 {
-	using Factors;
-	using IntegerMath;
-	using Matrix;
-	using Polynomials;
-
+	
 	public class RelationContainer
 	{
 		public List<List<Relation>> FreeRelations { get; internal set; }
