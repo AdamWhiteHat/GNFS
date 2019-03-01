@@ -24,7 +24,7 @@ namespace GNFSCore
 
 		private static readonly int showDigits = 22;
 		private static readonly string elipse = "[...]";
-		private static readonly string saveRootDirectory = "C:\\GNFS";
+		private static readonly string saveRootDirectory = "GNFS";
 
 		public string SaveDirectory { get { return _saveDirectory; } }
 
@@ -45,6 +45,14 @@ namespace GNFSCore
 		public string SmoothRelations_SaveDirectory { get { return Path.Combine(Relations_SaveDirectory, "SmoothRelations"); } }
 		public string FreeRelations_SaveDirectory { get { return Path.Combine(Relations_SaveDirectory, "FreeRelations"); } }
 
+		static DirectoryLocations()
+		{
+			if (!IsLinuxOS())
+			{
+				saveRootDirectory = "C:\\GNFS";
+			}
+		}
+
 		public DirectoryLocations(string baseDirectory)
 		{
 			_saveDirectory = baseDirectory;
@@ -61,6 +69,12 @@ namespace GNFSCore
 		{
 			_saveDirectory = GenerateSaveDirectory(n);
 			SetPolynomialPath(polynomialBase, polynomialDegree);
+		}
+
+		private static bool IsLinuxOS()
+		{
+			int p = (int)Environment.OSVersion.Platform;
+			return (p == 4) || (p == 6) || (p == 128); // 128 comes from mono run-times
 		}
 
 		private string SearchPolynomialPaths()
