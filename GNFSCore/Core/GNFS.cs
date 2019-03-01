@@ -144,13 +144,14 @@ namespace GNFSCore
 			PolynomialBase = input.PolynomialBase;
 			PolynomialDegree = input.PolynomialDegree;
 
-
 			PrimeFactorBase.MaxRationalFactorBase = input.PrimeFactorBase.MaxRationalFactorBase;
 			PrimeFactorBase.MaxAlgebraicFactorBase = input.PrimeFactorBase.MaxAlgebraicFactorBase;
 			PrimeFactorBase.MinQuadraticFactorBase = input.PrimeFactorBase.MinQuadraticFactorBase;
 			PrimeFactorBase.MaxQuadraticFactorBase = input.PrimeFactorBase.MaxQuadraticFactorBase;
 
 			int quadraticBaseSize = CalculateQuadraticBaseSize(PolynomialDegree);
+
+			PrimeFactory.IncreaseMaxValue(PrimeFactorBase.MaxQuadraticFactorBase);
 
 			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxRationalFactorBase).ToList();
 			PrimeFactorBase.AlgebraicFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxAlgebraicFactorBase).ToList();
@@ -259,43 +260,33 @@ namespace GNFSCore
 
 		private void CaclulatePrimeBounds(BigInteger bound)
 		{
-			PrimeFactory.IncreaseMaxValue(PrimeFactorBase.MaxAlgebraicFactorBase + 10000);
-
 			PrimeFactorBase = new FactorBase();
 
 			PrimeFactorBase.MaxRationalFactorBase = bound;
-			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxRationalFactorBase).ToList();
-
 			PrimeFactorBase.MaxAlgebraicFactorBase = (PrimeFactorBase.MaxRationalFactorBase) * 3;
+
+			int quadraticBaseSize = CalculateQuadraticBaseSize(PolynomialDegree);
+
+			PrimeFactorBase.MinQuadraticFactorBase = PrimeFactorBase.MaxAlgebraicFactorBase + 20;
+			PrimeFactorBase.MaxQuadraticFactorBase = PrimeFactory.GetApproximateValueFromIndex((UInt64)(PrimeFactorBase.MinQuadraticFactorBase + quadraticBaseSize));
+			
+			PrimeFactory.IncreaseMaxValue(PrimeFactorBase.MaxQuadraticFactorBase);
+			
+			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxRationalFactorBase).ToList();
 			PrimeFactorBase.AlgebraicFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.MaxAlgebraicFactorBase).ToList();
 
-			int quadraticBaseSize = 0;
-
-			if (PolynomialDegree <= 3)
-			{
-				int tempQ = (PrimeFactorBase.RationalFactorBase.Count + PrimeFactorBase.AlgebraicFactorBase.Count + 1);
-				tempQ = tempQ / 10;
-
-				quadraticBaseSize = Math.Min(tempQ, 100);
-			}
-			else
-			{
-				quadraticBaseSize = CalculateQuadraticBaseSize(PolynomialDegree);
-			}
-
-			//PrimeFactorBase.MinQuadraticFactorBase = BigInteger.Multiply(bound, 3) + BigInteger.Divide(bound, 2);			
-			//(quadraticBaseSize * 2) + 1)
-			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesFrom(PrimeFactorBase.MaxAlgebraicFactorBase + 100).Take(200).ToList();
-
-			PrimeFactorBase.MaxQuadraticFactorBase = PrimeFactorBase.QuadraticFactorBase.Last();
-
+			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesFrom(PrimeFactorBase.MinQuadraticFactorBase).Take(quadraticBaseSize).ToList();
 		}
 
 		private static int CalculateQuadraticBaseSize(int polyDegree)
 		{
 			int result = -1;
 
-			if (polyDegree == 4)
+			if (polyDegree <= 3)
+			{
+				result = 10;
+			}
+			else if (polyDegree == 4)
 			{
 				result = 20;
 			}
