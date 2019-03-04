@@ -141,54 +141,73 @@ namespace GNFSCore.SquareRoot
 			List<Tuple<BigInteger, BigInteger>> resultTuples = new List<Tuple<BigInteger, BigInteger>>();
 
 			BigInteger primeProduct = 1;
-
-
-
+			
 			BigInteger lastP = N / N.ToString().Length; //((N * 3) + 1).NthRoot(3); //gnfs.QFB.Select(fp => fp.P).Max();
-			do
-			{
-				lastP = PrimeFactory.GetNextPrime(lastP + 1);
-
-				Tuple<BigInteger, BigInteger> lastResult = AlgebraicSquareRoot(f, m, degree, dd, lastP);
-
-				if (lastResult.Item1 != 0)
-				{
-					primes.Add(lastP);
-					resultTuples.Add(lastResult);
-					primeProduct *= BigInteger.Min(lastResult.Item1, lastResult.Item2);
-				}
-			}
-			while (primeProduct < N || primes.Count < degree);
-			AlgebraicPrimes = primes;
-
-			IEnumerable<IEnumerable<BigInteger>> permutations =
-				Combinatorics.CartesianProduct(resultTuples.Select(tup => new List<BigInteger>() { tup.Item1, tup.Item2 }));
-
-			BigInteger rationalSquareRoot = RationalSquareRootResidue;
-			BigInteger algebraicSquareRoot = 1;
 
 			bool solutionFound = false;
-			foreach (List<BigInteger> X in permutations)
+
+			while (!solutionFound)
 			{
-				algebraicSquareRoot = FiniteFieldArithmetic.ChineseRemainder(N, X, primes);
-
-				BigInteger min = BigInteger.Min(rationalSquareRoot, algebraicSquareRoot);
-				BigInteger max = BigInteger.Max(rationalSquareRoot, algebraicSquareRoot);
-
-				BigInteger A = max + min;
-				BigInteger B = max - min;
-
-				BigInteger U = GCD.FindGCD(N, A);
-				BigInteger V = GCD.FindGCD(N, B);
-
-				if (U > 1 && V > 1)
+				do
 				{
-					solutionFound = true;
-					AlgebraicResults = X;
-					AlgebraicSquareRootResidue = algebraicSquareRoot;
+					lastP = PrimeFactory.GetNextPrime(lastP + 1);
 
-					break;
+					Tuple<BigInteger, BigInteger> lastResult = AlgebraicSquareRoot(f, m, degree, dd, lastP);
+
+					if (lastResult.Item1 != 0)
+					{
+						primes.Add(lastP);
+						resultTuples.Add(lastResult);
+
+					}
 				}
+				while (primes.Count < degree);
+
+
+				if (primes.Count > degree)
+				{
+					primes.Remove(primes.First());
+					resultTuples.Remove(resultTuples.First());
+				}
+
+				primeProduct = (resultTuples.Select(tup => BigInteger.Min(tup.Item1, tup.Item2)).Product());
+
+				if (primeProduct < N)
+				{
+					continue;
+				}
+				
+				AlgebraicPrimes = primes;
+
+				IEnumerable<IEnumerable<BigInteger>> permutations =
+					Combinatorics.CartesianProduct(resultTuples.Select(tup => new List<BigInteger>() { tup.Item1, tup.Item2 }));
+
+				BigInteger rationalSquareRoot = RationalSquareRootResidue;
+				BigInteger algebraicSquareRoot = 1;
+
+				foreach (List<BigInteger> X in permutations)
+				{
+					algebraicSquareRoot = FiniteFieldArithmetic.ChineseRemainder(N, X, primes);
+
+					BigInteger min = BigInteger.Min(rationalSquareRoot, algebraicSquareRoot);
+					BigInteger max = BigInteger.Max(rationalSquareRoot, algebraicSquareRoot);
+
+					BigInteger A = max + min;
+					BigInteger B = max - min;
+
+					BigInteger U = GCD.FindGCD(N, A);
+					BigInteger V = GCD.FindGCD(N, B);
+
+					if (U > 1 && V > 1)
+					{
+						solutionFound = true;
+						AlgebraicResults = X;
+						AlgebraicSquareRootResidue = algebraicSquareRoot;
+
+						break;
+					}
+				}
+
 			}
 
 			return solutionFound;
