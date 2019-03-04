@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Adam Rakaska")]
 [assembly: AssemblyProduct("GNFS Winforms")]
 [assembly: AssemblyCopyright("Made by Adam Rakaska")]
-[assembly: AssemblyTrademark("https://github.com/AdamRakaska")]
+[assembly: AssemblyTrademark("https://github.com/AdamWhiteHat")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
