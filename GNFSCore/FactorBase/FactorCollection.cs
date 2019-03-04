@@ -55,7 +55,7 @@ namespace GNFSCore.Factors
 			// magnitude p > AFB.Last().p
 			public static FactorCollection BuildQuadradicFactorBase(GNFS gnfs)
 			{
-				return new FactorCollection(FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.QuadraticFactorBase, 2, gnfs.PrimeFactorBase.MinQuadraticFactorBase, 100));
+				return new FactorCollection(FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.QuadraticFactorBase, 2, gnfs.PrimeFactorBase.MaxQuadraticFactorBase, gnfs.PrimeFactorBase.QuadraticBaseSize));
 			}
 		}
 
