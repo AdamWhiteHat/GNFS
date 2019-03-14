@@ -23,7 +23,7 @@ namespace GNFS_Winforms
 
 		public static void SetControlEnabledState(Control control, bool enabled)
 		{
-			if (control.InvokeRequired)
+			if (!GNFSCore.DirectoryLocations.IsLinuxOS() && control.InvokeRequired)
 			{
 				control.Invoke(new MethodInvoker(() =>
 					SetControlEnabledState(control, enabled)
@@ -37,7 +37,7 @@ namespace GNFS_Winforms
 
 		public static void SetControlVisibleState(Control control, bool visible)
 		{
-			if (control.InvokeRequired)
+			if (!GNFSCore.DirectoryLocations.IsLinuxOS() && control.InvokeRequired)
 			{
 				control.Invoke(new MethodInvoker(() =>
 					SetControlVisibleState(control, visible)
@@ -51,7 +51,7 @@ namespace GNFS_Winforms
 
 		public static void SetControlText(Control control, string text)
 		{
-			if (control.InvokeRequired)
+			if (!GNFSCore.DirectoryLocations.IsLinuxOS() && control.InvokeRequired)
 			{
 				control.Invoke(new MethodInvoker(() =>
 					SetControlText(control, text)

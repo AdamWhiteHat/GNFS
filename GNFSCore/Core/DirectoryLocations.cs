@@ -45,7 +45,7 @@ namespace GNFSCore
 			SetPolynomialPath(polynomialBase, polynomialDegree);
 		}
 
-		private static bool IsLinuxOS()
+		public static bool IsLinuxOS()
 		{
 			int p = (int)Environment.OSVersion.Platform;
 			return (p == 4) || (p == 6) || (p == 128); // 128 comes from mono run-times

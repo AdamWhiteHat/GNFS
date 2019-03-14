@@ -25,9 +25,9 @@ namespace GNFS_Winforms
 				+ 3;
 
 
-			mainForm.LogOutput($"Total relations: {smoothCount}");
-			mainForm.LogOutput($"MaxRelationsToSelect: {maxRelationsToSelect}");
-			mainForm.LogOutput($"ttl / max = {smoothCount / maxRelationsToSelect}");
+			Logging.LogMessage($"Total relations: {smoothCount}");
+			Logging.LogMessage($"MaxRelationsToSelect: {maxRelationsToSelect}");
+			Logging.LogMessage($"ttl / max = {smoothCount / maxRelationsToSelect}");
 
 			List<List<Relation>> allSolutionGroups = new List<List<Relation>>();
 			List<Tuple<BigInteger, BigInteger>> allSolutionTuples = new List<Tuple<BigInteger, BigInteger>>();
@@ -75,12 +75,12 @@ namespace GNFS_Winforms
 					bool isAlgebraicSquare = algebraic.IsSquare();
 					bool isRationalSquare = rational.IsSquare();
 
-					mainForm.LogOutput("---");
-					mainForm.LogOutput($"Relations count: {relations.Count}");
-					mainForm.LogOutput($"(a,b) pairs: {string.Join(" ", relations.Select(rel => $"({rel.A},{rel.B})"))}");
-					mainForm.LogOutput($"Rational  ∏(a+mb): IsSquare? {isRationalSquare} : {rational}");
-					mainForm.LogOutput($"Algebraic ∏ƒ(a/b): IsSquare? {isAlgebraicSquare} : {algebraic}");
-					mainForm.LogOutput($"Algebraic (factorization): {algCountDict.FormatStringAsFactorization()}");
+					Logging.LogMessage("---");
+					Logging.LogMessage($"Relations count: {relations.Count}");
+					Logging.LogMessage($"(a,b) pairs: {string.Join(" ", relations.Select(rel => $"({rel.A},{rel.B})"))}");
+					Logging.LogMessage($"Rational  ∏(a+mb): IsSquare? {isRationalSquare} : {rational}");
+					Logging.LogMessage($"Algebraic ∏ƒ(a/b): IsSquare? {isAlgebraicSquare} : {algebraic}");
+					Logging.LogMessage($"Algebraic (factorization): {algCountDict.FormatStringAsFactorization()}");
 
 					if (isAlgebraicSquare && isRationalSquare)
 					{
@@ -115,9 +115,8 @@ namespace GNFS_Winforms
 
 			gnfs.CurrentRelationsProgress.AddFreeRelations(allSolutionGroups);
 
-			mainForm.LogOutput();
-			mainForm.LogOutput();
-
+			Logging.LogMessage();
+			
 			return gnfs;
 		}
 

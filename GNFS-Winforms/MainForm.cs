@@ -25,9 +25,7 @@ namespace GNFS_Winforms
 		private BigInteger primeBound;
 		private GnfsUiBridge gnfsBridge;
 
-		private string logFilename;
 		private bool IsWorking = false;
-		private bool firstFindRelations = false;
 		private CancellationToken cancellationToken;
 		private CancellationTokenSource cancellationTokenSource;
 
@@ -47,30 +45,27 @@ namespace GNFS_Winforms
 		{
 			InitializeComponent();
 			IsWorking = false;
-			logFilename = "";
 			gnfs = null;
-
 			gnfsBridge = new GnfsUiBridge(this);
 
-			tbN.Text = MatthewBriggs.ToString(); //PerLeslieJensen.ToString();//RSA_100.ToString();
-			tbDegree.Text = "3"; // "5";//"3"; //"4"; //"5"; //"6"; //"7"						
-
+			tbN.Text = RSA_100.ToString();
+			tbDegree.Text = Settings.Degree;
+			tbBase.Text = Settings.Base;
+			tbBound.Text = Settings.Bound;
+			tbRelationQuantity.Text = Settings.RelationQuantity;
+			tbRelationValueRange.Text = Settings.RelationValueRange;
 
 			n = BigInteger.Parse(tbN.Text);
 			degree = int.Parse(tbDegree.Text);
 
-			tbBase.Text = "31"; // "1261737131078349405";// "117"; // "31";
-
-			tbBound.Text = "61"; // "1020379"; //"61"; 
-			tbRelationQuantity.Text = "200"; // "4778012"; //"200";
-			tbRelationValueRange.Text = "300"; //"1800000"; //"300";
-
 			gnfsBridge = new GnfsUiBridge(this);
+
+			Logging.OutputTextbox = tbOutput;
 		}
 
 		private static void SetGnfs(MainForm form, GNFS gnfs)
 		{
-			if (form.InvokeRequired)
+			if (!GNFSCore.DirectoryLocations.IsLinuxOS() && form.InvokeRequired)
 			{
 				form.Invoke(new MethodInvoker(() =>
 					SetGnfs(form, gnfs)
@@ -135,57 +130,7 @@ namespace GNFS_Winforms
 			}
 		}
 
-		public void LogOutput(string message = "")
-		{
-			if (tbOutput.InvokeRequired)
-			{
-				tbOutput.Invoke(new MethodInvoker(() => LogOutput(message)));
-			}
-			else
-			{
-				if (!this.IsDisposed)
-				{
-					string toLog = message + Environment.NewLine;
 
-					tbOutput.AppendText(toLog);
-
-					if (!string.IsNullOrWhiteSpace(logFilename) && File.Exists(logFilename))
-					{
-						File.AppendAllText(logFilename, toLog);
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// Creates a base folder and log file if no such structures exist.
-		/// </summary>
-		/// <returns>True if a previous save folder was found and loaded. This is so we know to populate the UI with loaded values.</returns>
-		private bool CreateLogFileIfNotExists(string logFilename)
-		{
-			bool load = true;
-
-			string directory = Path.GetDirectoryName(logFilename);
-
-			if (!Directory.Exists(directory))
-			{
-				firstFindRelations = true;
-				if (File.Exists(logFilename))
-				{
-					File.Delete(logFilename);
-				}
-			}
-
-			if (!File.Exists(logFilename))
-			{
-				string logHeader = $"Log created: {DateTime.Now}";
-				string line = new string(Enumerable.Repeat('-', logHeader.Length).ToArray());
-
-				File.WriteAllLines(logFilename, new string[] { logHeader, line, Environment.NewLine });
-			}
-
-			return load;
-		}
 
 		#endregion
 
@@ -199,9 +144,9 @@ namespace GNFS_Winforms
 
 				bool breakAfterOneRound = false;
 
-				if (firstFindRelations)
+				if (Logging.FirstFindRelations)
 				{
-					firstFindRelations = false;
+					Logging.FirstFindRelations = false;
 					breakAfterOneRound = true;
 				}
 
@@ -269,7 +214,7 @@ namespace GNFS_Winforms
 		{
 			if (gnfs.CurrentRelationsProgress.SmoothRelations.Any())
 			{
-				LogOutput(gnfs.CurrentRelationsProgress.ToString());
+				Logging.LogMessage(gnfs.CurrentRelationsProgress.ToString());
 			}
 		}
 
@@ -291,8 +236,8 @@ namespace GNFS_Winforms
 
 				n = BigInteger.Parse(tbN.Text);
 
-				logFilename = DirectoryLocations.GetUniqueNameFromN(n) + ".LOG.txt";
-				CreateLogFileIfNotExists(logFilename);
+				Logging.OutputFilename = DirectoryLocations.GetUniqueNameFromN(n) + ".LOG.txt";
+				Logging.CreateLogFileIfNotExists();
 
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
@@ -321,9 +266,8 @@ namespace GNFS_Winforms
 				int relationQuantity = int.Parse(tbRelationQuantity.Text);
 				int relationValueRange = int.Parse(tbRelationValueRange.Text);
 
-				logFilename = DirectoryLocations.GetUniqueNameFromN(n) + ".LOG.txt";
-
-				CreateLogFileIfNotExists(logFilename);
+				Logging.OutputFilename = DirectoryLocations.GetUniqueNameFromN(n) + ".LOG.txt";
+				Logging.CreateLogFileIfNotExists();
 
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>

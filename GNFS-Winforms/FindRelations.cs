@@ -13,11 +13,11 @@ namespace GNFS_Winforms
 			{
 				gnfs.CurrentRelationsProgress.GenerateRelations(cancelToken);
 
-				mainForm.LogOutput();
-				mainForm.LogOutput($"Sieving progress saved at:");
-				mainForm.LogOutput($"   A = {gnfs.CurrentRelationsProgress.A}");
-				mainForm.LogOutput($"   B = {gnfs.CurrentRelationsProgress.B}");
-				mainForm.LogOutput();
+				Logging.LogMessage();
+				Logging.LogMessage($"Sieving progress saved at:");
+				Logging.LogMessage($"   A = {gnfs.CurrentRelationsProgress.A}");
+				Logging.LogMessage($"   B = {gnfs.CurrentRelationsProgress.B}");
+				Logging.LogMessage();
 
 				if (oneRound)
 				{
