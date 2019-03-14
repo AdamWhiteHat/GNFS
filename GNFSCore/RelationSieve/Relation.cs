@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using System.Numerics;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Xml;
@@ -14,46 +15,57 @@ namespace GNFSCore
 	using Factors;
 	using IntegerMath;
 	using Matrix;
-	using Polynomials;
 
-	public class Relation : IEquatable<Relation>, IEqualityComparer<Relation>, IFormattable, IXmlSerializable
+	using Interfaces;
+
+	public class Relation : IEquatable<Relation>, IEqualityComparer<Relation>
 	{
-		public int A { get; private set; }
+		[JsonProperty(Order = 0)]
+		public int A { get; protected set; }
 
 		/// <summary>
 		/// Root of f(x) in algebraic field
 		/// </summary>
-		public int B { get; private set; }
+		[JsonProperty(Order = 1)]
+		public int B { get; protected set; }
 
 		/// <summary> ƒ(b) ≡ 0 (mod a); Calculated as: ƒ(-a/b) * -b^deg </summary>
-		public BigInteger AlgebraicNorm { get; private set; }
+		[JsonProperty(Order = 2)]
+		public BigInteger AlgebraicNorm { get; protected set; }
 		/// <summary>  a + bm </summary>
-		public BigInteger RationalNorm { get; private set; }
+		[JsonProperty(Order = 3)]
+		public BigInteger RationalNorm { get; protected set; }
 
-		[XmlElement(ElementName = "AlgebraicFactorization")]
-		public CountDictionary AlgebraicFactorization { get; private set; }
-
-		[XmlElement(ElementName = "RationalFactorization")]
-		public CountDictionary RationalFactorization { get; private set; }
-
+		[JsonProperty(Order = 4)]
 		internal BigInteger AlgebraicQuotient;
+		[JsonProperty(Order = 5)]
 		internal BigInteger RationalQuotient;
 
-		public bool IsSmooth
-		{
-			get
-			{
-				return (AlgebraicQuotient == 1 || AlgebraicQuotient == 0) && (RationalQuotient == 1 || RationalQuotient == 0);
-			}
-		}
+		public bool ShouldSerializeAlgebraicQuotient() { return !(AlgebraicQuotient == 1 || AlgebraicQuotient == 0); }
+		public bool ShouldSerializeRationalQuotient() { return !(RationalQuotient == 1 || RationalQuotient == 0); }
 
-		public Tuple<BigInteger, BigInteger> GetRoughRemainders()
-		{
-			return new Tuple<BigInteger, BigInteger>(AlgebraicQuotient, RationalQuotient);
-		}
+		[JsonProperty(Order = 6)]
+		public CountDictionary AlgebraicFactorization { get; private set; }
+		[JsonProperty(Order = 7)]
+		public CountDictionary RationalFactorization { get; private set; }
+
+		[JsonProperty(Order = 8)]
+		public bool IsSmooth { get { return (AlgebraicQuotient == 1 || AlgebraicQuotient == 0) && (RationalQuotient == 1 || RationalQuotient == 0); } }
 
 		public Relation()
+		{ }
+
+		public Relation(Relation relation)
 		{
+			this.A = relation.A;
+			this.B = relation.B;
+			this.AlgebraicNorm = relation.AlgebraicNorm;
+			this.RationalNorm = relation.RationalNorm;
+			this.AlgebraicQuotient = BigInteger.Abs(relation.AlgebraicQuotient);
+			this.RationalQuotient = BigInteger.Abs(relation.RationalQuotient);
+			this.AlgebraicFactorization = relation.AlgebraicFactorization;
+			this.RationalFactorization = relation.RationalFactorization;
+
 		}
 
 		public Relation(GNFS gnfs, int a, int b)
@@ -103,8 +115,8 @@ namespace GNFSCore
 
 		public void Sieve(PolyRelationsSieveProgress relationsSieve)
 		{
-			Sieve(relationsSieve.PrimeBase.AlgebraicFactorBase, ref AlgebraicQuotient, AlgebraicFactorization);
-			Sieve(relationsSieve.PrimeBase.RationalFactorBase, ref RationalQuotient, RationalFactorization);
+			Sieve(relationsSieve._gnfs.PrimeFactorBase.AlgebraicFactorBase, ref AlgebraicQuotient, AlgebraicFactorization);
+			Sieve(relationsSieve._gnfs.PrimeFactorBase.RationalFactorBase, ref RationalQuotient, RationalFactorization);
 		}
 
 		private static void Sieve(IEnumerable<BigInteger> primeFactors, ref BigInteger quotientValue, CountDictionary dictionary)
@@ -137,25 +149,6 @@ namespace GNFSCore
 					dictionary.Add(factor);
 				}
 			}
-		}
-
-		public static List<Relation> LoadUnfactoredFile(GNFS gnfs, string filename)
-		{
-			return File.ReadAllLines(filename).Select(str =>
-			{
-				string[] ab = str.Split(new char[] { ',' });
-				return new Relation(gnfs, int.Parse(ab[0]), int.Parse(ab[1]));
-			}).ToList();
-		}
-
-		public static void SerializeUnfactoredToFile(string filename, List<Relation> relations)
-		{
-			File.WriteAllLines(filename, relations.Select(rel => $"{rel.A},{rel.B}"));
-		}
-
-		public void Save(string filename)
-		{
-			Serializer.Serialize(filename, this); // $"{directory}\\{relation.A}_{relation.B}.relation"
 		}
 
 		#region IEquatable / IEqualityComparer
@@ -196,13 +189,6 @@ namespace GNFSCore
 
 		#endregion
 
-		#region IFormattable
-
-		public string ToString(string format, IFormatProvider formatProvider)
-		{
-			return ToString();
-		}
-
 		public override string ToString()
 		{
 			return
@@ -210,46 +196,5 @@ namespace GNFSCore
 				+ $"[ƒ(b) ≡ 0 (mod a):{AlgebraicNorm.ToString().PadLeft(10)} (AlgebraicNorm) IsSquare: {AlgebraicNorm.IsSquare()},\ta+b*m={RationalNorm.ToString().PadLeft(4)} (RationalNorm) IsSquare: {RationalNorm.IsSquare()}]\t";
 		}
 
-		#endregion
-
-		#region IXmlSerializable
-
-		private static XmlSerializer AlgebraicFactorizationXmlSerializer = new XmlSerializer(typeof(CountDictionary), new XmlRootAttribute("AlgebraicFactorization"));
-		private static XmlSerializer RationalFactorizationXmlSerializer = new XmlSerializer(typeof(CountDictionary), new XmlRootAttribute("RationalFactorization"));
-		public void WriteXml(XmlWriter writer)
-		{
-			writer.WriteElementString("A", A.ToString());
-			writer.WriteElementString("B", B.ToString());
-			writer.WriteElementString("AlgebraicNorm", AlgebraicNorm.ToString());
-			writer.WriteElementString("RationalNorm", RationalNorm.ToString());
-			writer.WriteElementString("AlgebraicQuotient", AlgebraicQuotient.ToString());
-			writer.WriteElementString("RationalQuotient", RationalQuotient.ToString());
-
-			AlgebraicFactorizationXmlSerializer.Serialize(writer, AlgebraicFactorization);
-
-			RationalFactorizationXmlSerializer.Serialize(writer, RationalFactorization);
-		}
-
-		public void ReadXml(XmlReader reader)
-		{
-			reader.MoveToContent();
-			reader.ReadStartElement();
-
-			A = int.Parse(reader.ReadElementString("A"));
-			B = int.Parse(reader.ReadElementString("B"));
-			AlgebraicNorm = BigInteger.Parse(reader.ReadElementString("AlgebraicNorm"));
-			RationalNorm = BigInteger.Parse(reader.ReadElementString("RationalNorm"));
-			AlgebraicQuotient = BigInteger.Parse(reader.ReadElementString("AlgebraicQuotient"));
-			RationalQuotient = BigInteger.Parse(reader.ReadElementString("RationalQuotient"));
-
-
-			AlgebraicFactorization = (CountDictionary)AlgebraicFactorizationXmlSerializer.Deserialize(reader);
-
-			RationalFactorization = (CountDictionary)RationalFactorizationXmlSerializer.Deserialize(reader);
-		}
-
-		public XmlSchema GetSchema() { return null; }
-
-		#endregion
 	}
 }

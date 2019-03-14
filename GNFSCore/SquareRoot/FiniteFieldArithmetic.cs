@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace GNFSCore.SquareRoot
 {
-	using GNFSCore.Polynomials;
-	using GNFSCore.IntegerMath;
+	using Interfaces;
+	using IntegerMath;
 
 	public static class FiniteFieldArithmetic
 	{
@@ -42,13 +40,13 @@ namespace GNFSCore.SquareRoot
 			int i = 0;
 			do
 			{
-				i++;				
+				i++;
 
 				zeta = BigInteger.ModPow(theta, (i * s), p);
 
 				lambda = (lambda * BigInteger.Pow(zeta, (int)Math.Pow(2, (r - i)))).Mod(p);
 
-				omegaPoly = Polynomial.MultiplyMod(omegaPoly, BigInteger.Pow(zeta, (int)Math.Pow(2, ((r - i) - 1))), p);								
+				omegaPoly = Polynomial.MultiplyMod(omegaPoly, BigInteger.Pow(zeta, (int)Math.Pow(2, ((r - i) - 1))), p);
 			}
 			while (!((lambda == 1) || (i > (r))));
 

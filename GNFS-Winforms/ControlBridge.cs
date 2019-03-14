@@ -1,11 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Numerics;
-using System.Threading;
-using System.Windows.Forms;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+﻿using System.Windows.Forms;
 
 namespace GNFS_Winforms
 {

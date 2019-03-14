@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace GNFSCore
 {
@@ -58,6 +56,6 @@ namespace GNFSCore
 			return $"{{{nl}" +
 					string.Join(delim, input.Select(i => $"{tab}{i.ToString().PadLeft(padding)}")) +
 					$"{nl}}}";
-		}		
+		}
 	}
 }

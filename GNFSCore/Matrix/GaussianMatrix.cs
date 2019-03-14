@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Collections.Generic;
 
 namespace GNFSCore.Matrix
 {
-	using GNFSCore.Factors;
-	using GNFSCore.IntegerMath;
+	using IntegerMath;
 
 	public class GaussianMatrix
 	{
@@ -24,8 +23,7 @@ namespace GNFSCore.Matrix
 		private List<Relation> relations;
 		public Dictionary<int, Relation> ColumnIndexRelationDictionary;
 		private List<Tuple<Relation, bool[]>> relationMatrixTuple;
-
-
+		
 		public GaussianMatrix(GNFS gnfs, List<Relation> rels)
 		{
 			_gnfs = gnfs;
@@ -35,7 +33,7 @@ namespace GNFSCore.Matrix
 			M = new List<bool[]>();
 
 
-			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.MaxRationalFactorBase) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.MaxAlgebraicFactorBase) + _gnfs.QFB.Count + 3;
+			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.RationalFactorBaseMax) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.AlgebraicFactorBaseMax) + _gnfs.QuadradicFactorPairCollection.Count + 3;
 
 			relations = rels;
 
@@ -76,8 +74,7 @@ namespace GNFSCore.Matrix
 				relationMatrixTuple.Add(new Tuple<Relation, bool[]>(row.SourceRelation, row.GetBoolArray()));
 			}
 		}
-
-
+		
 		public void DontTransposeAppend()
 		{
 			List<bool[]> result = new List<bool[]>();
@@ -97,12 +94,7 @@ namespace GNFSCore.Matrix
 			M = result;
 			freeCols = new bool[M.Count];
 		}
-
-
-
-
-
-
+		
 		public void TransposeAppend()
 		{
 			List<bool[]> result = new List<bool[]>();
@@ -124,9 +116,7 @@ namespace GNFSCore.Matrix
 			M = result;
 			freeCols = new bool[M.Count];
 		}
-
-
-
+				
 		public void Elimination()
 		{
 			if (eliminationStep)
@@ -278,9 +268,7 @@ namespace GNFSCore.Matrix
 
 			return result;
 		}
-
-
-
+		
 		public static bool[] Add(bool[] left, bool[] right)
 		{
 			if (left.Length != right.Length) throw new ArgumentException($"Both vectors must have the same length.");
@@ -297,11 +285,7 @@ namespace GNFSCore.Matrix
 
 			return result;
 		}
-
-
-
-
-
+		
 		public static string VectorToString(bool[] vector)
 		{
 			return string.Join(",", vector.Select(b => b ? '1' : '0'));

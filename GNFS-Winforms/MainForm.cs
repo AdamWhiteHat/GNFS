@@ -13,11 +13,7 @@ using System.Collections.Generic;
 namespace GNFS_Winforms
 {
 	using GNFSCore;
-	using GNFSCore.Polynomials;
-	using GNFSCore.Factors;
-	using GNFSCore.SquareRoot;
-	using GNFSCore.IntegerMath;
-	using GNFSCore.Matrix;
+
 	public partial class MainForm : Form
 	{
 		#region Private Members		
@@ -57,41 +53,41 @@ namespace GNFS_Winforms
 			gnfsBridge = new GnfsUiBridge(this);
 
 			tbN.Text = MatthewBriggs.ToString(); //PerLeslieJensen.ToString();//RSA_100.ToString();
-			tbDegree.Text = "3"; //"5"; //"6"; //"7"						
+			tbDegree.Text = "3"; // "5";//"3"; //"4"; //"5"; //"6"; //"7"						
 
 
 			n = BigInteger.Parse(tbN.Text);
 			degree = int.Parse(tbDegree.Text);
 
-			IEnumerable<BigInteger> primes = PrimeFactory.GetPrimes(10000);
+			tbBase.Text = "31"; // "1261737131078349405";// "117"; // "31";
 
-			tbBase.Text = "31";
-			
-			tbBound.Text = "29";
-			tbRelationQuantity.Text = "40";
-			tbRelationValueRange.Text = "1000";
+			tbBound.Text = "61"; // "1020379"; //"61"; 
+			tbRelationQuantity.Text = "200"; // "4778012"; //"200";
+			tbRelationValueRange.Text = "300"; //"1800000"; //"300";
 
 			gnfsBridge = new GnfsUiBridge(this);
 		}
 
-		private static void SetGnfs(MainForm form, GNFS nfs)
+		private static void SetGnfs(MainForm form, GNFS gnfs)
 		{
 			if (form.InvokeRequired)
 			{
 				form.Invoke(new MethodInvoker(() =>
-					SetGnfs(form, nfs)
+					SetGnfs(form, gnfs)
 				));
 			}
 			else
 			{
-				form.gnfs = nfs;
+				form.gnfs = gnfs;
 
-				form.tbDegree.Text = nfs.CurrentPolynomial.Degree.ToString();
-				form.tbBase.Text = nfs.PolynomialBase.ToString();
-				form.tbBound.Text = nfs.PrimeFactorBase.MaxRationalFactorBase.ToString();
+				form.tbN.Text = gnfs.N.ToString();
 
-				form.tbRelationQuantity.Text = nfs.CurrentRelationsProgress.Quantity.ToString();
-				form.tbRelationValueRange.Text = nfs.CurrentRelationsProgress.ValueRange.ToString();
+				form.tbBound.Text = gnfs.PrimeFactorBase.RationalFactorBaseMax.ToString();
+				form.tbBase.Text = gnfs.PolynomialBase.ToString();
+				form.tbDegree.Text = gnfs.CurrentPolynomial.Degree.ToString();
+
+				form.tbRelationQuantity.Text = gnfs.CurrentRelationsProgress.Quantity.ToString();
+				form.tbRelationValueRange.Text = gnfs.CurrentRelationsProgress.ValueRange.ToString();
 			}
 		}
 
@@ -283,7 +279,7 @@ namespace GNFS_Winforms
 
 		private void btnSave_Click(object sender, EventArgs e)
 		{
-			gnfs.SaveGnfsProgress();
+			GNFS.JsonSave(gnfs);
 		}
 
 		private void btnLoad_Click(object sender, EventArgs e)
@@ -295,13 +291,13 @@ namespace GNFS_Winforms
 
 				n = BigInteger.Parse(tbN.Text);
 
-				logFilename = DirectoryLocations.GenerateFileNameFromBigInteger(n) + ".LOG.txt";
+				logFilename = DirectoryLocations.GetUniqueNameFromN(n) + ".LOG.txt";
 				CreateLogFileIfNotExists(logFilename);
 
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS localGnfs = gnfsBridge.CreateGnfs(token, n);
+					GNFS localGnfs = gnfsBridge.LoadGnfs(token, n);
 					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 					ControlBridge.SetControlEnabledState(panelFunctions, true);
@@ -325,7 +321,7 @@ namespace GNFS_Winforms
 				int relationQuantity = int.Parse(tbRelationQuantity.Text);
 				int relationValueRange = int.Parse(tbRelationValueRange.Text);
 
-				logFilename = DirectoryLocations.GenerateFileNameFromBigInteger(n) + ".LOG.txt";
+				logFilename = DirectoryLocations.GetUniqueNameFromN(n) + ".LOG.txt";
 
 				CreateLogFileIfNotExists(logFilename);
 

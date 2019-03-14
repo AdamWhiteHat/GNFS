@@ -1,10 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Numerics;
 using System.Threading;
-using System.Windows.Forms;
-using System.Threading.Tasks;
 
 namespace GNFS_Winforms
 {
@@ -15,18 +13,13 @@ namespace GNFS_Winforms
 		public GNFS CreateGnfs(CancellationToken cancelToken, BigInteger n, BigInteger polyBase, int degree, BigInteger primeBound, int relationQuantity, int relationValueRange)
 		{
 			GNFS gnfs = new GNFS(cancelToken, n, polyBase, degree, primeBound, relationQuantity, relationValueRange);
-
-			mainForm.LogOutput(gnfs.ToString());
-
 			return gnfs;
 		}
 
 		public GNFS LoadGnfs(CancellationToken cancelToken, BigInteger n)
 		{
-			GNFS gnfs = new GNFS(cancelToken, n);
-
-			mainForm.LogOutput(gnfs.ToString());
-
+			string jsonFilename = Path.Combine(DirectoryLocations.GetSaveLocation(n), "GNFS.json");
+			GNFS gnfs = GNFS.JsonLoad(cancelToken, jsonFilename);
 			return gnfs;
 		}
 

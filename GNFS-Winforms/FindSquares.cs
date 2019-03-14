@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using System.Numerics;
 using System.Threading;
-using System.Windows.Forms;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace GNFS_Winforms
 {
 	using GNFSCore;
-	using GNFSCore.Matrix;
-	using GNFSCore.Factors;
-	using GNFSCore.Polynomials;
+	using GNFSCore.Interfaces;
 	using GNFSCore.SquareRoot;
 	using GNFSCore.IntegerMath;
 
@@ -126,7 +121,7 @@ namespace GNFS_Winforms
 			mainForm.LogOutput($"GCD(N, A) = {C}");
 			mainForm.LogOutput($"GCD(N, B) = {D}");
 			mainForm.LogOutput();
-			
+
 			return gnfs;
 		}
 	}

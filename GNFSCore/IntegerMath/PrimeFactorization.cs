@@ -40,7 +40,7 @@ namespace GNFSCore.IntegerMath
 				.ToDictionary()
 				.Where(kvp => kvp.Key <= maxValue && kvp.Key != -1)
 				.Select(kvp => new Factor(kvp.Key, kvp.Value));
-			
+
 			this.AddRange(results);
 		}
 

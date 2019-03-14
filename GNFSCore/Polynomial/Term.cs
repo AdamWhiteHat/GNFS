@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
+using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
-namespace GNFSCore.Polynomials
+namespace GNFSCore
 {
-	[Serializable]
-	public class Term : ITerm, IXmlSerializable
+	using Interfaces;
+
+	public class Term : ITerm
 	{
 		public static Term Zero = new Term(BigInteger.Zero, 0);
 
-		public int Exponent { get; set; }
+		[JsonProperty]
 		public BigInteger CoEfficient { get; set; }
+		[JsonProperty]
+		public int Exponent { get; set; }
+
+
+		[JsonIgnore]
 		private static string IndeterminateSymbol = "X";
 
 		public Term()
@@ -23,8 +27,8 @@ namespace GNFSCore.Polynomials
 
 		public Term(BigInteger coefficient, int exponent)
 		{
-			Exponent = exponent;
 			CoEfficient = coefficient;
+			Exponent = exponent;
 		}
 
 		public static ITerm[] GetTerms(BigInteger[] terms)
@@ -55,30 +59,6 @@ namespace GNFSCore.Polynomials
 		public override string ToString()
 		{
 			return $"{CoEfficient}*{IndeterminateSymbol}^{Exponent}";
-		}
-
-		public void WriteXml(XmlWriter writer)
-		{
-			writer.WriteElementString("CoEfficient", CoEfficient.ToString());
-			writer.WriteElementString("Exponent", Exponent.ToString());
-		}
-
-		public void ReadXml(XmlReader reader)
-		{
-			reader.MoveToContent();
-			reader.ReadStartElement();
-			CoEfficient = BigInteger.Parse(reader.ReadElementString("CoEfficient"));
-			Exponent = int.Parse(reader.ReadElementString("Exponent"));
-		}
-
-		public XmlSchema GetSchema() { return null; }
-	}
-
-	public static class ITermExtensionMethods
-	{
-		public static BigInteger[] GetCoefficients(this ITerm[] source)
-		{
-			return source.Select(trm => trm.CoEfficient).ToArray();
 		}
 	}
 }

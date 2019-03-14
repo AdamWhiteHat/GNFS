@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace GNFSCore.Factors
 {
-	using Polynomials;
+	using Interfaces;
 
 	public static class Normal
 	{
@@ -82,24 +82,5 @@ namespace GNFSCore.Factors
 
 			return result;
 		}
-
-
-		//public static BigRational AlgebraicRational(int a, int b, IPoly polynomial)
-		//{
-		//	ƒ(−a/b) ∙ −bᵈ 
-		// (−b)ᵈ ∙ ƒ(−a/b)
-		//
-		//	Fraction ratA = new Fraction(a);
-		//	Fraction negB = new Fraction(-b);
-		//	BigRational aOverB = BigRational.Divide(ratA, negB);
-		//
-		//	BigRational left = polynomial.Evaluate(aOverB);
-		//	BigRational right = BigRational.Pow(new BigRational(negB), polynomial.Degree);
-		//
-		//	BigRational result = BigRational.Multiply(left, right);
-		//	return result;
-		//}
 	}
-
-
 }

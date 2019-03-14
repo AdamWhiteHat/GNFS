@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
-using System.Collections;
-using System.Threading.Tasks;
-using GNFSCore.Polynomials;
-using GNFSCore.IntegerMath;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace GNFSCore.Factors
 {
 	public struct FactorPair : IEquatable<FactorPair>
 	{
-		public int P { get; }
-		public int R { get; }
+		[JsonProperty]
+		public int P { get; private set; }
+		[JsonProperty]
+		public int R { get; private set; }
 
 		public FactorPair(BigInteger p, BigInteger r)
 		{
@@ -59,24 +56,6 @@ namespace GNFSCore.Factors
 		public override string ToString()
 		{
 			return $"({P},{R})";
-		}
-
-		internal string Serialize()
-		{
-			return $"{P},{R}";
-		}
-
-		private static readonly char[] delimiter = new char[] { ',' };
-		internal static FactorPair Deserialize(string serializedString)
-		{
-			int commaIndex = serializedString.IndexOf(',');
-
-			string pString = serializedString.Substring(0, commaIndex);
-			string rString = serializedString.Substring(commaIndex + 1);
-			int p = int.Parse(pString);
-			int r = int.Parse(rString);
-
-			return new FactorPair(p, r);
 		}
 	}
 }

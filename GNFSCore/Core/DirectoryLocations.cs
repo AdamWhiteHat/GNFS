@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
-using System.Numerics;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Xml.Schema;
-using System.Threading;
-
-using GNFSCore.Factors;
-using GNFSCore.Polynomials;
-using GNFSCore.IntegerMath;
+using System.Linq;
+using System.Numerics;
+using System.Collections.Generic;
 
 namespace GNFSCore
 {
@@ -20,30 +10,14 @@ namespace GNFSCore
 	{
 		private string _polynomial = null;
 		private string _saveDirectory = null;
-		private string _parameters = "_GNFS.Parameters";
+		private string _parameters = "GNFS.json";
 
 		private static readonly int showDigits = 22;
 		private static readonly string elipse = "[...]";
 		private static readonly string saveRootDirectory = "GNFS";
 
 		public string SaveDirectory { get { return _saveDirectory; } }
-
 		public string GnfsParameters_SaveFile { get { return Path.Combine(SaveDirectory, _parameters); } }
-
-		public string Polynomial_Filename { get { return "_Polynomial.Parameters"; } }
-		public string Polynomial_SaveDirectory { get { return _polynomial ?? SearchPolynomialPaths(); } }
-
-		public string Polynomial_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, Polynomial_Filename); } }
-		public string RationalFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Rational.FactorBase"); } }
-		public string AlgebraicFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Algebraic.FactorBase"); } }
-		public string QuadradicFactorBase_SaveFile { get { return Path.Combine(Polynomial_SaveDirectory, "Quadradic.FactorBase"); } }
-
-		public string Relations_SaveDirectory { get { return Path.Combine(Polynomial_SaveDirectory, "Relations"); } }
-		public string RelationProgress_Filename { get { return Path.Combine(Relations_SaveDirectory, "Relations.Progress"); } }
-		public string UnfactoredProgress_Filename { get { return Path.Combine(Relations_SaveDirectory, "Unfactored.relations"); } }
-		public string RoughRelations_Filename { get { return Path.Combine(Relations_SaveDirectory, "Rough.relations"); } }
-		public string SmoothRelations_SaveDirectory { get { return Path.Combine(Relations_SaveDirectory, "SmoothRelations"); } }
-		public string FreeRelations_SaveDirectory { get { return Path.Combine(Relations_SaveDirectory, "FreeRelations"); } }
 
 		static DirectoryLocations()
 		{
@@ -61,13 +35,13 @@ namespace GNFSCore
 
 		public DirectoryLocations(BigInteger n)
 		{
-			_saveDirectory = GenerateSaveDirectory(n);
+			_saveDirectory = GetSaveLocation(n);
 			SearchPolynomialPaths();
 		}
 
 		public DirectoryLocations(BigInteger n, BigInteger polynomialBase, BigInteger polynomialDegree)
 		{
-			_saveDirectory = GenerateSaveDirectory(n);
+			_saveDirectory = GetSaveLocation(n);
 			SetPolynomialPath(polynomialBase, polynomialDegree);
 		}
 
@@ -90,13 +64,13 @@ namespace GNFSCore
 			_polynomial = Path.Combine(SaveDirectory, $"Poly_B[{polynomialBase}]_D[{polynomialDegree}]");
 		}
 
-		public static string GenerateSaveDirectory(BigInteger n)
+		public static string GetSaveLocation(BigInteger n)
 		{
-			string directoryFilename = GenerateFileNameFromBigInteger(n);
+			string directoryFilename = GetUniqueNameFromN(n);
 			return Path.Combine(saveRootDirectory, directoryFilename);
 		}
 
-		public static string GenerateFileNameFromBigInteger(BigInteger n)
+		public static string GetUniqueNameFromN(BigInteger n)
 		{
 			string result = n.ToString();
 

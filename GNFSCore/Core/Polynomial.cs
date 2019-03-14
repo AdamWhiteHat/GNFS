@@ -2,27 +2,31 @@
 using System.Xml;
 using System.Linq;
 using System.Numerics;
+using Newtonsoft.Json;
 using System.Xml.Schema;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using System.Runtime.Serialization;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using GNFSCore.IntegerMath;
 
-namespace GNFSCore.Polynomials
+namespace GNFSCore
 {
-	[Serializable]
-	public class Polynomial : IPolynomial, IXmlSerializable
+	using Interfaces;
+
+	[DataContract]
+	public class Polynomial : IPolynomial//, IXmlSerializable
 	{
 		public static IPolynomial Zero = new Polynomial(Term.GetTerms(new BigInteger[] { 0 }));
 		public static IPolynomial One = new Polynomial(Term.GetTerms(new BigInteger[] { 1 }));
 		public static IPolynomial Two = new Polynomial(Term.GetTerms(new BigInteger[] { 2 }));
 
-		[XmlArrayItem("Terms")]
-		public ITerm[] Terms { get { return _terms.ToArray(); } }
-		private List<ITerm> _terms = new List<ITerm>();
 		public int Degree { get; private set; }
+
+		public ITerm[] Terms { get { return _terms.ToArray(); } }
+
+		[DataMember(Name = "Terms")]
+		private TermCollection _terms = new TermCollection();
 
 		#region Indexer
 
@@ -50,7 +54,7 @@ namespace GNFSCore.Polynomials
 					if (value != BigInteger.Zero)
 					{
 						ITerm newTerm = new Term(value, degree);
-						List<ITerm> terms = _terms;
+						TermCollection terms = _terms;
 						terms.Add(newTerm);
 						SetTerms(terms);
 					}
@@ -64,9 +68,14 @@ namespace GNFSCore.Polynomials
 
 		#endregion
 
-		private Polynomial() { _terms = new List<ITerm>(); }
+		internal Polynomial() { _terms = new TermCollection(); }
 
 		//public SparsePolynomial() { _terms = new List<ITerm>() { new PolyTerm(0, 0) }; Degree = 0; }
+
+		public Polynomial(Term[] terms)
+			: this(terms.Select(t => (ITerm)t).ToArray())
+		{
+		}
 
 		public Polynomial(ITerm[] terms)
 		{
@@ -86,7 +95,7 @@ namespace GNFSCore.Polynomials
 
 		private void SetTerms(IEnumerable<ITerm> terms)
 		{
-			_terms = terms.OrderBy(t => t.Exponent).ToList();
+			_terms = new TermCollection(terms.OrderBy(t => t.Exponent).ToList());
 			RemoveZeros();
 		}
 
@@ -95,7 +104,7 @@ namespace GNFSCore.Polynomials
 			_terms.RemoveAll(t => t.CoEfficient == 0);
 			if (!_terms.Any())
 			{
-				_terms = Term.GetTerms(new BigInteger[] { 0 }).ToList();
+				_terms = new TermCollection(Term.GetTerms(new BigInteger[] { 0 }).ToList());
 			}
 			SetDegree();
 		}
@@ -113,7 +122,7 @@ namespace GNFSCore.Polynomials
 		}
 
 
-		private static List<ITerm> GetPolynomialTerms(BigInteger value, BigInteger polynomialBase, int degree)
+		private static TermCollection GetPolynomialTerms(BigInteger value, BigInteger polynomialBase, int degree)
 		{
 			int d = degree; // (int)Math.Truncate(BigInteger.Log(value, (double)polynomialBase)+ 1);
 			BigInteger toAdd = value;
@@ -150,7 +159,7 @@ namespace GNFSCore.Polynomials
 
 				d--;
 			}
-			return result.ToList();
+			return new TermCollection(result.ToList());
 		}
 
 		public static IPolynomial FromRoots(params BigInteger[] roots)
@@ -353,6 +362,7 @@ namespace GNFSCore.Polynomials
 				a = swap;
 			}
 		}
+
 		// GCDMod
 		public static IPolynomial GCDMod(IPolynomial left, IPolynomial right, BigInteger polynomialBase)
 		{
@@ -402,12 +412,6 @@ namespace GNFSCore.Polynomials
 
 					a = Polynomial.Subtract(a, b);
 				}
-
-				//IPoly smallerA = SparsePolynomial.ReduceDegree(a, polynomialBase);
-				//IPoly smallerB = SparsePolynomial.ReduceDegree(b, polynomialBase);
-
-				//a=smallerA;
-				//b=smallerB;
 			}
 
 			if (a.Degree == 0)
@@ -887,8 +891,8 @@ namespace GNFSCore.Polynomials
 			if (BigInteger.Abs(result.Terms[deg].CoEfficient) > 1)
 			{
 				BigInteger toAdd = (result.Terms[deg].CoEfficient - 1) * polynomialBase;
-				result.Terms[deg].CoEfficient = 1;
-				result.Terms[deg - 1].CoEfficient += toAdd;
+				result[deg] = 1;
+				result[deg - 1] += toAdd;
 			}
 			return result;
 		}
@@ -1010,11 +1014,6 @@ namespace GNFSCore.Polynomials
 		public IPolynomial Clone()
 		{
 			return new Polynomial(Terms.Select(pt => pt.Clone()).ToArray());
-		}
-
-		public string ToString(string format, IFormatProvider formatProvider)
-		{
-			return this.ToString();
 		}
 
 		public override string ToString()
@@ -1151,51 +1150,5 @@ namespace GNFSCore.Polynomials
 				return 0;
 			}
 		}
-
-		#region IXmlSerializable
-
-		private static XmlSerializer TermXmlSerializer = new XmlSerializer(typeof(Term));
-		public void WriteXml(XmlWriter writer)
-		{
-			writer.WriteElementString("Degree", Degree.ToString());
-			writer.WriteStartElement("Terms");
-
-			foreach (Term term in Terms)
-			{
-				TermXmlSerializer.Serialize(writer, term);
-			}
-
-			writer.WriteEndElement();
-			writer.WriteElementString("PolynomialString", this.ToString());
-		}
-
-		public void ReadXml(XmlReader reader)
-		{
-			reader.MoveToContent();
-			reader.ReadStartElement();
-
-			Degree = int.Parse(reader.ReadElementString("Degree"));
-			reader.ReadStartElement("Terms");
-
-			List<Term> terms = new List<Term>();
-			do
-			{
-				Term term = (Term)Serializer.Deserialize(reader, typeof(Term));
-				terms.Add(term);
-			}
-			while (reader.ReadToNextSibling("Term"));
-
-			reader.ReadEndElement();
-
-			_terms = terms.Select(trm => (ITerm)trm).ToList();
-			if (_terms.Count - 1 != Degree)
-			{
-				throw new Exception("Element Degree does not agree with number of terms. Degree should equal #terms - 1.");
-			}
-		}
-
-		public XmlSchema GetSchema() { return null; }
-
-		#endregion
 	}
 }

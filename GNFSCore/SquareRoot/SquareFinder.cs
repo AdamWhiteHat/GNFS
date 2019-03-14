@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace GNFSCore.SquareRoot
 {
-	using Polynomials;
+	using Interfaces;
 	using IntegerMath;
 
 	public partial class SquareFinder
@@ -141,7 +141,7 @@ namespace GNFSCore.SquareRoot
 			List<Tuple<BigInteger, BigInteger>> resultTuples = new List<Tuple<BigInteger, BigInteger>>();
 
 			BigInteger primeProduct = 1;
-			
+
 			BigInteger lastP = N / N.ToString().Length; //((N * 3) + 1).NthRoot(3); //gnfs.QFB.Select(fp => fp.P).Max();
 
 			bool solutionFound = false;
@@ -176,7 +176,7 @@ namespace GNFSCore.SquareRoot
 				{
 					continue;
 				}
-				
+
 				AlgebraicPrimes = primes;
 
 				IEnumerable<IEnumerable<BigInteger>> permutations =
@@ -232,7 +232,7 @@ namespace GNFSCore.SquareRoot
 			{
 				bool resultSquaredEqualsInput1 = (startPolynomial.CompareTo(resultSquared1) == 0);
 				bool resultSquaredEqualsInput2 = (startInversePolynomial.CompareTo(resultSquared1) == 0);
-				
+
 				if (resultSquaredEqualsInput1)
 				{
 					return new Tuple<BigInteger, BigInteger>(result1, result2);
@@ -242,8 +242,8 @@ namespace GNFSCore.SquareRoot
 					return new Tuple<BigInteger, BigInteger>(result2, result1);
 				}
 			}
-			
-			return new Tuple<BigInteger, BigInteger>(BigInteger.Zero, BigInteger.Zero);			
+
+			return new Tuple<BigInteger, BigInteger>(BigInteger.Zero, BigInteger.Zero);
 		}
 
 		public override string ToString()

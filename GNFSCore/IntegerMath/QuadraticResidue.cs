@@ -26,21 +26,12 @@ namespace GNFSCore.IntegerMath
 			BigInteger abp = BigInteger.Abs(BigInteger.Multiply(ab, quadraticFactor.P));
 
 			int legendreSymbol = Legendre.Symbol(abp, quadraticFactor.R);
-
-			if (legendreSymbol != 1)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return (legendreSymbol != 1);
 		}
 
 		public static bool[] GetQuadraticCharacters(Relation rel, IEnumerable<FactorPair> quadraticCharacterBase)
 		{
-			IEnumerable<bool> results = quadraticCharacterBase.Select(pair => GetQuadraticCharacter(rel, pair));
-			return results.ToArray();
+			return quadraticCharacterBase.Select(pair => GetQuadraticCharacter(rel, pair)).ToArray();
 		}
 	}
 }

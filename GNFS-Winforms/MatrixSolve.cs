@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using System.Numerics;
 using System.Threading;
-using System.Windows.Forms;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace GNFS_Winforms
 {
 	using GNFSCore;
 	using GNFSCore.Matrix;
-	using GNFSCore.Factors;
 	using GNFSCore.IntegerMath;
 
 	public partial class GnfsUiBridge
 	{
-
 		public GNFS MatrixSolveGaussian(CancellationToken cancelToken, GNFS gnfs)
 		{
 			List<Relation> smoothRelations = gnfs.CurrentRelationsProgress.SmoothRelations.ToList();
@@ -24,16 +19,16 @@ namespace GNFS_Winforms
 			int smoothCount = smoothRelations.Count;
 
 			int maxRelationsToSelect =
-				PrimeFactory.GetIndexFromValue(gnfs.PrimeFactorBase.MaxRationalFactorBase)
-				+ PrimeFactory.GetIndexFromValue(gnfs.PrimeFactorBase.MaxAlgebraicFactorBase)
-				+ gnfs.QFB.Count
+				PrimeFactory.GetIndexFromValue(gnfs.PrimeFactorBase.RationalFactorBaseMax)
+				+ PrimeFactory.GetIndexFromValue(gnfs.PrimeFactorBase.AlgebraicFactorBaseMax)
+				+ gnfs.QuadradicFactorPairCollection.Count
 				+ 3;
 
 
 			mainForm.LogOutput($"Total relations: {smoothCount}");
 			mainForm.LogOutput($"MaxRelationsToSelect: {maxRelationsToSelect}");
 			mainForm.LogOutput($"ttl / max = {smoothCount / maxRelationsToSelect}");
-						
+
 			List<List<Relation>> allSolutionGroups = new List<List<Relation>>();
 			List<Tuple<BigInteger, BigInteger>> allSolutionTuples = new List<Tuple<BigInteger, BigInteger>>();
 			while (smoothRelations.Count >= maxRelationsToSelect)

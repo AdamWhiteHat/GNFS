@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Collections.Generic;
 
 namespace GNFSCore.Matrix
 {
-	using GNFSCore.Factors;
-	using GNFSCore.IntegerMath;
+	using Factors;
+	using IntegerMath;
 
 	public class GaussianRow
 	{
@@ -39,10 +39,10 @@ namespace GNFSCore.Matrix
 				Sign = false;
 			}
 
-			FactorCollection qfb = gnfs.QFB;
+			FactorPairCollection qfb = gnfs.QuadradicFactorPairCollection;
 
-			BigInteger rationalMaxValue = gnfs.PrimeFactorBase.MaxRationalFactorBase;
-			BigInteger algebraicMaxValue = gnfs.PrimeFactorBase.MaxAlgebraicFactorBase;
+			BigInteger rationalMaxValue = gnfs.PrimeFactorBase.RationalFactorBaseMax;
+			BigInteger algebraicMaxValue = gnfs.PrimeFactorBase.AlgebraicFactorBaseMax;
 
 			PrimeFactorization ratFactorization = new PrimeFactorization(relation.RationalFactorization, rationalMaxValue);
 			PrimeFactorization algFactorization = new PrimeFactorization(relation.AlgebraicFactorization, algebraicMaxValue);

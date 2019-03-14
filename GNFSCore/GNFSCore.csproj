@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GNFSCore</RootNamespace>
     <AssemblyName>GNFSCore</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,9 +32,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,23 +51,26 @@
     <Compile Include="Core\CountDictionary.cs" />
     <Compile Include="Core\ExtensionMethods\BigIntegerCollectionExtensionMethods.cs" />
     <Compile Include="Core\ExtensionMethods\IEnumerableExtensionMethods.cs" />
+    <Compile Include="Core\ExtensionMethods\ITermExtensionMethods.cs" />
     <Compile Include="Core\FactorBase.cs" />
     <Compile Include="Core\DirectoryLocations.cs" />
+    <Compile Include="Core\Interfaces\IPolynomial.cs" />
+    <Compile Include="Core\Interfaces\ITerm.cs" />
+    <Compile Include="Core\Serialization\Serialization.cs" />
     <Compile Include="Core\SieveRangeEnumerable.cs" />
     <Compile Include="IntegerMath\Combinatorics.cs" />
-    <Compile Include="Polynomial\Polynomial.cs" />
+    <Compile Include="Core\Polynomial.cs" />
     <Compile Include="Polynomial\Term.cs" />
+    <Compile Include="Polynomial\TermCollection.cs" />
     <Compile Include="RelationSieve\PolyRelationsSieveProgress.cs" />
     <Compile Include="IntegerMath\QuadraticResidue.cs" />
     <Compile Include="RelationSieve\Relation.cs" />
     <Compile Include="RelationSieve\RelationContainer.cs" />
-    <Compile Include="RelationSieve\RoughPair.cs" />
-    <Compile Include="Core\Serializer.cs" />
     <!--Compile Include="SquareRoot\AlgebraicSquareRoot.cs" /-->
     <Compile Include="SquareRoot\FiniteFieldArithmetic.cs" />
     <Compile Include="SquareRoot\SquareFinder.cs" />
     <Compile Include="Core\StaticRandom.cs" />
-    <Compile Include="FactorBase\FactorCollection.cs" />
+    <Compile Include="FactorBase\FactorPairCollection.cs" />
     <Compile Include="FactorBase\FactorPair.cs" />
     <!--Compile Include="RelationSieve\OtherSeives\FermatEuclidSeive.cs" /-->
     <Compile Include="IntegerMath\Normal.cs" />
@@ -71,13 +81,16 @@
     <Compile Include="Matrix\GaussianMatrix.cs" />
     <Compile Include="Matrix\GaussianRow.cs" />
     <!--Compile Include="Polynomial\BigIntegerArithmetic.cs" /-->
-    <Compile Include="Polynomial\Interfaces.cs" />
+    <Compile Include="Core\Interfaces\ICloneable.cs" />
     <Compile Include="Core\GNFS.cs" />
     <Compile Include="Core\ExtensionMethods\BigIntegerExtensionMethods.cs" />
     <Compile Include="IntegerMath\Eratosthenes.cs" />
     <Compile Include="IntegerMath\GCD.cs" />
     <Compile Include="IntegerMath\FactorizationFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

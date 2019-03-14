@@ -1,29 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using System.Xml;
-using System.Xml.Schema;
 using System.Collections.Generic;
 
-namespace GNFSCore.Polynomials
+namespace GNFSCore.Interfaces
 {
-	public interface ICloneable<T>
-	{
-		T Clone();
-	}
-
-	public interface ITerm : ICloneable<ITerm>
-	{
-		int Exponent { get; }
-		BigInteger CoEfficient { get; set; }
-	}
-
 	public interface IPolynomial
 		: ICloneable<IPolynomial>,
 			IComparable, IComparable<IPolynomial>,
 			IEquatable<IPolynomial>, IEquatable<Polynomial>,
-			IEqualityComparer<IPolynomial>, IEqualityComparer<Polynomial>,
-			IFormattable
+			IEqualityComparer<IPolynomial>, IEqualityComparer<Polynomial>
 	{
 		int Degree { get; }
 		ITerm[] Terms { get; }
