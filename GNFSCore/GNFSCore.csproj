@@ -56,7 +56,9 @@
     <Compile Include="Core\DirectoryLocations.cs" />
     <Compile Include="Core\Interfaces\IPolynomial.cs" />
     <Compile Include="Core\Interfaces\ITerm.cs" />
-    <Compile Include="Core\Serialization\Serialization.cs" />
+    <Compile Include="Core\Serialization\JsonConverters.cs" />
+    <Compile Include="Core\Serialization\Serialization.Load.cs" />
+    <Compile Include="Core\Serialization\Serialization.Save.cs" />
     <Compile Include="Core\SieveRangeEnumerable.cs" />
     <Compile Include="IntegerMath\Combinatorics.cs" />
     <Compile Include="Core\Polynomial.cs" />

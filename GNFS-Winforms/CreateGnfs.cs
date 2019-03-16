@@ -19,7 +19,7 @@ namespace GNFS_Winforms
 		public GNFS LoadGnfs(CancellationToken cancelToken, BigInteger n)
 		{
 			string jsonFilename = Path.Combine(DirectoryLocations.GetSaveLocation(n), "GNFS.json");
-			GNFS gnfs = GNFS.JsonLoad(cancelToken, jsonFilename);
+			GNFS gnfs = Serialization.Load.Gnfs(cancelToken, jsonFilename);
 			return gnfs;
 		}
 

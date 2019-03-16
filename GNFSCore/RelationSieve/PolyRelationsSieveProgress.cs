@@ -28,10 +28,11 @@ namespace GNFSCore
 
 		public List<List<Relation>> FreeRelations { get { return Relations.FreeRelations; } }
 		public List<Relation> SmoothRelations { get { return Relations.SmoothRelations; } }
-		public List<Relation> UnFactored { get { return Relations.UnFactoredRelations; } }
 		public List<Relation> RoughRelations { get { return Relations.RoughRelations; } }
 
 		public RelationContainer Relations { get; set; }
+
+		public int FreeRelationsCounter { get; set; }
 
 		internal GNFS _gnfs;
 
@@ -63,7 +64,7 @@ namespace GNFSCore
 			ValueRange = valueRange;
 		}
 
-		public PolyRelationsSieveProgress(GNFS gnfs, int a, int b, int quantity, int valueRange, List<List<Relation>> free, List<Relation> smooth, List<Relation> rough, List<Relation> unfactored)
+		public PolyRelationsSieveProgress(GNFS gnfs, int a, int b, int quantity, int valueRange, List<List<Relation>> free, List<Relation> smooth, List<Relation> rough)
 			: this(gnfs, quantity, valueRange)
 		{
 			A = a;
@@ -72,7 +73,6 @@ namespace GNFSCore
 			Relations.FreeRelations = free;
 			Relations.SmoothRelations = smooth;
 			Relations.RoughRelations = rough;
-			Relations.UnFactoredRelations = unfactored;
 		}
 
 		#endregion
@@ -151,6 +151,9 @@ namespace GNFSCore
 				B += 2;
 				A = 1;
 			}
+
+			Serialization.Save.Relations.Smooth.Create(_gnfs);
+			Serialization.Save.Relations.Rough.Create(_gnfs);
 		}
 
 		#endregion
@@ -176,9 +179,10 @@ namespace GNFSCore
 			Relations.RoughRelations = roughRelations;
 		}
 
-		public void AddFreeRelations(List<List<Relation>> freeRelations)
+		public void AddFreeRelationSolution(List<Relation> freeRelationSolution)
 		{
-			Relations.FreeRelations.AddRange(freeRelations);
+			Relations.FreeRelations.Add(freeRelationSolution);
+			Serialization.Save.Relations.Free.SingleSolution(_gnfs, freeRelationSolution);
 		}
 
 		#endregion

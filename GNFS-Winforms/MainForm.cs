@@ -61,6 +61,11 @@ namespace GNFS_Winforms
 			gnfsBridge = new GnfsUiBridge(this);
 
 			Logging.OutputTextbox = tbOutput;
+
+			if (GNFSCore.DirectoryLocations.IsLinuxOS())
+			{
+				this.Text += " [MONO RUNTIME DETECTED]";
+			}
 		}
 
 		private static void SetGnfs(MainForm form, GNFS gnfs)
@@ -224,7 +229,7 @@ namespace GNFS_Winforms
 
 		private void btnSave_Click(object sender, EventArgs e)
 		{
-			GNFS.JsonSave(gnfs);
+			Serialization.Save.Gnfs(gnfs);
 		}
 
 		private void btnLoad_Click(object sender, EventArgs e)

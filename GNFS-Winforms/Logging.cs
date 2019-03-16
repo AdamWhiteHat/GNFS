@@ -16,7 +16,6 @@ namespace GNFS_Winforms
 		{
 			FirstFindRelations = false;
 			OutputFilename = Settings.Log_FileName ?? DefaultLoggingFilename;
-			CreateLogFileIfNotExists();
 		}
 
 		public static bool IsDebugMode()
@@ -71,14 +70,10 @@ namespace GNFS_Winforms
 		public static void CreateLogFileIfNotExists()
 		{
 			string directory = Path.GetDirectoryName(OutputFilename);
-
 			if (!Directory.Exists(directory))
 			{
 				FirstFindRelations = true;
-				if (File.Exists(OutputFilename))
-				{
-					File.Delete(OutputFilename);
-				}
+				Directory.CreateDirectory(directory);
 			}
 			if (!File.Exists(OutputFilename))
 			{

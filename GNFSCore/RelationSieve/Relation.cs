@@ -52,6 +52,9 @@ namespace GNFSCore
 		[JsonProperty(Order = 8)]
 		public bool IsSmooth { get { return (AlgebraicQuotient == 1 || AlgebraicQuotient == 0) && (RationalQuotient == 1 || RationalQuotient == 0); } }
 
+		[JsonIgnore]
+		public bool IsPersisted { get; set; } 
+
 		public Relation()
 		{ }
 

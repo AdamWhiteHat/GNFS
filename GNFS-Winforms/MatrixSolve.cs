@@ -29,8 +29,6 @@ namespace GNFS_Winforms
 			Logging.LogMessage($"MaxRelationsToSelect: {maxRelationsToSelect}");
 			Logging.LogMessage($"ttl / max = {smoothCount / maxRelationsToSelect}");
 
-			List<List<Relation>> allSolutionGroups = new List<List<Relation>>();
-			List<Tuple<BigInteger, BigInteger>> allSolutionTuples = new List<Tuple<BigInteger, BigInteger>>();
 			while (smoothRelations.Count >= maxRelationsToSelect)
 			{
 
@@ -85,6 +83,7 @@ namespace GNFS_Winforms
 					if (isAlgebraicSquare && isRationalSquare)
 					{
 						solution.Add(relations);
+						gnfs.CurrentRelationsProgress.AddFreeRelationSolution(relations);
 					}
 
 					if (cancelToken.IsCancellationRequested)
@@ -102,21 +101,15 @@ namespace GNFS_Winforms
 							)
 						)
 						.ToList();
-
-
-				allSolutionGroups.AddRange(solution);
-				allSolutionTuples.AddRange(productTuples);
-
+				
 				if (cancelToken.IsCancellationRequested)
 				{
 					break;
 				}
 			}
 
-			gnfs.CurrentRelationsProgress.AddFreeRelations(allSolutionGroups);
-
 			Logging.LogMessage();
-			
+
 			return gnfs;
 		}
 
