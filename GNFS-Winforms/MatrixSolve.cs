@@ -101,7 +101,7 @@ namespace GNFS_Winforms
 							)
 						)
 						.ToList();
-				
+
 				if (cancelToken.IsCancellationRequested)
 				{
 					break;

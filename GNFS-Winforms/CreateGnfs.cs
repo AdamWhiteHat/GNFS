@@ -12,7 +12,7 @@ namespace GNFS_Winforms
 	{
 		public GNFS CreateGnfs(CancellationToken cancelToken, BigInteger n, BigInteger polyBase, int degree, BigInteger primeBound, int relationQuantity, int relationValueRange)
 		{
-			GNFS gnfs = new GNFS(cancelToken, n, polyBase, degree, primeBound, relationQuantity, relationValueRange);
+			GNFS gnfs = new GNFS(cancelToken, Logging.LogMessage, n, polyBase, degree, primeBound, relationQuantity, relationValueRange);
 			return gnfs;
 		}
 
@@ -20,8 +20,8 @@ namespace GNFS_Winforms
 		{
 			string jsonFilename = Path.Combine(DirectoryLocations.GetSaveLocation(n), "GNFS.json");
 			GNFS gnfs = Serialization.Load.Gnfs(cancelToken, jsonFilename);
+			gnfs.LogFunction = Logging.LogMessage;
 			return gnfs;
 		}
-
 	}
 }

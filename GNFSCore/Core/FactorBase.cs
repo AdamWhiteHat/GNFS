@@ -8,6 +8,13 @@ namespace GNFSCore
 {
 	public class FactorBase
 	{
+		public FactorBase()
+		{
+			RationalFactorBase = new List<BigInteger>();
+			AlgebraicFactorBase = new List<BigInteger>();
+			QuadraticFactorBase = new List<BigInteger>();
+		}
+
 		[JsonProperty]
 		public BigInteger RationalFactorBaseMax { get; internal set; }
 		[JsonProperty]

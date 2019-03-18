@@ -27,7 +27,7 @@ namespace GNFSCore
 		/// Root of f(x) in algebraic field
 		/// </summary>
 		[JsonProperty(Order = 1)]
-		public int B { get; protected set; }
+		public uint B { get; protected set; }
 
 		/// <summary> ƒ(b) ≡ 0 (mod a); Calculated as: ƒ(-a/b) * -b^deg </summary>
 		[JsonProperty(Order = 2)]
@@ -53,29 +53,18 @@ namespace GNFSCore
 		public bool IsSmooth { get { return (AlgebraicQuotient == 1 || AlgebraicQuotient == 0) && (RationalQuotient == 1 || RationalQuotient == 0); } }
 
 		[JsonIgnore]
-		public bool IsPersisted { get; set; } 
+		public bool IsPersisted { get; set; }
 
 		public Relation()
-		{ }
-
-		public Relation(Relation relation)
 		{
-			this.A = relation.A;
-			this.B = relation.B;
-			this.AlgebraicNorm = relation.AlgebraicNorm;
-			this.RationalNorm = relation.RationalNorm;
-			this.AlgebraicQuotient = BigInteger.Abs(relation.AlgebraicQuotient);
-			this.RationalQuotient = BigInteger.Abs(relation.RationalQuotient);
-			this.AlgebraicFactorization = relation.AlgebraicFactorization;
-			this.RationalFactorization = relation.RationalFactorization;
-
+			IsPersisted = false;
+			RationalFactorization = new CountDictionary();
+			AlgebraicFactorization = new CountDictionary();
 		}
 
-		public Relation(GNFS gnfs, int a, int b)
+		public Relation(GNFS gnfs, int a, uint b)
+			: this()
 		{
-			AlgebraicFactorization = new CountDictionary();
-			RationalFactorization = new CountDictionary();
-
 			A = a;
 			B = b;
 
@@ -96,6 +85,20 @@ namespace GNFSCore
 			}
 		}
 
+		/*
+		public Relation(Relation relation)
+		{
+			this.A = relation.A;
+			this.B = relation.B;
+			this.AlgebraicNorm = relation.AlgebraicNorm;
+			this.RationalNorm = relation.RationalNorm;
+			this.AlgebraicQuotient = BigInteger.Abs(relation.AlgebraicQuotient);
+			this.RationalQuotient = BigInteger.Abs(relation.RationalQuotient);
+			this.AlgebraicFactorization = relation.AlgebraicFactorization;
+			this.RationalFactorization = relation.RationalFactorization;
+			this.IsPersisted = relation.IsPersisted;
+		}
+
 		public Relation(int a, int b, BigInteger algebraicNorm, BigInteger rationalNorm, CountDictionary algebraicFactorization, CountDictionary rationalFactorization)
 		{
 			A = a;
@@ -110,6 +113,7 @@ namespace GNFSCore
 			AlgebraicFactorization = algebraicFactorization;
 			RationalFactorization = rationalFactorization;
 		}
+		*/
 
 		public BigInteger Apply(BigInteger x)
 		{

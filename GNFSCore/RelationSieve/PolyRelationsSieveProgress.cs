@@ -18,7 +18,7 @@ namespace GNFSCore
 		[DataMember]
 		public int A { get; private set; }
 		[DataMember]
-		public int B { get; private set; }
+		public uint B { get; private set; }
 		[DataMember]
 		public int Quantity { get; private set; }
 		[DataMember]
@@ -32,7 +32,11 @@ namespace GNFSCore
 
 		public RelationContainer Relations { get; set; }
 
+		[DataMember]
+		public uint MaxB { get; set; }
+		public int SmoothRelationsCounter { get; set; }
 		public int FreeRelationsCounter { get; set; }
+
 
 		internal GNFS _gnfs;
 
@@ -40,10 +44,12 @@ namespace GNFSCore
 
 		public PolyRelationsSieveProgress()
 		{
+			MaxB = 0;
 			Relations = new RelationContainer();
 		}
 
 		public PolyRelationsSieveProgress(GNFS gnfs)
+			: this()
 		{
 			_gnfs = gnfs;
 
@@ -51,8 +57,6 @@ namespace GNFSCore
 			{
 				CancelToken = cancellationSource.Token;
 			}
-
-			Relations = new RelationContainer();
 		}
 
 		public PolyRelationsSieveProgress(GNFS gnfs, int quantity, int valueRange)
@@ -62,9 +66,15 @@ namespace GNFSCore
 			B = 3;
 			Quantity = quantity;
 			ValueRange = valueRange;
+
+			if (MaxB == 0)
+			{
+				MaxB = (uint)gnfs.PrimeFactorBase.AlgebraicFactorBaseMax;
+			}
 		}
 
-		public PolyRelationsSieveProgress(GNFS gnfs, int a, int b, int quantity, int valueRange, List<List<Relation>> free, List<Relation> smooth, List<Relation> rough)
+		/*
+		public PolyRelationsSieveProgress(GNFS gnfs, int a, uint b, int quantity, int valueRange, List<List<Relation>> free, List<Relation> smooth, List<Relation> rough)
 			: this(gnfs, quantity, valueRange)
 		{
 			A = a;
@@ -74,6 +84,7 @@ namespace GNFSCore
 			Relations.SmoothRelations = smooth;
 			Relations.RoughRelations = rough;
 		}
+		*/
 
 		#endregion
 
@@ -81,38 +92,54 @@ namespace GNFSCore
 
 		public void GenerateRelations(CancellationToken cancelToken)
 		{
+			if (_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Any())
+			{
+				SmoothRelationsCounter = _gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Count;
+				_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Clear();
+			}
+
+			int roughRelationCounter = 0;
+			if (_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Any())
+			{
+				_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Clear();
+			}
+
+
+
 			if (Quantity == -1)
 			{
 				Quantity = _gnfs.RationalFactorPairCollection.Count + _gnfs.AlgebraicFactorPairCollection.Count + _gnfs.QuadradicFactorPairCollection.Count + 1;
 			}
-			else if (Relations.SmoothRelations.Count >= Quantity)
-			{
-				Quantity += 2000;
-			}
+			//else if (SmoothRelationsCounter >= Quantity)
+			//{
+			//	Quantity += 2000;
+			//}
 
 			if (A >= ValueRange)
 			{
-				ValueRange += 100;
+				ValueRange += 200;
 			}
-
-			int adjustedRange = ValueRange % 2 == 0 ? ValueRange + 1 : ValueRange;
+			
+			ValueRange = ValueRange % 2 == 0 ? ValueRange + 1 : ValueRange;
 			A = (A % 2 == 0) ? A + 1 : A;
+			
+			int startA = A;
 
-			int maxB = Math.Min(adjustedRange * 2, Quantity);
-
-			if (B >= maxB)
+			while (B >= MaxB)
 			{
-				maxB += 100;
+				MaxB += 100;
 			}
 
-			while (Relations.SmoothRelations.Count < Quantity)
+			_gnfs.LogMessage($"GenerateRelations: Quantity = {Quantity}, ValueRange = {ValueRange}, A = {A}, B = {B}, Max B = {MaxB}");
+
+			while (SmoothRelationsCounter < Quantity)
 			{
 				if (cancelToken.IsCancellationRequested)
 				{
 					break;
 				}
 
-				if (B > maxB)
+				if (B > MaxB)
 				{
 					break;
 				}
@@ -134,11 +161,22 @@ namespace GNFSCore
 						bool smooth = rel.IsSmooth;
 						if (smooth)
 						{
-							_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Add(rel);
+							Serialization.Save.Relations.Smooth.Append(_gnfs, rel);
+							SmoothRelationsCounter++;
+
+							_gnfs.LogMessage($"Found smooth relation: A = {rel.A}, B = {rel.B}");
 						}
 						else
 						{
-							_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Add(new Relation(rel));
+							_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Add(rel);
+							roughRelationCounter++;
+
+							if (roughRelationCounter > 1000)
+							{
+								Serialization.Save.Relations.Rough.AppendList(_gnfs, _gnfs.CurrentRelationsProgress.Relations.RoughRelations);
+								_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Clear();
+								roughRelationCounter = 0;
+							}
 						}
 					}
 				}
@@ -149,11 +187,19 @@ namespace GNFSCore
 				}
 
 				B += 2;
-				A = 1;
+				A = startA;
+
+				if (B % 11 == 0)
+				{
+					_gnfs.LogMessage($"B = {B}");
+				}
 			}
 
-			Serialization.Save.Relations.Smooth.Create(_gnfs);
-			Serialization.Save.Relations.Rough.Create(_gnfs);
+			if (_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Any())
+			{
+				Serialization.Save.Relations.Rough.AppendList(_gnfs, _gnfs.CurrentRelationsProgress.Relations.RoughRelations);
+				_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Clear();
+			}
 		}
 
 		#endregion
@@ -183,6 +229,7 @@ namespace GNFSCore
 		{
 			Relations.FreeRelations.Add(freeRelationSolution);
 			Serialization.Save.Relations.Free.SingleSolution(_gnfs, freeRelationSolution);
+			_gnfs.LogMessage($"Added free relation solution: Relation count = {freeRelationSolution.Count}");
 		}
 
 		#endregion

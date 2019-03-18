@@ -23,6 +23,11 @@ namespace GNFS_Winforms
 				{
 					break;
 				}
+
+				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.Quantity)
+				{
+					break;
+				}
 			}
 
 			return gnfs;

@@ -43,6 +43,7 @@
 			this.btnMatrix = new System.Windows.Forms.Button();
 			this.panelButtons = new System.Windows.Forms.Panel();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.btnLoad = new System.Windows.Forms.Button();
 			this.btnSave = new System.Windows.Forms.Button();
 			this.panelFunctions = new System.Windows.Forms.Panel();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -56,7 +57,6 @@
 			this.tbRelationQuantity = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.tbRelationValueRange = new System.Windows.Forms.TextBox();
-			this.btnLoad = new System.Windows.Forms.Button();
 			this.panelButtons.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			this.panelFunctions.SuspendLayout();
@@ -222,6 +222,16 @@
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "1) Create Polynomial, Factor Bases && Roots";
 			// 
+			// btnLoad
+			// 
+			this.btnLoad.Location = new System.Drawing.Point(6, 15);
+			this.btnLoad.Name = "btnLoad";
+			this.btnLoad.Size = new System.Drawing.Size(96, 23);
+			this.btnLoad.TabIndex = 2;
+			this.btnLoad.Text = "Load";
+			this.btnLoad.UseVisualStyleBackColor = true;
+			this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
+			// 
 			// btnSave
 			// 
 			this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -368,16 +378,6 @@
 			this.tbRelationValueRange.TabIndex = 5;
 			this.tbRelationValueRange.Text = "200";
 			// 
-			// btnLoad
-			// 
-			this.btnLoad.Location = new System.Drawing.Point(6, 15);
-			this.btnLoad.Name = "btnLoad";
-			this.btnLoad.Size = new System.Drawing.Size(96, 23);
-			this.btnLoad.TabIndex = 2;
-			this.btnLoad.Text = "Load";
-			this.btnLoad.UseVisualStyleBackColor = true;
-			this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -388,7 +388,6 @@
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.tbRelationQuantity);
 			this.Controls.Add(this.panelButtons);
-			this.Controls.Add(this.panelCancel);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.tbDegree);
 			this.Controls.Add(this.label3);
@@ -398,6 +397,7 @@
 			this.Controls.Add(this.tbBase);
 			this.Controls.Add(this.tbN);
 			this.Controls.Add(this.tbOutput);
+			this.Controls.Add(this.panelCancel);
 			this.MinimumSize = new System.Drawing.Size(500, 300);
 			this.Name = "MainForm";
 			this.Text = "GNFS";

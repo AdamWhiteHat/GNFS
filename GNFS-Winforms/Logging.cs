@@ -8,14 +8,18 @@ namespace GNFS_Winforms
 	public static class Logging
 	{
 		public static string OutputFilename;
+		public static MainForm PrimaryForm;
 		public static TextBox OutputTextbox;
 		public static bool FirstFindRelations;
+
+		private static int MaxLines = 200;
 		private static readonly string DefaultLoggingFilename = "Output.log.txt";
-		
+
 		static Logging()
 		{
 			FirstFindRelations = false;
 			OutputFilename = Settings.Log_FileName ?? DefaultLoggingFilename;
+			OutputFilename = Path.GetFullPath(OutputFilename);
 		}
 
 		public static bool IsDebugMode()
@@ -35,35 +39,54 @@ namespace GNFS_Winforms
 
 		public static void LogMessage()
 		{
-			CreateLogFileIfNotExists();
-			File.AppendAllText(OutputFilename, Environment.NewLine);
-			LogTextbox(Environment.NewLine);
+			LogMessage(Environment.NewLine);
 		}
 
 		public static void LogMessage(string message, params object[] args)
 		{
-			string msg = args.Any() ? string.Format(message, args) : string.IsNullOrWhiteSpace(message) ? "(empty)" : message;
-			if (!string.IsNullOrWhiteSpace(msg))
+			LogMessage(args.Any() ? string.Format(message, args) : string.IsNullOrWhiteSpace(message) ? "(empty)" : message);
+		}
+
+		public static void LogMessage(string message)
+		{
+			if (!string.IsNullOrWhiteSpace(message))
 			{
+				string toLog = message + Environment.NewLine;
 				CreateLogFileIfNotExists();
-				File.AppendAllText(OutputFilename, msg + Environment.NewLine);
-				LogTextbox(msg);
+				File.AppendAllText(OutputFilename, toLog);
+				LogTextbox(toLog);
 			}
 		}
 
 		public static void LogTextbox(string message)
 		{
-			if (GNFSCore.DirectoryLocations.IsLinuxOS())
+			//if (GNFSCore.DirectoryLocations.IsLinuxOS())
+			//{
+			//	return;
+			//}
+
+			if (!OutputTextbox.IsHandleCreated || OutputTextbox.IsDisposed)
 			{
-				return;
+				throw new Exception();
 			}
-			if (OutputTextbox.InvokeRequired)
+			
+			if (OutputTextbox.InvokeRequired /* && !GNFSCore.DirectoryLocations.IsLinuxOS()*/)
 			{
-				OutputTextbox.Invoke(new MethodInvoker(() => LogTextbox(message)));
+				OutputTextbox.Invoke(new Action(() => { LogTextbox(message); }));
 			}
 			else
 			{
-				OutputTextbox.AppendText(message);
+				string toLog = message;
+				if (PrimaryForm.IsWorking)
+				{
+					toLog = "\t" + message;
+				}
+
+				if (OutputTextbox.Lines.Length > MaxLines)
+				{
+					OutputTextbox.Clear();
+				}
+				OutputTextbox.AppendText(toLog);
 			}
 		}
 

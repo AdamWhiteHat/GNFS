@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace GNFS_Winforms
 {
@@ -23,11 +24,14 @@ namespace GNFS_Winforms
 
 		public static void SetControlEnabledState(Control control, bool enabled)
 		{
-			if (!GNFSCore.DirectoryLocations.IsLinuxOS() && control.InvokeRequired)
+			if (!control.IsHandleCreated || control.IsDisposed)
 			{
-				control.Invoke(new MethodInvoker(() =>
-					SetControlEnabledState(control, enabled)
-				));
+				throw new Exception();
+			}
+
+			if (control.InvokeRequired /* && !GNFSCore.DirectoryLocations.IsLinuxOS()*/)
+			{
+				control.Invoke(new Action(() => { SetControlEnabledState(control, enabled); }));
 			}
 			else
 			{
@@ -37,11 +41,14 @@ namespace GNFS_Winforms
 
 		public static void SetControlVisibleState(Control control, bool visible)
 		{
-			if (!GNFSCore.DirectoryLocations.IsLinuxOS() && control.InvokeRequired)
+			if (!control.IsHandleCreated || control.IsDisposed)
 			{
-				control.Invoke(new MethodInvoker(() =>
-					SetControlVisibleState(control, visible)
-				));
+				throw new Exception();
+			}
+
+			if (control.InvokeRequired /* && !GNFSCore.DirectoryLocations.IsLinuxOS()*/)
+			{
+				control.Invoke(new Action(() => { SetControlVisibleState(control, visible); }));
 			}
 			else
 			{
@@ -51,11 +58,14 @@ namespace GNFS_Winforms
 
 		public static void SetControlText(Control control, string text)
 		{
-			if (!GNFSCore.DirectoryLocations.IsLinuxOS() && control.InvokeRequired)
+			if (!control.IsHandleCreated || control.IsDisposed)
 			{
-				control.Invoke(new MethodInvoker(() =>
-					SetControlText(control, text)
-				));
+				throw new Exception();
+			}
+
+			if (control.InvokeRequired /* && !GNFSCore.DirectoryLocations.IsLinuxOS()*/)
+			{
+				control.Invoke(new Action(() => { SetControlText(control, text); }));
 			}
 			else
 			{

@@ -106,6 +106,7 @@ namespace GNFSCore
 						if (gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Any())
 						{
 							Save.Object(gnfs.CurrentRelationsProgress.Relations.SmoothRelations, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(RelationContainer.SmoothRelations)}.json"));
+							gnfs.CurrentRelationsProgress.Relations.SmoothRelations.ForEach(rel => rel.IsPersisted = true);
 						}
 					}
 
@@ -115,10 +116,11 @@ namespace GNFSCore
 						{
 							string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(RelationContainer.SmoothRelations)}.json");
 							string json = JsonConvert.SerializeObject(relation, Formatting.Indented);
-							File.AppendAllText(filename, json);
-
+							json += ",";
+							File.AppendAllText(filename, json); 
+							relation.IsPersisted = true;
 						}
-					}
+					}					
 				}
 
 				public static class Rough
@@ -128,17 +130,31 @@ namespace GNFSCore
 						if (gnfs.CurrentRelationsProgress.Relations.RoughRelations.Any())
 						{
 							Save.Object(gnfs.CurrentRelationsProgress.Relations.RoughRelations, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(RelationContainer.RoughRelations)}.json"));
+							gnfs.CurrentRelationsProgress.Relations.RoughRelations.ForEach(rel => rel.IsPersisted = true);
 						}
 					}
 
-					public static void Append(GNFS gnfs, Relation relation)
+					public static void Append(GNFS gnfs, Relation roughRelation)
 					{
-						if (relation != null && relation.IsSmooth)
+						if (roughRelation != null && roughRelation.IsSmooth)
 						{
 							string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(RelationContainer.RoughRelations)}.json");
-							string json = JsonConvert.SerializeObject(relation, Formatting.Indented);
+							string json = JsonConvert.SerializeObject(roughRelation, Formatting.Indented);
+							json += ",";
 							File.AppendAllText(filename, json);
+							roughRelation.IsPersisted = true;
+						}
+					}
 
+					public static void AppendList(GNFS gnfs, List<Relation> roughRelations)
+					{
+						if (roughRelations != null && roughRelations.Any())
+						{
+							string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(RelationContainer.RoughRelations)}.json");
+							string json = JsonConvert.SerializeObject(roughRelations, Formatting.Indented);
+							json = json.Replace("[","").Replace("]",",");
+							File.AppendAllText(filename, json);
+							roughRelations.ForEach(rel => rel.IsPersisted = true);
 						}
 					}
 				}
@@ -161,8 +177,9 @@ namespace GNFSCore
 					{
 						if (solution.Any())
 						{
+							solution.ForEach(rel => rel.IsPersisted = true);
 							Save.Object(solution, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(RelationContainer.FreeRelations)}_{gnfs.CurrentRelationsProgress.FreeRelationsCounter}.json"));
-							gnfs.CurrentRelationsProgress.FreeRelationsCounter += 1;
+							gnfs.CurrentRelationsProgress.FreeRelationsCounter += 1;							
 						}
 					}
 				}

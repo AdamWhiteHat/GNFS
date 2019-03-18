@@ -51,6 +51,10 @@ namespace GNFSCore
 
 		public DirectoryLocations SaveLocations { get; internal set; }
 
+		public LogMessageDelegate LogFunction { get; set; }
+
+		public delegate void LogMessageDelegate(string message);
+
 		#endregion
 
 		#region Constructors 
@@ -65,10 +69,11 @@ namespace GNFSCore
 			CurrentRelationsProgress = new PolyRelationsSieveProgress();
 		}
 
-		public GNFS(CancellationToken cancelToken, BigInteger n, BigInteger polynomialBase, int polyDegree, BigInteger primeBound, int relationQuantity, int relationValueRange)
+		public GNFS(CancellationToken cancelToken, LogMessageDelegate logFunction, BigInteger n, BigInteger polynomialBase, int polyDegree, BigInteger primeBound, int relationQuantity, int relationValueRange)
 			: this()
 		{
 			CancelToken = cancelToken;
+			LogFunction = logFunction;
 			N = n;
 
 			SaveLocations = new DirectoryLocations(N, polynomialBase, polyDegree);
@@ -77,6 +82,7 @@ namespace GNFSCore
 			{
 				// New GNFS instance
 				Directory.CreateDirectory(SaveLocations.SaveDirectory);
+				LogMessage($"Directory created.");
 
 				if (polyDegree == -1)
 				{
@@ -92,18 +98,22 @@ namespace GNFSCore
 				if (CancelToken.IsCancellationRequested) { return; }
 
 				ConstructNewPolynomial(this.PolynomialBase, this.PolynomialDegree);
+				LogMessage($"Polynomial constructed.");
 
 				if (CancelToken.IsCancellationRequested) { return; }
 
 				CaclulatePrimeBounds(primeBound);
+				LogMessage($"Prime bounds calculated.");
 
 				if (CancelToken.IsCancellationRequested) { return; }
 
 				NewFactorBases();
+				LogMessage($"Factor bases populated.");
 
 				if (CancelToken.IsCancellationRequested) { return; }
 
 				CurrentRelationsProgress = new PolyRelationsSieveProgress(this, relationQuantity, relationValueRange);
+				LogMessage($"Relations container initialized.");
 
 				Serialization.Save.Gnfs(this);
 			}
@@ -198,16 +208,21 @@ namespace GNFSCore
 
 			Serialization.Save.Gnfs(this);
 
+			LogMessage($"Constructing new prime bases (- of 3)...");
+
 			PrimeFactory.IncreaseMaxValue(PrimeFactorBase.QuadraticFactorBaseMax);
 
 			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.RationalFactorBaseMax).ToList();
 			Serialization.Save.FactorBase.Rational(this);
+			LogMessage($"Completed rational prime base (1 of 3).");
 
 			PrimeFactorBase.AlgebraicFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.AlgebraicFactorBaseMax).ToList();
 			Serialization.Save.FactorBase.Algebraic(this);
+			LogMessage($"Completed algebraic prime base (2 of 3).");
 
 			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesFrom(PrimeFactorBase.QuadraticFactorBaseMin).Take(PrimeFactorBase.QuadraticBaseCount).ToList();
 			Serialization.Save.FactorBase.Quadratic(this);
+			LogMessage($"Completed quadratic prime base (3 of 3).");
 		}
 
 		private static int CalculateQuadraticBaseSize(int polyDegree)
@@ -247,30 +262,32 @@ namespace GNFSCore
 
 		private void NewFactorBases()
 		{
+			LogMessage($"Constructing new factor bases (- of 3)...");
+
 			if (!RationalFactorPairCollection.Any())
 			{
 				RationalFactorPairCollection = FactorPairCollection.Factory.BuildRationalFactorBase(this);
 			}
-
 			Serialization.Save.FactorPair.Rational(this);
+			LogMessage($"Completed rational factor base (1 of 3).");
+
 
 			if (CancelToken.IsCancellationRequested) { return; }
-
 			if (!AlgebraicFactorPairCollection.Any())
 			{
 				AlgebraicFactorPairCollection = FactorPairCollection.Factory.BuildAlgebraicFactorBase(this);
 			}
-
 			Serialization.Save.FactorPair.Algebraic(this);
+			LogMessage($"Completed algebraic factor base (2 of 3).");
+
 
 			if (CancelToken.IsCancellationRequested) { return; }
-
 			if (!QuadradicFactorPairCollection.Any())
 			{
 				QuadradicFactorPairCollection = FactorPairCollection.Factory.BuildQuadradicFactorBase(this);
 			}
-
 			Serialization.Save.FactorPair.Quadratic(this);
+			LogMessage($"Completed quadratic factor base (3 of 3).");
 
 			if (CancelToken.IsCancellationRequested) { return; }
 		}
@@ -313,8 +330,8 @@ namespace GNFSCore
 				var As = likePair.Select(lp => lp.A).ToList();
 				var Bs = likePair.Select(lp => lp.B).ToList();
 
-				int a = (As[0] + Bs[0]) * (As[0] - Bs[0]);//(int)Math.Round(Math.Sqrt(As.Sum()));
-				int b = (As[1] + Bs[1]) * (As[1] - Bs[1]);//(int)Math.Round(Math.Sqrt(Bs.Sum()));
+				int a = (int)(As[0] + Bs[0]) * (int)(As[0] - Bs[0]);//(int)Math.Round(Math.Sqrt(As.Sum()));
+				uint b = (uint)(As[1] + Bs[1]) * (uint)(As[1] - Bs[1]);//(int)Math.Round(Math.Sqrt(Bs.Sum()));
 
 				if (a > 0 && b > 0)
 				{
@@ -323,6 +340,14 @@ namespace GNFSCore
 			}
 
 			return result;
+		}
+
+		public void LogMessage(string message)
+		{
+			if (LogFunction != null)
+			{
+				LogFunction.Invoke(message);
+			}
 		}
 
 		#region ToString
