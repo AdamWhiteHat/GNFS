@@ -11,6 +11,11 @@ namespace GNFS_Winforms
 		{
 			while (!cancelToken.IsCancellationRequested)
 			{
+				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.Quantity)
+				{
+					gnfs.CurrentRelationsProgress.IncreaseQuantity();
+				}
+
 				gnfs.CurrentRelationsProgress.GenerateRelations(cancelToken);
 
 				Logging.LogMessage();
@@ -26,7 +31,7 @@ namespace GNFS_Winforms
 
 				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.Quantity)
 				{
-					break;
+					continue;
 				}
 			}
 

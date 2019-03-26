@@ -39,7 +39,7 @@ namespace GNFSCore.Matrix
 				Sign = false;
 			}
 
-			FactorPairCollection qfb = gnfs.QuadradicFactorPairCollection;
+			FactorPairCollection qfb = gnfs.QuadraticFactorPairCollection;
 
 			BigInteger rationalMaxValue = gnfs.PrimeFactorBase.RationalFactorBaseMax;
 			BigInteger algebraicMaxValue = gnfs.PrimeFactorBase.AlgebraicFactorBaseMax;
@@ -64,7 +64,6 @@ namespace GNFSCore.Matrix
 					if (oddFactor.Prime > maxValue)
 					{
 						throw new Exception(); // or continue;
-
 					}
 					int index = PrimeFactory.GetIndexFromValue(oddFactor.Prime);
 					result[index] = true;
@@ -73,8 +72,7 @@ namespace GNFSCore.Matrix
 
 			return result.Take(primeIndex).ToArray();
 		}
-
-
+		
 		public bool[] GetBoolArray()
 		{
 			List<bool> result = new List<bool>() { Sign };

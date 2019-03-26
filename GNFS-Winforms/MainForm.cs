@@ -246,7 +246,7 @@ namespace GNFS_Winforms
 		private void btnSave_Click(object sender, EventArgs e)
 		{
 			Logging.LogMessage("[Save progress task began...]");
-			Serialization.Save.Gnfs(gnfs);
+			Serialization.Save.All(gnfs);
 			Logging.LogMessage("[Save progress task successfully completed]");
 		}
 
@@ -272,7 +272,26 @@ namespace GNFS_Winforms
 					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 					ControlBridge.SetControlEnabledState(panelFunctions, true);
+					Logging.LogMessage();
+					Logging.LogMessage("Counts/Quantities:");
+					Logging.LogMessage();
+					Logging.LogMessage($"Algebraic Factor Base (Quantity):\t{localGnfs.PrimeFactorBase.AlgebraicFactorBase.Count}");
+					Logging.LogMessage($"Rational Factor Base (Quantity):\t{localGnfs.PrimeFactorBase.RationalFactorBase.Count}");
+					Logging.LogMessage($"Quadratic Factor Base (Quantity):\t{localGnfs.PrimeFactorBase.QuadraticFactorBase.Count}");
+					Logging.LogMessage();
+					Logging.LogMessage($"Algebraic Factor Pairs (Quantity):\t{localGnfs.AlgebraicFactorPairCollection.Count}");
+					Logging.LogMessage($"Rational Factor Pairs (Quantity):\t{localGnfs.RationalFactorPairCollection.Count}");
+					Logging.LogMessage($"Quadratic Factor Pairs (Quantity):\t{localGnfs.QuadraticFactorPairCollection.Count}");
+					Logging.LogMessage();
+					Logging.LogMessage($"     Smooth Relations (Quantity):\t{localGnfs.CurrentRelationsProgress.SmoothRelationsCounter}");
+					Logging.LogMessage($"      Rough Relations (Quantity):\t{localGnfs.CurrentRelationsProgress.RoughRelations.Count}");
+					Logging.LogMessage($"       Free Relations (Quantity):\t{localGnfs.CurrentRelationsProgress.FreeRelationsCounter}");
+					Logging.LogMessage();
 					Logging.LogMessage("[Loading factorization progress complete]");
+
+
+
+
 				}).Start();
 			}
 		}

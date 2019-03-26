@@ -14,6 +14,15 @@ namespace GNFS_Winforms
 	{
 		public GNFS MatrixSolveGaussian(CancellationToken cancelToken, GNFS gnfs)
 		{
+			Serialization.Save.Relations.Smooth.Append(gnfs); // Persist any relations not already persisted to disk
+
+
+			// Because some operations clear this collection after persisting unsaved relations (to keep memory usage light)...
+			// We completely reload the entire relations collection from disk.
+			// This ensure that all the smooth relations are available for the matrix solving step.
+			Serialization.Load.Relations.Smooth(ref gnfs);
+
+
 			List<Relation> smoothRelations = gnfs.CurrentRelationsProgress.SmoothRelations.ToList();
 
 			int smoothCount = smoothRelations.Count;
@@ -21,7 +30,7 @@ namespace GNFS_Winforms
 			int maxRelationsToSelect =
 				PrimeFactory.GetIndexFromValue(gnfs.PrimeFactorBase.RationalFactorBaseMax)
 				+ PrimeFactory.GetIndexFromValue(gnfs.PrimeFactorBase.AlgebraicFactorBaseMax)
-				+ gnfs.QuadradicFactorPairCollection.Count
+				+ gnfs.QuadraticFactorPairCollection.Count
 				+ 3;
 
 
@@ -34,24 +43,20 @@ namespace GNFS_Winforms
 
 				// Randomly select n relations from smoothRelations
 				List<Relation> selectedRelations = new List<Relation>();
-				while (selectedRelations.Count != maxRelationsToSelect)
+				while (
+						selectedRelations.Count < maxRelationsToSelect 
+						||
+						selectedRelations.Count % 2 != 0 // Force number of relations to be even
+					)
 				{
 					int randomIndex = StaticRandom.Next(0, smoothRelations.Count);
 					selectedRelations.Add(smoothRelations[randomIndex]);
 					smoothRelations.RemoveAt(randomIndex);
 				}
 
-				// Force number of relations to be even
-				if (selectedRelations.Count % 2 != 0)
-				{
-					selectedRelations.RemoveAt(selectedRelations.Count - 1);
-				}
-
-
 				GaussianMatrix gaussianReduction = new GaussianMatrix(gnfs, selectedRelations);
 				gaussianReduction.TransposeAppend();
 				gaussianReduction.Elimination();
-
 
 				int number = 1;
 				int solutionCount = gaussianReduction.FreeVariables.Count(b => b) - 1;

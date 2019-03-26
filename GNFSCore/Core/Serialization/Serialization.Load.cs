@@ -23,23 +23,26 @@ namespace GNFSCore
 			public static T Generic<T>(string filename)
 			{
 				string loadJson = File.ReadAllText(filename);
-				loadJson = loadJson.Replace("][", ",").Trim();
-				if (loadJson.First() != '[')
-				{
-					loadJson = "[\r\n" + loadJson;
-				}
-				if (loadJson.Last() != ']')
-				{
-					if (loadJson.Last() == ',')
-					{
-						loadJson = loadJson.Substring(0, loadJson.Length - 1);
-					}
-					loadJson = loadJson + "]";
-				}
 				return JsonConvert.DeserializeObject<T>(loadJson);
 			}
 
-			public static GNFS Gnfs(CancellationToken cancelToken, string filename)
+			public static T GenericFixedArray<T>(string filename)
+			{
+				string loadJson = File.ReadAllText(filename);
+				string fixedJson = FixAppendedJsonArrays(loadJson);
+				return JsonConvert.DeserializeObject<T>(fixedJson);
+			}
+
+			private static string FixAppendedJsonArrays(string input)
+			{
+				//string inputJson = new string(input.Where(c => !char.IsWhiteSpace(c)).ToArray()); // Remove all whitespace
+				//inputJson = inputJson.Replace("[", "").Replace("]", ""); // Remove square brackets. There may be many, due to multiple calls to Serialization.Save.Relations.Smooth.Append()
+				//inputJson = inputJson.Replace("}{", "},{"); // Insert commas between item instances
+				string inputJson = input.Insert(input.Length,"]").Insert(0,"["); // Re-add square brackets.
+				return inputJson;
+			}
+
+			public static GNFS All(CancellationToken cancelToken, string filename)
 			{
 				string loadJson = File.ReadAllText(filename);
 				GNFS gnfs = JsonConvert.DeserializeObject<GNFS>(loadJson);
@@ -122,10 +125,10 @@ namespace GNFSCore
 
 				public static void Quadratic(ref GNFS gnfs)
 				{
-					string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(GNFS.QuadradicFactorPairCollection)}.json");
+					string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(GNFS.QuadraticFactorPairCollection)}.json");
 					if (File.Exists(filename))
 					{
-						gnfs.QuadradicFactorPairCollection = Load.Generic<FactorPairCollection>(filename);
+						gnfs.QuadraticFactorPairCollection = Load.Generic<FactorPairCollection>(filename);
 					}
 
 				}
@@ -138,7 +141,7 @@ namespace GNFSCore
 					string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(RelationContainer.SmoothRelations)}.json");
 					if (File.Exists(filename))
 					{
-						List<Relation> temp = Load.Generic<List<Relation>>(filename);
+						List<Relation> temp = Load.GenericFixedArray<List<Relation>>(filename);
 						temp.ForEach(rel => rel.IsPersisted = true);
 						gnfs.CurrentRelationsProgress.SmoothRelationsCounter = temp.Count;
 						gnfs.CurrentRelationsProgress.Relations.SmoothRelations = temp;
@@ -150,7 +153,7 @@ namespace GNFSCore
 					string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(RelationContainer.RoughRelations)}.json");
 					if (File.Exists(filename))
 					{
-						List<Relation> temp = Load.Generic<List<Relation>>(filename);
+						List<Relation> temp = Load.GenericFixedArray<List<Relation>>(filename);
 						temp.ForEach(rel => rel.IsPersisted = true);
 						gnfs.CurrentRelationsProgress.Relations.RoughRelations = temp;
 					}

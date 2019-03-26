@@ -94,13 +94,15 @@ namespace GNFSCore
 		{
 			if (_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Any())
 			{
-				SmoothRelationsCounter = _gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Count;
+				// SmoothRelationsCounter should reflect accurately
+				Serialization.Save.Relations.Smooth.Append(_gnfs); // This method updates SmoothRelationsCounter correctly
 				_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Clear();
 			}
 
 			int roughRelationCounter = 0;
 			if (_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Any())
 			{
+				Serialization.Save.Relations.Rough.Append(_gnfs);
 				_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Clear();
 			}
 
@@ -108,7 +110,7 @@ namespace GNFSCore
 
 			if (Quantity == -1)
 			{
-				Quantity = _gnfs.RationalFactorPairCollection.Count + _gnfs.AlgebraicFactorPairCollection.Count + _gnfs.QuadradicFactorPairCollection.Count + 1;
+				Quantity = _gnfs.RationalFactorPairCollection.Count + _gnfs.AlgebraicFactorPairCollection.Count + _gnfs.QuadraticFactorPairCollection.Count + 1;
 			}
 			//else if (SmoothRelationsCounter >= Quantity)
 			//{
@@ -165,6 +167,8 @@ namespace GNFSCore
 							SmoothRelationsCounter++;
 
 							_gnfs.LogMessage($"Found smooth relation: A = {rel.A}, B = {rel.B}");
+
+							rel = null;
 						}
 						else
 						{
@@ -177,6 +181,8 @@ namespace GNFSCore
 								_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Clear();
 								roughRelationCounter = 0;
 							}
+
+							rel = null;
 						}
 					}
 				}
@@ -205,6 +211,12 @@ namespace GNFSCore
 		#endregion
 
 		#region Misc
+
+		public void IncreaseQuantity(int ammount = 10)
+		{
+			Quantity += ammount;
+			Serialization.Save.Gnfs(_gnfs);
+		}
 
 		public void PurgePrimeRoughRelations()
 		{
@@ -242,7 +254,7 @@ namespace GNFSCore
 
 			result.AppendLine($"Smooth relations:");
 			result.AppendLine("\t_______________________________________________");
-			result.AppendLine($"\t|   A   |  B | ALGEBRAIC_NORM | RATIONAL_NORM | \t\tQuantity: {Relations.SmoothRelations.Count} Target quantity: {(_gnfs.RationalFactorPairCollection.Count + _gnfs.AlgebraicFactorPairCollection.Count + _gnfs.QuadradicFactorPairCollection.Count + 1).ToString()}");
+			result.AppendLine($"\t|   A   |  B | ALGEBRAIC_NORM | RATIONAL_NORM | \t\tQuantity: {Relations.SmoothRelations.Count} Target quantity: {(_gnfs.RationalFactorPairCollection.Count + _gnfs.AlgebraicFactorPairCollection.Count + _gnfs.QuadraticFactorPairCollection.Count + 1).ToString()}");
 			result.AppendLine("\t```````````````````````````````````````````````");
 			foreach (Relation rel in relations.OrderByDescending(rel => rel.A * rel.B))
 			{

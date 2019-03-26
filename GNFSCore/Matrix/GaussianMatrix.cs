@@ -33,7 +33,7 @@ namespace GNFSCore.Matrix
 			M = new List<bool[]>();
 
 
-			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.RationalFactorBaseMax) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.AlgebraicFactorBaseMax) + _gnfs.QuadradicFactorPairCollection.Count + 3;
+			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.RationalFactorBaseMax) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.AlgebraicFactorBaseMax) + _gnfs.QuadraticFactorPairCollection.Count + 3;
 
 			relations = rels;
 

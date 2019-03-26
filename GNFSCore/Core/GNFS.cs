@@ -47,7 +47,7 @@ namespace GNFSCore
 		/// Array of (p, r) where ƒ(r) % p == 0
 		/// </summary>
 		public FactorPairCollection AlgebraicFactorPairCollection { get; set; }
-		public FactorPairCollection QuadradicFactorPairCollection { get; set; }
+		public FactorPairCollection QuadraticFactorPairCollection { get; set; }
 
 		public DirectoryLocations SaveLocations { get; internal set; }
 
@@ -65,7 +65,7 @@ namespace GNFSCore
 			PolynomialCollection = new List<IPolynomial>();
 			RationalFactorPairCollection = new FactorPairCollection();
 			AlgebraicFactorPairCollection = new FactorPairCollection();
-			QuadradicFactorPairCollection = new FactorPairCollection();
+			QuadraticFactorPairCollection = new FactorPairCollection();
 			CurrentRelationsProgress = new PolyRelationsSieveProgress();
 		}
 
@@ -115,7 +115,7 @@ namespace GNFSCore
 				CurrentRelationsProgress = new PolyRelationsSieveProgress(this, relationQuantity, relationValueRange);
 				LogMessage($"Relations container initialized.");
 
-				Serialization.Save.Gnfs(this);
+				Serialization.Save.All(this);
 			}
 		}
 
@@ -206,7 +206,7 @@ namespace GNFSCore
 			PrimeFactorBase.QuadraticFactorBaseMin = PrimeFactorBase.AlgebraicFactorBaseMax + 20;
 			PrimeFactorBase.QuadraticFactorBaseMax = PrimeFactory.GetApproximateValueFromIndex((UInt64)(PrimeFactorBase.QuadraticFactorBaseMin + PrimeFactorBase.QuadraticBaseCount));
 
-			Serialization.Save.Gnfs(this);
+			Serialization.Save.All(this);
 
 			LogMessage($"Constructing new prime bases (- of 3)...");
 
@@ -257,7 +257,7 @@ namespace GNFSCore
 		{
 			CurrentPolynomial = new Polynomial(N, polynomialBase, polyDegree);
 			PolynomialCollection.Add(CurrentPolynomial);
-			Serialization.Save.Gnfs(this);
+			Serialization.Save.All(this);
 		}
 
 		private void NewFactorBases()
@@ -282,9 +282,9 @@ namespace GNFSCore
 
 
 			if (CancelToken.IsCancellationRequested) { return; }
-			if (!QuadradicFactorPairCollection.Any())
+			if (!QuadraticFactorPairCollection.Any())
 			{
-				QuadradicFactorPairCollection = FactorPairCollection.Factory.BuildQuadradicFactorBase(this);
+				QuadraticFactorPairCollection = FactorPairCollection.Factory.BuildQuadraticFactorBase(this);
 			}
 			Serialization.Save.FactorPair.Quadratic(this);
 			LogMessage($"Completed quadratic factor base (3 of 3).");
@@ -373,8 +373,8 @@ namespace GNFSCore
 			result.AppendLine($"AFB - Algebraic Factor Base - Count: {AlgebraicFactorPairCollection.Count} - Array of (p, r) such that ƒ(r) ≡ 0 (mod p) and p is prime");
 			result.AppendLine(AlgebraicFactorPairCollection.ToString(200));
 			result.AppendLine();
-			result.AppendLine($"QFB - Quadratic Factor Base - Count: {QuadradicFactorPairCollection.Count} - Array of (p, r) such that ƒ(r) ≡ 0 (mod p) and p is prime");
-			result.AppendLine(QuadradicFactorPairCollection.ToString());
+			result.AppendLine($"QFB - Quadratic Factor Base - Count: {QuadraticFactorPairCollection.Count} - Array of (p, r) such that ƒ(r) ≡ 0 (mod p) and p is prime");
+			result.AppendLine(QuadraticFactorPairCollection.ToString());
 			result.AppendLine();
 
 			result.AppendLine();

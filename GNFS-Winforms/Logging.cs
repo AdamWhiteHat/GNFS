@@ -39,7 +39,7 @@ namespace GNFS_Winforms
 
 		public static void LogMessage()
 		{
-			LogMessage(Environment.NewLine);
+			LogMessage(string.Empty);
 		}
 
 		public static void LogMessage(string message, params object[] args)
@@ -49,13 +49,10 @@ namespace GNFS_Winforms
 
 		public static void LogMessage(string message)
 		{
-			if (!string.IsNullOrWhiteSpace(message))
-			{
-				string toLog = message + Environment.NewLine;
-				CreateLogFileIfNotExists();
-				File.AppendAllText(OutputFilename, toLog);
-				LogTextbox(toLog);
-			}
+			string toLog = message + Environment.NewLine;
+			CreateLogFileIfNotExists();
+			File.AppendAllText(OutputFilename, toLog);
+			LogTextbox(toLog);
 		}
 
 		public static void LogTextbox(string message)
@@ -69,7 +66,7 @@ namespace GNFS_Winforms
 			{
 				throw new Exception();
 			}
-			
+
 			if (OutputTextbox.InvokeRequired /* && !GNFSCore.DirectoryLocations.IsLinuxOS()*/)
 			{
 				OutputTextbox.Invoke(new Action(() => { LogTextbox(message); }));
