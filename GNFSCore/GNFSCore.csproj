@@ -62,6 +62,7 @@
     <Compile Include="Core\SieveRangeEnumerable.cs" />
     <Compile Include="IntegerMath\Combinatorics.cs" />
     <Compile Include="Core\Polynomial.cs" />
+    <Compile Include="Matrix\MatrixSolve.cs" />
     <Compile Include="Polynomial\Term.cs" />
     <Compile Include="Polynomial\TermCollection.cs" />
     <Compile Include="RelationSieve\PolyRelationsSieveProgress.cs" />

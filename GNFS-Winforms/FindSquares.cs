@@ -13,16 +13,13 @@ namespace GNFS_Winforms
 
 	public partial class GnfsUiBridge
 	{
-		private BigInteger N = -1;
-
-		public GNFS FindSquares(GNFS gnfs, CancellationToken cancelToken)
+		public static GNFS FindSquares(GNFS gnfs, CancellationToken cancelToken)
 		{
 			if (cancelToken.IsCancellationRequested)
 			{
 				return gnfs;
 			}
 
-			N = gnfs.N;
 			BigInteger polyBase = gnfs.PolynomialBase;
 
 			List<List<Relation>> freeRelations = gnfs.CurrentRelationsProgress.FreeRelations;
@@ -38,11 +35,11 @@ namespace GNFS_Winforms
 
 			BigInteger prodS = SRingSquare.Evaluate(polyBase);
 
-			IPolynomial reducedS = Polynomial.Modulus(S, N);
+			IPolynomial reducedS = Polynomial.Modulus(S, gnfs.N);
 
 			BigInteger totalProdS = squareRootFinder.TotalS.Evaluate(polyBase) * squareRootFinder.PolynomialDerivative;
-			BigInteger totalProdModN = totalProdS % N;
-			BigInteger prodSmodN = prodS % N;
+			BigInteger totalProdModN = totalProdS % gnfs.N;
+			BigInteger prodSmodN = prodS % gnfs.N;
 
 			List<BigInteger> algebraicNumberFieldSquareRoots = squareRootFinder.AlgebraicResults;
 
@@ -114,8 +111,8 @@ namespace GNFS_Winforms
 			BigInteger A = max + min;
 			BigInteger B = max - min;
 
-			BigInteger C = GCD.FindGCD(N, A);
-			BigInteger D = GCD.FindGCD(N, B);
+			BigInteger C = GCD.FindGCD(gnfs.N, A);
+			BigInteger D = GCD.FindGCD(gnfs.N, B);
 
 
 			Logging.LogMessage($"GCD(N, A) = {C}");

@@ -7,7 +7,7 @@ namespace GNFSCore.Interfaces
 {
 	public interface IPolynomial
 		: ICloneable<IPolynomial>,
-			IComparable, IComparable<IPolynomial>,
+			IComparable<IPolynomial>,
 			IEquatable<IPolynomial>, IEquatable<Polynomial>,
 			IEqualityComparer<IPolynomial>, IEqualityComparer<Polynomial>
 	{

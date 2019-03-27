@@ -7,20 +7,13 @@ namespace GNFS_Winforms
 {
 	public static class Logging
 	{
-		public static string OutputFilename;
 		public static MainForm PrimaryForm;
 		public static TextBox OutputTextbox;
-		public static bool FirstFindRelations;
+		public static bool FirstFindRelations = false;
+		public static string OutputFilename = Path.GetFullPath(Settings.Log_FileName ?? DefaultLoggingFilename);
 
 		private static int MaxLines = 200;
-		private static readonly string DefaultLoggingFilename = "Output.log.txt";
-
-		static Logging()
-		{
-			FirstFindRelations = false;
-			OutputFilename = Settings.Log_FileName ?? DefaultLoggingFilename;
-			OutputFilename = Path.GetFullPath(OutputFilename);
-		}
+		private const string DefaultLoggingFilename = "Output.log.txt";
 
 		public static bool IsDebugMode()
 		{

@@ -10,22 +10,14 @@ namespace GNFSCore
 	{
 		private string _polynomial = null;
 		private string _saveDirectory = null;
-		private string _parameters = "GNFS.json";
 
-		private static readonly int showDigits = 22;
-		private static readonly string elipse = "[...]";
-		private static readonly string saveRootDirectory = "GNFS";
+		private const int showDigits = 22;
+		private const string elipse = "[...]";
+		private const string _parameters = "GNFS.json";
+		private static readonly string saveRootDirectory = IsLinuxOS() ? "GNFS" : "C:\\GNFS";
 
 		public string SaveDirectory { get { return _saveDirectory; } }
 		public string GnfsParameters_SaveFile { get { return Path.Combine(SaveDirectory, _parameters); } }
-
-		static DirectoryLocations()
-		{
-			if (!IsLinuxOS())
-			{
-				saveRootDirectory = "C:\\GNFS";
-			}
-		}
 
 		public DirectoryLocations(string baseDirectory)
 		{

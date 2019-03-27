@@ -11,12 +11,11 @@ namespace GNFSCore.IntegerMath
 
 	public static class PrimeFactory
 	{
-		private static BigInteger MaxValue;
+		private static BigInteger MaxValue = 10;
 		private static List<BigInteger> primes = new List<BigInteger>() { 2, 3, 5, 7, 11, 13 };
 
 		static PrimeFactory()
 		{
-			MaxValue = 10;
 			SetPrimes();
 		}
 

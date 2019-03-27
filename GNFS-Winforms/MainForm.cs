@@ -23,19 +23,18 @@ namespace GNFS_Winforms
 		private BigInteger n;
 		private BigInteger polyBase;
 		private BigInteger primeBound;
-		private GnfsUiBridge gnfsBridge;
 
 		public bool IsWorking { get; private set; }
 		private CancellationToken cancellationToken;
 		private CancellationTokenSource cancellationTokenSource;
 
-		private static readonly BigInteger MatthewBriggs = BigInteger.Parse("45113");
-		private static readonly BigInteger PerLeslieJensen = BigInteger.Parse("3218147");
-		private static readonly BigInteger RSA_100 = BigInteger.Parse("1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139");
-		private static readonly BigInteger RSA_110 = BigInteger.Parse("35794234179725868774991807832568455403003778024228226193532908190484670252364677411513516111204504060317568667");
-		private static readonly BigInteger RSA_120 = BigInteger.Parse("227010481295437363334259960947493668895875336466084780038173258247009162675779735389791151574049166747880487470296548479");
-		private static readonly BigInteger RSA_129 = BigInteger.Parse("114381625757888867669235779976146612010218296721242362562561842935706935245733897830597123563958705058989075147599290026879543541");
-		private static readonly BigInteger RSA_130 = BigInteger.Parse("1807082088687404805951656164405905566278102516769401349170127021450056662540244048387341127590812303371781887966563182013214880557");
+		//private static readonly BigInteger MatthewBriggs = BigInteger.Parse("45113");
+		//private static readonly BigInteger PerLeslieJensen = BigInteger.Parse("3218147");
+		//private static readonly BigInteger RSA_100 = BigInteger.Parse("1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139");
+		//private static readonly BigInteger RSA_110 = BigInteger.Parse("35794234179725868774991807832568455403003778024228226193532908190484670252364677411513516111204504060317568667");
+		//private static readonly BigInteger RSA_120 = BigInteger.Parse("227010481295437363334259960947493668895875336466084780038173258247009162675779735389791151574049166747880487470296548479");
+		//private static readonly BigInteger RSA_129 = BigInteger.Parse("114381625757888867669235779976146612010218296721242362562561842935706935245733897830597123563958705058989075147599290026879543541");
+		//private static readonly BigInteger RSA_130 = BigInteger.Parse("1807082088687404805951656164405905566278102516769401349170127021450056662540244048387341127590812303371781887966563182013214880557");
 
 		#endregion
 
@@ -50,7 +49,6 @@ namespace GNFS_Winforms
 
 			IsWorking = false;
 			gnfs = null;
-			gnfsBridge = new GnfsUiBridge(this);
 
 			tbN.Text = Settings.N.ToString();
 			tbDegree.Text = Settings.Degree;
@@ -61,8 +59,6 @@ namespace GNFS_Winforms
 
 			n = BigInteger.Parse(tbN.Text);
 			degree = int.Parse(tbDegree.Text);
-
-			gnfsBridge = new GnfsUiBridge(this);
 
 			if (GNFSCore.DirectoryLocations.IsLinuxOS())
 			{
@@ -166,7 +162,7 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS resultGnfs = gnfsBridge.FindRelations(breakAfterOneRound, localGnfs, token);
+					GNFS resultGnfs = GnfsUiBridge.FindRelations(breakAfterOneRound, localGnfs, token);
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
 					Logging.LogMessage("[Find relations task complete]");
@@ -184,9 +180,10 @@ namespace GNFS_Winforms
 
 				GNFS localGnfs = gnfs;
 				CancellationToken token = cancellationTokenSource.Token;
+				gnfs.CancelToken = token;
 				new Thread(() =>
 				{
-					GNFS resultGnfs = gnfsBridge.MatrixSolveGaussian(token, localGnfs);
+					GNFS resultGnfs = GnfsUiBridge.MatrixSolveGaussian(localGnfs);
 
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
@@ -208,7 +205,7 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS resultGnfs = gnfsBridge.FindSquares(localGnfs, token);
+					GNFS resultGnfs = GnfsUiBridge.FindSquares(localGnfs, token);
 
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
@@ -268,7 +265,7 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS localGnfs = gnfsBridge.LoadGnfs(token, n);
+					GNFS localGnfs = GnfsUiBridge.LoadGnfs(token, n);
 					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 					ControlBridge.SetControlEnabledState(panelFunctions, true);
@@ -319,7 +316,7 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS localGnfs = gnfsBridge.CreateGnfs(token, n, polyBase, degree, primeBound, relationQuantity, relationValueRange);
+					GNFS localGnfs = GnfsUiBridge.CreateGnfs(token, n, polyBase, degree, primeBound, relationQuantity, relationValueRange);
 					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 					ControlBridge.SetControlEnabledState(panelFunctions, true);

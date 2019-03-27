@@ -7,11 +7,9 @@ namespace GNFSCore
 {
 	public static class StaticRandom
 	{
-		private static readonly Random rand;
+		private static readonly Random rand = new Random();
 		static StaticRandom()
 		{
-			rand = new Random();
-
 			int counter = rand.Next(100, 200);
 			while (counter-- > 0)
 			{

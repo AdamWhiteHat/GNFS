@@ -20,10 +20,6 @@ namespace GNFSCore.Matrix
 		public int LastIndexOfAlgebraic { get { return AlgebraicPart.LastIndexOf(true); } }
 		public int LastIndexOfQuadratic { get { return QuadraticPart.LastIndexOf(true); } }
 
-		public int RationalLength { get { return RationalPart.Count - 1; } }
-		public int AlgebraicLength { get { return AlgebraicPart.Count - 1; } }
-		public int QuadraticLength { get { return QuadraticPart.Count - 1; } }
-
 		public Relation SourceRelation { get; private set; }
 
 		public GaussianRow(GNFS gnfs, Relation relation)

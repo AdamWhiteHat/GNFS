@@ -7,7 +7,7 @@ namespace GNFS_Winforms
 
 	public partial class GnfsUiBridge
 	{
-		public GNFS FindRelations(bool oneRound, GNFS gnfs, CancellationToken cancelToken)
+		public static GNFS FindRelations(bool oneRound, GNFS gnfs, CancellationToken cancelToken)
 		{
 			while (!cancelToken.IsCancellationRequested)
 			{
@@ -31,7 +31,7 @@ namespace GNFS_Winforms
 
 				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.Quantity)
 				{
-					continue;
+					break;
 				}
 			}
 

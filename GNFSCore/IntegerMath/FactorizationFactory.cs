@@ -10,82 +10,7 @@ namespace GNFSCore.IntegerMath
 {
 	public static partial class FactorizationFactory
 	{
-		private static IEnumerable<BigInteger> primes;
-
-		static FactorizationFactory()
-		{
-			primes = new BigInteger[] { 2, 3, 5, 7, 11 };
-		}
-
-		public static PrimeFactorization GetPrimeFactorizationGridRow(BigInteger value, BigInteger maxValue)
-		{
-			PrimeFactorization factorizationTuple = GetPrimeFactorization(value, maxValue);
-
-			PrimeFactorization results = new PrimeFactorization();
-
-			IEnumerable<BigInteger> primeCollection = PrimeFactory.GetPrimesTo(maxValue);
-
-			foreach (BigInteger prime in primeCollection)
-			{
-				var primeFactor = factorizationTuple.Where(factor => factor.Prime == prime);
-
-				if (primeFactor.Any())
-				{
-					var tup = primeFactor.First();
-					results.Add(new Factor(prime, tup.Exponent % 2));
-				}
-				else
-				{
-					results.Add(new Factor(prime, 0));
-				}
-			}
-
-			return results;
-		}
-
-		public static PrimeFactorization GetPrimeFactorization(BigInteger value, BigInteger maxValue)
-		{
-			if (value == 0)
-			{
-				throw new ArgumentException();
-			}
-
-			PrimeFactorization result = new PrimeFactorization();
-			BigInteger toFactor = value;
-
-			BigInteger lastPrime = int.MinValue;
-			BigInteger primeCounter = 1;
-			IEnumerable<BigInteger> factorization = GetPrimeFactorCollection(toFactor, maxValue);
-
-			if (!factorization.Any())
-			{
-				return new PrimeFactorization();
-			}
-
-			foreach (BigInteger prime in factorization)
-			{
-				if (prime == lastPrime)
-				{
-					primeCounter += 1;
-				}
-				else if (lastPrime != int.MinValue)
-				{
-					result.Add(new Factor(lastPrime, primeCounter));
-					primeCounter = 1;
-				}
-
-				lastPrime = prime;
-			}
-
-			result.Add(new Factor(lastPrime, primeCounter));
-
-			if (factorization.Distinct().Count() != result.Count)
-			{
-				throw new Exception($"There is a bug in {nameof(FactorizationFactory.GetPrimeFactorization)}!");
-			}
-
-			return result;
-		}
+		private static IEnumerable<BigInteger> primes = new BigInteger[] { 2, 3, 5, 7, 11 };
 
 		public static IEnumerable<BigInteger> GetPrimeFactorCollection(BigInteger value, BigInteger maxValue)
 		{
@@ -160,39 +85,6 @@ namespace GNFSCore.IntegerMath
 			}
 		}
 
-		public static BigInteger[] GetFactorizationExponents(BigInteger value, BigInteger maxValue)
-		{
-			return GetPrimeFactorization(value, maxValue).Select(factor => factor.Exponent).ToArray();
-		}
-
-		public static bool IsSmoothOverFactorBase(BigInteger n, IEnumerable<BigInteger> factorBase)
-		{
-			BigInteger result = BigInteger.Abs(n);
-			BigInteger sqrt = result.SquareRoot();
-
-			foreach (BigInteger factor in factorBase)
-			{
-				while (result % factor == 0 && result != 1)
-				{
-					result /= factor;
-				}
-
-				if (result == 0 || result == 1 || factor > sqrt)
-				{
-					break;
-				}
-				else if (result > 1)
-				{
-					if (factorBase.Contains(result))
-					{
-						return true;
-					}
-				}
-			}
-
-			return (result == 1);
-		}
-
 		private static BigInteger[] primeCheckBases = new BigInteger[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47 };
 		public static bool IsProbablePrime(BigInteger input)
 		{
@@ -242,14 +134,6 @@ namespace GNFSCore.IntegerMath
 			}
 
 			return true;
-		}
-
-		public static class FormatString
-		{
-			public static string PrimeFactorizationTuple(PrimeFactorization factorization)
-			{
-				return $"{string.Join(" * ", factorization.Select(factor => $"{factor.Prime}^{factor.Exponent}"))}";
-			}
 		}
 	}
 }
