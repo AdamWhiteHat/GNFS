@@ -79,7 +79,6 @@
     <Compile Include="IntegerMath\Normal.cs" />
     <Compile Include="IntegerMath\BigRange.cs" />
     <Compile Include="IntegerMath\Legendre.cs" />
-    <Compile Include="IntegerMath\PrimeFactorization.cs" />
     <Compile Include="IntegerMath\PrimeFactory.cs" />
     <Compile Include="Matrix\GaussianMatrix.cs" />
     <Compile Include="Matrix\GaussianRow.cs" />

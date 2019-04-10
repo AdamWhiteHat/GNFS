@@ -40,35 +40,42 @@ namespace GNFSCore.Matrix
 			BigInteger rationalMaxValue = gnfs.PrimeFactorBase.RationalFactorBaseMax;
 			BigInteger algebraicMaxValue = gnfs.PrimeFactorBase.AlgebraicFactorBaseMax;
 
-			PrimeFactorization ratFactorization = new PrimeFactorization(relation.RationalFactorization, rationalMaxValue);
-			PrimeFactorization algFactorization = new PrimeFactorization(relation.AlgebraicFactorization, algebraicMaxValue);
-
-			RationalPart = GetVector(ratFactorization, rationalMaxValue).ToList();
-			AlgebraicPart = GetVector(algFactorization, algebraicMaxValue).ToList();
+			RationalPart = GetVector(relation.RationalFactorization, rationalMaxValue).ToList();
+			AlgebraicPart = GetVector(relation.AlgebraicFactorization, algebraicMaxValue).ToList();
 			QuadraticPart = qfb.Select(qf => QuadraticResidue.GetQuadraticCharacter(relation, qf)).ToList();
 		}
 
-		protected static bool[] GetVector(PrimeFactorization primeFactorization, BigInteger maxValue)
+		protected static bool[] GetVector(CountDictionary primeFactorizationDict, BigInteger maxValue)
 		{
 			int primeIndex = PrimeFactory.GetIndexFromValue(maxValue);
 
 			bool[] result = new bool[primeIndex];
-			if (primeFactorization.Any())
+
+			if (primeFactorizationDict.Any())
 			{
-				foreach (Factor oddFactor in primeFactorization.Where(f => f.ExponentMod2 == 1))
+				foreach (KeyValuePair<BigInteger, BigInteger> kvp in primeFactorizationDict)
 				{
-					if (oddFactor.Prime > maxValue)
+					if (kvp.Key > maxValue)
 					{
-						throw new Exception(); // or continue;
+						continue;
 					}
-					int index = PrimeFactory.GetIndexFromValue(oddFactor.Prime);
+					if (kvp.Key == -1)
+					{
+						continue;
+					}
+					if (kvp.Value % 2 == 0)
+					{
+						continue;
+					}
+
+					int index = PrimeFactory.GetIndexFromValue(kvp.Key);
 					result[index] = true;
 				}
 			}
 
-			return result.Take(primeIndex).ToArray();
+			return result;
 		}
-		
+				
 		public bool[] GetBoolArray()
 		{
 			List<bool> result = new List<bool>() { Sign };
