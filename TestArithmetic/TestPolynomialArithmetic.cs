@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using GNFSCore;
-using GNFSCore.Polynomials;
+using GNFSCore.Interfaces;
 
 namespace TestArithmetic
 {
@@ -19,6 +19,7 @@ namespace TestArithmetic
 		private TestContext testContextInstance;
 		public TestContext TestContext { get { return testContextInstance; } set { testContextInstance = value; } }
 
+		/*
 		[TestMethod]
 		public void TestGCDPolynomials()
 		{
@@ -39,6 +40,7 @@ namespace TestArithmetic
 
 			CollectionAssert.AreEqual(expectedCoefficients, resultCoefficients);
 		}
+		*/
 
 		[TestMethod]
 		public void TestMultiplyPolynomials()
@@ -105,6 +107,7 @@ namespace TestArithmetic
 			WriteOutput($"Remainder: {resultRemainder}");
 		}
 
+		/*
 		[TestMethod]
 		public void TestAddPolynomials()
 		{
@@ -144,5 +147,6 @@ namespace TestArithmetic
 			WriteOutput($"PolyB: {polyB}");
 			WriteOutput($"Result: {result}");
 		}
+		*/
 	}
 }

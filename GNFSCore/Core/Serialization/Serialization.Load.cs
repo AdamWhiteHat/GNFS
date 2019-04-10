@@ -48,9 +48,11 @@ namespace GNFSCore
 				GNFS gnfs = JsonConvert.DeserializeObject<GNFS>(loadJson);
 				gnfs.CancelToken = cancelToken;
 
-				gnfs.SaveLocations = new DirectoryLocations(Path.GetDirectoryName(filename));
+				string directoryName = Path.GetDirectoryName(filename);
+				gnfs.SaveLocations = new DirectoryLocations(directoryName);
 
 				gnfs.CurrentPolynomial = gnfs.PolynomialCollection.Last();
+				((Polynomial)gnfs.CurrentPolynomial).SetDegree();
 
 				Load.FactorBase.Rational(ref gnfs);
 				Load.FactorBase.Algebraic(ref gnfs);
@@ -60,7 +62,7 @@ namespace GNFSCore
 				Load.FactorPair.Algebraic(ref gnfs);
 				Load.FactorPair.Quadratic(ref gnfs);
 
-				gnfs.CurrentRelationsProgress._gnfs = gnfs;
+				gnfs.CurrentRelationsProgress._gnfs = gnfs;				
 
 				Load.Relations.Smooth(ref gnfs);
 				Load.Relations.Rough(ref gnfs);

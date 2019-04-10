@@ -57,6 +57,7 @@
 			this.tbRelationQuantity = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.tbRelationValueRange = new System.Windows.Forms.TextBox();
+			this.btnIncreaseSmoothnessBound = new System.Windows.Forms.Button();
 			this.panelButtons.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			this.panelFunctions.SuspendLayout();
@@ -85,7 +86,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbN.Location = new System.Drawing.Point(20, 4);
 			this.tbN.Name = "tbN";
-			this.tbN.Size = new System.Drawing.Size(702, 20);
+			this.tbN.Size = new System.Drawing.Size(699, 20);
 			this.tbN.TabIndex = 0;
 			// 
 			// tbBase
@@ -94,7 +95,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbBase.Location = new System.Drawing.Point(117, 52);
 			this.tbBase.Name = "tbBase";
-			this.tbBase.Size = new System.Drawing.Size(258, 20);
+			this.tbBase.Size = new System.Drawing.Size(260, 20);
 			this.tbBase.TabIndex = 2;
 			// 
 			// tbBound
@@ -103,7 +104,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbBound.Location = new System.Drawing.Point(117, 26);
 			this.tbBound.Name = "tbBound";
-			this.tbBound.Size = new System.Drawing.Size(258, 20);
+			this.tbBound.Size = new System.Drawing.Size(185, 20);
 			this.tbBound.TabIndex = 1;
 			this.tbBound.Text = "61";
 			// 
@@ -165,7 +166,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbDegree.Location = new System.Drawing.Point(117, 72);
 			this.tbDegree.Name = "tbDegree";
-			this.tbDegree.Size = new System.Drawing.Size(18, 20);
+			this.tbDegree.Size = new System.Drawing.Size(21, 20);
 			this.tbDegree.TabIndex = 3;
 			// 
 			// btnFindRelations
@@ -354,7 +355,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbRelationQuantity.Location = new System.Drawing.Point(117, 98);
 			this.tbRelationQuantity.Name = "tbRelationQuantity";
-			this.tbRelationQuantity.Size = new System.Drawing.Size(258, 20);
+			this.tbRelationQuantity.Size = new System.Drawing.Size(260, 20);
 			this.tbRelationQuantity.TabIndex = 4;
 			this.tbRelationQuantity.Text = "70";
 			// 
@@ -374,15 +375,27 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbRelationValueRange.Location = new System.Drawing.Point(117, 118);
 			this.tbRelationValueRange.Name = "tbRelationValueRange";
-			this.tbRelationValueRange.Size = new System.Drawing.Size(258, 20);
+			this.tbRelationValueRange.Size = new System.Drawing.Size(260, 20);
 			this.tbRelationValueRange.TabIndex = 5;
 			this.tbRelationValueRange.Text = "200";
+			// 
+			// btnIncreaseSmoothnessBound
+			// 
+			this.btnIncreaseSmoothnessBound.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnIncreaseSmoothnessBound.Location = new System.Drawing.Point(304, 25);
+			this.btnIncreaseSmoothnessBound.Name = "btnIncreaseSmoothnessBound";
+			this.btnIncreaseSmoothnessBound.Size = new System.Drawing.Size(75, 23);
+			this.btnIncreaseSmoothnessBound.TabIndex = 20;
+			this.btnIncreaseSmoothnessBound.Text = "Increase";
+			this.btnIncreaseSmoothnessBound.UseVisualStyleBackColor = true;
+			this.btnIncreaseSmoothnessBound.Click += new System.EventHandler(this.btnIncreaseSmoothnessBound_Click);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(725, 489);
+			this.Controls.Add(this.btnIncreaseSmoothnessBound);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.tbRelationValueRange);
 			this.Controls.Add(this.label5);
@@ -444,6 +457,7 @@
 		private System.Windows.Forms.Button btnPrintRelations;
 		private System.Windows.Forms.GroupBox groupBox4;
 		private System.Windows.Forms.Button btnLoad;
+		private System.Windows.Forms.Button btnIncreaseSmoothnessBound;
 	}
 }
 

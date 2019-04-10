@@ -38,8 +38,8 @@ namespace GNFSCore
 				Save.FactorPair.Algebraic(gnfs);
 				Save.FactorPair.Quadratic(gnfs);
 
-				Save.Relations.Smooth.Create(gnfs);
-				Save.Relations.Rough.Create(gnfs);
+				Save.Relations.Smooth.Append(gnfs);
+				Save.Relations.Rough.Append(gnfs);
 				Save.Relations.Free.AllSolutions(gnfs);
 			}
 
@@ -116,11 +116,6 @@ namespace GNFSCore
 						return _fileExists.Value;
 					}
 
-					public static void Create(GNFS gnfs)
-					{
-						Append(gnfs);
-					}
-
 					public static void Append(GNFS gnfs)
 					{
 						if (gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Any())
@@ -164,11 +159,6 @@ namespace GNFSCore
 							_fileExists = File.Exists(Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(RelationContainer.RoughRelations)}.json"));
 						}
 						return _fileExists.Value;
-					}
-
-					public static void Create(GNFS gnfs)
-					{
-						Append(gnfs);
 					}
 
 					public static void Append(GNFS gnfs)

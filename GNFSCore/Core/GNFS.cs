@@ -102,12 +102,16 @@ namespace GNFSCore
 
 				if (CancelToken.IsCancellationRequested) { return; }
 
-				CaclulatePrimeBounds(primeBound);
+				CaclulatePrimeFactorBaseBounds(primeBound);
+
+				if (CancelToken.IsCancellationRequested) { return; }
+
+				SetPrimeFactorBases(primeBound);
 				LogMessage($"Prime bounds calculated.");
 
 				if (CancelToken.IsCancellationRequested) { return; }
 
-				NewFactorBases();
+				NewFactorPairCollections();
 				LogMessage($"Factor bases populated.");
 
 				if (CancelToken.IsCancellationRequested) { return; }
@@ -161,7 +165,7 @@ namespace GNFSCore
 			return result;
 		}
 
-		private void CaclulatePrimeBounds()
+		private void GetPrimeBoundsApproximation()
 		{
 			BigInteger bound = new BigInteger();
 
@@ -191,10 +195,10 @@ namespace GNFSCore
 				bound = 250000000;
 			}
 
-			CaclulatePrimeBounds(bound);
+			SetPrimeFactorBases(bound);
 		}
 
-		private void CaclulatePrimeBounds(BigInteger bound)
+		public void CaclulatePrimeFactorBaseBounds(BigInteger bound)
 		{
 			PrimeFactorBase = new FactorBase();
 
@@ -207,7 +211,11 @@ namespace GNFSCore
 			PrimeFactorBase.QuadraticFactorBaseMax = PrimeFactory.GetApproximateValueFromIndex((UInt64)(PrimeFactorBase.QuadraticFactorBaseMin + PrimeFactorBase.QuadraticBaseCount));
 
 			Serialization.Save.All(this);
+			LogMessage("Saved prime factor base bounds.");
+		}
 
+		public void SetPrimeFactorBases(BigInteger bound)
+		{
 			LogMessage($"Constructing new prime bases (- of 3)...");
 
 			PrimeFactory.IncreaseMaxValue(PrimeFactorBase.QuadraticFactorBaseMax);
@@ -260,13 +268,13 @@ namespace GNFSCore
 			Serialization.Save.All(this);
 		}
 
-		private void NewFactorBases()
+		private void NewFactorPairCollections()
 		{
 			LogMessage($"Constructing new factor bases (- of 3)...");
 
 			if (!RationalFactorPairCollection.Any())
 			{
-				RationalFactorPairCollection = FactorPairCollection.Factory.BuildRationalFactorBase(this);
+				RationalFactorPairCollection = FactorPairCollection.Factory.BuildRationalFactorPairCollection(this);
 			}
 			Serialization.Save.FactorPair.Rational(this);
 			LogMessage($"Completed rational factor base (1 of 3).");
@@ -275,7 +283,7 @@ namespace GNFSCore
 			if (CancelToken.IsCancellationRequested) { return; }
 			if (!AlgebraicFactorPairCollection.Any())
 			{
-				AlgebraicFactorPairCollection = FactorPairCollection.Factory.BuildAlgebraicFactorBase(this);
+				AlgebraicFactorPairCollection = FactorPairCollection.Factory.BuildAlgebraicFactorPairCollection(this);
 			}
 			Serialization.Save.FactorPair.Algebraic(this);
 			LogMessage($"Completed algebraic factor base (2 of 3).");
@@ -284,7 +292,7 @@ namespace GNFSCore
 			if (CancelToken.IsCancellationRequested) { return; }
 			if (!QuadraticFactorPairCollection.Any())
 			{
-				QuadraticFactorPairCollection = FactorPairCollection.Factory.BuildQuadraticFactorBase(this);
+				QuadraticFactorPairCollection = FactorPairCollection.Factory.BuildQuadraticFactorPairCollection(this);
 			}
 			Serialization.Save.FactorPair.Quadratic(this);
 			LogMessage($"Completed quadratic factor base (3 of 3).");

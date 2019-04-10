@@ -142,6 +142,27 @@ namespace GNFS_Winforms
 
 		#region Button Methods
 
+		private void btnIncreaseSmoothnessBound_Click(object sender, EventArgs e)
+		{
+			BigInteger rationalBaseMax = gnfs.PrimeFactorBase.RationalFactorBaseMax;
+			BigInteger textboxBaseMax = BigInteger.Parse(tbBound.Text);
+
+			BigInteger newBaseMax = rationalBaseMax;
+			if (textboxBaseMax > rationalBaseMax)
+			{
+				newBaseMax = textboxBaseMax;
+			}
+			else
+			{
+				newBaseMax = rationalBaseMax + 100000;
+			}
+
+			tbBound.Text = newBaseMax.ToString();
+
+			gnfs.CaclulatePrimeFactorBaseBounds(newBaseMax);
+			gnfs.SetPrimeFactorBases(newBaseMax);
+		}
+
 		private void btnFindRelations_Click(object sender, EventArgs e)
 		{
 			if (!IsWorking)

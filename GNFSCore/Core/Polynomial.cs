@@ -99,7 +99,7 @@ namespace GNFSCore
 			SetDegree();
 		}
 
-		private void SetDegree()
+		internal void SetDegree()
 		{
 			if (_terms.Any())
 			{

@@ -96,14 +96,14 @@ namespace GNFSCore
 			{
 				// SmoothRelationsCounter should reflect accurately
 				Serialization.Save.Relations.Smooth.Append(_gnfs); // This method updates SmoothRelationsCounter correctly
-				_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Clear();
+				//_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Clear();
 			}
 
 			int roughRelationCounter = 0;
 			if (_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Any())
 			{
 				Serialization.Save.Relations.Rough.Append(_gnfs);
-				_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Clear();
+				//_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Clear();
 			}
 
 
@@ -163,12 +163,12 @@ namespace GNFSCore
 						bool smooth = rel.IsSmooth;
 						if (smooth)
 						{
-							Serialization.Save.Relations.Smooth.Append(_gnfs, rel);
-							SmoothRelationsCounter++;
+							//Serialization.Save.Relations.Smooth.Append(_gnfs, rel);
+							//SmoothRelationsCounter++;
+
+							_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Add(rel);
 
 							_gnfs.LogMessage($"Found smooth relation: A = {rel.A}, B = {rel.B}");
-
-							rel = null;
 						}
 						else
 						{
@@ -181,8 +181,6 @@ namespace GNFSCore
 								_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Clear();
 								roughRelationCounter = 0;
 							}
-
-							rel = null;
 						}
 					}
 				}
@@ -199,12 +197,6 @@ namespace GNFSCore
 				{
 					_gnfs.LogMessage($"B = {B}");
 				}
-			}
-
-			if (_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Any())
-			{
-				Serialization.Save.Relations.Rough.AppendList(_gnfs, _gnfs.CurrentRelationsProgress.Relations.RoughRelations);
-				_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Clear();
 			}
 		}
 

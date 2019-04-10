@@ -8,9 +8,7 @@ namespace GNFSCore
 {
 	public class DirectoryLocations
 	{
-		private string _polynomial = null;
 		private string _saveDirectory = null;
-
 		private const int showDigits = 22;
 		private const string elipse = "[...]";
 		private const string _parameters = "GNFS.json";
@@ -22,19 +20,16 @@ namespace GNFSCore
 		public DirectoryLocations(string baseDirectory)
 		{
 			_saveDirectory = baseDirectory;
-			SearchPolynomialPaths();
 		}
 
 		public DirectoryLocations(BigInteger n)
 		{
 			_saveDirectory = GetSaveLocation(n);
-			SearchPolynomialPaths();
 		}
 
 		public DirectoryLocations(BigInteger n, BigInteger polynomialBase, BigInteger polynomialDegree)
 		{
 			_saveDirectory = GetSaveLocation(n);
-			SetPolynomialPath(polynomialBase, polynomialDegree);
 		}
 
 		public static bool IsLinuxOS()
@@ -43,23 +38,10 @@ namespace GNFSCore
 			return (p == 4) || (p == 6) || (p == 128); // 128 comes from mono run-times
 		}
 
-		private string SearchPolynomialPaths()
-		{
-			IEnumerable<string> polyDirectoriesrelationFiles = Directory.EnumerateDirectories(SaveDirectory, "Poly_B[*", SearchOption.TopDirectoryOnly);
-
-			_polynomial = polyDirectoriesrelationFiles.FirstOrDefault() ?? SaveDirectory;
-			return _polynomial;
-		}
-
-		public void SetPolynomialPath(BigInteger polynomialBase, BigInteger polynomialDegree)
-		{
-			_polynomial = Path.Combine(SaveDirectory, $"Poly_B[{polynomialBase}]_D[{polynomialDegree}]");
-		}
-
 		public static string GetSaveLocation(BigInteger n)
 		{
-			string directoryFilename = GetUniqueNameFromN(n);
-			return Path.Combine(saveRootDirectory, directoryFilename);
+			string directoryName = GetUniqueNameFromN(n);
+			return Path.Combine(saveRootDirectory, directoryName);
 		}
 
 		public static string GetUniqueNameFromN(BigInteger n)

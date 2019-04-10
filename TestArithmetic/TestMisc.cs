@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GNFSCore;
-using GNFSCore.Polynomials;
+using GNFSCore.Interfaces;
 
 namespace TestArithmetic
 {
