@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
@@ -10,6 +11,7 @@ namespace GNFS_Winforms
 	using GNFSCore.Interfaces;
 	using GNFSCore.SquareRoot;
 	using GNFSCore.IntegerMath;
+	using System.Text;
 
 	public partial class GnfsUiBridge
 	{
@@ -24,11 +26,30 @@ namespace GNFS_Winforms
 
 			List<List<Relation>> freeRelations = gnfs.CurrentRelationsProgress.FreeRelations;
 
+			Logging.LogMessage();
+			Logging.LogMessage($"# of solution sets: {freeRelations.Count}");
+			Logging.LogMessage();
+			Logging.LogMessage();
 
-			SquareFinder squareRootFinder = new SquareFinder(gnfs, freeRelations.First()); // relationSet
+			SquareFinder squareRootFinder = new SquareFinder(gnfs, freeRelations.First());
 
+			Logging.LogMessage($"ƒ'(m)     = {squareRootFinder.PolynomialDerivative}");
+			Logging.LogMessage($"ƒ'(m)^2   = {squareRootFinder.PolynomialDerivativeSquared}");
+			Logging.LogMessage();
+			
 			squareRootFinder.CalculateRationalSide();
+			
+			Logging.LogMessage($"γ²        = {squareRootFinder.RationalProduct} IsSquare? {squareRootFinder.RationalProduct.IsSquare()}");
+			Logging.LogMessage($"(γ  · ƒ'(m))^2 = {squareRootFinder.RationalSquare} IsSquare? {squareRootFinder.RationalSquare.IsSquare()}");
+			Logging.LogMessage();
+
+			
+			Logging.LogMessage("Please wait...");
+
+
 			squareRootFinder.CalculateAlgebraicSide();
+
+			Logging.LogMessage();
 
 			IPolynomial S = squareRootFinder.S;
 			IPolynomial SRingSquare = squareRootFinder.SRingSquare;
@@ -46,10 +67,7 @@ namespace GNFS_Winforms
 			BigInteger rationalSquareRoot = squareRootFinder.RationalSquareRootResidue;
 			BigInteger algebraicSquareRoot = squareRootFinder.AlgebraicSquareRootResidue;
 
-			Logging.LogMessage();
-			Logging.LogMessage($"# of solution sets: {freeRelations.Count}");
-			Logging.LogMessage();
-			Logging.LogMessage();
+			
 			Logging.LogMessage($"∏ Sᵢ =");
 			Logging.LogMessage($"{squareRootFinder.TotalS}");
 			Logging.LogMessage();
@@ -62,13 +80,7 @@ namespace GNFS_Winforms
 			Logging.LogMessage("Primes:");
 			Logging.LogMessage($"{string.Join(" * ", squareRootFinder.AlgebraicPrimes)}"); // .RelationsSet.Select(rel => rel.B).Distinct().OrderBy(relB => relB))
 			Logging.LogMessage();
-			Logging.LogMessage($"ƒ'(m)     = {squareRootFinder.PolynomialDerivative}");
-			Logging.LogMessage($"ƒ'(m)^2   = {squareRootFinder.PolynomialDerivativeSquared}");
 			Logging.LogMessage();
-			Logging.LogMessage($"γ²        = {squareRootFinder.RationalProduct} IsSquare? {squareRootFinder.RationalProduct.IsSquare()}");
-			Logging.LogMessage($"(γ  · ƒ'(m))^2 = {squareRootFinder.RationalSquare} IsSquare? {squareRootFinder.RationalSquare.IsSquare()}");
-			Logging.LogMessage($"");
-			Logging.LogMessage($"");
 			Logging.LogMessage($"X² / ƒ(m) = {squareRootFinder.AlgebraicProductModF}  IsSquare? {squareRootFinder.AlgebraicProductModF.IsSquare()}");
 			Logging.LogMessage();
 			Logging.LogMessage($"");
@@ -118,6 +130,18 @@ namespace GNFS_Winforms
 			Logging.LogMessage($"GCD(N, A) = {C}");
 			Logging.LogMessage($"GCD(N, B) = {D}");
 			Logging.LogMessage();
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.AppendLine($"N = {gnfs.N}");
+			sb.AppendLine();
+			sb.AppendLine($"P = {BigInteger.Max(C, D)}");
+			sb.AppendLine($"Q = {BigInteger.Min(C, D)}");
+			sb.AppendLine();
+
+			string path = Path.Combine(gnfs.SaveLocations.SaveDirectory, "Solution.txt");
+
+			File.WriteAllText(path, sb.ToString());
 
 			return gnfs;
 		}

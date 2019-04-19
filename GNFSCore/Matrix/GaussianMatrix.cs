@@ -75,26 +75,6 @@ namespace GNFSCore.Matrix
 			}
 		}
 		
-		public void DontTransposeAppend()
-		{
-			List<bool[]> result = new List<bool[]>();
-			ColumnIndexRelationDictionary = new Dictionary<int, Relation>();
-
-			int index = 0;
-			int numRows = relationMatrixTuple.Count; //[0].Item2.Length;
-
-			while (index < numRows)
-			{
-				result.Add(relationMatrixTuple[index].Item2);
-				ColumnIndexRelationDictionary.Add(index, relationMatrixTuple[index].Item1);
-
-				index++;
-			}
-
-			M = result;
-			freeCols = new bool[M.Count];
-		}
-		
 		public void TransposeAppend()
 		{
 			List<bool[]> result = new List<bool[]>();
@@ -210,7 +190,7 @@ namespace GNFSCore.Matrix
 			return result;
 		}
 
-		public bool[] GetSolutionFlags(int numSolutions)
+		private bool[] GetSolutionFlags(int numSolutions)
 		{
 			if (!eliminationStep)
 			{
