@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("GNFS Core Library")]
 [assembly: AssemblyDescription("A General Number Field Sieve implementation in C#")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Adam Rakaska")]
+[assembly: AssemblyCompany("Adam White")]
 [assembly: AssemblyProduct("GNFS Core Library")]
-[assembly: AssemblyCopyright("Made by Adam Rakaska")]
+[assembly: AssemblyCopyright("Made by Adam White")]
 [assembly: AssemblyTrademark("https://github.com/AdamWhiteHat")]
 [assembly: AssemblyCulture("")]
 
