@@ -102,11 +102,6 @@ namespace GNFS_Winforms
 			Logging.LogMessage($"Processing thread LAUNCHED.");
 		}
 
-		private void btnCancel_Click(object sender, EventArgs e)
-		{
-			HaultAllProcessing();
-			Logging.LogMessage($"Processing thread CANCELED.");
-		}
 
 		private void HaultAllProcessing()
 		{
@@ -141,6 +136,12 @@ namespace GNFS_Winforms
 		#endregion
 
 		#region Button Methods
+
+		private void btnCancel_Click(object sender, EventArgs e)
+		{
+			HaultAllProcessing();
+			Logging.LogMessage($"Processing thread CANCELED.");
+		}
 
 		private void btnIncreaseSmoothnessBound_Click(object sender, EventArgs e)
 		{
@@ -257,6 +258,11 @@ namespace GNFS_Winforms
 			}
 		}
 
+		private void linkGitHubProject_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			System.Diagnostics.Process.Start(linkGitHubProject.Text);
+		}
+
 		#endregion
 
 		#region Create / Load / Save
@@ -349,5 +355,6 @@ namespace GNFS_Winforms
 
 		#endregion
 
+		
 	}
 }

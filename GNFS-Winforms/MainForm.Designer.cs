@@ -58,6 +58,8 @@
 			this.label6 = new System.Windows.Forms.Label();
 			this.tbRelationValueRange = new System.Windows.Forms.TextBox();
 			this.btnIncreaseSmoothnessBound = new System.Windows.Forms.Button();
+			this.linkGitHubProject = new System.Windows.Forms.LinkLabel();
+			this.label7 = new System.Windows.Forms.Label();
 			this.panelButtons.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			this.panelFunctions.SuspendLayout();
@@ -72,11 +74,11 @@
 			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbOutput.Location = new System.Drawing.Point(4, 246);
+			this.tbOutput.Location = new System.Drawing.Point(4, 220);
 			this.tbOutput.Multiline = true;
 			this.tbOutput.Name = "tbOutput";
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.tbOutput.Size = new System.Drawing.Size(718, 241);
+			this.tbOutput.Size = new System.Drawing.Size(718, 251);
 			this.tbOutput.TabIndex = 6;
 			this.tbOutput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbOutput_KeyDown);
 			// 
@@ -93,7 +95,7 @@
 			// 
 			this.tbBase.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbBase.Location = new System.Drawing.Point(117, 52);
+			this.tbBase.Location = new System.Drawing.Point(117, 55);
 			this.tbBase.Name = "tbBase";
 			this.tbBase.Size = new System.Drawing.Size(260, 20);
 			this.tbBase.TabIndex = 2;
@@ -102,7 +104,7 @@
 			// 
 			this.tbBound.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbBound.Location = new System.Drawing.Point(117, 26);
+			this.tbBound.Location = new System.Drawing.Point(117, 29);
 			this.tbBound.Name = "tbBound";
 			this.tbBound.Size = new System.Drawing.Size(185, 20);
 			this.tbBound.TabIndex = 1;
@@ -121,7 +123,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(33, 56);
+			this.label2.Location = new System.Drawing.Point(33, 59);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(83, 13);
 			this.label2.TabIndex = 5;
@@ -131,7 +133,7 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(17, 30);
+			this.label3.Location = new System.Drawing.Point(17, 33);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(99, 13);
 			this.label3.TabIndex = 6;
@@ -153,7 +155,7 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(21, 76);
+			this.label4.Location = new System.Drawing.Point(21, 79);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(93, 13);
 			this.label4.TabIndex = 9;
@@ -164,7 +166,7 @@
 			// 
 			this.tbDegree.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbDegree.Location = new System.Drawing.Point(117, 72);
+			this.tbDegree.Location = new System.Drawing.Point(117, 75);
 			this.tbDegree.Name = "tbDegree";
 			this.tbDegree.Size = new System.Drawing.Size(21, 20);
 			this.tbDegree.TabIndex = 3;
@@ -206,7 +208,7 @@
 			this.panelButtons.Controls.Add(this.panelFunctions);
 			this.panelButtons.Location = new System.Drawing.Point(381, 26);
 			this.panelButtons.Name = "panelButtons";
-			this.panelButtons.Size = new System.Drawing.Size(338, 214);
+			this.panelButtons.Size = new System.Drawing.Size(338, 192);
 			this.panelButtons.TabIndex = 14;
 			// 
 			// groupBox4
@@ -255,7 +257,7 @@
 			this.panelFunctions.Enabled = false;
 			this.panelFunctions.Location = new System.Drawing.Point(8, 49);
 			this.panelFunctions.Name = "panelFunctions";
-			this.panelFunctions.Size = new System.Drawing.Size(324, 156);
+			this.panelFunctions.Size = new System.Drawing.Size(324, 140);
 			this.panelFunctions.TabIndex = 16;
 			// 
 			// groupBox3
@@ -342,7 +344,7 @@
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(24, 101);
+			this.label5.Location = new System.Drawing.Point(24, 104);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(89, 13);
 			this.label5.TabIndex = 17;
@@ -353,7 +355,7 @@
 			// 
 			this.tbRelationQuantity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbRelationQuantity.Location = new System.Drawing.Point(117, 98);
+			this.tbRelationQuantity.Location = new System.Drawing.Point(117, 101);
 			this.tbRelationQuantity.Name = "tbRelationQuantity";
 			this.tbRelationQuantity.Size = new System.Drawing.Size(260, 20);
 			this.tbRelationQuantity.TabIndex = 4;
@@ -362,7 +364,7 @@
 			// label6
 			// 
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(5, 122);
+			this.label6.Location = new System.Drawing.Point(5, 125);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(108, 13);
 			this.label6.TabIndex = 19;
@@ -373,7 +375,7 @@
 			// 
 			this.tbRelationValueRange.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbRelationValueRange.Location = new System.Drawing.Point(117, 118);
+			this.tbRelationValueRange.Location = new System.Drawing.Point(117, 121);
 			this.tbRelationValueRange.Name = "tbRelationValueRange";
 			this.tbRelationValueRange.Size = new System.Drawing.Size(260, 20);
 			this.tbRelationValueRange.TabIndex = 5;
@@ -382,7 +384,7 @@
 			// btnIncreaseSmoothnessBound
 			// 
 			this.btnIncreaseSmoothnessBound.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnIncreaseSmoothnessBound.Location = new System.Drawing.Point(304, 25);
+			this.btnIncreaseSmoothnessBound.Location = new System.Drawing.Point(304, 28);
 			this.btnIncreaseSmoothnessBound.Name = "btnIncreaseSmoothnessBound";
 			this.btnIncreaseSmoothnessBound.Size = new System.Drawing.Size(75, 23);
 			this.btnIncreaseSmoothnessBound.TabIndex = 20;
@@ -390,11 +392,35 @@
 			this.btnIncreaseSmoothnessBound.UseVisualStyleBackColor = true;
 			this.btnIncreaseSmoothnessBound.Click += new System.EventHandler(this.btnIncreaseSmoothnessBound_Click);
 			// 
+			// linkGitHubProject
+			// 
+			this.linkGitHubProject.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.linkGitHubProject.AutoSize = true;
+			this.linkGitHubProject.Location = new System.Drawing.Point(513, 473);
+			this.linkGitHubProject.Name = "linkGitHubProject";
+			this.linkGitHubProject.Size = new System.Drawing.Size(206, 13);
+			this.linkGitHubProject.TabIndex = 21;
+			this.linkGitHubProject.TabStop = true;
+			this.linkGitHubProject.Text = "https://github.com/AdamWhiteHat/GNFS";
+			this.linkGitHubProject.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkGitHubProject_LinkClicked);
+			// 
+			// label7
+			// 
+			this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(407, 474);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(103, 13);
+			this.label7.TabIndex = 22;
+			this.label7.Text = "It\'s open source!  -->";
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(725, 489);
+			this.Controls.Add(this.label7);
+			this.Controls.Add(this.linkGitHubProject);
 			this.Controls.Add(this.btnIncreaseSmoothnessBound);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.tbRelationValueRange);
@@ -413,7 +439,7 @@
 			this.Controls.Add(this.panelCancel);
 			this.MinimumSize = new System.Drawing.Size(500, 300);
 			this.Name = "MainForm";
-			this.Text = "GNFS";
+			this.Text = "A C# Implementation of the General Number Field Sieve";
 			this.panelButtons.ResumeLayout(false);
 			this.groupBox4.ResumeLayout(false);
 			this.panelFunctions.ResumeLayout(false);
@@ -458,6 +484,8 @@
 		private System.Windows.Forms.GroupBox groupBox4;
 		private System.Windows.Forms.Button btnLoad;
 		private System.Windows.Forms.Button btnIncreaseSmoothnessBound;
+		private System.Windows.Forms.LinkLabel linkGitHubProject;
+		private System.Windows.Forms.Label label7;
 	}
 }
 
