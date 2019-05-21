@@ -163,8 +163,7 @@ namespace GNFSCore
 						bool smooth = rel.IsSmooth;
 						if (smooth)
 						{
-							//Serialization.Save.Relations.Smooth.Append(_gnfs, rel);
-							//SmoothRelationsCounter++;
+							Serialization.Save.Relations.Smooth.Append(_gnfs, rel);
 
 							_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Add(rel);
 

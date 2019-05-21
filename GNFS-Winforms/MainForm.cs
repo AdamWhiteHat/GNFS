@@ -343,7 +343,20 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS localGnfs = GnfsUiBridge.CreateGnfs(token, n, polyBase, degree, primeBound, relationQuantity, relationValueRange);
+					GNFS localGnfs = 
+						GnfsUiBridge.CreateGnfs
+						(
+							token,	// CancellationToken
+							n,		// Semi-prime to factor N = P*Q
+							polyBase, // Polynomial base (value for x)
+							degree,	// Polynomial Degree
+							primeBound , //  BigInteger
+							relationQuantity, // Total # of relations to collect before proceeding.
+							relationValueRange // 
+						);
+
+
+
 					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 					ControlBridge.SetControlEnabledState(panelFunctions, true);
