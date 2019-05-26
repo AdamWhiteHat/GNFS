@@ -8,28 +8,29 @@ namespace GNFSCore
 {
 	public class DirectoryLocations
 	{
-		private string _saveDirectory = null;
+		private string saveDirectory = null;
+		private static string baseDirectory = IsLinuxOS() ? "GNFS" : "C:\\GNFS";
+
 		private const int showDigits = 22;
 		private const string elipse = "[...]";
-		private const string _parameters = "GNFS.json";
-		private static readonly string saveRootDirectory = IsLinuxOS() ? "GNFS" : "C:\\GNFS";
+		private const string parametersFilename = "GNFS.json";
 
-		public string SaveDirectory { get { return _saveDirectory; } }
-		public string GnfsParameters_SaveFile { get { return Path.Combine(SaveDirectory, _parameters); } }
+		public string SaveDirectory { get { return saveDirectory; } }
+		public string GnfsParameters_SaveFile { get { return Path.Combine(SaveDirectory, parametersFilename); } }
 
-		public DirectoryLocations(string baseDirectory)
+		public DirectoryLocations(string saveLocation)
 		{
-			_saveDirectory = baseDirectory;
+			saveDirectory = saveLocation;
 		}
 
 		public DirectoryLocations(BigInteger n)
 		{
-			_saveDirectory = GetSaveLocation(n);
+			saveDirectory = GetSaveLocation(n);
 		}
 
 		public DirectoryLocations(BigInteger n, BigInteger polynomialBase, BigInteger polynomialDegree)
 		{
-			_saveDirectory = GetSaveLocation(n);
+			saveDirectory = GetSaveLocation(n);
 		}
 
 		public static bool IsLinuxOS()
@@ -38,10 +39,15 @@ namespace GNFSCore
 			return (p == 4) || (p == 6) || (p == 128); // 128 comes from mono run-times
 		}
 
+		public static void SetBaseDirectory(string path)
+		{
+			baseDirectory = path;
+		}
+
 		public static string GetSaveLocation(BigInteger n)
 		{
 			string directoryName = GetUniqueNameFromN(n);
-			return Path.Combine(saveRootDirectory, directoryName);
+			return Path.Combine(baseDirectory, directoryName);
 		}
 
 		public static string GetUniqueNameFromN(BigInteger n)
