@@ -15,7 +15,7 @@ namespace GNFS_Winforms
 
 	public partial class GnfsUiBridge
 	{
-		public static GNFS FindSquares(GNFS gnfs, CancellationToken cancelToken)
+		public static GNFS FindSquares(CancellationToken cancelToken, GNFS gnfs)
 		{
 			if (cancelToken.IsCancellationRequested)
 			{

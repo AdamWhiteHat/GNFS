@@ -1,22 +1,19 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using GNFSCore;
 using GNFSCore.Matrix;
-using GNFSCore.Factors;
-using GNFSCore.Interfaces;
 using GNFSCore.SquareRoot;
 using GNFSCore.IntegerMath;
-using GNFSCore.IntegerMath.Internal;
-using System.IO;
 
 namespace TestGNFS.Integration
 {
-	[TestClass]
+	[TestFixture]
 	public class SmallFactorizationTest
 	{
 		public TestContext TestContext
@@ -37,11 +34,11 @@ namespace TestGNFS.Integration
 		private static CancellationToken cancelToken;
 		private static CancellationTokenSource cancellationTokenSource;
 
-		private static bool step00_passed;
-		private static bool step01_passed;
-		private static bool step02_passed;
-		private static bool step03_passed;
-		private static bool step04_passed;
+		private static bool step00_passed = false;
+		private static bool step01_passed = false;
+		private static bool step02_passed = false;
+		private static bool step03_passed = false;
+		private static bool step04_passed = false;
 
 		private static readonly string TestSaveLocation = "C:\\GNFS\\Test";
 
@@ -62,7 +59,8 @@ namespace TestGNFS.Integration
 			Directory.Delete(path);
 		}
 
-		[TestMethod]
+		[Order(0)]
+		[Test]
 		public void Test00_Initialize()
 		{
 			TestContext.WriteLine($"ENTER: {nameof(Test00_Initialize)}");
@@ -90,9 +88,15 @@ namespace TestGNFS.Integration
 			TestContext.WriteLine($"LEAVE: {nameof(Test00_Initialize)}");
 		}
 
-		[TestMethod]
+		[Order(1)]
+		[Test]
 		public void Test01_GNFSCreate()
 		{
+			while (!step00_passed)
+			{
+				Thread.SpinWait(100);
+			}
+
 			TestContext.WriteLine($"ENTER: {nameof(Test01_GNFSCreate)}");
 
 			Assert.IsTrue(step00_passed, "IsTrue(step00_passed)");
@@ -115,12 +119,11 @@ namespace TestGNFS.Integration
 			TestContext.WriteLine($"LEAVE: {nameof(Test01_GNFSCreate)}");
 		}
 
-
-		[TestMethod]
+		[Order(2)]
+		[Test]
 		public void Test02_GenerateRelations()
 		{
 			TestContext.WriteLine($"ENTER: {nameof(Test02_GenerateRelations)}");
-
 			Assert.IsTrue(step01_passed, "IsTrue(step01_passed)");
 			Assert.IsNotNull(gnfs, "IsNotNull(gnfs)");
 
@@ -152,8 +155,8 @@ namespace TestGNFS.Integration
 			TestContext.WriteLine($"LEAVE: {nameof(Test02_GenerateRelations)}");
 		}
 
-
-		[TestMethod]
+		[Order(3)]
+		[Test]
 		public void Test03_Matrix()
 		{
 			TestContext.WriteLine($"ENTER: {nameof(Test03_Matrix)}");
@@ -161,7 +164,7 @@ namespace TestGNFS.Integration
 			Assert.IsTrue(step02_passed, "IsTrue(step02_passed)");
 			Assert.IsNotNull(gnfs, "IsNotNull(gnfs)");
 
-			MatrixSolve.GaussianSolve(gnfs);
+			MatrixSolve.GaussianSolve(cancelToken, gnfs);
 
 			Assert.IsTrue(gnfs.CurrentRelationsProgress.FreeRelations.Any(), "IsTrue(gnfs.CurrentRelationsProgress.FreeRelations.Any())");
 
@@ -171,8 +174,8 @@ namespace TestGNFS.Integration
 			TestContext.WriteLine($"LEAVE: {nameof(Test03_Matrix)}");
 		}
 
-
-		[TestMethod]
+		[Order(4)]
+		[Test]
 		public void Test04_SquareRoot()
 		{
 			TestContext.WriteLine($"ENTER: {nameof(Test04_SquareRoot)}");

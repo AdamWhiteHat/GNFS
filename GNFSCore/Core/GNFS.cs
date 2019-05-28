@@ -33,8 +33,6 @@ namespace GNFSCore
 		[DataMember]
 		public PolyRelationsSieveProgress CurrentRelationsProgress { get; set; }
 
-		public CancellationToken CancelToken { get; set; }
-
 		[DataMember]
 		public FactorBase PrimeFactorBase { get; set; }
 
@@ -72,7 +70,6 @@ namespace GNFSCore
 		public GNFS(CancellationToken cancelToken, LogMessageDelegate logFunction, BigInteger n, BigInteger polynomialBase, int polyDegree, BigInteger primeBound, int relationQuantity, int relationValueRange)
 			: this()
 		{
-			CancelToken = cancelToken;
 			LogFunction = logFunction;
 			N = n;
 
@@ -92,29 +89,28 @@ namespace GNFSCore
 				{
 					this.PolynomialDegree = polyDegree;
 				}
-
 				this.PolynomialBase = polynomialBase;
 
-				if (CancelToken.IsCancellationRequested) { return; }
+				if (cancelToken.IsCancellationRequested) { return; }
 
 				ConstructNewPolynomial(this.PolynomialBase, this.PolynomialDegree);
 				LogMessage($"Polynomial constructed.");
 
-				if (CancelToken.IsCancellationRequested) { return; }
+				if (cancelToken.IsCancellationRequested) { return; }
 
 				CaclulatePrimeFactorBaseBounds(primeBound);
 
-				if (CancelToken.IsCancellationRequested) { return; }
+				if (cancelToken.IsCancellationRequested) { return; }
 
 				SetPrimeFactorBases(primeBound);
 				LogMessage($"Prime bounds calculated.");
 
-				if (CancelToken.IsCancellationRequested) { return; }
+				if (cancelToken.IsCancellationRequested) { return; }
 
-				NewFactorPairCollections();
+				NewFactorPairCollections(cancelToken);
 				LogMessage($"Factor bases populated.");
 
-				if (CancelToken.IsCancellationRequested) { return; }
+				if (cancelToken.IsCancellationRequested) { return; }
 
 				CurrentRelationsProgress = new PolyRelationsSieveProgress(this, relationQuantity, relationValueRange);
 				LogMessage($"Relations container initialized.");
@@ -268,7 +264,7 @@ namespace GNFSCore
 			Serialization.Save.All(this);
 		}
 
-		private void NewFactorPairCollections()
+		private void NewFactorPairCollections(CancellationToken cancelToken)
 		{
 			LogMessage($"Constructing new factor bases (- of 3)...");
 
@@ -280,24 +276,24 @@ namespace GNFSCore
 			LogMessage($"Completed rational factor base (1 of 3).");
 
 
-			if (CancelToken.IsCancellationRequested) { return; }
+			if (cancelToken.IsCancellationRequested) { return; }
 			if (!AlgebraicFactorPairCollection.Any())
 			{
-				AlgebraicFactorPairCollection = FactorPairCollection.Factory.BuildAlgebraicFactorPairCollection(this);
+				AlgebraicFactorPairCollection = FactorPairCollection.Factory.BuildAlgebraicFactorPairCollection(cancelToken, this);
 			}
 			Serialization.Save.FactorPair.Algebraic(this);
 			LogMessage($"Completed algebraic factor base (2 of 3).");
 
 
-			if (CancelToken.IsCancellationRequested) { return; }
+			if (cancelToken.IsCancellationRequested) { return; }
 			if (!QuadraticFactorPairCollection.Any())
 			{
-				QuadraticFactorPairCollection = FactorPairCollection.Factory.BuildQuadraticFactorPairCollection(this);
+				QuadraticFactorPairCollection = FactorPairCollection.Factory.BuildQuadraticFactorPairCollection(cancelToken, this);
 			}
 			Serialization.Save.FactorPair.Quadratic(this);
 			LogMessage($"Completed quadratic factor base (3 of 3).");
 
-			if (CancelToken.IsCancellationRequested) { return; }
+			if (cancelToken.IsCancellationRequested) { return; }
 		}
 
 		#endregion

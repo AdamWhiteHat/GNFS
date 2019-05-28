@@ -42,17 +42,17 @@ namespace GNFSCore.Factors
 
 			// array of (p, r) where ƒ(r) % p == 0
 			// quantity = 2-3 times RFB.quantity
-			public static FactorPairCollection BuildAlgebraicFactorPairCollection(GNFS gnfs)
+			public static FactorPairCollection BuildAlgebraicFactorPairCollection(CancellationToken cancelToken, GNFS gnfs)
 			{
-				return new FactorPairCollection(FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.AlgebraicFactorBase, 0, gnfs.PrimeFactorBase.AlgebraicFactorBaseMax, 2000));
+				return new FactorPairCollection(FindPolynomialRootsInRange(cancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.AlgebraicFactorBase, 0, gnfs.PrimeFactorBase.AlgebraicFactorBaseMax, 2000));
 			}
 
 			// array of (p, r) where ƒ(r) % p == 0
 			// quantity =< 100
 			// magnitude p > AFB.Last().p
-			public static FactorPairCollection BuildQuadraticFactorPairCollection(GNFS gnfs)
+			public static FactorPairCollection BuildQuadraticFactorPairCollection(CancellationToken cancelToken, GNFS gnfs)
 			{
-				return new FactorPairCollection(FindPolynomialRootsInRange(gnfs.CancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.QuadraticFactorBase, 2, gnfs.PrimeFactorBase.QuadraticFactorBaseMax, gnfs.PrimeFactorBase.QuadraticBaseCount));
+				return new FactorPairCollection(FindPolynomialRootsInRange(cancelToken, gnfs.CurrentPolynomial, gnfs.PrimeFactorBase.QuadraticFactorBase, 2, gnfs.PrimeFactorBase.QuadraticFactorBaseMax, gnfs.PrimeFactorBase.QuadraticBaseCount));
 			}
 		}
 
