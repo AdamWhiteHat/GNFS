@@ -24,8 +24,6 @@ namespace GNFSCore
 		[DataMember]
 		public int ValueRange { get; private set; }
 
-		public CancellationToken CancelToken;
-
 		public List<List<Relation>> FreeRelations { get { return Relations.FreeRelations; } }
 		public List<Relation> SmoothRelations { get { return Relations.SmoothRelations; } }
 		public List<Relation> RoughRelations { get { return Relations.RoughRelations; } }
@@ -52,11 +50,6 @@ namespace GNFSCore
 			: this()
 		{
 			_gnfs = gnfs;
-
-			using (CancellationTokenSource cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(_gnfs.CancelToken))
-			{
-				CancelToken = cancellationSource.Token;
-			}
 		}
 
 		public PolyRelationsSieveProgress(GNFS gnfs, int quantity, int valueRange)
