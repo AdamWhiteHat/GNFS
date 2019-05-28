@@ -38,15 +38,14 @@ namespace GNFSCore
 				//string inputJson = new string(input.Where(c => !char.IsWhiteSpace(c)).ToArray()); // Remove all whitespace
 				//inputJson = inputJson.Replace("[", "").Replace("]", ""); // Remove square brackets. There may be many, due to multiple calls to Serialization.Save.Relations.Smooth.Append()
 				//inputJson = inputJson.Replace("}{", "},{"); // Insert commas between item instances
-				string inputJson = input.Insert(input.Length,"]").Insert(0,"["); // Re-add square brackets.
+				string inputJson = input.Insert(input.Length, "]").Insert(0, "["); // Re-add square brackets.
 				return inputJson;
 			}
 
-			public static GNFS All(CancellationToken cancelToken, string filename)
+			public static GNFS All(string filename)
 			{
 				string loadJson = File.ReadAllText(filename);
 				GNFS gnfs = JsonConvert.DeserializeObject<GNFS>(loadJson);
-				gnfs.CancelToken = cancelToken;
 
 				string directoryName = Path.GetDirectoryName(filename);
 				gnfs.SaveLocations = new DirectoryLocations(directoryName);
@@ -62,7 +61,7 @@ namespace GNFSCore
 				Load.FactorPair.Algebraic(ref gnfs);
 				Load.FactorPair.Quadratic(ref gnfs);
 
-				gnfs.CurrentRelationsProgress._gnfs = gnfs;				
+				gnfs.CurrentRelationsProgress._gnfs = gnfs;
 
 				Load.Relations.Smooth(ref gnfs);
 				Load.Relations.Rough(ref gnfs);

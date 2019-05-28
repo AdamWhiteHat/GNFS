@@ -107,7 +107,6 @@ namespace GNFS_Winforms
 		{
 			if (cancellationTokenSource != null && IsWorking)
 			{
-				cancellationToken = cancellationTokenSource.Token;
 				cancellationTokenSource.Cancel();
 			}
 		}
@@ -184,7 +183,7 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS resultGnfs = GnfsUiBridge.FindRelations(breakAfterOneRound, localGnfs, token);
+					GNFS resultGnfs = GnfsUiBridge.FindRelations(token, localGnfs, breakAfterOneRound);
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
 					Logging.LogMessage("[Find relations task complete]");
@@ -202,10 +201,9 @@ namespace GNFS_Winforms
 
 				GNFS localGnfs = gnfs;
 				CancellationToken token = cancellationTokenSource.Token;
-				gnfs.CancelToken = token;
 				new Thread(() =>
 				{
-					GNFS resultGnfs = GnfsUiBridge.MatrixSolveGaussian(localGnfs);
+					GNFS resultGnfs = GnfsUiBridge.MatrixSolveGaussian(token, localGnfs);
 
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
@@ -227,7 +225,7 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS resultGnfs = GnfsUiBridge.FindSquares(localGnfs, token);
+					GNFS resultGnfs = GnfsUiBridge.FindSquares(token, localGnfs);
 
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
@@ -292,7 +290,7 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS localGnfs = GnfsUiBridge.LoadGnfs(token, n);
+					GNFS localGnfs = GnfsUiBridge.LoadGnfs(n);
 					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 					ControlBridge.SetControlEnabledState(panelFunctions, true);
@@ -343,14 +341,14 @@ namespace GNFS_Winforms
 				CancellationToken token = cancellationTokenSource.Token;
 				new Thread(() =>
 				{
-					GNFS localGnfs = 
+					GNFS localGnfs =
 						GnfsUiBridge.CreateGnfs
 						(
-							token,	// CancellationToken
-							n,		// Semi-prime to factor N = P*Q
+							token,  // CancellationToken
+							n,      // Semi-prime to factor N = P*Q
 							polyBase, // Polynomial base (value for x)
-							degree,	// Polynomial Degree
-							primeBound , //  BigInteger
+							degree, // Polynomial Degree
+							primeBound, //  BigInteger
 							relationQuantity, // Total # of relations to collect before proceeding.
 							relationValueRange // 
 						);
@@ -368,6 +366,6 @@ namespace GNFS_Winforms
 
 		#endregion
 
-		
+
 	}
 }
