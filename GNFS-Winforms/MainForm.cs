@@ -92,14 +92,15 @@ namespace GNFS_Winforms
 		private void SetAsProcessing()
 		{
 			panelButtons.Visible = false;
-			panelCancel.Visible = true;
+			panelCancel.Visible = true;			
 
 			cancellationTokenSource = new CancellationTokenSource();
 			cancellationToken = cancellationTokenSource.Token;
 			cancellationToken.Register(new Action(() => RestoreAllButtons()));
-			IsWorking = true;
 
 			Logging.LogMessage($"Processing thread LAUNCHED.");
+
+			IsWorking = true;			
 		}
 
 
