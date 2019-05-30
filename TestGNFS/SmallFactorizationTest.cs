@@ -190,18 +190,21 @@ namespace TestGNFS.Integration
 			SquareFinder squareRootFinder = new SquareFinder(gnfs, choosenRelationSet);
 
 			squareRootFinder.CalculateRationalSide();
-			bool sqrtSuccess = squareRootFinder.CalculateAlgebraicSide();
+			Tuple<BigInteger, BigInteger> foundFactors = squareRootFinder.CalculateAlgebraicSide(cancelToken);
 
-			Assert.IsTrue(sqrtSuccess, "Square Root Success");
-
+			/*	Non-trivial factors also recoverable by doing the following:
+			
 			BigInteger min = BigInteger.Min(squareRootFinder.RationalSquareRootResidue, squareRootFinder.AlgebraicSquareRootResidue);
 			BigInteger max = BigInteger.Max(squareRootFinder.RationalSquareRootResidue, squareRootFinder.AlgebraicSquareRootResidue);
-
 			BigInteger R = max - min;
 			BigInteger S = max + min;
-
 			BigInteger P = GCD.FindGCD(gnfs.N, S);
 			BigInteger Q = GCD.FindGCD(gnfs.N, R);
+
+			*/
+
+			BigInteger P = foundFactors.Item1;
+			BigInteger Q = foundFactors.Item2;
 
 			Assert.AreNotEqual(1, P, "AreNotEqual(1, P)");
 			Assert.AreNotEqual(1, Q, "AreNotEqual(1, Q)");

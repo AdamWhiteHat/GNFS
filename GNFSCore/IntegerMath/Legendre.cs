@@ -9,6 +9,9 @@ namespace GNFSCore.IntegerMath
 {
 	public static class Legendre
 	{
+		/// <summary>
+		/// Legendre Symbol returns 1 for a (nonzero) quadratic residue mod p, -1 for a non-quadratic residue (non-residue), or 0 on zero.
+		/// </summary>		
 		public static int Symbol(BigInteger a, BigInteger p)
 		{
 			if (p < 2) throw new ArgumentOutOfRangeException("p", "p must not be < 2");

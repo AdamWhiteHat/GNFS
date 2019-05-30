@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Linq;
-using System.Numerics;
 using System.Text;
+using System.Numerics;
+using System.Threading;
 using System.Collections.Generic;
 
 namespace GNFSCore.SquareRoot
 {
 	using Interfaces;
 	using IntegerMath;
+
 
 	public partial class SquareFinder
 	{
@@ -93,8 +95,10 @@ namespace GNFSCore.SquareRoot
 			IsRationalSquare = RationalSquareRootResidue.IsSquare();
 		}
 
-		public bool CalculateAlgebraicSide()
+		public Tuple<BigInteger, BigInteger> CalculateAlgebraicSide(CancellationToken cancelToken)
 		{
+			bool solutionFound = false;
+
 			RootsOfS.AddRange(RelationsSet.Select(rel => new Tuple<BigInteger, BigInteger>(rel.A, rel.B)));
 
 			PolynomialRing = new List<IPolynomial>();
@@ -112,6 +116,8 @@ namespace GNFSCore.SquareRoot
 
 				PolynomialRing.Add(newPoly);
 			}
+
+			if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); }
 
 			BigInteger m = polyBase;
 			IPolynomial f = (Polynomial)monicPoly.Clone();
@@ -144,12 +150,18 @@ namespace GNFSCore.SquareRoot
 
 			BigInteger lastP = N / N.ToString().Length; //((N * 3) + 1).NthRoot(3); //gnfs.QFB.Select(fp => fp.P).Max();
 
-			bool solutionFound = false;
-
 			while (!solutionFound)
 			{
+				if (primes.Count > 0 && resultTuples.Count > 0)
+				{
+					primes.Remove(primes.First());
+					resultTuples.Remove(resultTuples.First());
+				}
+
 				do
 				{
+					if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); }
+
 					lastP = PrimeFactory.GetNextPrime(lastP + 1);
 
 					Tuple<BigInteger, BigInteger> lastResult = AlgebraicSquareRoot(f, m, degree, dd, lastP);
@@ -158,7 +170,6 @@ namespace GNFSCore.SquareRoot
 					{
 						primes.Add(lastP);
 						resultTuples.Add(lastResult);
-
 					}
 				}
 				while (primes.Count < degree);
@@ -179,6 +190,8 @@ namespace GNFSCore.SquareRoot
 
 				AlgebraicPrimes = primes;
 
+				if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); ; }
+
 				IEnumerable<IEnumerable<BigInteger>> permutations =
 					Combinatorics.CartesianProduct(resultTuples.Select(tup => new List<BigInteger>() { tup.Item1, tup.Item2 }));
 
@@ -187,6 +200,8 @@ namespace GNFSCore.SquareRoot
 
 				foreach (List<BigInteger> X in permutations)
 				{
+					if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); ; }
+
 					algebraicSquareRoot = FiniteFieldArithmetic.ChineseRemainder(N, X, primes);
 
 					BigInteger min = BigInteger.Min(rationalSquareRoot, algebraicSquareRoot);
@@ -198,19 +213,47 @@ namespace GNFSCore.SquareRoot
 					BigInteger U = GCD.FindGCD(N, A);
 					BigInteger V = GCD.FindGCD(N, B);
 
-					if (U > 1 && V > 1)
+					if (U > 1 && U != N)
 					{
-						solutionFound = true;
-						AlgebraicResults = X;
-						AlgebraicSquareRootResidue = algebraicSquareRoot;
+						BigInteger rem = 1;
+						BigInteger other = BigInteger.DivRem(N, U, out rem);
 
-						break;
+						if (rem == 0)
+						{
+							solutionFound = true;
+							V = other;
+							AlgebraicResults = X;
+							AlgebraicSquareRootResidue = algebraicSquareRoot;
+
+							return new Tuple<BigInteger, BigInteger>(U, V);
+						}
+					}
+
+					if (V > 1 && V != N)
+					{
+						BigInteger rem = 1;
+						BigInteger other = BigInteger.DivRem(N, V, out rem);
+
+						if (rem == 0)
+						{
+							solutionFound = true;
+
+							U = other;
+							AlgebraicResults = X;
+							AlgebraicSquareRootResidue = algebraicSquareRoot;
+
+							return new Tuple<BigInteger, BigInteger>(U, V);
+						}
 					}
 				}
 
+				if (!solutionFound)
+				{
+					gnfs.LogFunction($"No solution found amongst the algebraic square roots {{ {string.Join(", ", resultTuples.Select(tup => $"({ tup.Item1}, { tup.Item2})"))} }} mod primes {{ {string.Join(", ", primes.Select(p => p.ToString()))} }}");
+				}
 			}
 
-			return solutionFound;
+			return new Tuple<BigInteger, BigInteger>(1, 1);
 		}
 
 		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(IPolynomial f, BigInteger m, int degree, IPolynomial dd, BigInteger p)
