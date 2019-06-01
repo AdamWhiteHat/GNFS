@@ -7,7 +7,7 @@ namespace GNFS_Winforms
 
 	public partial class GnfsUiBridge
 	{
-		public static GNFS FindRelations(bool oneRound, GNFS gnfs, CancellationToken cancelToken)
+		public static GNFS FindRelations(CancellationToken cancelToken, GNFS gnfs, bool oneRound)
 		{
 			while (!cancelToken.IsCancellationRequested)
 			{

@@ -11,9 +11,9 @@ namespace GNFS_Winforms
 
 	public partial class GnfsUiBridge
 	{
-		public static GNFS MatrixSolveGaussian(GNFS gnfs)
+		public static GNFS MatrixSolveGaussian(CancellationToken cancelToken, GNFS gnfs)
 		{
-			MatrixSolve.GaussianSolve(gnfs);
+			MatrixSolve.GaussianSolve(cancelToken, gnfs);
 			return gnfs;
 		}
 	}

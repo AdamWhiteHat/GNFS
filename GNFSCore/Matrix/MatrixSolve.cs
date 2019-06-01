@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Collections.Generic;
 
 namespace GNFSCore.Matrix
 {
 	using IntegerMath;
 
+
 	public static class MatrixSolve
 	{
-		public static void GaussianSolve(GNFS gnfs)
+		public static void GaussianSolve(CancellationToken cancelToken, GNFS gnfs)
 		{
 			Serialization.Save.Relations.Smooth.Append(gnfs); // Persist any relations not already persisted to disk
 
@@ -86,13 +87,13 @@ namespace GNFSCore.Matrix
 						gnfs.CurrentRelationsProgress.AddFreeRelationSolution(relations);
 					}
 
-					if (gnfs.CancelToken.IsCancellationRequested)
+					if (cancelToken.IsCancellationRequested)
 					{
 						break;
 					}
 				}
 
-				if (gnfs.CancelToken.IsCancellationRequested)
+				if (cancelToken.IsCancellationRequested)
 				{
 					break;
 				}

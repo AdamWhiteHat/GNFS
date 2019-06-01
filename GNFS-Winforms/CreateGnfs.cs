@@ -16,10 +16,10 @@ namespace GNFS_Winforms
 			return gnfs;
 		}
 
-		public static GNFS LoadGnfs(CancellationToken cancelToken, BigInteger n)
+		public static GNFS LoadGnfs(BigInteger n)
 		{
 			string jsonFilename = Path.Combine(DirectoryLocations.GetSaveLocation(n), "GNFS.json");
-			GNFS gnfs = Serialization.Load.All(cancelToken, jsonFilename);
+			GNFS gnfs = Serialization.Load.All(jsonFilename);
 			gnfs.LogFunction = Logging.LogMessage;
 			return gnfs;
 		}
