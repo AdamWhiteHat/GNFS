@@ -9,7 +9,7 @@ namespace GNFSCore
 	public class DirectoryLocations
 	{
 		private string saveDirectory = null;
-		private static string baseDirectory = IsLinuxOS() ? "GNFS" : "C:\\GNFS";
+		private static string baseDirectory = "GNFS";
 
 		private const int showDigits = 22;
 		private const string elipse = "[...]";
@@ -31,12 +31,6 @@ namespace GNFSCore
 		public DirectoryLocations(BigInteger n, BigInteger polynomialBase, BigInteger polynomialDegree)
 		{
 			saveDirectory = GetSaveLocation(n);
-		}
-
-		public static bool IsLinuxOS()
-		{
-			int p = (int)Environment.OSVersion.Platform;
-			return (p == 4) || (p == 6) || (p == 128); // 128 comes from mono run-times
 		}
 
 		public static void SetBaseDirectory(string path)

@@ -60,10 +60,6 @@ namespace GNFS_Winforms
 			n = BigInteger.Parse(tbN.Text);
 			degree = int.Parse(tbDegree.Text);
 
-			if (GNFSCore.DirectoryLocations.IsLinuxOS())
-			{
-				this.Text += " [MONO RUNTIME DETECTED]";
-			}
 		}
 
 		private static void SetGnfs(MainForm form, GNFS gnfs)
