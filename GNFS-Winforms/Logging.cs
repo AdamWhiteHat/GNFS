@@ -11,9 +11,12 @@ namespace GNFS_Winforms
 		public static TextBox OutputTextbox;
 		public static bool FirstFindRelations = false;
 		public static string OutputFilename = Path.GetFullPath(Settings.Log_FileName ?? DefaultLoggingFilename);
+		public static string ExceptionLogFilename = Path.GetFullPath(DefaultExceptionLogFilename);
+
 
 		private static int MaxLines = 200;
 		private const string DefaultLoggingFilename = "Output.log.txt";
+		private const string DefaultExceptionLogFilename = "Exceptions.log.txt";
 
 		public static bool IsDebugMode()
 		{
@@ -22,12 +25,6 @@ namespace GNFS_Winforms
 #else
 			return false;
 #endif
-		}
-
-		public static void LogException(Exception ex, string message, params object[] args)
-		{
-			string msg = args.Any() ? string.Format(message, args) : string.IsNullOrWhiteSpace(message) ? "(empty)" : message;
-			LogMessage("{0} : {1}", msg, ex == null ? "(null)" : ex.ToString());
 		}
 
 		public static void LogMessage()
@@ -43,8 +40,25 @@ namespace GNFS_Winforms
 		public static void LogMessage(string message)
 		{
 			string toLog = message + Environment.NewLine;
-			CreateLogFileIfNotExists();
-			File.AppendAllText(OutputFilename, toLog);
+			CreateLogFileIfNotExists(OutputFilename);
+			File.AppendAllText(OutputFilename, GetTimestamp() + toLog);
+			LogTextbox(toLog);
+		}
+
+		public static void LogException(Exception ex, string message)
+		{
+			string toLog = (ex == null) ? Environment.NewLine + "Application encountered an error" : ex.ToString();
+
+			if (!string.IsNullOrWhiteSpace(message))
+				toLog += ": " + message;
+			else
+				toLog += "!";
+
+			toLog += Environment.NewLine + Environment.NewLine;
+
+
+			CreateLogFileIfNotExists(OutputFilename);
+			File.AppendAllText(OutputFilename, GetTimestamp() + toLog);
 			LogTextbox(toLog);
 		}
 
@@ -80,21 +94,27 @@ namespace GNFS_Winforms
 			}
 		}
 
-		public static void CreateLogFileIfNotExists()
+		public static void CreateLogFileIfNotExists(string file)
 		{
-			string directory = Path.GetDirectoryName(OutputFilename);
+			string directory = Path.GetDirectoryName(file);
 			if (!Directory.Exists(directory))
 			{
 				FirstFindRelations = true;
 				Directory.CreateDirectory(directory);
 			}
-			if (!File.Exists(OutputFilename))
+			if (!File.Exists(file))
 			{
 				string logHeader = $"Log created: {DateTime.Now}";
 				string line = new string(Enumerable.Repeat('-', logHeader.Length).ToArray());
 
-				File.WriteAllLines(OutputFilename, new string[] { logHeader, line, Environment.NewLine });
+				File.WriteAllLines(file, new string[] { logHeader, line, Environment.NewLine });
 			}
+		}
+
+		public static string GetTimestamp()
+		{
+			DateTime now = DateTime.Now;
+			return $"[{now.DayOfYear}.{now.Year} @ {now.ToString("HH:mm:ss")}]  ";
 		}
 	}
 }

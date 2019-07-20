@@ -26,7 +26,7 @@ namespace GNFS_Winforms
 		{
 			try
 			{
-				Logging.LogException((Exception)e.ExceptionObject, "CAUGHT UNHANDLED _APPLICATION_ EXCEPTION");
+				Logging.LogException((Exception)e.ExceptionObject, "CAUGHT A UNHANDLED _APPLICATION_ EXCEPTION");
 			}
 			catch
 			{
@@ -37,22 +37,11 @@ namespace GNFS_Winforms
 		{
 			try
 			{
-				Logging.LogException(e.Exception, "CAUGHT UNHANDLED _THREAD_ EXCEPTION");
+				Logging.LogException(e.Exception, "ENCOUNTERED A UNTRAPPED _THREAD_ EXCEPTION");
 			}
 			catch
 			{
 			}
-		}
-
-		public static bool IsDebug()
-		{
-			bool result = false;
-
-#if DEBUG
-			result = true;
-#endif
-
-			return result;
-		}
+		}		
 	}
 }
