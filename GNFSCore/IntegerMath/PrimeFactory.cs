@@ -12,6 +12,9 @@ namespace GNFSCore.IntegerMath
 	public static class PrimeFactory
 	{
 		private static BigInteger MaxValue = 10;
+
+		private static int primesCount;
+		private static BigInteger primesLast;
 		private static List<BigInteger> primes = new List<BigInteger>() { 2, 3, 5, 7, 11, 13 };
 
 		static PrimeFactory()
@@ -22,33 +25,19 @@ namespace GNFSCore.IntegerMath
 		private static void SetPrimes()
 		{
 			primes = Eratosthenes.Sieve((Int32)MaxValue).ToList();
+			primesCount = primes.Count;
+			primesLast = primes.Last();
 		}
 
-		public static IEnumerable<BigInteger> GetPrimes()
+		public static IEnumerable<BigInteger> GetPrimeEnumerator(int startIndex = 0, int stopIndex = -1)
 		{
-			return primes.AsEnumerable();
-		}
-
-		public static IEnumerable<BigInteger> GetPrimes(BigInteger maxValue)
-		{
-			if (maxValue > MaxValue)
-			{
-				IncreaseMaxValue(maxValue);
-			}
-			return primes.Take(GetIndexFromValue(maxValue));
-		}
-
-		public static IEnumerable<BigInteger> GetPrimeEnumerator(BigInteger startValue)
-		{
-			int index = GetIndexFromValue(startValue);
-			BigInteger stopIndex = primes.Count - 1;
-
-			while (index < stopIndex)
+			int index = startIndex;
+			int maxIndex = stopIndex > 0 ? stopIndex : primesCount - 1;
+			while (index < maxIndex)
 			{
 				yield return primes[index];
 				index++;
 			}
-
 			yield break;
 		}
 
@@ -71,7 +60,7 @@ namespace GNFSCore.IntegerMath
 			{
 				return -1;
 			}
-			if (primes.Last() < value)
+			if (primesLast < value)
 			{
 				IncreaseMaxValue(value);
 			}
@@ -84,7 +73,7 @@ namespace GNFSCore.IntegerMath
 
 		public static BigInteger GetValueFromIndex(int index)
 		{
-			while ((primes.Count - 1) < index)
+			while ((primesCount - 1) < index)
 			{
 				IncreaseMaxValue();
 			}
@@ -131,21 +120,25 @@ namespace GNFSCore.IntegerMath
 
 		public static IEnumerable<BigInteger> GetPrimesFrom(BigInteger minValue)
 		{
-			return primes.SkipWhile(p => p < minValue);
+			return GetPrimeEnumerator(GetIndexFromValue(minValue));
 		}
 
 		public static IEnumerable<BigInteger> GetPrimesTo(BigInteger maxValue)
 		{
-			return GetPrimesRange(0, maxValue);
+			if (primesLast < maxValue)
+			{
+				IncreaseMaxValue(maxValue);
+			}
+			return GetPrimeEnumerator(0).TakeWhile(p => p < maxValue);
 		}
 
 		public static IEnumerable<BigInteger> GetPrimesRange(BigInteger minValue, BigInteger maxValue)
 		{
-			if (primes.Last() < maxValue)
+			if (primesLast < maxValue)
 			{
 				IncreaseMaxValue(maxValue);
 			}
-			return primes.SkipWhile(p => p < minValue).TakeWhile(p => p < maxValue);
+			return GetPrimeEnumerator(GetIndexFromValue(minValue)).TakeWhile(p => p < maxValue);
 		}
 
 		public static bool IsPrime(BigInteger value)

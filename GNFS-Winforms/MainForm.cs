@@ -157,7 +157,7 @@ namespace GNFS_Winforms
 			tbBound.Text = newBaseMax.ToString();
 
 			gnfs.CaclulatePrimeFactorBaseBounds(newBaseMax);
-			gnfs.SetPrimeFactorBases(newBaseMax);
+			gnfs.SetPrimeFactorBases();
 		}
 
 		private void btnFindRelations_Click(object sender, EventArgs e)
@@ -294,9 +294,9 @@ namespace GNFS_Winforms
 					Logging.LogMessage();
 					Logging.LogMessage("Counts/Quantities:");
 					Logging.LogMessage();
-					Logging.LogMessage($"Algebraic Factor Base (Quantity):\t{localGnfs.PrimeFactorBase.AlgebraicFactorBase.Count}");
-					Logging.LogMessage($"Rational Factor Base (Quantity):\t{localGnfs.PrimeFactorBase.RationalFactorBase.Count}");
-					Logging.LogMessage($"Quadratic Factor Base (Quantity):\t{localGnfs.PrimeFactorBase.QuadraticFactorBase.Count}");
+					Logging.LogMessage($"Algebraic Factor Base (MaxValue):\t{localGnfs.PrimeFactorBase.AlgebraicFactorBaseMax}");
+					Logging.LogMessage($"Rational Factor Base (MaxValue):\t{localGnfs.PrimeFactorBase.RationalFactorBaseMax}");
+					Logging.LogMessage($"Quadratic Factor Base (MaxValue):\t{localGnfs.PrimeFactorBase.QuadraticFactorBaseMax}");
 					Logging.LogMessage();
 					Logging.LogMessage($"Algebraic Factor Pairs (Quantity):\t{localGnfs.AlgebraicFactorPairCollection.Count}");
 					Logging.LogMessage($"Rational Factor Pairs (Quantity):\t{localGnfs.RationalFactorPairCollection.Count}");

@@ -26,10 +26,10 @@ namespace GNFSCore
 		[JsonProperty]
 		public int QuadraticBaseCount { get; internal set; }
 		[JsonIgnore]
-		public List<BigInteger> RationalFactorBase { get; internal set; }
+		public IEnumerable<BigInteger> RationalFactorBase { get; internal set; }
 		[JsonIgnore]
-		public List<BigInteger> AlgebraicFactorBase { get; internal set; }
+		public IEnumerable<BigInteger> AlgebraicFactorBase { get; internal set; }
 		[JsonIgnore]
-		public List<BigInteger> QuadraticFactorBase { get; internal set; }
+		public IEnumerable<BigInteger> QuadraticFactorBase { get; internal set; }
 	}
 }

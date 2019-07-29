@@ -10,8 +10,6 @@ namespace GNFSCore.IntegerMath
 {
 	public static partial class FactorizationFactory
 	{
-		private static IEnumerable<BigInteger> primes = new BigInteger[] { 2, 3, 5, 7, 11 };
-
 		public static IEnumerable<BigInteger> GetPrimeFactorCollection(BigInteger value, BigInteger maxValue)
 		{
 			if (value == 0)
@@ -36,18 +34,13 @@ namespace GNFSCore.IntegerMath
 				}
 			}
 
-			if (primes.Last() < maxValue)
-			{
-				primes = PrimeFactory.GetPrimes(maxValue);
-			}
-
 			if (PrimeFactory.IsPrime(toFactor))
 			{
 				factors.Add(toFactor);
 				return factors;
 			}
 
-			foreach (BigInteger prime in primes.Where(p => p <= maxValue))
+			foreach (BigInteger prime in PrimeFactory.GetPrimesTo(maxValue))
 			{
 				while (toFactor % prime == 0)
 				{

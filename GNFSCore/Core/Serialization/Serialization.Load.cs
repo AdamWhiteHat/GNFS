@@ -53,9 +53,11 @@ namespace GNFSCore
 				gnfs.CurrentPolynomial = gnfs.PolynomialCollection.Last();
 				((Polynomial)gnfs.CurrentPolynomial).SetDegree();
 
-				Load.FactorBase.Rational(ref gnfs);
-				Load.FactorBase.Algebraic(ref gnfs);
-				Load.FactorBase.Quadratic(ref gnfs);
+				Load.FactorBase(ref gnfs);
+
+				//Load.FactorBase.Rational(ref gnfs);
+				//Load.FactorBase.Algebraic(ref gnfs);
+				//Load.FactorBase.Quadratic(ref gnfs);
 
 				Load.FactorPair.Rational(ref gnfs);
 				Load.FactorPair.Algebraic(ref gnfs);
@@ -70,6 +72,12 @@ namespace GNFSCore
 				return gnfs;
 			}
 
+			public static void FactorBase(ref GNFS gnfs)
+			{
+				gnfs.SetPrimeFactorBases();
+			}
+
+			/*
 			public static class FactorBase
 			{
 				public static void Rational(ref GNFS gnfs)
@@ -99,6 +107,7 @@ namespace GNFSCore
 					}
 				}
 			}
+			*/
 
 			public static class FactorPair
 			{

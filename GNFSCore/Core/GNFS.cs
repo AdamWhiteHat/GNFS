@@ -102,7 +102,7 @@ namespace GNFSCore
 
 				if (cancelToken.IsCancellationRequested) { return; }
 
-				SetPrimeFactorBases(primeBound);
+				SetPrimeFactorBases();
 				LogMessage($"Prime bounds calculated.");
 
 				if (cancelToken.IsCancellationRequested) { return; }
@@ -191,7 +191,7 @@ namespace GNFSCore
 				bound = 250000000;
 			}
 
-			SetPrimeFactorBases(bound);
+			SetPrimeFactorBases();
 		}
 
 		public void CaclulatePrimeFactorBaseBounds(BigInteger bound)
@@ -210,22 +210,22 @@ namespace GNFSCore
 			LogMessage("Saved prime factor base bounds.");
 		}
 
-		public void SetPrimeFactorBases(BigInteger bound)
+		public void SetPrimeFactorBases()
 		{
 			LogMessage($"Constructing new prime bases (- of 3)...");
 
 			PrimeFactory.IncreaseMaxValue(PrimeFactorBase.QuadraticFactorBaseMax);
 
-			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.RationalFactorBaseMax).ToList();
-			Serialization.Save.FactorBase.Rational(this);
+			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.RationalFactorBaseMax);
+			//Serialization.Save.FactorBase.Rational(this);
 			LogMessage($"Completed rational prime base (1 of 3).");
 
-			PrimeFactorBase.AlgebraicFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.AlgebraicFactorBaseMax).ToList();
-			Serialization.Save.FactorBase.Algebraic(this);
+			PrimeFactorBase.AlgebraicFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.AlgebraicFactorBaseMax);
+			//Serialization.Save.FactorBase.Algebraic(this);
 			LogMessage($"Completed algebraic prime base (2 of 3).");
 
-			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesFrom(PrimeFactorBase.QuadraticFactorBaseMin).Take(PrimeFactorBase.QuadraticBaseCount).ToList();
-			Serialization.Save.FactorBase.Quadratic(this);
+			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesFrom(PrimeFactorBase.QuadraticFactorBaseMin).Take(PrimeFactorBase.QuadraticBaseCount);
+			//Serialization.Save.FactorBase.Quadratic(this);
 			LogMessage($"Completed quadratic prime base (3 of 3).");
 		}
 
@@ -369,7 +369,7 @@ namespace GNFSCore
 			result.AppendLine($"RationalFactorBase : {PrimeFactorBase.RationalFactorBaseMax}");
 			result.AppendLine($"AlgebraicFactorBase: {PrimeFactorBase.AlgebraicFactorBaseMax}");
 			result.AppendLine($"QuadraticPrimeBase Range: {PrimeFactorBase.QuadraticFactorBaseMin} - {PrimeFactorBase.QuadraticFactorBaseMax}");
-			result.AppendLine($"QuadraticPrimeBase Count: {PrimeFactorBase.QuadraticFactorBase.Count}");
+			result.AppendLine($"QuadraticPrimeBase Count: {PrimeFactorBase.QuadraticBaseCount}");
 			result.AppendLine();
 			result.AppendLine($"RFB - Rational Factor Base - Count: {RationalFactorPairCollection.Count} - Array of (p, m % p) with prime p");
 			result.AppendLine(RationalFactorPairCollection.ToString(200));
