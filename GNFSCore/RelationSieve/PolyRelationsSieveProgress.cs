@@ -158,6 +158,7 @@ namespace GNFSCore
 						}
 						else
 						{
+							/*
 							_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Add(rel);
 							roughRelationCounter++;
 
@@ -167,6 +168,7 @@ namespace GNFSCore
 								_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Clear();
 								roughRelationCounter = 0;
 							}
+							*/
 						}
 					}
 				}
