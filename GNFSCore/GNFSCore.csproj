@@ -34,8 +34,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Polynomial, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExtendedArithmetic.Polynomial.1.0.0.1\lib\net45\Polynomial.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,20 +54,14 @@
     <Compile Include="Core\CountDictionary.cs" />
     <Compile Include="Core\ExtensionMethods\BigIntegerCollectionExtensionMethods.cs" />
     <Compile Include="Core\ExtensionMethods\IEnumerableExtensionMethods.cs" />
-    <Compile Include="Core\ExtensionMethods\ITermExtensionMethods.cs" />
     <Compile Include="Core\FactorBase.cs" />
     <Compile Include="Core\DirectoryLocations.cs" />
-    <Compile Include="Core\Interfaces\IPolynomial.cs" />
-    <Compile Include="Core\Interfaces\ITerm.cs" />
     <Compile Include="Core\Serialization\JsonConverters.cs" />
     <Compile Include="Core\Serialization\Serialization.Load.cs" />
     <Compile Include="Core\Serialization\Serialization.Save.cs" />
     <Compile Include="Core\SieveRangeEnumerable.cs" />
     <Compile Include="IntegerMath\Combinatorics.cs" />
-    <Compile Include="Core\Polynomial.cs" />
     <Compile Include="Matrix\MatrixSolve.cs" />
-    <Compile Include="Polynomial\Term.cs" />
-    <Compile Include="Polynomial\TermCollection.cs" />
     <Compile Include="RelationSieve\PolyRelationsSieveProgress.cs" />
     <Compile Include="IntegerMath\QuadraticResidue.cs" />
     <Compile Include="RelationSieve\Relation.cs" />
