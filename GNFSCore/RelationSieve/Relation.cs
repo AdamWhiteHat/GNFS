@@ -12,80 +12,84 @@ using System.Xml.Serialization;
 
 namespace GNFSCore
 {
-	using Factors;
-	using IntegerMath;
-	using Matrix;
+    using Factors;
+    using IntegerMath;
+    using Matrix;
 
-	using Interfaces;
+    using Interfaces;
 
-	public class Relation : IEquatable<Relation>, IEqualityComparer<Relation>
-	{
-		[JsonProperty(Order = 0)]
-		public int A { get; protected set; }
+    public class Relation : IEquatable<Relation>, IEqualityComparer<Relation>
+    {
+        [JsonProperty(Order = 0)]
+        public int A { get; protected set; }
 
-		/// <summary>
-		/// Root of f(x) in algebraic field
-		/// </summary>
-		[JsonProperty(Order = 1)]
-		public uint B { get; protected set; }
+        /// <summary>
+        /// Root of f(x) in algebraic field
+        /// </summary>
+        [JsonProperty(Order = 1)]
+        public uint B { get; protected set; }
 
-		/// <summary> ƒ(b) ≡ 0 (mod a); Calculated as: ƒ(-a/b) * -b^deg </summary>
-		[JsonProperty(Order = 2)]
-		public BigInteger AlgebraicNorm { get; protected set; }
-		/// <summary>  a + bm </summary>
-		[JsonProperty(Order = 3)]
-		public BigInteger RationalNorm { get; protected set; }
+        /// <summary> ƒ(b) ≡ 0 (mod a); Calculated as: ƒ(-a/b) * -b^deg </summary>
+        [JsonProperty(Order = 2)]
+        public BigInteger AlgebraicNorm { get; protected set; }
+        /// <summary>  a + bm </summary>
+        [JsonProperty(Order = 3)]
+        public BigInteger RationalNorm { get; protected set; }
 
-		[JsonProperty(Order = 4)]
-		internal BigInteger AlgebraicQuotient;
-		[JsonProperty(Order = 5)]
-		internal BigInteger RationalQuotient;
+        [JsonProperty(Order = 4)]
+        internal BigInteger AlgebraicQuotient;
+        [JsonProperty(Order = 5)]
+        internal BigInteger RationalQuotient;
 
-		public bool ShouldSerializeAlgebraicQuotient() { return !(AlgebraicQuotient == 1 || AlgebraicQuotient == 0); }
-		public bool ShouldSerializeRationalQuotient() { return !(RationalQuotient == 1 || RationalQuotient == 0); }
+        [JsonProperty(Order = 6)]
+        public CountDictionary AlgebraicFactorization { get; private set; }
+        [JsonProperty(Order = 7)]
+        public CountDictionary RationalFactorization { get; private set; }
 
-		[JsonProperty(Order = 6)]
-		public CountDictionary AlgebraicFactorization { get; private set; }
-		[JsonProperty(Order = 7)]
-		public CountDictionary RationalFactorization { get; private set; }
+        [JsonProperty(Order = 8)]
+        public bool IsSmooth { get { return (IsRationalQuotientSmooth && IsAlgebraicQuotientSmooth); } }
 
-		[JsonProperty(Order = 8)]
-		public bool IsSmooth { get { return (AlgebraicQuotient == 1 || AlgebraicQuotient == 0) && (RationalQuotient == 1 || RationalQuotient == 0); } }
+        [JsonProperty(Order = 9)]
+        public bool IsRationalQuotientSmooth { get { return (RationalQuotient == 1 || RationalQuotient == 0); } }
 
-		[JsonIgnore]
-		public bool IsPersisted { get; set; }
+        [JsonProperty(Order = 10)]
+        public bool IsAlgebraicQuotientSmooth { get { return (AlgebraicQuotient == 1 || AlgebraicQuotient == 0); } }
 
-		public Relation()
-		{
-			IsPersisted = false;
-			RationalFactorization = new CountDictionary();
-			AlgebraicFactorization = new CountDictionary();
-		}
 
-		public Relation(GNFS gnfs, int a, uint b)
-			: this()
-		{
-			A = a;
-			B = b;
+        [JsonIgnore]
+        public bool IsPersisted { get; set; }
 
-			AlgebraicNorm = Normal.Algebraic(A, B, gnfs.CurrentPolynomial); // b^deg * f( a/b )
-			RationalNorm = Normal.Rational(A, B, gnfs.PolynomialBase); // a + bm
+        public Relation()
+        {
+            IsPersisted = false;
+            RationalFactorization = new CountDictionary();
+            AlgebraicFactorization = new CountDictionary();
+        }
 
-			AlgebraicQuotient = BigInteger.Abs(AlgebraicNorm);
-			RationalQuotient = BigInteger.Abs(RationalNorm);
+        public Relation(GNFS gnfs, int a, uint b)
+            : this()
+        {
+            A = a;
+            B = b;
 
-			if (AlgebraicNorm.Sign == -1)
-			{
-				AlgebraicFactorization.Add(BigInteger.MinusOne);
-			}
+            AlgebraicNorm = Normal.Algebraic(A, B, gnfs.CurrentPolynomial); // b^deg * f( a/b )
+            RationalNorm = Normal.Rational(A, B, gnfs.PolynomialBase); // a + bm
 
-			if (RationalNorm.Sign == -1)
-			{
-				RationalFactorization.Add(BigInteger.MinusOne);
-			}
-		}
+            AlgebraicQuotient = BigInteger.Abs(AlgebraicNorm);
+            RationalQuotient = BigInteger.Abs(RationalNorm);
 
-		/*
+            if (AlgebraicNorm.Sign == -1)
+            {
+                AlgebraicFactorization.Add(BigInteger.MinusOne);
+            }
+
+            if (RationalNorm.Sign == -1)
+            {
+                RationalFactorization.Add(BigInteger.MinusOne);
+            }
+        }
+
+        /*
 		public Relation(Relation relation)
 		{
 			this.A = relation.A;
@@ -115,93 +119,97 @@ namespace GNFSCore
 		}
 		*/
 
-		public BigInteger Apply(BigInteger x)
-		{
-			return BigInteger.Add(A, BigInteger.Multiply(B, x));
-		}
+        public BigInteger Apply(BigInteger x)
+        {
+            return BigInteger.Add(A, BigInteger.Multiply(B, x));
+        }
 
-		public void Sieve(PolyRelationsSieveProgress relationsSieve)
-		{
-			Sieve(relationsSieve._gnfs.PrimeFactorBase.AlgebraicFactorBase, ref AlgebraicQuotient, AlgebraicFactorization);
-			Sieve(relationsSieve._gnfs.PrimeFactorBase.RationalFactorBase, ref RationalQuotient, RationalFactorization);
-		}
+        public void Sieve(PolyRelationsSieveProgress relationsSieve)
+        {
+            Sieve(relationsSieve._gnfs.PrimeFactorBase.RationalFactorBase, ref RationalQuotient, RationalFactorization);
 
-		private static void Sieve(IEnumerable<BigInteger> primeFactors, ref BigInteger quotientValue, CountDictionary dictionary)
-		{
-			if (quotientValue.Sign == -1 || primeFactors.Any(f => f.Sign == -1))
-			{
-				throw new Exception("There shouldn't be any negative values either in the quotient or the factors");
-			}
+            if(IsRationalQuotientSmooth) // No sense wasting time on factoring the AlgebraicQuotient if the relation is ultimately going to be rejected anyways.
+            {
+                Sieve(relationsSieve._gnfs.PrimeFactorBase.AlgebraicFactorBase, ref AlgebraicQuotient, AlgebraicFactorization);
+            }
+        }
 
-			foreach (BigInteger factor in primeFactors)
-			{
-				if (quotientValue == 0 || quotientValue == 1)
-				{
-					return;
-				}
+        private static void Sieve(IEnumerable<BigInteger> primeFactors, ref BigInteger quotientValue, CountDictionary dictionary)
+        {
+            if (quotientValue.Sign == -1 || primeFactors.Any(f => f.Sign == -1))
+            {
+                throw new Exception("There shouldn't be any negative values either in the quotient or the factors");
+            }
 
-				if ((factor * factor) > quotientValue)
-				{
-					if (primeFactors.Contains(quotientValue))
-					{
-						dictionary.Add(quotientValue);
-						quotientValue = 1;
-					}
-					return;
-				}
+            foreach (BigInteger factor in primeFactors)
+            {
+                if (quotientValue == 0 || quotientValue == 1)
+                {
+                    return;
+                }
 
-				while (quotientValue != 1 && quotientValue % factor == 0)
-				{
-					quotientValue = BigInteger.Divide(quotientValue, factor);
-					dictionary.Add(factor);
-				}
-			}
-		}
+                if ((factor * factor) > quotientValue)
+                {
+                    if (primeFactors.Contains(quotientValue))
+                    {
+                        dictionary.Add(quotientValue);
+                        quotientValue = 1;
+                    }
+                    return;
+                }
 
-		#region IEquatable / IEqualityComparer
+                while (quotientValue != 1 && quotientValue % factor == 0)
+                {
+                    quotientValue = BigInteger.Divide(quotientValue, factor);
+                    dictionary.Add(factor);
+                }
+            }
+        }
 
-		public override bool Equals(object obj)
-		{
-			Relation other = obj as Relation;
+        #region IEquatable / IEqualityComparer
 
-			if (other == null)
-			{
-				return false;
-			}
-			else
-			{
-				return this.Equals(other);
-			}
-		}
+        public override bool Equals(object obj)
+        {
+            Relation other = obj as Relation;
 
-		public bool Equals(Relation x, Relation y)
-		{
-			return x.Equals(y);
-		}
+            if (other == null)
+            {
+                return false;
+            }
+            else
+            {
+                return this.Equals(other);
+            }
+        }
 
-		public bool Equals(Relation other)
-		{
-			return (this.A == other.A && this.B == other.B);
-		}
+        public bool Equals(Relation x, Relation y)
+        {
+            return x.Equals(y);
+        }
 
-		public int GetHashCode(Relation obj)
-		{
-			return obj.GetHashCode();
-		}
+        public bool Equals(Relation other)
+        {
+            return (this.A == other.A && this.B == other.B);
+        }
 
-		public override int GetHashCode()
-		{
-			return Tuple.Create(this.A, this.B).GetHashCode();
-		}
+        public int GetHashCode(Relation obj)
+        {
+            return obj.GetHashCode();
+        }
 
-		#endregion
+        public override int GetHashCode()
+        {
+            return Tuple.Create(this.A, this.B).GetHashCode();
+        }
 
-		public override string ToString()
-		{
-			return
-				$"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t"
-				+ $"[ƒ(b) ≡ 0 (mod a):{AlgebraicNorm.ToString().PadLeft(10)} (AlgebraicNorm) IsSquare: {AlgebraicNorm.IsSquare()},\ta+b*m={RationalNorm.ToString().PadLeft(4)} (RationalNorm) IsSquare: {RationalNorm.IsSquare()}]\t";
-		}
+        #endregion
 
-	}
+        public override string ToString()
+        {
+            return
+                $"(a:{A.ToString().PadLeft(4)}, b:{B.ToString().PadLeft(2)})\t"
+                + $"[ƒ(b) ≡ 0 (mod a):{AlgebraicNorm.ToString().PadLeft(10)} (AlgebraicNorm) IsSquare: {AlgebraicNorm.IsSquare()},\ta+b*m={RationalNorm.ToString().PadLeft(4)} (RationalNorm) IsSquare: {RationalNorm.IsSquare()}]\t";
+        }
+
+    }
 }
