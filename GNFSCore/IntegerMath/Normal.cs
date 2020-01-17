@@ -14,7 +14,7 @@ namespace GNFSCore.Factors
         /// </summary>
         /// <param name="polynomialBase">Base m of f(m) = N</param>
         /// <returns></returns>
-        public static BigInteger Rational(int a, uint b, BigInteger polynomialBase)
+        public static BigInteger Rational(BigInteger a, BigInteger b, BigInteger polynomialBase)
         {
             return BigInteger.Add(a, BigInteger.Multiply(b, polynomialBase));
         }
@@ -22,7 +22,7 @@ namespace GNFSCore.Factors
         /// <summary>
         /// a - bm
         /// </summary>
-        public static BigInteger RationalSubtract(int a, uint b, BigInteger polynomialBase)
+        public static BigInteger RationalSubtract(BigInteger a, BigInteger b, BigInteger polynomialBase)
         {
             return BigInteger.Subtract(a, BigInteger.Multiply(b, polynomialBase));
         }

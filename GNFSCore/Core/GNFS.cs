@@ -265,6 +265,7 @@ namespace GNFSCore
         private void ConstructNewPolynomial(BigInteger polynomialBase, int polyDegree)
         {
             CurrentPolynomial = new Polynomial(N, polynomialBase, polyDegree);
+            Polynomial.MakeCoefficientsSmaller(CurrentPolynomial, polynomialBase);
             PolynomialCollection.Add(CurrentPolynomial);
             Serialization.Save.All(this);
         }

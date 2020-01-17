@@ -21,13 +21,13 @@ namespace GNFSCore
     public class Relation : IEquatable<Relation>, IEqualityComparer<Relation>
     {
         [JsonProperty(Order = 0)]
-        public int A { get; protected set; }
+        public BigInteger A { get; protected set; }
 
         /// <summary>
         /// Root of f(x) in algebraic field
         /// </summary>
         [JsonProperty(Order = 1)]
-        public uint B { get; protected set; }
+        public BigInteger B { get; protected set; }
 
         /// <summary> ƒ(b) ≡ 0 (mod a); Calculated as: ƒ(-a/b) * -b^deg </summary>
         [JsonProperty(Order = 2)]
@@ -66,7 +66,7 @@ namespace GNFSCore
             AlgebraicFactorization = new CountDictionary();
         }
 
-        public Relation(GNFS gnfs, int a, uint b)
+        public Relation(GNFS gnfs, BigInteger a, BigInteger b)
             : this()
         {
             A = a;
@@ -103,7 +103,7 @@ namespace GNFSCore
 			this.IsPersisted = relation.IsPersisted;
 		}
 
-		public Relation(int a, int b, BigInteger algebraicNorm, BigInteger rationalNorm, CountDictionary algebraicFactorization, CountDictionary rationalFactorization)
+		public Relation(BigInteger a, BigInteger b, BigInteger algebraicNorm, BigInteger rationalNorm, CountDictionary algebraicFactorization, CountDictionary rationalFactorization)
 		{
 			A = a;
 			B = b;
@@ -128,7 +128,7 @@ namespace GNFSCore
         {
             Sieve(relationsSieve._gnfs.PrimeFactorBase.RationalFactorBase, ref RationalQuotient, RationalFactorization);
 
-            if(IsRationalQuotientSmooth) // No sense wasting time on factoring the AlgebraicQuotient if the relation is ultimately going to be rejected anyways.
+            if (IsRationalQuotientSmooth) // No sense wasting time on factoring the AlgebraicQuotient if the relation is ultimately going to be rejected anyways.
             {
                 Sieve(relationsSieve._gnfs.PrimeFactorBase.AlgebraicFactorBase, ref AlgebraicQuotient, AlgebraicFactorization);
             }
@@ -143,7 +143,7 @@ namespace GNFSCore
 
             foreach (BigInteger factor in primeFactors)
             {
-                if (quotientValue == 0 || quotientValue == 1)
+                if (quotientValue == 1)
                 {
                     return;
                 }
@@ -160,10 +160,24 @@ namespace GNFSCore
 
                 while (quotientValue != 1 && quotientValue % factor == 0)
                 {
-                    quotientValue = BigInteger.Divide(quotientValue, factor);
                     dictionary.Add(factor);
+                    quotientValue = BigInteger.Divide(quotientValue, factor);
                 }
             }
+
+            /*
+            if (quotientValue != 0 && quotientValue != 1)
+            {
+                if (FactorizationFactory.IsProbablePrime(quotientValue))
+                {
+                    if (quotientValue < (primeFactors.Last() * 2))
+                    {
+                        dictionary.Add(quotientValue);
+                        quotientValue = 1;
+                    }
+                }
+            }
+            */
         }
 
         #region IEquatable / IEqualityComparer
