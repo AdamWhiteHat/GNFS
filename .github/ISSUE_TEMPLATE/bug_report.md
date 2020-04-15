@@ -10,9 +10,13 @@ assignees: AdamWhiteHat
 **Description**
 A clear and concise description of what the bug is.
 
+**Output.log.txt**
+There should be an 'Output.log.txt' file in the same directory as the binary file. Please include that if you have it 
+
 **Error/Exception Message**
-Was an exception thrown? If so, please paste the full exception message here. Please include the full stacktrace if you have it. If you don't have a stacktrace, but you think you can reproduce the bug, please run the application in debug mode and trigger the exception again. A full stacktrace should be available to debug builds, but probably not for release builds.
-Otherwise, just give us a much of the error message or exception message as you can here.  Please provide the error message in full and verbatim.
+Including a link to your Output.log.txt should provide a full exception message.
+Otherwise, please paste the full exception message here. Please include the full stacktrace if you have it. If you don't have a stacktrace, but you think you can reproduce the bug, please run the application in debug mode and trigger the exception again. A full stacktrace should be available to debug builds, but probably not for release builds.
+Otherwise, just give us a much of the error message or exception message as you can here. Please provide the error message in full and verbatim (or just give us the Output.log.txt).
 
 **Expected Behavior**
 What behavior were you expecting?
