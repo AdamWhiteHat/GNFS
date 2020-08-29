@@ -15,6 +15,7 @@ namespace GNFSCore
 		private const string elipse = "[...]";
 		private const string parametersFilename = "GNFS.json";
 
+		public static string SaveFilename = parametersFilename;
 		public string SaveDirectory { get { return saveDirectory; } }
 		public string GnfsParameters_SaveFile { get { return Path.Combine(SaveDirectory, parametersFilename); } }
 

@@ -89,7 +89,7 @@
 			this.tbN.Location = new System.Drawing.Point(20, 4);
 			this.tbN.Name = "tbN";
 			this.tbN.Size = new System.Drawing.Size(699, 20);
-			this.tbN.TabIndex = 0;
+			this.tbN.TabIndex = 0;			
 			// 
 			// tbBase
 			// 
@@ -328,7 +328,6 @@
 			this.panelCancel.Name = "panelCancel";
 			this.panelCancel.Size = new System.Drawing.Size(289, 56);
 			this.panelCancel.TabIndex = 15;
-			this.panelCancel.Visible = false;
 			// 
 			// btnCancel
 			// 
@@ -440,6 +439,7 @@
 			this.MinimumSize = new System.Drawing.Size(500, 300);
 			this.Name = "MainForm";
 			this.Text = "A C# Implementation of the General Number Field Sieve";
+			this.Shown += new System.EventHandler(this.MainForm_Shown);
 			this.panelButtons.ResumeLayout(false);
 			this.groupBox4.ResumeLayout(false);
 			this.panelFunctions.ResumeLayout(false);

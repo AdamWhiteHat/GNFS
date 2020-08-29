@@ -11,9 +11,9 @@ namespace GNFS_Winforms
 		{
 			while (!cancelToken.IsCancellationRequested)
 			{
-				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.Quantity)
+				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.SmoothRelations_TargetQuantity)
 				{
-					gnfs.CurrentRelationsProgress.IncreaseQuantity(100);
+					gnfs.CurrentRelationsProgress.IncreaseTargetQuantity(100);
 				}
 
 				gnfs.CurrentRelationsProgress.GenerateRelations(cancelToken);
@@ -29,7 +29,7 @@ namespace GNFS_Winforms
 					break;
 				}
 
-				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.Quantity)
+				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.SmoothRelations_TargetQuantity)
 				{
 					break;
 				}

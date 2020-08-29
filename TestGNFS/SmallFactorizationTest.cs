@@ -131,16 +131,16 @@ namespace TestGNFS.Integration
 
 			while (!cancelToken.IsCancellationRequested)
 			{
-				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.Quantity)
+				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.SmoothRelations_TargetQuantity)
 				{
-					gnfs.CurrentRelationsProgress.IncreaseQuantity(100);
+					gnfs.CurrentRelationsProgress.IncreaseTargetQuantity(100);
 				}
 
 				gnfs.CurrentRelationsProgress.GenerateRelations(cancelToken);
 
 				Console.Write(".");
 
-				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.Quantity)
+				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter >= gnfs.CurrentRelationsProgress.SmoothRelations_TargetQuantity)
 				{
 					success = true;
 					break;

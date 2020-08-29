@@ -13,20 +13,82 @@ using System.Collections.Generic;
 namespace GNFS_Winforms
 {
 	using GNFSCore;
+	using GNFSCore.IntegerMath;
 
 	public partial class MainForm : Form
 	{
-		#region Private Members		
+		public BigInteger N
+		{
+			get
+			{
+				BigInteger result = -1;
+				return BigInteger.TryParse(tbN.Text, out result) ? result : -1;
+			}
+			set
+			{
+				ControlBridge.SetControlText(tbN, value.ToString());
+			}
+		}
 
-		private GNFS gnfs;
-		private int degree;
-		private BigInteger n;
-		private BigInteger polyBase;
-		private BigInteger primeBound;
+		public int Degree
+		{
+			get
+			{
+				int result = -1;
+				return int.TryParse(tbDegree.Text, out result) ? result : -1;
+			}
+			set
+			{
+				ControlBridge.SetControlText(tbDegree, value.ToString());
+			}
+		}
+
+		public BigInteger Base
+		{
+			get
+			{
+				BigInteger result = -1;
+				return BigInteger.TryParse(tbBase.Text, out result) ? result : -1;
+			}
+			set
+			{
+				ControlBridge.SetControlText(tbBase, value.ToString());
+			}
+		}
+
+		public BigInteger Bound
+		{
+			get
+			{
+				BigInteger result = -1;
+				return BigInteger.TryParse(tbBound.Text, out result) ? result : -1;
+			}
+			set
+			{
+				ControlBridge.SetControlText(tbBound, value.ToString());
+			}
+		}
+
+		public bool DoesSaveFileExist
+		{
+			get
+			{
+				BigInteger currentN = N;
+				if (currentN == -1) return false;
+				string directory = DirectoryLocations.GetSaveLocation(currentN);
+				if (!Directory.Exists(directory)) return false;
+				return File.Exists(Path.Combine(directory, DirectoryLocations.SaveFilename));
+			}
+		}
 
 		public bool IsWorking { get; private set; }
-		private CancellationToken cancellationToken;
-		private CancellationTokenSource cancellationTokenSource;
+
+		#region Private Members		
+
+		private GNFS _gnfs;
+
+		private CancellationToken _cancellationToken;
+		private CancellationTokenSource _cancellationTokenSource;
 
 		//private static readonly BigInteger MatthewBriggs = BigInteger.Parse("45113");
 		//private static readonly BigInteger PerLeslieJensen = BigInteger.Parse("3218147");
@@ -44,78 +106,89 @@ namespace GNFS_Winforms
 		{
 			InitializeComponent();
 
+			IsWorking = false;
+			_gnfs = null;
+
 			Logging.PrimaryForm = this;
 			Logging.OutputTextbox = tbOutput;
+		}
 
-			IsWorking = false;
-			gnfs = null;
+		private void MainForm_Shown(object sender, EventArgs e)
+		{
+			ControlBridge.SetControlText(tbN, Settings.N);
+			ControlBridge.SetControlText(tbDegree, Settings.Degree);
+			ControlBridge.SetControlText(tbBase, Settings.Base);
+			ControlBridge.SetControlText(tbBound, Settings.Bound);
+			ControlBridge.SetControlText(tbRelationQuantity, Settings.RelationQuantity);
+			ControlBridge.SetControlText(tbRelationValueRange, Settings.RelationValueRange);
 
-			tbN.Text = Settings.N.ToString();
-			tbDegree.Text = Settings.Degree;
-			tbBase.Text = Settings.Base;
-			tbBound.Text = Settings.Bound;
-			tbRelationQuantity.Text = Settings.RelationQuantity;
-			tbRelationValueRange.Text = Settings.RelationValueRange;
+			ControlBridge.SetControlVisibleState(panelCancel, false);
 
-			n = BigInteger.Parse(tbN.Text);
-			degree = int.Parse(tbDegree.Text);
+			RefreshLoadSaveButtonState();
 
+			this.tbN.TextChanged += new System.EventHandler(this.tbN_TextChanged);
 		}
 
 		private static void SetGnfs(MainForm form, GNFS gnfs)
 		{
-			if (/* !GNFSCore.DirectoryLocations.IsLinuxOS() && */ form.InvokeRequired)
+			if (form.IsDisposed || !form.IsHandleCreated)
 			{
-				form.Invoke(new Action(() =>
-					SetGnfs(form, gnfs)
-				));
+				throw new Exception();
+			}
+
+			if (form.InvokeRequired)
+			{
+				form.Invoke(new Action(() => SetGnfs(form, gnfs)));
 			}
 			else
 			{
-				form.gnfs = gnfs;
+				form._gnfs = gnfs;
 
-				form.tbN.Text = gnfs.N.ToString();
+				form.N = gnfs.N;
+				form.Degree = gnfs.PolynomialDegree;
 
-				form.tbBound.Text = gnfs.PrimeFactorBase.RationalFactorBaseMax.ToString();
-				form.tbBase.Text = gnfs.PolynomialBase.ToString();
-				form.tbDegree.Text = gnfs.PolynomialDegree.ToString();
+				form.Base = gnfs.PolynomialBase;
+				form.Bound = gnfs.PrimeFactorBase.RationalFactorBaseMax;
 
-				form.tbRelationQuantity.Text = gnfs.CurrentRelationsProgress.Quantity.ToString();
+				form.tbRelationQuantity.Text = gnfs.CurrentRelationsProgress.SmoothRelations_TargetQuantity.ToString();
 				form.tbRelationValueRange.Text = gnfs.CurrentRelationsProgress.ValueRange.ToString();
 			}
 		}
 
 		private void SetAsProcessing()
 		{
-			panelButtons.Visible = false;
-			panelCancel.Visible = true;			
+			ControlBridge.SetControlVisibleState(panelCancel, true);
+			ControlBridge.SetControlVisibleState(panelButtons, false);
 
-			cancellationTokenSource = new CancellationTokenSource();
-			cancellationToken = cancellationTokenSource.Token;
-			cancellationToken.Register(new Action(() => RestoreAllButtons()));
+			_cancellationTokenSource = new CancellationTokenSource();
+			_cancellationToken = _cancellationTokenSource.Token;
+			_cancellationToken.Register(new Action(() => RestoreAllButtons()));
 
 			Logging.LogMessage($"Processing thread LAUNCHED.");
 
-			IsWorking = true;			
+			IsWorking = true;
 		}
 
 
 		private void HaultAllProcessing()
 		{
-			if (cancellationTokenSource != null && IsWorking)
+			if (_cancellationTokenSource != null && IsWorking)
 			{
-				cancellationTokenSource.Cancel();
+				_cancellationTokenSource.Cancel();
 			}
 		}
 
 		private void RestoreAllButtons()
 		{
-			IsWorking = false;
+			if (IsWorking)
+			{
+				IsWorking = false;
 
-			ControlBridge.SetControlVisibleState(panelCancel, false);
-			ControlBridge.SetControlVisibleState(panelButtons, true);
+				ControlBridge.SetControlVisibleState(panelCancel, false);
+				ControlBridge.SetControlVisibleState(panelButtons, true);
 
-			Logging.LogMessage($"Processing thread COMPLETED.");
+				Logging.LogMessage($"Processing thread COMPLETED.");
+			}
 		}
 
 		private void tbOutput_KeyDown(object sender, KeyEventArgs e)
@@ -126,6 +199,33 @@ namespace GNFS_Winforms
 				{
 					tbOutput.SelectAll();
 				}
+			}
+		}
+
+		private void tbN_TextChanged(object sender, EventArgs e)
+		{
+			TextBox control = (TextBox)sender;
+			if (control == null) return;
+			if (!control.Modified) return;
+
+			RefreshLoadSaveButtonState();
+
+			//control.Modified = false;
+		}
+
+		private void RefreshLoadSaveButtonState()
+		{
+			if (DoesSaveFileExist)
+			{
+				ControlBridge.SetControlEnabledState(btnLoad, true);
+				ControlBridge.SetControlEnabledState(btnCreate, false);
+				ControlBridge.SetControlEnabledState(btnSave, true);
+			}
+			else
+			{
+				ControlBridge.SetControlEnabledState(btnLoad, false);
+				ControlBridge.SetControlEnabledState(btnCreate, true);
+				ControlBridge.SetControlEnabledState(btnSave, false);
 			}
 		}
 
@@ -141,8 +241,8 @@ namespace GNFS_Winforms
 
 		private void btnIncreaseSmoothnessBound_Click(object sender, EventArgs e)
 		{
-			BigInteger rationalBaseMax = gnfs.PrimeFactorBase.RationalFactorBaseMax;
-			BigInteger textboxBaseMax = BigInteger.Parse(tbBound.Text);
+			BigInteger rationalBaseMax = _gnfs.PrimeFactorBase.RationalFactorBaseMax;
+			BigInteger textboxBaseMax = Bound;
 
 			BigInteger newBaseMax = rationalBaseMax;
 			if (textboxBaseMax > rationalBaseMax)
@@ -154,10 +254,11 @@ namespace GNFS_Winforms
 				newBaseMax = rationalBaseMax + 100000;
 			}
 
-			tbBound.Text = newBaseMax.ToString();
+			Bound = newBaseMax;
 
-			gnfs.CaclulatePrimeFactorBaseBounds(newBaseMax);
-			gnfs.SetPrimeFactorBases();
+			_gnfs.CaclulatePrimeFactorBaseBounds(newBaseMax);
+			_gnfs.SetPrimeFactorBases();
+			PrintCurrentCounts();
 		}
 
 		private void btnFindRelations_Click(object sender, EventArgs e)
@@ -176,14 +277,15 @@ namespace GNFS_Winforms
 
 				Logging.LogMessage("[Find relations task starting up...]");
 
-				GNFS localGnfs = gnfs;
-				CancellationToken token = cancellationTokenSource.Token;
+				GNFS localGnfs = _gnfs;
+				CancellationToken token = _cancellationTokenSource.Token;
 				new Thread(() =>
 				{
 					GNFS resultGnfs = GnfsUiBridge.FindRelations(token, localGnfs, breakAfterOneRound);
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
 					Logging.LogMessage("[Find relations task complete]");
+					PrintCurrentCounts();
 				}).Start();
 			}
 		}
@@ -196,8 +298,8 @@ namespace GNFS_Winforms
 
 				Logging.LogMessage("[Matrix solve task starting up...]");
 
-				GNFS localGnfs = gnfs;
-				CancellationToken token = cancellationTokenSource.Token;
+				GNFS localGnfs = _gnfs;
+				CancellationToken token = _cancellationTokenSource.Token;
 				new Thread(() =>
 				{
 					GNFS resultGnfs = GnfsUiBridge.MatrixSolveGaussian(token, localGnfs);
@@ -218,8 +320,8 @@ namespace GNFS_Winforms
 
 				Logging.LogMessage("[Find square root task starting up...]");
 
-				GNFS localGnfs = gnfs;
-				CancellationToken token = cancellationTokenSource.Token;
+				GNFS localGnfs = _gnfs;
+				CancellationToken token = _cancellationTokenSource.Token;
 				new Thread(() =>
 				{
 					GNFS resultGnfs = GnfsUiBridge.FindSquares(token, localGnfs);
@@ -228,29 +330,65 @@ namespace GNFS_Winforms
 					HaultAllProcessing();
 					Logging.LogMessage("[Find square root task complete]");
 				}).Start();
-
 			}
 		}
 
 		private void btnPurgeRough_Click(object sender, EventArgs e)
 		{
-			int before = gnfs.CurrentRelationsProgress.RoughRelations.Count;
+			int before = _gnfs.CurrentRelationsProgress.RoughRelations.Count;
 
-			gnfs.CurrentRelationsProgress.PurgePrimeRoughRelations();
+			_gnfs.CurrentRelationsProgress.PurgePrimeRoughRelations();
 
-			int after = gnfs.CurrentRelationsProgress.RoughRelations.Count;
+			int after = _gnfs.CurrentRelationsProgress.RoughRelations.Count;
 
 			int quantityRemoved = before - after;
 
 			Logging.LogMessage($"Purged {quantityRemoved} rough relations whom were prime.");
+
+			PrintCurrentCounts();
 		}
 
 		private void btnPrintRelations_Click(object sender, EventArgs e)
 		{
-			if (gnfs.CurrentRelationsProgress.SmoothRelations.Any())
+			if (_gnfs.CurrentRelationsProgress.SmoothRelations.Any())
 			{
-				Logging.LogMessage(gnfs.CurrentRelationsProgress.ToString());
+				Logging.LogMessage(_gnfs.CurrentRelationsProgress.ToString());
 			}
+
+			PrintCurrentCounts();
+		}
+
+		private void PrintCurrentCounts()
+		{
+			int smoothRelation_CurrentTarget = _gnfs.CurrentRelationsProgress.SmoothRelations_TargetQuantity;
+
+			int smoothRelations_CurrentCount = _gnfs.CurrentRelationsProgress.SmoothRelations.Count;
+			int smoothRelation_SavedCounter = _gnfs.CurrentRelationsProgress.SmoothRelationsCounter;
+
+			BigInteger rationalBase_Max = _gnfs.PrimeFactorBase.RationalFactorBaseMax;
+			BigInteger algebraicBase_Max = _gnfs.PrimeFactorBase.AlgebraicFactorBaseMax;
+			BigInteger quadraticBase_Max = _gnfs.PrimeFactorBase.QuadraticFactorBaseMax;
+
+			int rationalBase_Size = PrimeFactory.GetIndexFromValue(rationalBase_Max);
+			int algebraicBase_Size = PrimeFactory.GetIndexFromValue(algebraicBase_Max);
+			int quadraticBase_Size = PrimeFactory.GetIndexFromValue(quadraticBase_Max);
+
+			int rationalFactorPair_Count = _gnfs.RationalFactorPairCollection.Count;
+			int algebraicFactorPair_Count = _gnfs.AlgebraicFactorPairCollection.Count;
+			int quadraticFactorPair_Count = _gnfs.QuadraticFactorPairCollection.Count;
+
+			int smoothRelation_RequiredBeforeMatrixStep = _gnfs.CurrentRelationsProgress.SmoothRelationsRequiredForMatrixStep;
+
+			Logging.LogMessage();
+			Logging.LogMessage($"Required smooth relations found before beginning matrix step: {smoothRelation_RequiredBeforeMatrixStep}");
+			Logging.LogMessage($"Smooth relations target value: {smoothRelation_CurrentTarget}");
+			Logging.LogMessage();
+			Logging.LogMessage($"Smooth relations currently loaded count: {smoothRelations_CurrentCount}");
+			Logging.LogMessage($"Smooth relations saved counter: {smoothRelation_SavedCounter}");
+			Logging.LogMessage();
+			Logging.LogMessage($"quadraticFactorPair_Count: {quadraticFactorPair_Count}");
+			Logging.LogMessage($"PrimeIndxOf(quadraticBase_Max): {PrimeFactory.GetIndexFromValue(quadraticBase_Max)}");
+			Logging.LogMessage();
 		}
 
 		private void linkGitHubProject_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -265,8 +403,9 @@ namespace GNFS_Winforms
 		private void btnSave_Click(object sender, EventArgs e)
 		{
 			Logging.LogMessage("[Save progress task began...]");
-			Serialization.Save.All(gnfs);
+			Serialization.Save.All(_gnfs);
 			Logging.LogMessage("[Save progress task successfully completed]");
+			RefreshLoadSaveButtonState();
 		}
 
 		private void btnLoad_Click(object sender, EventArgs e)
@@ -274,17 +413,14 @@ namespace GNFS_Winforms
 			if (!IsWorking)
 			{
 				SetAsProcessing();
-				//ControlBridge.SetControlEnabledState(btnCreate, false);
 
-				n = BigInteger.Parse(tbN.Text);
+				BigInteger n = N;
 
-				//Logging.OutputFilename = DirectoryLocations.GetUniqueNameFromN(n) + ".LOG.txt";
-				//Logging.CreateLogFileIfNotExists();
-
-				string jsonFilename = Path.Combine(DirectoryLocations.GetSaveLocation(n), "GNFS.json");
+				string jsonFilename = Path.Combine(DirectoryLocations.GetSaveLocation(n), DirectoryLocations.SaveFilename);
 				Logging.LogMessage($"[Loading factorization progress from \"{jsonFilename}\"...]");
 
-				CancellationToken token = cancellationTokenSource.Token;
+				CancellationToken token = _cancellationTokenSource.Token;
+
 				new Thread(() =>
 				{
 					GNFS localGnfs = GnfsUiBridge.LoadGnfs(n);
@@ -307,9 +443,8 @@ namespace GNFS_Winforms
 					Logging.LogMessage($"       Free Relations (Quantity):\t{localGnfs.CurrentRelationsProgress.FreeRelationsCounter}");
 					Logging.LogMessage();
 					Logging.LogMessage("[Loading factorization progress complete]");
-
-
-
+					PrintCurrentCounts();
+					RefreshLoadSaveButtonState();
 
 				}).Start();
 			}
@@ -320,12 +455,11 @@ namespace GNFS_Winforms
 			if (!IsWorking)
 			{
 				SetAsProcessing();
-				//ControlBridge.SetControlEnabledState(btnCreate, false);
 
-				n = BigInteger.Parse(tbN.Text);
-				degree = int.Parse(tbDegree.Text);
-				polyBase = BigInteger.Parse(tbBase.Text);
-				primeBound = BigInteger.Parse(tbBound.Text);
+				BigInteger n = N;
+				int degree = Degree;
+				BigInteger polyBase = Base;
+				BigInteger bound = Bound;
 
 				int relationQuantity = int.Parse(tbRelationQuantity.Text);
 				int relationValueRange = int.Parse(tbRelationValueRange.Text);
@@ -335,7 +469,7 @@ namespace GNFS_Winforms
 
 				Logging.LogMessage($"[New factorization job creation initialization for N = {DirectoryLocations.GetUniqueNameFromN(n)}...]");
 
-				CancellationToken token = cancellationTokenSource.Token;
+				CancellationToken token = _cancellationTokenSource.Token;
 				new Thread(() =>
 				{
 					GNFS localGnfs =
@@ -345,24 +479,24 @@ namespace GNFS_Winforms
 							n,      // Semi-prime to factor N = P*Q
 							polyBase, // Polynomial base (value for x)
 							degree, // Polynomial Degree
-							primeBound, //  BigInteger
+							bound, //  BigInteger
 							relationQuantity, // Total # of relations to collect before proceeding.
 							relationValueRange // 
 						);
-
-
 
 					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 					ControlBridge.SetControlEnabledState(panelFunctions, true);
 					Logging.LogMessage($"[New factorization job initialization complete]");
 					Logging.LogMessage($"NOTE: You should save your progress now.");
+					PrintCurrentCounts();
+					RefreshLoadSaveButtonState();
 				}).Start();
 			}
 		}
 
-		#endregion
 
+		#endregion
 
 	}
 }

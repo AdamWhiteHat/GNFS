@@ -10,83 +10,94 @@ using System.Runtime.Serialization;
 
 namespace GNFSCore
 {
-    using IntegerMath;
+	using IntegerMath;
 
-    [DataContract]
-    public class PolyRelationsSieveProgress
-    {
-        [DataMember]
-        public BigInteger A { get; private set; }
-        [DataMember]
-        public BigInteger B { get; private set; }
-        [DataMember]
-        public int Quantity { get; private set; }
-        [DataMember]
-        public BigInteger ValueRange { get; private set; }
+	[DataContract]
+	public class PolyRelationsSieveProgress
+	{
+		[DataMember]
+		public BigInteger A { get; private set; }
+		[DataMember]
+		public BigInteger B { get; private set; }
+		[DataMember]
+		public int SmoothRelations_TargetQuantity { get; private set; }
 
-        public List<List<Relation>> FreeRelations { get { return Relations.FreeRelations; } }
-        public List<Relation> SmoothRelations { get { return Relations.SmoothRelations; } }
-        public List<Relation> RoughRelations { get { return Relations.RoughRelations; } }
+		[DataMember]
+		public BigInteger ValueRange { get; private set; }
 
-        public RelationContainer Relations { get; set; }
+		public List<List<Relation>> FreeRelations { get { return Relations.FreeRelations; } }
+		public List<Relation> SmoothRelations { get { return Relations.SmoothRelations; } }
+		public List<Relation> RoughRelations { get { return Relations.RoughRelations; } }
 
-        [DataMember]
-        public BigInteger MaxB { get; set; }
-        public int SmoothRelationsCounter { get; set; }
-        public int FreeRelationsCounter { get; set; }
+		public RelationContainer Relations { get; set; }
 
-        internal GNFS _gnfs;
+		[DataMember]
+		public BigInteger MaxB { get; set; }
+		public int SmoothRelationsCounter { get; set; }
+		public int FreeRelationsCounter { get; set; }
 
-        #region Constructors
-
-        public PolyRelationsSieveProgress()
-        {
-            Relations = new RelationContainer();
-        }
-
-        public PolyRelationsSieveProgress(GNFS gnfs, int quantity, BigInteger valueRange)
-        {
-            _gnfs = gnfs;
-            Relations = new RelationContainer();
-
-            A = 0;
-            B = 3;
-            Quantity = quantity;
-            ValueRange = valueRange;
-
-            if (MaxB == 0)
-            {
-                MaxB = (uint)gnfs.PrimeFactorBase.AlgebraicFactorBaseMax;
-            }
-        }
-
-        /*
-		public PolyRelationsSieveProgress(GNFS gnfs, int a, uint b, int quantity, int valueRange, List<List<Relation>> free, List<Relation> smooth, List<Relation> rough)
-			: this(gnfs, quantity, valueRange)
+		public int SmoothRelationsRequiredForMatrixStep
 		{
-			A = a;
-			B = b;
-
-			Relations.FreeRelations = free;
-			Relations.SmoothRelations = smooth;
-			Relations.RoughRelations = rough;
+			get
+			{
+				return PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.RationalFactorBaseMax)
+					  + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.AlgebraicFactorBaseMax)
+					  + _gnfs.QuadraticFactorPairCollection.Count + 3;
+			}
 		}
-		*/
 
-        #endregion
+		internal GNFS _gnfs;
 
-        #region Processing / Computation
+		#region Constructors
 
-        public void GenerateRelations(CancellationToken cancelToken)
-        {
-            if (_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Any())
-            {
-                // SmoothRelationsCounter should reflect accurately
-                Serialization.Save.Relations.Smooth.Append(_gnfs); // This method updates SmoothRelationsCounter correctly
-                                                                   //_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Clear();
-            }
+		public PolyRelationsSieveProgress()
+		{
+			Relations = new RelationContainer();
+		}
 
-            /*
+		public PolyRelationsSieveProgress(GNFS gnfs, BigInteger valueRange)
+			: this(gnfs, -1, valueRange)
+		{
+		}
+
+		public PolyRelationsSieveProgress(GNFS gnfs, int smoothRelationsTargetQuantity, BigInteger valueRange)
+		{
+			_gnfs = gnfs;
+			Relations = new RelationContainer();
+
+			A = 0;
+			B = 3;
+			ValueRange = valueRange;
+
+			if (smoothRelationsTargetQuantity == -1)
+			{
+				SmoothRelations_TargetQuantity = SmoothRelationsRequiredForMatrixStep;
+			}
+			else
+			{
+				SmoothRelations_TargetQuantity = smoothRelationsTargetQuantity;
+			}
+
+			if (MaxB == 0)
+			{
+				MaxB = (uint)gnfs.PrimeFactorBase.AlgebraicFactorBaseMax;
+			}
+		}
+
+		#endregion
+
+		#region Processing / Computation
+
+		public void GenerateRelations(CancellationToken cancelToken)
+		{
+			if (_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Any())
+			{
+				// SmoothRelationsCounter should reflect accurately
+				Serialization.Save.Relations.Smooth.Append(_gnfs); // This method updates SmoothRelationsCounter correctly
+																   //_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Clear();
+			}
+
+			/*
             int roughRelationCounter = 0;
             if (_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Any())
             {
@@ -95,71 +106,66 @@ namespace GNFSCore
             }
             */
 
+			if (SmoothRelations_TargetQuantity == -1)
+			{
+				SmoothRelations_TargetQuantity = SmoothRelationsRequiredForMatrixStep;
+			}
 
-            if (Quantity == -1)
-            {
-                Quantity = _gnfs.RationalFactorPairCollection.Count + _gnfs.AlgebraicFactorPairCollection.Count + _gnfs.QuadraticFactorPairCollection.Count + 1;
-            }
-            //else if (SmoothRelationsCounter >= Quantity)
-            //{
-            //	Quantity += 2000;
-            //}
+			if (A >= ValueRange)
+			{
+				ValueRange += 200;
+			}
 
-            if (A >= ValueRange)
-            {
-                ValueRange += 200;
-            }
+			ValueRange = (ValueRange % 2 == 0) ? ValueRange + 1 : ValueRange;
+			A = (A % 2 == 0) ? A + 1 : A;
 
-            ValueRange = (ValueRange % 2 == 0) ? ValueRange + 1 : ValueRange;
-            A = (A % 2 == 0) ? A + 1 : A;
+			BigInteger startA = A;
 
-            BigInteger startA = A;
+			while (B >= MaxB)
+			{
+				MaxB += 100;
+			}
 
-            while (B >= MaxB)
-            {
-                MaxB += 100;
-            }
+			_gnfs.LogMessage($"GenerateRelations: TargetQuantity = {SmoothRelations_TargetQuantity}, ValueRange = {ValueRange}, A = {A}, B = {B}, Max B = {MaxB}");
 
-            _gnfs.LogMessage($"GenerateRelations: Quantity = {Quantity}, ValueRange = {ValueRange}, A = {A}, B = {B}, Max B = {MaxB}");
+			while (SmoothRelationsCounter < SmoothRelations_TargetQuantity)
+			{
+				if (cancelToken.IsCancellationRequested)
+				{
+					break;
+				}
 
-            while (SmoothRelationsCounter < Quantity)
-            {
-                if (cancelToken.IsCancellationRequested)
-                {
-                    break;
-                }
+				if (B > MaxB)
+				{
+					break;
+				}
 
-                if (B > MaxB)
-                {
-                    break;
-                }
+				foreach (BigInteger a in SieveRange.GetSieveRangeContinuation(A, ValueRange))
+				{
+					if (cancelToken.IsCancellationRequested)
+					{
+						break;
+					}
 
-                foreach (BigInteger a in SieveRange.GetSieveRangeContinuation(A, ValueRange))
-                {
-                    if (cancelToken.IsCancellationRequested)
-                    {
-                        break;
-                    }
+					A = a;
+					if (GCD.AreCoprime(A, B))
+					{
+						Relation rel = new Relation(_gnfs, A, B);
 
-                    A = a;
-                    if (GCD.AreCoprime(A, B))
-                    {
-                        Relation rel = new Relation(_gnfs, A, B);
+						rel.Sieve(_gnfs.CurrentRelationsProgress);
 
-                        rel.Sieve(_gnfs.CurrentRelationsProgress);
+						bool smooth = rel.IsSmooth;
+						if (smooth)
+						{
+							Serialization.Save.Relations.Smooth.Append(_gnfs, rel);
 
-                        bool smooth = rel.IsSmooth;
-                        if (smooth)
-                        {
-                            Serialization.Save.Relations.Smooth.Append(_gnfs, rel);
+							_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Add(rel);
 
-                            _gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Add(rel);
-
-                            _gnfs.LogMessage($"Found smooth relation: A = {rel.A}, B = {rel.B}");
-                        }
-                        else
-                        {
-                            /*
+							_gnfs.LogMessage($"Found smooth relation: A = {rel.A}, B = {rel.B}");
+						}
+						else
+						{
+							/*
 							_gnfs.CurrentRelationsProgress.Relations.RoughRelations.Add(rel);
 							roughRelationCounter++;
 
@@ -170,138 +176,143 @@ namespace GNFSCore
 								roughRelationCounter = 0;
 							}
 							*/
-                        }
-                    }
-                }
+						}
+					}
+				}
 
-                if (cancelToken.IsCancellationRequested)
-                {
-                    break;
-                }
+				if (cancelToken.IsCancellationRequested)
+				{
+					break;
+				}
 
-                B += 1;
-                A = startA;
+				B += 1;
+				A = startA;
 
-                //if (B % 11 == 0)
-                _gnfs.LogMessage($"B = {B}");
+				//if (B % 11 == 0)
+				_gnfs.LogMessage($"B = {B}");
 
-            }
-        }
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region Misc
+		#region Misc
 
-        public void IncreaseQuantity(int ammount = 10)
-        {
-            Quantity += ammount;
-            Serialization.Save.Gnfs(_gnfs);
-        }
+		public void IncreaseTargetQuantity()
+		{
+			IncreaseTargetQuantity(SmoothRelations_TargetQuantity - SmoothRelationsRequiredForMatrixStep);
+		}
 
-        public void PurgePrimeRoughRelations()
-        {
-            List<Relation> roughRelations = Relations.RoughRelations.ToList();
+		public void IncreaseTargetQuantity(int ammount)
+		{
+			SmoothRelations_TargetQuantity += ammount;
+			Serialization.Save.Gnfs(_gnfs);
+		}
 
-            IEnumerable<Relation> toRemoveAlg = roughRelations
-                .Where(r => r.AlgebraicQuotient != 1 && FactorizationFactory.IsProbablePrime(r.AlgebraicQuotient));
+		public void PurgePrimeRoughRelations()
+		{
+			List<Relation> roughRelations = Relations.RoughRelations.ToList();
 
-            roughRelations = roughRelations.Except(toRemoveAlg).ToList();
+			IEnumerable<Relation> toRemoveAlg = roughRelations
+				.Where(r => r.AlgebraicQuotient != 1 && FactorizationFactory.IsProbablePrime(r.AlgebraicQuotient));
 
-            Relations.RoughRelations = roughRelations;
+			roughRelations = roughRelations.Except(toRemoveAlg).ToList();
 
-            IEnumerable<Relation> toRemoveRational = roughRelations
-                .Where(r => r.RationalQuotient != 1 && FactorizationFactory.IsProbablePrime(r.RationalQuotient));
+			Relations.RoughRelations = roughRelations;
 
-            roughRelations = roughRelations.Except(toRemoveRational).ToList();
+			IEnumerable<Relation> toRemoveRational = roughRelations
+				.Where(r => r.RationalQuotient != 1 && FactorizationFactory.IsProbablePrime(r.RationalQuotient));
 
-            Relations.RoughRelations = roughRelations;
-        }
+			roughRelations = roughRelations.Except(toRemoveRational).ToList();
 
-        public void AddFreeRelationSolution(List<Relation> freeRelationSolution)
-        {
-            Relations.FreeRelations.Add(freeRelationSolution);
-            Serialization.Save.Relations.Free.SingleSolution(_gnfs, freeRelationSolution);
-            _gnfs.LogMessage($"Added free relation solution: Relation count = {freeRelationSolution.Count}");
-        }
+			Relations.RoughRelations = roughRelations;
+		}
 
-        #endregion
+		public void AddFreeRelationSolution(List<Relation> freeRelationSolution)
+		{
+			Relations.FreeRelations.Add(freeRelationSolution);
+			Serialization.Save.Relations.Free.SingleSolution(_gnfs, freeRelationSolution);
+			_gnfs.LogMessage($"Added free relation solution: Relation count = {freeRelationSolution.Count}");
+		}
 
-        #region ToString
+		#endregion
 
-        public string FormatRelations(IEnumerable<Relation> relations)
-        {
-            StringBuilder result = new StringBuilder();
+		#region ToString
 
-            result.AppendLine($"Smooth relations:");
-            result.AppendLine("\t_______________________________________________");
-            result.AppendLine($"\t|   A   |  B | ALGEBRAIC_NORM | RATIONAL_NORM | \t\tQuantity: {Relations.SmoothRelations.Count} Target quantity: {(_gnfs.RationalFactorPairCollection.Count + _gnfs.AlgebraicFactorPairCollection.Count + _gnfs.QuadraticFactorPairCollection.Count + 1).ToString()}");
-            result.AppendLine("\t```````````````````````````````````````````````");
-            foreach (Relation rel in relations.OrderByDescending(rel => rel.A * rel.B))
-            {
-                result.AppendLine(rel.ToString());
-                result.AppendLine("Algebraic " + rel.AlgebraicFactorization.FormatStringAsFactorization());
-                result.AppendLine("Rational  " + rel.RationalFactorization.FormatStringAsFactorization());
-                result.AppendLine();
-            }
-            result.AppendLine();
+		public string FormatRelations(IEnumerable<Relation> relations)
+		{
+			StringBuilder result = new StringBuilder();
 
-            return result.ToString();
-        }
+			result.AppendLine($"Smooth relations:");
+			result.AppendLine("\t_______________________________________________");
+			result.AppendLine($"\t|   A   |  B | ALGEBRAIC_NORM | RATIONAL_NORM | \t\tRelations count: {Relations.SmoothRelations.Count} Target quantity: {SmoothRelations_TargetQuantity}");
+			result.AppendLine("\t```````````````````````````````````````````````");
+			foreach (Relation rel in relations.OrderByDescending(rel => rel.A * rel.B))
+			{
+				result.AppendLine(rel.ToString());
+				result.AppendLine("Algebraic " + rel.AlgebraicFactorization.FormatStringAsFactorization());
+				result.AppendLine("Rational  " + rel.RationalFactorization.FormatStringAsFactorization());
+				result.AppendLine();
+			}
+			result.AppendLine();
 
-        public override string ToString()
-        {
-            if (Relations.FreeRelations.Any())
-            {
-                StringBuilder result = new StringBuilder();
+			return result.ToString();
+		}
 
-                List<Relation> relations = Relations.FreeRelations.First();
+		public override string ToString()
+		{
+			if (Relations.FreeRelations.Any())
+			{
+				StringBuilder result = new StringBuilder();
 
-                result.AppendLine(FormatRelations(relations));
+				List<Relation> relations = Relations.FreeRelations.First();
 
-                BigInteger algebraic = relations.Select(rel => rel.AlgebraicNorm).Product();
-                BigInteger rational = relations.Select(rel => rel.RationalNorm).Product();
+				result.AppendLine(FormatRelations(relations));
 
-                bool isAlgebraicSquare = algebraic.IsSquare();
-                bool isRationalSquare = rational.IsSquare();
+				BigInteger algebraic = relations.Select(rel => rel.AlgebraicNorm).Product();
+				BigInteger rational = relations.Select(rel => rel.RationalNorm).Product();
 
-                CountDictionary algCountDict = new CountDictionary();
-                foreach (Relation rel in relations)
-                {
-                    algCountDict.Combine(rel.AlgebraicFactorization);
-                }
+				bool isAlgebraicSquare = algebraic.IsSquare();
+				bool isRationalSquare = rational.IsSquare();
 
-                result.AppendLine("---");
-                result.AppendLine($"Rational  ∏(a+mb): IsSquare? {isRationalSquare} : {rational}");
-                result.AppendLine($"Algebraic ∏ƒ(a/b): IsSquare? {isAlgebraicSquare} : {algebraic}");
-                result.AppendLine();
-                result.AppendLine($"Algebraic factorization (as prime ideals): {algCountDict.FormatStringAsFactorization()}");
-                result.AppendLine();
+				CountDictionary algCountDict = new CountDictionary();
+				foreach (Relation rel in relations)
+				{
+					algCountDict.Combine(rel.AlgebraicFactorization);
+				}
 
-                result.AppendLine();
-                result.AppendLine("");
-                result.AppendLine(string.Join(Environment.NewLine,
-                    relations.Select(rel =>
-                    {
-                        BigInteger f = _gnfs.CurrentPolynomial.Evaluate((BigInteger)rel.A);
-                        if (rel.B == 0)
-                        {
-                            return "";
-                        }
-                        return $"ƒ({rel.A}) ≡ {f} ≡ {(f % rel.B)} (mod {rel.B})";
-                    }
-                    )));
-                result.AppendLine();
+				result.AppendLine("---");
+				result.AppendLine($"Rational  ∏(a+mb): IsSquare? {isRationalSquare} : {rational}");
+				result.AppendLine($"Algebraic ∏ƒ(a/b): IsSquare? {isAlgebraicSquare} : {algebraic}");
+				result.AppendLine();
+				result.AppendLine($"Algebraic factorization (as prime ideals): {algCountDict.FormatStringAsFactorization()}");
+				result.AppendLine();
+
+				result.AppendLine();
+				result.AppendLine("");
+				result.AppendLine(string.Join(Environment.NewLine,
+					relations.Select(rel =>
+					{
+						BigInteger f = _gnfs.CurrentPolynomial.Evaluate((BigInteger)rel.A);
+						if (rel.B == 0)
+						{
+							return "";
+						}
+						return $"ƒ({rel.A}) ≡ {f} ≡ {(f % rel.B)} (mod {rel.B})";
+					}
+					)));
+				result.AppendLine();
 
 
 
-                return result.ToString();
-            }
-            else
-            {
-                return FormatRelations(Relations.SmoothRelations);
-            }
-        }
+				return result.ToString();
+			}
+			else
+			{
+				return FormatRelations(Relations.SmoothRelations);
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

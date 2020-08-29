@@ -24,7 +24,7 @@ namespace GNFS_Winforms
 
 		public static void SetControlEnabledState(Control control, bool enabled)
 		{
-			if (!control.IsHandleCreated || control.IsDisposed)
+			if (control.IsDisposed || !control.IsHandleCreated)
 			{
 				throw new Exception();
 			}
@@ -41,7 +41,7 @@ namespace GNFS_Winforms
 
 		public static void SetControlVisibleState(Control control, bool visible)
 		{
-			if (!control.IsHandleCreated || control.IsDisposed)
+			if (control.IsDisposed || !control.IsHandleCreated)
 			{
 				throw new Exception();
 			}
@@ -58,7 +58,7 @@ namespace GNFS_Winforms
 
 		public static void SetControlText(Control control, string text)
 		{
-			if (!control.IsHandleCreated || control.IsDisposed)
+			if (control.IsDisposed || !control.IsHandleCreated)
 			{
 				throw new Exception();
 			}

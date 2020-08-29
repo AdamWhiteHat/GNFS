@@ -10,9 +10,9 @@ namespace GNFS_Winforms
 
 	public partial class GnfsUiBridge
 	{
-		public static GNFS CreateGnfs(CancellationToken cancelToken, BigInteger n, BigInteger polyBase, int degree, BigInteger primeBound, int relationQuantity, int relationValueRange)
+		public static GNFS CreateGnfs(CancellationToken cancelToken, BigInteger n, BigInteger polyBase, int degree, BigInteger primeBound, int relationsTargetQuantity, int relationValueRange)
 		{
-			GNFS gnfs = new GNFS(cancelToken, Logging.LogMessage, n, polyBase, degree, primeBound, relationQuantity, relationValueRange);
+			GNFS gnfs = new GNFS(cancelToken, Logging.LogMessage, n, polyBase, degree, primeBound, relationsTargetQuantity, relationValueRange);
 			return gnfs;
 		}
 

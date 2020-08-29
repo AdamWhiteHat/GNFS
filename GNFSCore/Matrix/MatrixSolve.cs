@@ -8,7 +8,6 @@ namespace GNFSCore.Matrix
 {
 	using IntegerMath;
 
-
 	public static class MatrixSolve
 	{
 		public static void GaussianSolve(CancellationToken cancelToken, GNFS gnfs)
@@ -25,22 +24,17 @@ namespace GNFSCore.Matrix
 
 			int smoothCount = smoothRelations.Count;
 
-			int maxRelationsToSelect =
-				PrimeFactory.GetIndexFromValue(gnfs.PrimeFactorBase.RationalFactorBaseMax)
-				+ PrimeFactory.GetIndexFromValue(gnfs.PrimeFactorBase.AlgebraicFactorBaseMax)
-				+ gnfs.QuadraticFactorPairCollection.Count
-				+ 3;
+			BigInteger requiredRelationsCount = gnfs.CurrentRelationsProgress.SmoothRelationsRequiredForMatrixStep;
 
-			gnfs.LogFunction($"Total relations: {smoothCount}");
-			gnfs.LogFunction($"MaxRelationsToSelect: {maxRelationsToSelect}");
-			gnfs.LogFunction($"Total / Max = {smoothCount / maxRelationsToSelect}");
+			gnfs.LogFunction($"Total relations count: {smoothCount}");
+			gnfs.LogFunction($"Relations required to proceed: {requiredRelationsCount}");
 
-			while (smoothRelations.Count >= maxRelationsToSelect)
+			while (smoothRelations.Count >= requiredRelationsCount)
 			{
 				// Randomly select n relations from smoothRelations
 				List<Relation> selectedRelations = new List<Relation>();
 				while (
-						selectedRelations.Count < maxRelationsToSelect
+						selectedRelations.Count < requiredRelationsCount
 						||
 						selectedRelations.Count % 2 != 0 // Force number of relations to be even
 					)

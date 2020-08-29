@@ -69,7 +69,7 @@ namespace GNFS_Winforms
 			//	return;
 			//}
 
-			if (!OutputTextbox.IsHandleCreated || OutputTextbox.IsDisposed)
+			if (OutputTextbox.IsDisposed || !OutputTextbox.IsHandleCreated)
 			{
 				throw new Exception();
 			}

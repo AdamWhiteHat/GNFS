@@ -62,14 +62,10 @@ namespace GNFSCore.Factors
             List<FactorPair> result = new List<FactorPair>();
 
             BigInteger r = rangeFrom;
-            while (r < rangeTo && result.Count < totalFactorPairs)
+            IEnumerable<BigInteger> modList = primes.AsEnumerable();
+            while (!cancelToken.IsCancellationRequested && r < rangeTo && result.Count < totalFactorPairs)
             {
-                if (cancelToken.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                IEnumerable<BigInteger> modList = primes.Where(p => p > r);
+                // Finds p such that ƒ(r) ≡ 0 (mod p)
                 List<BigInteger> roots = GetRootsMod(polynomial, r, modList);
                 if (roots.Any())
                 {
@@ -81,6 +77,9 @@ namespace GNFSCore.Factors
             return result.OrderBy(tup => tup.P).ToList();
         }
 
+        /// <summary>
+        /// Given a list of primes, returns primes p such that ƒ(r) ≡ 0 (mod p)
+        /// </summary>
         public static List<BigInteger> GetRootsMod(IPolynomial polynomial, BigInteger baseM, IEnumerable<BigInteger> modList)
         {
             BigInteger polyResult = polynomial.Evaluate(baseM);

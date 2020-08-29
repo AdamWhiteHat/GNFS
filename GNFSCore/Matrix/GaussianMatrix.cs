@@ -23,7 +23,7 @@ namespace GNFSCore.Matrix
 		private List<Relation> relations;
 		public Dictionary<int, Relation> ColumnIndexRelationDictionary;
 		private List<Tuple<Relation, bool[]>> relationMatrixTuple;
-		
+
 		public GaussianMatrix(GNFS gnfs, List<Relation> rels)
 		{
 			_gnfs = gnfs;
@@ -31,9 +31,6 @@ namespace GNFSCore.Matrix
 			eliminationStep = false;
 			freeCols = new bool[0];
 			M = new List<bool[]>();
-
-
-			int maxRelationsToSelect = PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.RationalFactorBaseMax) + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.AlgebraicFactorBaseMax) + _gnfs.QuadraticFactorPairCollection.Count + 3;
 
 			relations = rels;
 
@@ -48,7 +45,7 @@ namespace GNFSCore.Matrix
 
 			//List<GaussianRow> orderedRows = relationsAsRows.OrderBy(row1 => row1.LastIndexOfAlgebraic).ThenBy(row2 => row2.LastIndexOfQuadratic).ToList();
 
-			List<GaussianRow> selectedRows = relationsAsRows.Take(maxRelationsToSelect).ToList();
+			List<GaussianRow> selectedRows = relationsAsRows.Take(_gnfs.CurrentRelationsProgress.SmoothRelationsRequiredForMatrixStep).ToList();
 
 			int maxIndexRat = selectedRows.Select(row => row.LastIndexOfRational).Max();
 			int maxIndexAlg = selectedRows.Select(row => row.LastIndexOfAlgebraic).Max();
@@ -74,7 +71,7 @@ namespace GNFSCore.Matrix
 				relationMatrixTuple.Add(new Tuple<Relation, bool[]>(row.SourceRelation, row.GetBoolArray()));
 			}
 		}
-		
+
 		public void TransposeAppend()
 		{
 			List<bool[]> result = new List<bool[]>();
@@ -96,7 +93,7 @@ namespace GNFSCore.Matrix
 			M = result;
 			freeCols = new bool[M.Count];
 		}
-				
+
 		public void Elimination()
 		{
 			if (eliminationStep)
@@ -248,7 +245,7 @@ namespace GNFSCore.Matrix
 
 			return result;
 		}
-		
+
 		public static bool[] Add(bool[] left, bool[] right)
 		{
 			if (left.Length != right.Length) throw new ArgumentException($"Both vectors must have the same length.");
@@ -265,7 +262,7 @@ namespace GNFSCore.Matrix
 
 			return result;
 		}
-		
+
 		public static string VectorToString(bool[] vector)
 		{
 			return string.Join(",", vector.Select(b => b ? '1' : '0'));
