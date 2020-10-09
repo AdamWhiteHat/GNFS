@@ -10,20 +10,10 @@ namespace GNFSCore.SquareRoot
 {
 	using IntegerMath;
 
-
 	public partial class SquareFinder
 	{
-		public List<Relation> RelationsSet { get; set; }
-
-		public BigInteger PolynomialDerivative { get; set; }
-		public BigInteger PolynomialDerivativeSquared { get; set; }
-
-		public IPolynomial DerivativePolynomial { get; set; }
-		public IPolynomial DerivativePolynomialSquared { get; set; }
-
 		public BigInteger RationalProduct { get; set; }
 		public BigInteger RationalSquare { get; set; }
-		public BigInteger RationalSquareRoot { get; set; }
 		public BigInteger RationalSquareRootResidue { get; set; }
 		public bool IsRationalSquare { get; set; }
 		public bool IsRationalIrreducible { get; set; }
@@ -38,22 +28,23 @@ namespace GNFSCore.SquareRoot
 		public bool IsAlgebraicSquare { get; set; }
 		public bool IsAlgebraicIrreducible { get; set; }
 
-		public List<Complex> AlgebraicComplexSet { get; set; }
-		public List<IPolynomial> PolynomialRing { get; set; }
-
-		public IPolynomial S { get; set; }
-		public IPolynomial SRingSquare { get; set; }
-		public IPolynomial TotalS { get; set; }
-
+		public Polynomial S { get; set; }
+		public Polynomial SRingSquare { get; set; }
+		public Polynomial TotalS { get; set; }
 		public List<Tuple<BigInteger, BigInteger>> RootsOfS { get; set; }
+		public List<Polynomial> PolynomialRing { get; set; }
+		public BigInteger PolynomialDerivative { get; set; }
+		public BigInteger PolynomialDerivativeSquared { get; set; }
 
 		private GNFS gnfs { get; set; }
 		private BigInteger N { get; set; }
-		private IPolynomial poly { get; set; }
-		private IPolynomial monicPoly { get; set; }
+		private Polynomial poly { get; set; }
+		private Polynomial monicPoly { get; set; }
 		private BigInteger polyBase { get; set; }
 		private IEnumerable<BigInteger> rationalSet { get; set; }
 		private IEnumerable<BigInteger> algebraicNormCollection { get; set; }
+		private List<Relation> relationsSet { get; set; }
+		private Polynomial derivativePolynomial { get; set; }
 
 		public SquareFinder(GNFS sieve, List<Relation> relations)
 		{
@@ -67,13 +58,11 @@ namespace GNFSCore.SquareRoot
 			monicPoly = Polynomial.MakeMonic(poly, polyBase);
 
 			RootsOfS = new List<Tuple<BigInteger, BigInteger>>();
-			AlgebraicComplexSet = new List<Complex>();
-			RelationsSet = relations;
+			relationsSet = relations;
 
-			DerivativePolynomial = Polynomial.GetDerivativePolynomial(poly);
-			DerivativePolynomialSquared = Polynomial.Field.Modulus(Polynomial.Square(DerivativePolynomial), poly);
+			derivativePolynomial = Polynomial.GetDerivativePolynomial(poly);
 
-			PolynomialDerivative = DerivativePolynomial.Evaluate(gnfs.PolynomialBase);
+			PolynomialDerivative = derivativePolynomial.Evaluate(gnfs.PolynomialBase);
 			PolynomialDerivativeSquared = BigInteger.Pow(PolynomialDerivative, 2);
 		}
 
@@ -84,12 +73,12 @@ namespace GNFSCore.SquareRoot
 
 		public void CalculateRationalSide()
 		{
-			rationalSet = RelationsSet.Select(rel => rel.RationalNorm);
+			rationalSet = relationsSet.Select(rel => rel.RationalNorm);
 
 			RationalProduct = rationalSet.Product();
 			RationalSquare = BigInteger.Multiply(RationalProduct, PolynomialDerivativeSquared);
-			RationalSquareRoot = RationalSquare.SquareRoot();
-			RationalSquareRootResidue = RationalSquareRoot.Mod(N);
+			BigInteger rationalSquareRoot = RationalSquare.SquareRoot();
+			RationalSquareRootResidue = rationalSquareRoot.Mod(N);
 
 			IsRationalIrreducible = IsPrimitive(rationalSet);
 			IsRationalSquare = RationalSquareRootResidue.IsSquare();
@@ -99,13 +88,13 @@ namespace GNFSCore.SquareRoot
 		{
 			bool solutionFound = false;
 
-			RootsOfS.AddRange(RelationsSet.Select(rel => new Tuple<BigInteger, BigInteger>(rel.A, rel.B)));
+			RootsOfS.AddRange(relationsSet.Select(rel => new Tuple<BigInteger, BigInteger>(rel.A, rel.B)));
 
-			PolynomialRing = new List<IPolynomial>();
-			foreach (Relation rel in RelationsSet)
+			PolynomialRing = new List<Polynomial>();
+			foreach (Relation rel in relationsSet)
 			{
 				// poly(x) = A + (B * x)
-				IPolynomial newPoly =
+				Polynomial newPoly =
 					new Polynomial(
 						new Term[]
 						{
@@ -120,21 +109,21 @@ namespace GNFSCore.SquareRoot
 			if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); }
 
 			BigInteger m = polyBase;
-			IPolynomial f = (Polynomial)monicPoly.Clone();
+			Polynomial f = monicPoly.Clone();
 			int degree = f.Degree;
 
-			IPolynomial fd = Polynomial.GetDerivativePolynomial(f);
-			IPolynomial d3 = Polynomial.Product(PolynomialRing);
-			IPolynomial derivativeSquared = Polynomial.Square(fd);
-			IPolynomial d2 = Polynomial.Multiply(d3, derivativeSquared);
-			IPolynomial dd = Polynomial.Field.Modulus(d2, f);
+			Polynomial fd = Polynomial.GetDerivativePolynomial(f);
+			Polynomial d3 = Polynomial.Product(PolynomialRing);
+			Polynomial derivativeSquared = Polynomial.Square(fd);
+			Polynomial d2 = Polynomial.Multiply(d3, derivativeSquared);
+			Polynomial dd = Polynomial.Field.Modulus(d2, f);
 
 			// Set the result to S
 			S = dd;
 			SRingSquare = dd;
 			TotalS = d2;
 
-			algebraicNormCollection = RelationsSet.Select(rel => rel.AlgebraicNorm);
+			algebraicNormCollection = relationsSet.Select(rel => rel.AlgebraicNorm);
 			AlgebraicProduct = d2.Evaluate(m);
 			AlgebraicSquare = dd.Evaluate(m);
 			AlgebraicProductModF = dd.Evaluate(m).Mod(N);
@@ -148,8 +137,8 @@ namespace GNFSCore.SquareRoot
 
 			BigInteger primeProduct = 1;
 
-			//gnfs.PrimeFactorBase.QuadraticFactorBase.Last(); 
-			BigInteger lastP = N / N.ToString().Length; //((N * 3) + 1).NthRoot(3); //gnfs.QFB.Select(fp => fp.P).Max();
+
+			BigInteger lastP = ((N * 3) + 1).NthRoot(3) + 1; //N / N.ToString().Length; //((N * 3) + 1).NthRoot(3); //gnfs.QFB.Select(fp => fp.P).Max();
 
 			int attempts = 7;
 
@@ -191,61 +180,67 @@ namespace GNFSCore.SquareRoot
 					continue;
 				}
 
-				AlgebraicPrimes = primes;
-
 				if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); ; }
 
-				IEnumerable<IEnumerable<BigInteger>> permutations =
-					Combinatorics.CartesianProduct(resultTuples.Select(tup => new List<BigInteger>() { tup.Item1, tup.Item2 }));
+				var temp = resultTuples.Select(tup => new List<BigInteger>() { tup.Item1, tup.Item2 });
 
-				BigInteger rationalSquareRoot = RationalSquareRootResidue;
+				IEnumerable<IEnumerable<BigInteger>> permutations =
+					Combinatorics.CartesianProduct(temp);
+
 				BigInteger algebraicSquareRoot = 1;
+
+				BigInteger min;
+				BigInteger max;
+				BigInteger A;
+				BigInteger B;
+				BigInteger U;
+				BigInteger V;
+				BigInteger P = 0;
+				BigInteger Q;
 
 				foreach (List<BigInteger> X in permutations)
 				{
-					if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); ; }
+					if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); }
 
 					algebraicSquareRoot = FiniteFieldArithmetic.ChineseRemainder(N, X, primes);
 
-					BigInteger min = BigInteger.Min(rationalSquareRoot, algebraicSquareRoot);
-					BigInteger max = BigInteger.Max(rationalSquareRoot, algebraicSquareRoot);
+					min = BigInteger.Min(RationalSquareRootResidue, algebraicSquareRoot);
+					max = BigInteger.Max(RationalSquareRootResidue, algebraicSquareRoot);
 
-					BigInteger A = max + min;
-					BigInteger B = max - min;
+					A = max + min;
+					B = max - min;
 
-					BigInteger U = GCD.FindGCD(N, A);
-					BigInteger V = GCD.FindGCD(N, B);
+					U = GCD.FindGCD(N, A);
+					V = GCD.FindGCD(N, B);
 
 					if (U > 1 && U != N)
 					{
-						BigInteger rem = 1;
-						BigInteger other = BigInteger.DivRem(N, U, out rem);
-
-						if (rem == 0)
-						{
-							solutionFound = true;
-							V = other;
-							AlgebraicResults = X;
-							AlgebraicSquareRootResidue = algebraicSquareRoot;
-
-							return new Tuple<BigInteger, BigInteger>(U, V);
-						}
+						P = U;
+						solutionFound = true;
+					}
+					else if (V > 1 && V != N)
+					{
+						P = V;
+						solutionFound = true;
 					}
 
-					if (V > 1 && V != N)
+					if (solutionFound)
 					{
-						BigInteger rem = 1;
-						BigInteger other = BigInteger.DivRem(N, V, out rem);
+						BigInteger rem;
+						BigInteger other = BigInteger.DivRem(N, P, out rem);
 
-						if (rem == 0)
+						if (rem != 0)
 						{
-							solutionFound = true;
-
-							U = other;
+							solutionFound = false;
+						}
+						else
+						{
+							Q = other;
 							AlgebraicResults = X;
 							AlgebraicSquareRootResidue = algebraicSquareRoot;
+							AlgebraicPrimes = primes;
 
-							return new Tuple<BigInteger, BigInteger>(U, V);
+							return new Tuple<BigInteger, BigInteger>(P, Q);
 						}
 					}
 				}
@@ -261,19 +256,16 @@ namespace GNFSCore.SquareRoot
 			return new Tuple<BigInteger, BigInteger>(1, 1);
 		}
 
-		public static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(IPolynomial f, BigInteger m, int degree, IPolynomial dd, BigInteger p)
+		private static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(Polynomial f, BigInteger m, int degree, Polynomial dd, BigInteger p)
 		{
-			IPolynomial startPolynomial = Polynomial.Field.Modulus(dd, p);
-			IPolynomial startInversePolynomial = ModularInverse(startPolynomial, p);
+			Polynomial startPolynomial = Polynomial.Field.Modulus(dd, p);
+			Polynomial startInversePolynomial = ModularInverse(startPolynomial, p);
 
-			IPolynomial resultPoly1 = FiniteFieldArithmetic.SquareRoot(startPolynomial, f, p, degree, m);
-			IPolynomial resultPoly2 = ModularInverse(resultPoly1, p);
+			Polynomial resultPoly1 = FiniteFieldArithmetic.SquareRoot(startPolynomial, f, p, degree, m);
+			Polynomial resultPoly2 = ModularInverse(resultPoly1, p);
 
-			BigInteger result1 = resultPoly1.Evaluate(m).Mod(p);
-			BigInteger result2 = resultPoly2.Evaluate(m).Mod(p);
-
-			IPolynomial resultSquared1 = Polynomial.Field.ModMod(Polynomial.Square(resultPoly1), f, p);
-			IPolynomial resultSquared2 = Polynomial.Field.ModMod(Polynomial.Square(resultPoly2), f, p);
+			Polynomial resultSquared1 = Polynomial.Field.ModMod(Polynomial.Square(resultPoly1), f, p);
+			Polynomial resultSquared2 = Polynomial.Field.ModMod(Polynomial.Square(resultPoly2), f, p);
 
 			bool bothResultsAgree = (resultSquared1.CompareTo(resultSquared2) == 0);
 			if (bothResultsAgree)
@@ -281,20 +273,26 @@ namespace GNFSCore.SquareRoot
 				bool resultSquaredEqualsInput1 = (startPolynomial.CompareTo(resultSquared1) == 0);
 				bool resultSquaredEqualsInput2 = (startInversePolynomial.CompareTo(resultSquared1) == 0);
 
-				if (resultSquaredEqualsInput1)
+				if (resultSquaredEqualsInput1 || resultSquaredEqualsInput2)
 				{
-					return new Tuple<BigInteger, BigInteger>(result1, result2);
-				}
-				else if (resultSquaredEqualsInput2)
-				{
-					return new Tuple<BigInteger, BigInteger>(result2, result1);
+					BigInteger result1 = resultPoly1.Evaluate(m).Mod(p);
+					BigInteger result2 = resultPoly2.Evaluate(m).Mod(p);
+
+					if (resultSquaredEqualsInput1)
+					{
+						return new Tuple<BigInteger, BigInteger>(result1, result2);
+					}
+					else if (resultSquaredEqualsInput2)
+					{
+						return new Tuple<BigInteger, BigInteger>(result2, result1);
+					}
 				}
 			}
 
 			return new Tuple<BigInteger, BigInteger>(BigInteger.Zero, BigInteger.Zero);
 		}
 
-		public static IPolynomial ModularInverse(IPolynomial poly, BigInteger mod)
+		private static Polynomial ModularInverse(Polynomial poly, BigInteger mod)
 		{
 			return new Polynomial(Term.GetTerms(poly.Terms.Select(trm => (mod - trm.CoEfficient).Mod(mod)).ToArray()));
 		}
@@ -310,8 +308,7 @@ namespace GNFSCore.SquareRoot
 			result.AppendLine($"γ² = √(  Sᵣ(m)  *  ƒ'(m)²  )");
 			result.AppendLine($"γ² = √( {RationalProduct} * {PolynomialDerivativeSquared} )");
 			result.AppendLine($"γ² = √( {RationalSquare} )");
-			result.AppendLine($"γ  =    {RationalSquareRoot} mod N");
-			result.AppendLine($"γ  =    {RationalSquareRootResidue}"); // δ mod N 
+			result.AppendLine($"γ  =    {RationalSquareRootResidue} mod N"); // δ mod N 
 
 			result.AppendLine();
 			result.AppendLine();
@@ -327,8 +324,8 @@ namespace GNFSCore.SquareRoot
 			result.AppendLine($"IsRationalSquare  ? {IsRationalSquare}");
 			result.AppendLine($"IsAlgebraicSquare ? {IsAlgebraicSquare}");
 
-			BigInteger min = BigInteger.Min(RationalSquareRoot, AlgebraicSquareRootResidue);
-			BigInteger max = BigInteger.Max(RationalSquareRoot, AlgebraicSquareRootResidue);
+			BigInteger min = BigInteger.Min(RationalSquareRootResidue, AlgebraicSquareRootResidue);
+			BigInteger max = BigInteger.Max(RationalSquareRootResidue, AlgebraicSquareRootResidue);
 
 			BigInteger add = max + min;
 			BigInteger sub = max - min;

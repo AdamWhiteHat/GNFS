@@ -10,7 +10,7 @@ namespace GNFSCore.SquareRoot
 
     public static class FiniteFieldArithmetic
     {
-        public static IPolynomial SquareRoot(IPolynomial startPolynomial, IPolynomial f, BigInteger p, int degree, BigInteger m)
+        public static Polynomial SquareRoot(Polynomial startPolynomial, Polynomial f, BigInteger p, int degree, BigInteger m)
         {
             BigInteger q = BigInteger.Pow(p, degree);
             BigInteger s = q - 1;
@@ -32,7 +32,7 @@ namespace GNFSCore.SquareRoot
             BigInteger theta = quadraticNonResidue;
             BigInteger minusOne = BigInteger.ModPow(theta, ((q - 1) / 2), p);
 
-            IPolynomial omegaPoly = Polynomial.Field.ExponentiateMod(startPolynomial, halfS, f, p);
+            Polynomial omegaPoly = Polynomial.Field.ExponentiateMod(startPolynomial, halfS, f, p);
 
             BigInteger lambda = minusOne;
             BigInteger zeta = 0;

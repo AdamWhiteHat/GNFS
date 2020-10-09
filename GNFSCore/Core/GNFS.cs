@@ -30,10 +30,10 @@ namespace GNFSCore
 		//[JsonProperty(ItemConverterType = typeof(Serialization.JsonPolynomialConverter))]
 
 		[IgnoreDataMember]
-		public List<IPolynomial> PolynomialCollection { get; set; }
+		public List<Polynomial> PolynomialCollection { get; set; }
 
 		[IgnoreDataMember]
-		public IPolynomial CurrentPolynomial { get; internal set; }
+		public Polynomial CurrentPolynomial { get; internal set; }
 
 		[DataMember]
 		public PolyRelationsSieveProgress CurrentRelationsProgress { get; set; }
@@ -65,7 +65,7 @@ namespace GNFSCore
 		public GNFS()
 		{
 			PrimeFactorBase = new FactorBase();
-			PolynomialCollection = new List<IPolynomial>();
+			PolynomialCollection = new List<Polynomial>();
 			RationalFactorPairCollection = new FactorPairCollection();
 			AlgebraicFactorPairCollection = new FactorPairCollection();
 			QuadraticFactorPairCollection = new FactorPairCollection();

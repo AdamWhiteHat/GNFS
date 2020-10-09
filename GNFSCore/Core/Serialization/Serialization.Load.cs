@@ -60,7 +60,7 @@ namespace GNFSCore
                     polyFilename = Path.GetFullPath(Path.Combine(gnfs.SaveLocations.SaveDirectory, $"Polynomial.{counter:00}"));
                     if (File.Exists(polyFilename))
                     {
-                        IPolynomial deserializedPoly = Load.Polynomial(polyFilename);
+                        Polynomial deserializedPoly = Load.Polynomial(polyFilename);
                         gnfs.PolynomialCollection.Add(deserializedPoly);
                     }
                     else
@@ -87,7 +87,7 @@ namespace GNFSCore
                 return gnfs;
             }
 
-            public static IPolynomial Polynomial(string filename)
+            public static Polynomial Polynomial(string filename)
             {
                 if (!File.Exists(filename))
                 {
@@ -96,7 +96,7 @@ namespace GNFSCore
                 string polyJson = File.ReadAllText(filename);
                 Polynomial result = JsonConvert.DeserializeObject<Polynomial>(polyJson, new JsonConverter[] { new JsonTermConverter(), new JsonPolynomialConverter() });
                 result.SetDegree();
-                return (IPolynomial)result;
+                return (Polynomial)result;
             }
 
             public static void FactorBase(ref GNFS gnfs)

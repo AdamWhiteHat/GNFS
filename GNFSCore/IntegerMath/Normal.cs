@@ -37,13 +37,13 @@ namespace GNFSCore.Factors
 		/// <param name="b">A root of f(x)</param>
 		/// <param name="poly">Base m of f(m) = N</param>
 		/// <returns></returns>
-		public static BigInteger Algebraic(BigInteger a, BigInteger b, IPolynomial poly)
+		public static BigInteger Algebraic(BigInteger a, BigInteger b, Polynomial poly)
 		{
-			decimal bneg = (decimal)BigInteger.Negate(b);
-			decimal ab = (decimal)a;
-			ab /= bneg;
+			decimal aD = (decimal)a;
+			decimal bD = (decimal)b;
+			decimal ab = (-aD) / bD;
 
-			decimal left = Evaluate(poly.Terms, ab);
+			decimal left = poly.Evaluate(ab);
 			BigInteger right = BigInteger.Pow(BigInteger.Negate(b), poly.Degree);
 
 			decimal product = (decimal)right;
@@ -53,8 +53,8 @@ namespace GNFSCore.Factors
 			return result;
 		}
 
-
-		private static decimal Evaluate(ITerm[] terms, decimal indeterminateValue)
+		/*
+		private static decimal Evaluate(Term[] terms, decimal indeterminateValue)
 		{
 			decimal result = 0;
 			decimal placeValue = 0;
@@ -67,7 +67,7 @@ namespace GNFSCore.Factors
 				d--;
 			}
 			return result;
-		}
+		}	
 
 		private static decimal Power(decimal value, int exponent)
 		{
@@ -91,6 +91,7 @@ namespace GNFSCore.Factors
 			}
 			return result;
 		}
+		*/
 
 		/*
 		/// <summary>
@@ -103,7 +104,7 @@ namespace GNFSCore.Factors
 		/// <param name="b">A root of f(x)</param>
 		/// <param name="poly">Base m of f(m) = N</param>
 		/// <returns></returns>
-		public static BigInteger Algebraic(BigInteger a, BigInteger b, IPolynomial poly)
+		public static BigInteger Algebraic(BigInteger a, BigInteger b, Polynomial poly)
 		{
 			BigInteger bneg = BigInteger.Negate(b);
 

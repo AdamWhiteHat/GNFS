@@ -57,7 +57,7 @@ namespace GNFSCore.Factors
             }
         }
 
-        public static List<FactorPair> FindPolynomialRootsInRange(CancellationToken cancelToken, IPolynomial polynomial, IEnumerable<BigInteger> primes, BigInteger rangeFrom, BigInteger rangeTo, int totalFactorPairs)
+        public static List<FactorPair> FindPolynomialRootsInRange(CancellationToken cancelToken, Polynomial polynomial, IEnumerable<BigInteger> primes, BigInteger rangeFrom, BigInteger rangeTo, int totalFactorPairs)
         {
             List<FactorPair> result = new List<FactorPair>();
 
@@ -80,7 +80,7 @@ namespace GNFSCore.Factors
         /// <summary>
         /// Given a list of primes, returns primes p such that ƒ(r) ≡ 0 (mod p)
         /// </summary>
-        public static List<BigInteger> GetRootsMod(IPolynomial polynomial, BigInteger baseM, IEnumerable<BigInteger> modList)
+        public static List<BigInteger> GetRootsMod(Polynomial polynomial, BigInteger baseM, IEnumerable<BigInteger> modList)
         {
             BigInteger polyResult = polynomial.Evaluate(baseM);
             IEnumerable<BigInteger> result = modList.Where(mod => (polyResult % mod) == 0);

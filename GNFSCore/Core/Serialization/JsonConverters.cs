@@ -11,17 +11,17 @@ namespace GNFSCore
 {
     public static partial class Serialization
     {
-        public class JsonPolynomialConverter : CustomCreationConverter<IPolynomial>
+        public class JsonPolynomialConverter : CustomCreationConverter<Polynomial>
         {
-            public override IPolynomial Create(Type objectType)
+            public override Polynomial Create(Type objectType)
             {
                 return new Polynomial();
             }
         }
 
-        public class JsonTermConverter : CustomCreationConverter<ITerm>
+        public class JsonTermConverter : CustomCreationConverter<Term>
         {
-            public override ITerm Create(Type objectType)
+            public override Term Create(Type objectType)
             {
                 return new Term();
             }

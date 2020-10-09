@@ -113,12 +113,12 @@ namespace GNFS_Winforms
 				Logging.LogMessage("NON-TRIVIAL FACTORS FOUND!");
 				Logging.LogMessage();
 
-				IPolynomial S = squareRootFinder.S;
-				IPolynomial SRingSquare = squareRootFinder.SRingSquare;
+				Polynomial S = squareRootFinder.S;
+				Polynomial SRingSquare = squareRootFinder.SRingSquare;
 
 				BigInteger prodS = SRingSquare.Evaluate(polyBase);
 
-				IPolynomial reducedS = Polynomial.Field.Modulus(S, gnfs.N);
+				Polynomial reducedS = Polynomial.Field.Modulus(S, gnfs.N);
 
 				BigInteger totalProdS = squareRootFinder.TotalS.Evaluate(polyBase) * squareRootFinder.PolynomialDerivative;
 				BigInteger totalProdModN = totalProdS % gnfs.N;
