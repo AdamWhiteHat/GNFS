@@ -38,7 +38,7 @@ namespace GNFSCore.Factors
             public static FactorPairCollection BuildRationalFactorPairCollection(GNFS gnfs)
             {
                 IEnumerable<FactorPair> result = gnfs.PrimeFactorBase.RationalFactorBase.Select(p => new FactorPair(p, (gnfs.PolynomialBase % p))).Distinct();
-                return new FactorPairCollection(result.ToList());
+                return new FactorPairCollection(result);
             }
 
             // array of (p, r) where ƒ(r) % p == 0

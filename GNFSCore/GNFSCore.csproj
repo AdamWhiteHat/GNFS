@@ -67,6 +67,7 @@
     <Compile Include="RelationSieve\RelationContainer.cs" />
     <!--Compile Include="SquareRoot\AlgebraicSquareRoot.cs" /-->
     <Compile Include="SquareRoot\FiniteFieldArithmetic.cs" />
+    <Compile Include="Core\Solution.cs" />
     <Compile Include="SquareRoot\SquareFinder.cs" />
     <Compile Include="Core\StaticRandom.cs" />
     <Compile Include="FactorBase\FactorPairCollection.cs" />

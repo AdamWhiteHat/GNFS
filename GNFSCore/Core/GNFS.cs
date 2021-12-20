@@ -22,7 +22,12 @@ namespace GNFSCore
 
 		[DataMember]
 		public BigInteger N { get; set; }
+
 		[DataMember]
+		public Solution Factorization { get; private set; }
+		[IgnoreDataMember]
+		public bool IsFactored { get { return Factorization != null; } }
+
 		public int PolynomialDegree { get; private set; }
 		[DataMember]
 		public BigInteger PolynomialBase { get; private set; }
@@ -64,6 +69,7 @@ namespace GNFSCore
 
 		public GNFS()
 		{
+			Factorization = null;
 			PrimeFactorBase = new FactorBase();
 			PolynomialCollection = new List<Polynomial>();
 			RationalFactorPairCollection = new FactorPairCollection();
@@ -356,12 +362,26 @@ namespace GNFSCore
 			return result;
 		}
 
-		public void LogMessage(string message)
+		public void LogMessage(string message = "")
 		{
 			if (LogFunction != null)
 			{
 				LogFunction.Invoke(message);
 			}
+		}
+
+		public bool SetFactorizationSolution(BigInteger p, BigInteger q)
+		{
+			BigInteger n = p * q;
+
+			if (n == this.N)
+			{
+				Factorization = new Solution(p, q);
+				string path = Path.Combine(SaveLocations.SaveDirectory, "Solution.txt");
+				File.WriteAllText(path, Factorization.ToString());
+				return true;
+			}
+			return false;
 		}
 
 		#region ToString

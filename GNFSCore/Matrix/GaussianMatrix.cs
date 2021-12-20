@@ -199,8 +199,8 @@ namespace GNFSCore.Matrix
 				throw new ArgumentException($"{nameof(numSolutions)} must be greater than 1.");
 			}
 
-			int numRows = M.Count;
-			int numCols = M.First().Length;
+			int numRows = RowCount;
+			int numCols = ColumnCount;
 
 			if (numSolutions >= numCols)
 			{
