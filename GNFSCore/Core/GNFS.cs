@@ -28,7 +28,7 @@ namespace GNFSCore
 		[IgnoreDataMember]
 		public bool IsFactored { get { return Factorization != null; } }
 
-		public int PolynomialDegree { get; private set; }
+		public int PolynomialDegree { get; internal set; }
 		[DataMember]
 		public BigInteger PolynomialBase { get; private set; }
 

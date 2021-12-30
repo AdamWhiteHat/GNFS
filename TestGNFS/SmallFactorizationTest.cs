@@ -187,10 +187,8 @@ namespace TestGNFS.Integration
 
 			List<Relation> choosenRelationSet = gnfs.CurrentRelationsProgress.FreeRelations.Where(lst => lst.Count == maxSetSize).First();
 
-			SquareFinder squareRootFinder = new SquareFinder(gnfs, choosenRelationSet);
 
-			squareRootFinder.CalculateRationalSide();
-			Tuple<BigInteger, BigInteger> foundFactors = squareRootFinder.CalculateAlgebraicSide(cancelToken);
+			bool solutionFound = SquareFinder.Solve(cancelToken, gnfs);
 
 			/*	Non-trivial factors also recoverable by doing the following:
 			
@@ -203,8 +201,10 @@ namespace TestGNFS.Integration
 
 			*/
 
-			BigInteger P = foundFactors.Item1;
-			BigInteger Q = foundFactors.Item2;
+			Assert.IsNotNull(gnfs.Factorization);
+
+			BigInteger P = gnfs.Factorization.P;
+			BigInteger Q = gnfs.Factorization.Q;
 
 			Assert.AreNotEqual(1, P, "AreNotEqual(1, P)");
 			Assert.AreNotEqual(1, Q, "AreNotEqual(1, Q)");
