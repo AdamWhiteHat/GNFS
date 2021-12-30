@@ -161,7 +161,7 @@ namespace GNFSCore
 
 							_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Add(rel);
 
-							_gnfs.LogMessage($"Found smooth relation: A = {rel.A}, B = {rel.B}");
+							//_gnfs.LogMessage($"Found smooth relation: A = {rel.A}, B = {rel.B}");
 						}
 						else
 						{
@@ -190,6 +190,7 @@ namespace GNFSCore
 
 				//if (B % 11 == 0)
 				_gnfs.LogMessage($"B = {B}");
+				_gnfs.LogMessage($"SmoothRelations.Count: {_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Count}");
 
 			}
 		}

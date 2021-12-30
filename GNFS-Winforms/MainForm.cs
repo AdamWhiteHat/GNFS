@@ -14,6 +14,7 @@ namespace GNFS_Winforms
 {
 	using GNFSCore;
 	using GNFSCore.IntegerMath;
+	using System.Diagnostics;
 
 	public partial class MainForm : Form
 	{
@@ -281,11 +282,15 @@ namespace GNFS_Winforms
 				CancellationToken token = _cancellationTokenSource.Token;
 				new Thread(() =>
 				{
+					Stopwatch timer = new Stopwatch();
+					timer.Start();
 					GNFS resultGnfs = GnfsUiBridge.FindRelations(token, localGnfs, breakAfterOneRound);
+					timer.Stop();
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
 					Logging.LogMessage("[Find relations task complete]");
 					PrintCurrentCounts();
+					Logging.LogMessage($"[Find relations task took: {timer.Elapsed.FormatString()}]");
 				}).Start();
 			}
 		}
@@ -302,11 +307,14 @@ namespace GNFS_Winforms
 				CancellationToken token = _cancellationTokenSource.Token;
 				new Thread(() =>
 				{
+					Stopwatch timer = new Stopwatch();
+					timer.Start();
 					GNFS resultGnfs = GnfsUiBridge.MatrixSolveGaussian(token, localGnfs);
-
+					timer.Stop();
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
 					Logging.LogMessage("[Matrix solve task complete]");
+					Logging.LogMessage($"[Matrix solve task took: {timer.Elapsed.FormatString()}]");
 				}).Start();
 
 			}
@@ -324,11 +332,14 @@ namespace GNFS_Winforms
 				CancellationToken token = _cancellationTokenSource.Token;
 				new Thread(() =>
 				{
+					Stopwatch timer = new Stopwatch();
+					timer.Start();
 					GNFS resultGnfs = GnfsUiBridge.FindSquares(token, localGnfs);
-
+					timer.Stop();
 					SetGnfs(this, resultGnfs);
 					HaultAllProcessing();
 					Logging.LogMessage("[Find square root task complete]");
+					Logging.LogMessage($"[Find square root task took: {timer.Elapsed.FormatString()}]");
 				}).Start();
 			}
 		}
@@ -337,7 +348,10 @@ namespace GNFS_Winforms
 		{
 			int before = _gnfs.CurrentRelationsProgress.RoughRelations.Count;
 
+			Stopwatch timer = new Stopwatch();
+			timer.Start();
 			_gnfs.CurrentRelationsProgress.PurgePrimeRoughRelations();
+			timer.Stop();
 
 			int after = _gnfs.CurrentRelationsProgress.RoughRelations.Count;
 
@@ -346,6 +360,8 @@ namespace GNFS_Winforms
 			Logging.LogMessage($"Purged {quantityRemoved} rough relations whom were prime.");
 
 			PrintCurrentCounts();
+
+			Logging.LogMessage($"Purge rough relations took: {timer.Elapsed.FormatString()}");
 		}
 
 		private void btnPrintRelations_Click(object sender, EventArgs e)
@@ -403,9 +419,13 @@ namespace GNFS_Winforms
 		private void btnSave_Click(object sender, EventArgs e)
 		{
 			Logging.LogMessage("[Save progress task began...]");
+			Stopwatch timer = new Stopwatch();
+			timer.Start();
 			Serialization.Save.All(_gnfs);
+			timer.Stop();
 			Logging.LogMessage("[Save progress task successfully completed]");
 			RefreshLoadSaveButtonState();
+			Logging.LogMessage($"[Saving took: {timer.Elapsed.FormatString()}]");
 		}
 
 		private void btnLoad_Click(object sender, EventArgs e)
@@ -423,7 +443,10 @@ namespace GNFS_Winforms
 
 				new Thread(() =>
 				{
+					Stopwatch timer = new Stopwatch();
+					timer.Start();
 					GNFS localGnfs = GnfsUiBridge.LoadGnfs(n);
+					timer.Stop();
 					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 					ControlBridge.SetControlEnabledState(panelFunctions, true);
@@ -445,6 +468,7 @@ namespace GNFS_Winforms
 					Logging.LogMessage("[Loading factorization progress complete]");
 					PrintCurrentCounts();
 					RefreshLoadSaveButtonState();
+					Logging.LogMessage($"[Loading took: {timer.Elapsed.FormatString()}]");
 
 				}).Start();
 			}
@@ -472,6 +496,8 @@ namespace GNFS_Winforms
 				CancellationToken token = _cancellationTokenSource.Token;
 				new Thread(() =>
 				{
+					Stopwatch timer = new Stopwatch();
+					timer.Start();
 					GNFS localGnfs =
 						GnfsUiBridge.CreateGnfs
 						(
@@ -483,7 +509,7 @@ namespace GNFS_Winforms
 							relationQuantity, // Total # of relations to collect before proceeding.
 							relationValueRange // 
 						);
-
+					timer.Stop();
 					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 					ControlBridge.SetControlEnabledState(panelFunctions, true);
@@ -491,6 +517,7 @@ namespace GNFS_Winforms
 					Logging.LogMessage($"NOTE: You should save your progress now.");
 					PrintCurrentCounts();
 					RefreshLoadSaveButtonState();
+					Logging.LogMessage($"[Initialization took: {timer.Elapsed.FormatString()}]");
 				}).Start();
 			}
 		}

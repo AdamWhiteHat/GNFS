@@ -68,12 +68,12 @@ namespace GNFSCore.Matrix
 					bool isAlgebraicSquare = algebraic.IsSquare();
 					bool isRationalSquare = rational.IsSquare();
 
-					gnfs.LogFunction("---");
-					gnfs.LogFunction($"Relations count: {relations.Count}");
-					gnfs.LogFunction($"(a,b) pairs: {string.Join(" ", relations.Select(rel => $"({rel.A},{rel.B})"))}");
-					gnfs.LogFunction($"Rational  ∏(a+mb): IsSquare? {isRationalSquare} : {rational}");
-					gnfs.LogFunction($"Algebraic ∏ƒ(a/b): IsSquare? {isAlgebraicSquare} : {algebraic}");
-					gnfs.LogFunction($"Algebraic (factorization): {algCountDict.FormatStringAsFactorization()}");
+					//gnfs.LogFunction("---");
+					//gnfs.LogFunction($"Relations count: {relations.Count}");
+					//gnfs.LogFunction($"(a,b) pairs: {string.Join(" ", relations.Select(rel => $"({rel.A},{rel.B})"))}");
+					//gnfs.LogFunction($"Rational  ∏(a+mb): IsSquare? {isRationalSquare} : {rational}");
+					//gnfs.LogFunction($"Algebraic ∏ƒ(a/b): IsSquare? {isAlgebraicSquare} : {algebraic}");
+					//gnfs.LogFunction($"Algebraic (factorization): {algCountDict.FormatStringAsFactorization()}");
 
 					if (isAlgebraicSquare && isRationalSquare)
 					{

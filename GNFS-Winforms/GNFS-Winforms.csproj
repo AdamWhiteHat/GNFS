@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="CreateGnfs.cs" />
     <Compile Include="ControlBridge.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FindRelations.cs" />
     <Compile Include="FindSquares.cs" />
     <Compile Include="Logging.cs" />

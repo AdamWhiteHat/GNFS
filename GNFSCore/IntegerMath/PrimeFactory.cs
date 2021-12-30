@@ -41,11 +41,6 @@ namespace GNFSCore.IntegerMath
 			yield break;
 		}
 
-		private static void IncreaseMaxValue()
-		{
-			IncreaseMaxValue(BigInteger.Zero);
-		}
-
 		public static void IncreaseMaxValue(BigInteger newMaxValue)
 		{
 			// Increase bound
@@ -69,15 +64,6 @@ namespace GNFSCore.IntegerMath
 
 			int index = primes.IndexOf(primeValue) + 1;
 			return index;
-		}
-
-		public static BigInteger GetValueFromIndex(int index)
-		{
-			while ((primesCount - 1) < index)
-			{
-				IncreaseMaxValue();
-			}
-			return primes.ElementAt(index);
 		}
 
 		public static BigInteger GetApproximateValueFromIndex(UInt64 n)
@@ -130,15 +116,6 @@ namespace GNFSCore.IntegerMath
 				IncreaseMaxValue(maxValue);
 			}
 			return GetPrimeEnumerator(0).TakeWhile(p => p < maxValue);
-		}
-
-		public static IEnumerable<BigInteger> GetPrimesRange(BigInteger minValue, BigInteger maxValue)
-		{
-			if (primesLast < maxValue)
-			{
-				IncreaseMaxValue(maxValue);
-			}
-			return GetPrimeEnumerator(GetIndexFromValue(minValue)).TakeWhile(p => p < maxValue);
 		}
 
 		public static bool IsPrime(BigInteger value)
