@@ -110,36 +110,28 @@ namespace GNFSCore.SquareRoot
 
 				List<Relation> selectedRelationSet = freeRelations[freeRelationIndex]; // Get the solution set
 
-				gnfs.LogMessage($"Selected solution set # {freeRelationIndex + 1}");
 				gnfs.LogMessage();
-				gnfs.LogMessage($"Selected set (a,b) pairs (count: {selectedRelationSet.Count}): {string.Join(" ", selectedRelationSet.Select(rel => $"({rel.A},{rel.B})"))}");
+				gnfs.LogMessage($"Selected solution set index # {freeRelationIndex + 1}");
 				gnfs.LogMessage();
-				gnfs.LogMessage();
-				gnfs.LogMessage();
-				gnfs.LogMessage($"ƒ'(m)     = {squareRootFinder.PolynomialDerivativeValue}");
-				gnfs.LogMessage($"ƒ'(m)^2   = {squareRootFinder.PolynomialDerivativeValueSquared}");
-				gnfs.LogMessage();
-				gnfs.LogMessage("Calculating Rational Square Root.");
-				gnfs.LogMessage("Please wait...");
+				gnfs.LogMessage("Calculating Rational Square Root... ");
 
 				squareRootFinder.CalculateRationalSide(selectedRelationSet);
 
-				gnfs.LogMessage("Completed.");
-				gnfs.LogMessage();
-				gnfs.LogMessage($"γ²        = {squareRootFinder.RationalProduct} IsSquare? {squareRootFinder.RationalProduct.IsSquare()}");
-				gnfs.LogMessage($"(γ  · ƒ'(m))^2 = {squareRootFinder.RationalSquare} IsSquare? {squareRootFinder.RationalSquare.IsSquare()}");
-				gnfs.LogMessage();
+
 				gnfs.LogMessage();
 				gnfs.LogMessage("Calculating Algebraic Square Root.");
-				gnfs.LogMessage("Please wait...");
 
 				if (cancelToken.IsCancellationRequested) { return solutionFound; }
 
 				squareRootFinder.CalculateAlgebraicSide(cancelToken);
+				gnfs.LogMessage("Completed.");
 
 				if (cancelToken.IsCancellationRequested) { return solutionFound; }
 
+				gnfs.LogMessage();
+				gnfs.LogMessage("Calculating Algebraic Square Root.");
 				Tuple<BigInteger, BigInteger> foundFactors = squareRootFinder.CalculateSquareRoot(cancelToken);
+				gnfs.LogMessage("Completed.");
 
 				BigInteger P = foundFactors.Item1;
 				BigInteger Q = foundFactors.Item2;
@@ -148,6 +140,9 @@ namespace GNFSCore.SquareRoot
 				if (nonTrivialFactorsFound)
 				{
 					solutionFound = gnfs.SetFactorizationSolution(P, Q);
+
+					gnfs.LogMessage($"Selected solution set index # {freeRelationIndex + 1}");
+					gnfs.LogMessage();
 
 					if (solutionFound)
 					{
@@ -419,10 +414,21 @@ namespace GNFSCore.SquareRoot
 		{
 			StringBuilder result = new StringBuilder();
 
+			result.AppendLine("Polynomial ring:");
+			result.AppendLine($"({string.Join(") * (", PolynomialRingElements.Select(ply => ply.ToString()))})");
+			result.AppendLine();			
 			result.AppendLine($"∏ Sᵢ =");
+			result.AppendLine($"{PolynomialRing}");
+			result.AppendLine();
+			result.AppendLine($"ƒ         = {gnfs.CurrentPolynomial}");
+			result.AppendLine($"ƒ(m)      = {MonicPolynomial }");
+			result.AppendLine($"ƒ'(m)     = {MonicPolynomialDerivative}");
+			result.AppendLine($"ƒ'(m)^2   = {MonicPolynomialDerivativeSquared}");
+			result.AppendLine();			
+			result.AppendLine($"∏ Sᵢ(m)  *  ƒ'(m)² =");
 			result.AppendLine($"{TotalS}");
 			result.AppendLine();
-			result.AppendLine($"∏ Sᵢ (mod ƒ) =");
+			result.AppendLine($"∏ Sᵢ(m)  *  ƒ'(m)² (mod ƒ) =");
 			result.AppendLine($"{S}");
 			result.AppendLine();
 			result.AppendLine();
@@ -448,18 +454,15 @@ namespace GNFSCore.SquareRoot
 			result.AppendLine($"{AlgebraicResults.FormatString(false)}");
 			result.AppendLine();
 			result.AppendLine();
-			result.AppendLine("Polynomial ring:");
-			result.AppendLine($"({string.Join(") * (", PolynomialRingElements.Select(ply => ply.ToString()))})");
-			result.AppendLine();
-			result.AppendLine();
+
 			result.AppendLine("Primes:");
 			result.AppendLine($"{string.Join(" * ", AlgebraicPrimes)}"); // .RelationsSet.Select(rel => rel.B).Distinct().OrderBy(relB => relB))
 			result.AppendLine();
 			result.AppendLine();
-			result.AppendLine("Roots of S(x):");
-			result.AppendLine($"{{{string.Join(", ", RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");
-			result.AppendLine();
-			result.AppendLine();
+			//result.AppendLine("Roots of S(x):");
+			//result.AppendLine($"{{{string.Join(", ", RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");
+			//result.AppendLine();
+			//result.AppendLine();
 			//result.AppendLine($"∏(a + mb) = {squareRootFinder.RationalProduct}");
 			//result.AppendLine($"∏ƒ(a/b)   = {squareRootFinder.AlgebraicProduct}");
 			//result.AppendLine();

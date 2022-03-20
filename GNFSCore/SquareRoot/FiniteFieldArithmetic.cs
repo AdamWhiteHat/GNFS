@@ -53,7 +53,12 @@ namespace GNFSCore.SquareRoot
             return omegaPoly;
         }
 
-        // Finds X such that a*X = 1 (mod p)
+        /// <summary>
+        /// Finds X such that a*X = 1 (mod p)
+        /// </summary>
+        /// <param name="a">a.</param>
+        /// <param name="mod">The modulus</param>
+        /// <returns></returns>
         public static BigInteger ModularMultiplicativeInverse(BigInteger a, BigInteger mod)
         {
             BigInteger b = a.Mod(mod);
@@ -67,6 +72,9 @@ namespace GNFSCore.SquareRoot
             return 1;
         }
 
+        /// <summary>
+        /// Finds k such that m[i] ≡ c[i] (mod N) for all c[i] with 0 &lt; i &lt; a.Length
+        /// </summary>
         public static BigInteger ChineseRemainder(BigInteger n, List<BigInteger> values, List<BigInteger> primes)
         {
             BigInteger primeProduct = primes.Product();
@@ -77,8 +85,7 @@ namespace GNFSCore.SquareRoot
             {
                 BigInteger Pj = primeProduct / pi;
                 BigInteger Aj = ModularMultiplicativeInverse(Pj, pi);
-                BigInteger Xj = values[indx];
-                BigInteger AXPj = (Aj * Xj * Pj);
+                BigInteger AXPj = values[indx] * Aj * Pj;
 
                 Z += AXPj;
                 indx++;
