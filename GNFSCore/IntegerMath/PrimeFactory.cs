@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 namespace GNFSCore.IntegerMath
 {
-	using Internal;
 	using System.Numerics;
 
 	public static class PrimeFactory
@@ -24,7 +23,7 @@ namespace GNFSCore.IntegerMath
 
 		private static void SetPrimes()
 		{
-			primes = Eratosthenes.Sieve((Int32)MaxValue).ToList();
+			primes = FastPrimeSieve.GetRange(2, (Int32)MaxValue).ToList();
 			primesCount = primes.Count;
 			primesLast = primes.Last();
 		}
