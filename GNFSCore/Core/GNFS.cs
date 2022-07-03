@@ -59,7 +59,7 @@ namespace GNFSCore
 
 		public DirectoryLocations SaveLocations { get; internal set; }
 
-		public LogMessageDelegate LogFunction { get; set; }
+		public static LogMessageDelegate LogFunction { get; set; }
 
 		public delegate void LogMessageDelegate(string message);
 
@@ -362,7 +362,7 @@ namespace GNFSCore
 			return result;
 		}
 
-		public void LogMessage(string message = "")
+		public static void LogMessage(string message = "")
 		{
 			if (LogFunction != null)
 			{

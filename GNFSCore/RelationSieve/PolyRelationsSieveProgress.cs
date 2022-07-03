@@ -126,7 +126,7 @@ namespace GNFSCore
 				MaxB += 100;
 			}
 
-			_gnfs.LogMessage($"GenerateRelations: TargetQuantity = {SmoothRelations_TargetQuantity}, ValueRange = {ValueRange}, A = {A}, B = {B}, Max B = {MaxB}");
+			GNFS.LogMessage($"GenerateRelations: TargetQuantity = {SmoothRelations_TargetQuantity}, ValueRange = {ValueRange}, A = {A}, B = {B}, Max B = {MaxB}");
 
 			while (SmoothRelationsCounter < SmoothRelations_TargetQuantity)
 			{
@@ -189,8 +189,8 @@ namespace GNFSCore
 				A = startA;
 
 				//if (B % 11 == 0)
-				_gnfs.LogMessage($"B = {B}");
-				_gnfs.LogMessage($"SmoothRelations.Count: {_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Count}");
+				GNFS.LogMessage($"B = {B}");
+				GNFS.LogMessage($"SmoothRelations.Count: {_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Count}");
 
 			}
 		}
@@ -233,7 +233,7 @@ namespace GNFSCore
 		{
 			Relations.FreeRelations.Add(freeRelationSolution);
 			Serialization.Save.Relations.Free.SingleSolution(_gnfs, freeRelationSolution);
-			_gnfs.LogMessage($"Added free relation solution: Relation count = {freeRelationSolution.Count}");
+			GNFS.LogMessage($"Added free relation solution: Relation count = {freeRelationSolution.Count}");
 		}
 
 		#endregion

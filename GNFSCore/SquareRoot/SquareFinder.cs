@@ -92,10 +92,10 @@ namespace GNFSCore.SquareRoot
 				// Previous used sets are tracked with the List<int> triedFreeRelationIndices
 				if (triedFreeRelationIndices.Count == freeRelations.Count) // If we have exhausted our solution sets, alert the user. Number wont factor for some reason.
 				{
-					gnfs.LogMessage("ERROR: ALL RELATION SETS HAVE BEEN TRIED...?");
-					gnfs.LogMessage($"If the number of solution sets ({freeRelations.Count}) is low, you may need to sieve some more and then re-run the matrix solving step.");
-					gnfs.LogMessage("If there are many solution sets, and you have tried them all without finding non-trivial factors, then something is wrong...");
-					gnfs.LogMessage();
+					GNFS.LogMessage("ERROR: ALL RELATION SETS HAVE BEEN TRIED...?");
+					GNFS.LogMessage($"If the number of solution sets ({freeRelations.Count}) is low, you may need to sieve some more and then re-run the matrix solving step.");
+					GNFS.LogMessage("If there are many solution sets, and you have tried them all without finding non-trivial factors, then something is wrong...");
+					GNFS.LogMessage();
 					break;
 				}
 
@@ -110,28 +110,28 @@ namespace GNFSCore.SquareRoot
 
 				List<Relation> selectedRelationSet = freeRelations[freeRelationIndex]; // Get the solution set
 
-				gnfs.LogMessage();
-				gnfs.LogMessage($"Selected solution set index # {freeRelationIndex + 1}");
-				gnfs.LogMessage();
-				gnfs.LogMessage("Calculating Rational Square Root... ");
+				GNFS.LogMessage();
+				GNFS.LogMessage($"Selected solution set index # {freeRelationIndex + 1}");
+				GNFS.LogMessage();
+				GNFS.LogMessage("Calculating Rational Square Root... ");
 
 				squareRootFinder.CalculateRationalSide(selectedRelationSet);
 
 
-				gnfs.LogMessage();
-				gnfs.LogMessage("Calculating Algebraic Square Root.");
+				GNFS.LogMessage();
+				GNFS.LogMessage("Calculating Algebraic Square Root.");
 
 				if (cancelToken.IsCancellationRequested) { return solutionFound; }
 
 				squareRootFinder.CalculateAlgebraicSide(cancelToken);
-				gnfs.LogMessage("Completed.");
+				GNFS.LogMessage("Completed.");
 
 				if (cancelToken.IsCancellationRequested) { return solutionFound; }
 
-				gnfs.LogMessage();
-				gnfs.LogMessage("Calculating Algebraic Square Root.");
+				GNFS.LogMessage();
+				GNFS.LogMessage("Calculating Algebraic Square Root.");
 				Tuple<BigInteger, BigInteger> foundFactors = squareRootFinder.CalculateSquareRoot(cancelToken);
-				gnfs.LogMessage("Completed.");
+				GNFS.LogMessage("Completed.");
 
 				BigInteger P = foundFactors.Item1;
 				BigInteger Q = foundFactors.Item2;
@@ -141,33 +141,33 @@ namespace GNFSCore.SquareRoot
 				{
 					solutionFound = gnfs.SetFactorizationSolution(P, Q);
 
-					gnfs.LogMessage($"Selected solution set index # {freeRelationIndex + 1}");
-					gnfs.LogMessage();
+					GNFS.LogMessage($"Selected solution set index # {freeRelationIndex + 1}");
+					GNFS.LogMessage();
 
 					if (solutionFound)
 					{
-						gnfs.LogMessage("NON-TRIVIAL FACTORS FOUND!");
-						gnfs.LogMessage();
-						gnfs.LogMessage(squareRootFinder.ToString());
-						gnfs.LogMessage();
-						gnfs.LogMessage();
-						gnfs.LogMessage(gnfs.Factorization.ToString());
-						gnfs.LogMessage();
+						GNFS.LogMessage("NON-TRIVIAL FACTORS FOUND!");
+						GNFS.LogMessage();
+						GNFS.LogMessage(squareRootFinder.ToString());
+						GNFS.LogMessage();
+						GNFS.LogMessage();
+						GNFS.LogMessage(gnfs.Factorization.ToString());
+						GNFS.LogMessage();
 					}
 					break;
 				}
 				else if (cancelToken.IsCancellationRequested)
 				{
-					gnfs.LogMessage("Aborting square root search.");
+					GNFS.LogMessage("Aborting square root search.");
 					break;
 				}
 				else
 				{
-					gnfs.LogMessage();
-					gnfs.LogMessage("Unable to locate a square root in solution set!");
-					gnfs.LogMessage();
-					gnfs.LogMessage("Trying a different solution set...");
-					gnfs.LogMessage();
+					GNFS.LogMessage();
+					GNFS.LogMessage("Unable to locate a square root in solution set!");
+					GNFS.LogMessage();
+					GNFS.LogMessage("Trying a different solution set...");
+					GNFS.LogMessage();
 				}
 			}
 
@@ -360,7 +360,7 @@ namespace GNFSCore.SquareRoot
 
 				if (!solutionFound)
 				{
-					gnfs.LogFunction($"No solution found amongst the algebraic square roots {{ {string.Join(", ", resultTuples.Select(tup => $"({ tup.Item1}, { tup.Item2})"))} }} mod primes {{ {string.Join(", ", primes.Select(p => p.ToString()))} }}");
+					GNFS.LogFunction($"No solution found amongst the algebraic square roots {{ {string.Join(", ", resultTuples.Select(tup => $"({ tup.Item1}, { tup.Item2})"))} }} mod primes {{ {string.Join(", ", primes.Select(p => p.ToString()))} }}");
 
 					attempts--;
 				}
@@ -416,7 +416,7 @@ namespace GNFSCore.SquareRoot
 
 			result.AppendLine("Polynomial ring:");
 			result.AppendLine($"({string.Join(") * (", PolynomialRingElements.Select(ply => ply.ToString()))})");
-			result.AppendLine();			
+			result.AppendLine();
 			result.AppendLine($"∏ Sᵢ =");
 			result.AppendLine($"{PolynomialRing}");
 			result.AppendLine();
@@ -424,7 +424,7 @@ namespace GNFSCore.SquareRoot
 			result.AppendLine($"ƒ(m)      = {MonicPolynomial }");
 			result.AppendLine($"ƒ'(m)     = {MonicPolynomialDerivative}");
 			result.AppendLine($"ƒ'(m)^2   = {MonicPolynomialDerivativeSquared}");
-			result.AppendLine();			
+			result.AppendLine();
 			result.AppendLine($"∏ Sᵢ(m)  *  ƒ'(m)² =");
 			result.AppendLine($"{TotalS}");
 			result.AppendLine();

@@ -26,8 +26,8 @@ namespace GNFSCore.Matrix
 
 			BigInteger requiredRelationsCount = gnfs.CurrentRelationsProgress.SmoothRelationsRequiredForMatrixStep;
 
-			gnfs.LogFunction($"Total relations count: {smoothCount}");
-			gnfs.LogFunction($"Relations required to proceed: {requiredRelationsCount}");
+			GNFS.LogFunction($"Total relations count: {smoothCount}");
+			GNFS.LogFunction($"Relations required to proceed: {requiredRelationsCount}");
 
 			while (smoothRelations.Count >= requiredRelationsCount)
 			{

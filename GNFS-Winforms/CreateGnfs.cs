@@ -20,7 +20,7 @@ namespace GNFS_Winforms
 		{
 			string jsonFilename = Path.Combine(DirectoryLocations.GetSaveLocation(n), "GNFS.json");
 			GNFS gnfs = Serialization.Load.All(jsonFilename);
-			gnfs.LogFunction = Logging.LogMessage;
+			GNFS.LogFunction = Logging.LogMessage;
 			return gnfs;
 		}
 	}

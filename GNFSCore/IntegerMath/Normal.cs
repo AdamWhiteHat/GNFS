@@ -43,6 +43,8 @@ namespace GNFSCore.Factors
 			decimal bD = (decimal)b;
 			decimal ab = (-aD) / bD;
 
+			
+
 			decimal left = poly.Evaluate(ab);
 			BigInteger right = BigInteger.Pow(BigInteger.Negate(b), poly.Degree);
 
