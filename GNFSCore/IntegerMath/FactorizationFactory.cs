@@ -10,7 +10,6 @@ namespace GNFSCore.IntegerMath
 {
 	public static partial class FactorizationFactory
 	{
-		/*
 		public static IEnumerable<BigInteger> GetPrimeFactorCollection(BigInteger value, BigInteger maxValue)
 		{
 			if (value == 0)
@@ -41,7 +40,7 @@ namespace GNFSCore.IntegerMath
 				return factors;
 			}
 
-			foreach (BigInteger prime in PrimeFactory.GetPrimesTo(maxValue).ToList())
+			foreach (BigInteger prime in PrimeFactory.GetPrimesTo(maxValue))
 			{
 				while (toFactor % prime == 0)
 				{
@@ -78,7 +77,6 @@ namespace GNFSCore.IntegerMath
 				return factors;
 			}
 		}
-		*/
 
 		private static BigInteger[] primeCheckBases = new BigInteger[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47 };
 		public static bool IsProbablePrime(BigInteger input)

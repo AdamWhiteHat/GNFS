@@ -40,22 +40,16 @@ namespace GNFSCore.Matrix
 			BigInteger rationalMaxValue = gnfs.PrimeFactorBase.RationalFactorBaseMax;
 			BigInteger algebraicMaxValue = gnfs.PrimeFactorBase.AlgebraicFactorBaseMax;
 
-			BigInteger max = BigInteger.Max(rationalMaxValue, algebraicMaxValue);
-
-			List<BigInteger>  primes = PrimeFactory.GetPrimesTo(max+1).ToList();
-
-			RationalPart = GetVector(relation.RationalFactorization, rationalMaxValue, primes).ToList();
-			AlgebraicPart = GetVector(relation.AlgebraicFactorization, algebraicMaxValue, primes).ToList();
+			RationalPart = GetVector(relation.RationalFactorization, rationalMaxValue).ToList();
+			AlgebraicPart = GetVector(relation.AlgebraicFactorization, algebraicMaxValue).ToList();
 			QuadraticPart = qfb.Select(qf => QuadraticResidue.GetQuadraticCharacter(relation, qf)).ToList();
 		}
 
-		protected static bool[] GetVector(CountDictionary primeFactorizationDict, BigInteger maxValue, List<BigInteger> primes)
+		protected static bool[] GetVector(CountDictionary primeFactorizationDict, BigInteger maxValue)
 		{
-			BigInteger prime = primes.SkipWhile(n => n < maxValue).First();
+			int primeIndex = PrimeFactory.GetIndexFromValue(maxValue);
 
-			int size = primes.IndexOf(prime) + 1;
-
-			bool[] result = new bool[size];
+			bool[] result = new bool[primeIndex];
 
 			if (primeFactorizationDict.Any())
 			{
@@ -74,7 +68,7 @@ namespace GNFSCore.Matrix
 						continue;
 					}
 
-					int index = primes.IndexOf(kvp.Key);
+					int index = PrimeFactory.GetIndexFromValue(kvp.Key);
 					result[index] = true;
 				}
 			}
