@@ -225,8 +225,6 @@ namespace GNFSCore
 		{
 			LogMessage($"Constructing new prime bases (- of 3)...");
 
-			PrimeFactory.IncreaseMaxValue(PrimeFactorBase.QuadraticFactorBaseMax);
-
 			PrimeFactorBase.RationalFactorBase = PrimeFactory.GetPrimesTo(PrimeFactorBase.RationalFactorBaseMax);
 			//Serialization.Save.FactorBase.Rational(this);
 			LogMessage($"Completed rational prime base (1 of 3).");
@@ -235,7 +233,7 @@ namespace GNFSCore
 			//Serialization.Save.FactorBase.Algebraic(this);
 			LogMessage($"Completed algebraic prime base (2 of 3).");
 
-			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesFrom(PrimeFactorBase.QuadraticFactorBaseMin).Take(PrimeFactorBase.QuadraticBaseCount);
+			PrimeFactorBase.QuadraticFactorBase = PrimeFactory.GetPrimesRange(PrimeFactorBase.QuadraticFactorBaseMin, PrimeFactorBase.QuadraticBaseCount);
 			//Serialization.Save.FactorBase.Quadratic(this);
 			LogMessage($"Completed quadratic prime base (3 of 3).");
 		}

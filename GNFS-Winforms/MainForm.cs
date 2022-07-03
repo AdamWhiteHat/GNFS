@@ -156,6 +156,20 @@ namespace GNFS_Winforms
 			}
 		}
 
+		private static void GetGnfs(ref GNFS gnfs, MainForm form)
+		{
+			int parseOut;
+			if (int.TryParse(form.tbRelationQuantity.Text, out parseOut))
+			{
+				gnfs.CurrentRelationsProgress.SetTargetQuantity(parseOut);
+			}
+			if (int.TryParse(form.tbRelationValueRange.Text, out parseOut))
+			{
+				gnfs.CurrentRelationsProgress.SetValueRange(parseOut);
+			}
+		}
+
+
 		private void SetAsProcessing()
 		{
 			ControlBridge.SetControlVisibleState(panelCancel, true);
@@ -278,6 +292,7 @@ namespace GNFS_Winforms
 
 				Logging.LogMessage("[Find relations task starting up...]");
 
+				GetGnfs(ref _gnfs, this);
 				GNFS localGnfs = _gnfs;
 				CancellationToken token = _cancellationTokenSource.Token;
 				new Thread(() =>
@@ -381,16 +396,16 @@ namespace GNFS_Winforms
 			int smoothRelations_CurrentCount = _gnfs.CurrentRelationsProgress.SmoothRelations.Count;
 			int smoothRelation_SavedCounter = _gnfs.CurrentRelationsProgress.SmoothRelationsCounter;
 
-			BigInteger rationalBase_Max = _gnfs.PrimeFactorBase.RationalFactorBaseMax;
-			BigInteger algebraicBase_Max = _gnfs.PrimeFactorBase.AlgebraicFactorBaseMax;
+			//BigInteger rationalBase_Max = _gnfs.PrimeFactorBase.RationalFactorBaseMax;
+			//BigInteger algebraicBase_Max = _gnfs.PrimeFactorBase.AlgebraicFactorBaseMax;
 			BigInteger quadraticBase_Max = _gnfs.PrimeFactorBase.QuadraticFactorBaseMax;
 
-			int rationalBase_Size = PrimeFactory.GetIndexFromValue(rationalBase_Max);
-			int algebraicBase_Size = PrimeFactory.GetIndexFromValue(algebraicBase_Max);
-			int quadraticBase_Size = PrimeFactory.GetIndexFromValue(quadraticBase_Max);
-
-			int rationalFactorPair_Count = _gnfs.RationalFactorPairCollection.Count;
-			int algebraicFactorPair_Count = _gnfs.AlgebraicFactorPairCollection.Count;
+			//int rationalBase_Size = PrimeFactory.GetIndexFromValue(rationalBase_Max);
+			//int algebraicBase_Size = PrimeFactory.GetIndexFromValue(algebraicBase_Max);
+			//int quadraticBase_Size = PrimeFactory.GetIndexFromValue(quadraticBase_Max);
+			//
+			//int rationalFactorPair_Count = _gnfs.RationalFactorPairCollection.Count;
+			//int algebraicFactorPair_Count = _gnfs.AlgebraicFactorPairCollection.Count;
 			int quadraticFactorPair_Count = _gnfs.QuadraticFactorPairCollection.Count;
 
 			int smoothRelation_RequiredBeforeMatrixStep = _gnfs.CurrentRelationsProgress.SmoothRelationsRequiredForMatrixStep;

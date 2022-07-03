@@ -40,7 +40,8 @@ namespace GNFSCore
 		{
 			get
 			{
-				return PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.RationalFactorBaseMax)
+				return
+				PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.RationalFactorBaseMax)
 					  + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.AlgebraicFactorBaseMax)
 					  + _gnfs.QuadraticFactorPairCollection.Count + 3;
 			}
@@ -207,6 +208,18 @@ namespace GNFSCore
 		public void IncreaseTargetQuantity(int ammount)
 		{
 			SmoothRelations_TargetQuantity += ammount;
+			Serialization.Save.Gnfs(_gnfs);
+		}
+
+		public void SetTargetQuantity(int quantity)
+		{
+			SmoothRelations_TargetQuantity = quantity;
+			Serialization.Save.Gnfs(_gnfs);
+		}
+
+		public void SetValueRange(int range)
+		{
+			ValueRange = range;
 			Serialization.Save.Gnfs(_gnfs);
 		}
 
