@@ -57,7 +57,7 @@ namespace GNFSCore.SquareRoot
         /// Finds X such that a*X = 1 (mod p)
         /// </summary>
         /// <param name="a">a.</param>
-        /// <param name="mod">The modulus</param>
+        /// <param name="p">The modulus</param>
         /// <returns></returns>
         public static BigInteger ModularMultiplicativeInverse(BigInteger a, BigInteger p)
         {
