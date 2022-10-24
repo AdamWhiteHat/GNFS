@@ -59,17 +59,38 @@ namespace GNFSCore.SquareRoot
         /// <param name="a">a.</param>
         /// <param name="mod">The modulus</param>
         /// <returns></returns>
-        public static BigInteger ModularMultiplicativeInverse(BigInteger a, BigInteger mod)
+        public static BigInteger ModularMultiplicativeInverse(BigInteger a, BigInteger p)
         {
-            BigInteger b = a.Mod(mod);
-            for (int x = 1; x < mod; x++)
+            if (p == 1)
             {
-                if ((b * x).Mod(mod) == 1)
-                {
-                    return x;
-                }
+                return 0;
             }
-            return 1;
+
+            BigInteger divisor;
+            BigInteger dividend = a;
+            BigInteger diff = 0;
+            BigInteger result = 1;
+            BigInteger quotient = 0;
+            BigInteger lastDivisor = 0;
+            BigInteger remainder = p;
+
+            while (dividend > 1)
+            {
+                divisor = remainder;
+                quotient = BigInteger.DivRem(dividend, divisor, out remainder); // Divide             
+                dividend = divisor;
+                lastDivisor = diff; // The thing to divide will be the last divisor
+
+                // Update diff and result 
+                diff = result - quotient * diff;
+                result = lastDivisor;
+            }
+
+            if (result < 0)
+            {
+                result += p; // Make result positive 
+            }
+            return result;
         }
 
         /// <summary>
