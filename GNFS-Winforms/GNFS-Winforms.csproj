@@ -34,8 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ExtendedArithmetic.Polynomial, Version=2021.364.1553.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExtendedArithmetic.Polynomial.2021.364.1553\lib\net48\ExtendedArithmetic.Polynomial.dll</HintPath>
+    <Reference Include="ExtendedArithmetic.Polynomial, Version=2022.152.744.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExtendedArithmetic.Polynomial.2022.152.744\lib\net48\ExtendedArithmetic.Polynomial.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
