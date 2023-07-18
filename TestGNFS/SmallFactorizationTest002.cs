@@ -14,7 +14,7 @@ using GNFSCore.IntegerMath;
 namespace TestGNFS.Integration
 {
 	[TestFixture]
-	public class SmallFactorizationTest
+	public class SmallFactorizationTest002
 	{
 		public TestContext TestContext
 		{

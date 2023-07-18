@@ -219,7 +219,7 @@ namespace GNFS_Winforms
 			if (DoesSaveFileExist)
 			{
 				ControlBridge.SetControlEnabledState(btnLoad, true);
-				ControlBridge.SetControlEnabledState(btnCreate, false);
+				ControlBridge.SetControlEnabledState(btnCreate, true);
 				ControlBridge.SetControlEnabledState(btnSave, true);
 			}
 			else
@@ -478,6 +478,25 @@ namespace GNFS_Winforms
 		{
 			if (!IsWorking)
 			{
+				if (DoesSaveFileExist)
+				{
+					DialogResult confirmationResult = MessageBox.Show(
+							"Are you sure that you want to override this progress a start new?" + Environment.NewLine +
+							Environment.NewLine +
+							"Factorization work has already been started for this N." + Environment.NewLine +
+							"If you continue, all progress from the prior factorization attempt will be lost and factorization will begin anew." + Environment.NewLine +
+							Environment.NewLine +
+							"Click okay if you wish to start a new factorization." + Environment.NewLine +
+							"Otherwise, click Cancel." + Environment.NewLine + "If you wish to resume the prior factorization attempt, click Cancel and try clicking the 'Load' button instead of 'Create'.",
+							"Data loss warning",
+							MessageBoxButtons.OKCancel,
+							MessageBoxIcon.Warning);
+					if (confirmationResult != DialogResult.OK)
+					{
+						return;
+					}
+				}
+
 				SetAsProcessing();
 
 				BigInteger n = N;
@@ -507,7 +526,8 @@ namespace GNFS_Winforms
 							degree, // Polynomial Degree
 							bound, //  BigInteger
 							relationQuantity, // Total # of relations to collect before proceeding.
-							relationValueRange // 
+							relationValueRange, // 
+							true // create new serialization data
 						);
 					timer.Stop();
 					SetGnfs(this, localGnfs);

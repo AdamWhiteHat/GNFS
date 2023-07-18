@@ -78,19 +78,42 @@ namespace GNFSCore
 			CurrentRelationsProgress = new PolyRelationsSieveProgress();
 		}
 
-		public GNFS(CancellationToken cancelToken, LogMessageDelegate logFunction, BigInteger n, BigInteger polynomialBase, int polyDegree, BigInteger primeBound, int relationQuantity, int relationValueRange)
+		public GNFS(CancellationToken cancelToken, LogMessageDelegate logFunction, BigInteger n, BigInteger polynomialBase, int polyDegree, BigInteger primeBound, int relationQuantity, int relationValueRange, bool createdNewData = false)
 			: this()
 		{
 			LogFunction = logFunction;
 			N = n;
 
-			SaveLocations = new DirectoryLocations(N, polynomialBase, polyDegree);
+			SaveLocations = new DirectoryLocations(N);
 
-			if (!Directory.Exists(SaveLocations.SaveDirectory))
+			if (createdNewData || !Directory.Exists(SaveLocations.SaveDirectory))
 			{
 				// New GNFS instance
-				Directory.CreateDirectory(SaveLocations.SaveDirectory);
-				LogMessage($"Directory created.");
+
+				if (!Directory.Exists(SaveLocations.SaveDirectory))
+				{
+					Directory.CreateDirectory(SaveLocations.SaveDirectory);
+					LogMessage($"Directory created.");
+				}
+				else
+				{
+					if (File.Exists(SaveLocations.SmoothRelations_SaveFile))
+					{
+						File.Delete(SaveLocations.SmoothRelations_SaveFile);
+					}
+					if (File.Exists(SaveLocations.RoughRelations_SaveFile))
+					{
+						File.Delete(SaveLocations.RoughRelations_SaveFile);
+					}
+					if (File.Exists(SaveLocations.QuadraticFactorPair_SaveFile))
+					{
+						File.Delete(SaveLocations.QuadraticFactorPair_SaveFile);
+					}
+					foreach (string freeRelationPath in SaveLocations.EnumerateFreeRelationFiles())
+					{
+						File.Delete(freeRelationPath);
+					}
+				}
 
 				if (polyDegree == -1)
 				{

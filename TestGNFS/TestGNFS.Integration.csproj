@@ -58,7 +58,8 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="SmallFactorizationTest.cs" />
+	<Compile Include="SmallFactorizationTest001.cs" />
+    <Compile Include="SmallFactorizationTest002.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

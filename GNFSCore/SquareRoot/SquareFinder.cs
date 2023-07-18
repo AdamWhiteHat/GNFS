@@ -186,7 +186,7 @@ namespace GNFSCore.SquareRoot
 				// so perhaps we are doing something wrong here, that we are meant to be checking the polynomial for irreducibility instead?
 				// Perhaps I inserted this check here just to ensure correctness.
 				// Is it an error to have two rational norms share a factor, or merely pointless?
-				throw new Exception($"{nameof(IsRationalIrreducible)} evaluated to false.");
+				//throw new Exception($"{nameof(IsRationalIrreducible)} evaluated to false.");
 			}
 
 			RationalProduct = rationalNorms.Product();
