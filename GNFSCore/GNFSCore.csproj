@@ -1,104 +1,35 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2AD1979D-4661-48F1-B264-81001452DB8A}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GNFSCore</RootNamespace>
-    <AssemblyName>GNFSCore</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="ExtendedArithmetic.Polynomial, Version=2022.152.744.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExtendedArithmetic.Polynomial.2022.152.744\lib\net48\ExtendedArithmetic.Polynomial.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Core\CountDictionary.cs" />
-    <Compile Include="Core\CPUInfo.cs" />
-    <Compile Include="Core\ExtensionMethods\BigIntegerCollectionExtensionMethods.cs" />
-    <Compile Include="Core\ExtensionMethods\IEnumerableExtensionMethods.cs" />
-    <Compile Include="Core\FactorBase.cs" />
-    <Compile Include="Core\DirectoryLocations.cs" />
-    <Compile Include="Core\Serialization\JsonConverters.cs" />
-    <Compile Include="Core\Serialization\Serialization.Load.cs" />
-    <Compile Include="Core\Serialization\Serialization.Save.cs" />
-    <Compile Include="Core\SieveRangeEnumerable.cs" />
-    <Compile Include="IntegerMath\Combinatorics.cs" />
-    <Compile Include="IntegerMath\FastPrimeSieve.cs" />
-    <Compile Include="Matrix\MatrixSolve.cs" />
-    <Compile Include="RelationSieve\PolyRelationsSieveProgress.cs" />
-    <Compile Include="IntegerMath\QuadraticResidue.cs" />
-    <Compile Include="RelationSieve\Relation.cs" />
-    <Compile Include="RelationSieve\RelationContainer.cs" />
-    <!--Compile Include="SquareRoot\AlgebraicSquareRoot.cs" /-->
-    <Compile Include="SquareRoot\FiniteFieldArithmetic.cs" />
-    <Compile Include="Core\Solution.cs" />
-    <Compile Include="SquareRoot\SquareFinder.cs" />
-    <Compile Include="Core\StaticRandom.cs" />
-    <Compile Include="FactorBase\FactorPairCollection.cs" />
-    <Compile Include="FactorBase\FactorPair.cs" />
-    <!--Compile Include="RelationSieve\OtherSeives\FermatEuclidSeive.cs" /-->
-    <Compile Include="IntegerMath\Normal.cs" />
-    <Compile Include="IntegerMath\Legendre.cs" />
-    <Compile Include="IntegerMath\PrimeFactory.cs" />
-    <Compile Include="Matrix\GaussianMatrix.cs" />
-    <Compile Include="Matrix\GaussianRow.cs" />
-    <!--Compile Include="Polynomial\BigIntegerArithmetic.cs" /-->
-    <Compile Include="Core\Interfaces\ICloneable.cs" />
-    <Compile Include="Core\GNFS.cs" />
-    <Compile Include="Core\ExtensionMethods\BigIntegerExtensionMethods.cs" />
-    <Compile Include="IntegerMath\GCD.cs" />
-    <Compile Include="IntegerMath\FactorizationFactory.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net6.0</TargetFrameworks>		
+		<OutputType>Library</OutputType>
+		<ImplicitUsings>False</ImplicitUsings>
+		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Title>GNFS Core Library</Title>
+		<Product>GNFS Core Library</Product>
+		<AssemblyName>GNFSCore</AssemblyName>
+		<AssemblyTitle>GNFSCore</AssemblyTitle>
+		<Description>A General Number Field Sieve implementation in C#</Description>
+
+		<Authors>Adam White</Authors>
+		<Company>Adam White</Company>
+		<Copyright>Made by Adam White</Copyright>
+		
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/AdamWhiteHat/GNFS</RepositoryUrl>
+
+		<Version>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</Version>
+		<AssemblyVersion>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</AssemblyVersion>
+		<FileVersion>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</FileVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ExtendedArithmetic.Polynomial" Version="2022.152.744" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Management" Version="7.0.2" />
+	</ItemGroup>
+
 </Project>
