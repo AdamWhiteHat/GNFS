@@ -75,7 +75,7 @@ namespace GNFSCore
 			}
 			else
 			{
-				SmoothRelations_TargetQuantity = smoothRelationsTargetQuantity;
+				SmoothRelations_TargetQuantity = Math.Max(smoothRelationsTargetQuantity, SmoothRelationsRequiredForMatrixStep);
 			}
 
 			if (MaxB == 0)
@@ -106,10 +106,8 @@ namespace GNFSCore
             }
             */
 
-			if (SmoothRelations_TargetQuantity == -1)
-			{
-				SmoothRelations_TargetQuantity = SmoothRelationsRequiredForMatrixStep;
-			}
+			SmoothRelations_TargetQuantity = Math.Max(SmoothRelations_TargetQuantity, SmoothRelationsRequiredForMatrixStep); ;
+
 
 			if (A >= ValueRange)
 			{

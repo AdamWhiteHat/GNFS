@@ -28,10 +28,5 @@ namespace GNFSCore.IntegerMath
 			int legendreSymbol = Legendre.Symbol(abp, quadraticFactor.R);
 			return (legendreSymbol != 1);
 		}
-
-		public static bool[] GetQuadraticCharacters(Relation rel, IEnumerable<FactorPair> quadraticCharacterBase)
-		{
-			return quadraticCharacterBase.Select(pair => GetQuadraticCharacter(rel, pair)).ToArray();
-		}
 	}
 }

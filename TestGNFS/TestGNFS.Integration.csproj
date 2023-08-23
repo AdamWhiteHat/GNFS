@@ -1,41 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>net6.0</TargetFrameworks>
-		<OutputType>Library</OutputType>	
-		<ImplicitUsings>True</ImplicitUsings>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RuntimeIdentifier>win81-x64</RuntimeIdentifier>
+    <ImplicitUsings>False</ImplicitUsings>
+  </PropertyGroup>
 
-	<PropertyGroup>
-		<Title>TestGNFS</Title>
-		<Product>TestGNFS</Product>
-		<AssemblyName>TestGNFS.Integration</AssemblyName>
-		<AssemblyTitle>TestGNFS.Integration</AssemblyTitle>
+  <PropertyGroup>
+    <Title>TestGNFS</Title>
+    <Product>TestGNFS</Product>
+    <AssemblyName>TestGNFS.Integration</AssemblyName>
+    <AssemblyTitle>TestGNFS.Integration</AssemblyTitle>
 
-		<Description>End-to-end integration tests for the GNFS project.</Description>
+    <Description>End-to-end integration tests for the GNFS project.</Description>
 
-		<Authors>Adam White</Authors>
-		<Company>Adam White</Company>
-		<Copyright>Made by Adam White</Copyright>
-		
-		<RepositoryType>git</RepositoryType>
-		<RepositoryUrl>https://github.com/AdamWhiteHat/GNFS</RepositoryUrl>
+    <Authors>Adam White</Authors>
+    <Company>Adam White</Company>
+    <Copyright>Made by Adam White</Copyright>
 
-		<Version>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</Version>
-		<AssemblyVersion>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</AssemblyVersion>
-		<FileVersion>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</FileVersion>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/AdamWhiteHat/GNFS</RepositoryUrl>
+
+    <Version>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</Version>
+    <AssemblyVersion>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</AssemblyVersion>
+    <FileVersion>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</FileVersion>
 
 
-	</PropertyGroup>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="ExtendedArithmetic.Polynomial" Version="2022.152.744" />
-		<PackageReference Include="NUnit" Version="3.12.0" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ExtendedArithmetic.Polynomial" Version="2022.152.744" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.0" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="6.0.0" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\GNFSCore\GNFSCore.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GNFSCore\GNFSCore.csproj" />
+  </ItemGroup>
 
 </Project>

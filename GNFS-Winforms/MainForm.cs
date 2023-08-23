@@ -116,6 +116,8 @@ namespace GNFS_Winforms
 
 		private void MainForm_Shown(object sender, EventArgs e)
 		{
+			GNFS.LogFunction = Logging.LogMessage;
+
 			ControlBridge.SetControlText(tbN, Settings.N);
 			ControlBridge.SetControlText(tbDegree, Settings.Degree);
 			ControlBridge.SetControlText(tbBase, Settings.Base);

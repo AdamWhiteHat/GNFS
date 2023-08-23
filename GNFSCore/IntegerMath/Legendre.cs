@@ -14,14 +14,14 @@ namespace GNFSCore.IntegerMath
 		/// </summary>		
 		public static int Symbol(BigInteger a, BigInteger p)
 		{
-			if (p < 2) throw new ArgumentOutOfRangeException("p", "p must not be < 2");
-			if (a == 0) return 0;
-			if (a == 1) return 1;
+			if (p < 2) { throw new ArgumentOutOfRangeException(nameof(p), $"Parameter '{nameof(p)}' must not be < 2, but you have supplied: {p}"); }
+			if (a == 0) { return 0; }
+			if (a == 1) { return 1; }
 
 			int result;
-			if (a % 2 == 0)
+			if (a.Mod(2) == 0)
 			{
-				result = Symbol(a / 2, p);
+				result = Symbol(a >> 2, p); // >> right shift == /2
 				if (((p * p - 1) & 8) != 0) // instead of dividing by 8, shift the mask bit
 				{
 					result = -result;
@@ -29,7 +29,7 @@ namespace GNFSCore.IntegerMath
 			}
 			else
 			{
-				result = Symbol(p % a, a);
+				result = Symbol(p.Mod(a), a);
 				if (((a - 1) * (p - 1) & 4) != 0) // instead of dividing by 4, shift the mask bit
 				{
 					result = -result;
@@ -39,7 +39,7 @@ namespace GNFSCore.IntegerMath
 		}
 
 		/// <summary>
-		///  Find r such that (r | m) = goal, where  (r | m) is the Legendre symbol
+		///  Find r such that (r | m) = goal, where  (r | m) is the Legendre symbol, and m = modulus
 		/// </summary>
 		public static BigInteger SymbolSearch(BigInteger start, BigInteger modulus, BigInteger goal)
 		{
@@ -49,17 +49,19 @@ namespace GNFSCore.IntegerMath
 			}
 
 			BigInteger counter = start;
+			BigInteger max = counter + modulus + 1;
 			do
 			{
 				if (Symbol(counter, modulus) == goal)
 				{
-					break;
+					return counter;
 				}
 				counter++;
 			}
-			while (true);
+			while (counter <= max);
 
-			return counter;
+			//return counter;
+			throw new Exception("Legendre symbol matching criteria not found.");
 		}
 	}
 

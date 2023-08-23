@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0</TargetFrameworks>		
+		<TargetFrameworks>net5.0-windows</TargetFrameworks>
+		<RuntimeIdentifier>win81-x64</RuntimeIdentifier>
 		<OutputType>Library</OutputType>
 		<ImplicitUsings>False</ImplicitUsings>
 		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
@@ -17,7 +18,7 @@
 		<Authors>Adam White</Authors>
 		<Company>Adam White</Company>
 		<Copyright>Made by Adam White</Copyright>
-		
+
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/AdamWhiteHat/GNFS</RepositoryUrl>
 
@@ -28,8 +29,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="ExtendedArithmetic.Polynomial" Version="2022.152.744" />
+		<PackageReference Include="ExtendedNumerics.BigRational" Version="2023.221.2134" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="System.Management" Version="7.0.2" />
+		<PackageReference Include="System.Management" Version="5.0.0" />
 	</ItemGroup>
 
 </Project>

@@ -40,24 +40,10 @@ namespace TestGNFS.Integration
 		private static bool step03_passed = false;
 		private static bool step04_passed = false;
 
-		private static readonly string TestSaveLocation = "C:\\GNFS\\Test";
+		private static string testSaveLocation;
+		private static string TestSaveLocation
+			=> testSaveLocation ?? (testSaveLocation = TestHelper.GetTestSaveLocation());
 
-		private void RecursiveDelete(string path)
-		{
-			IEnumerable<string> files = Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories);
-			foreach (string file in files)
-			{
-				File.Delete(file);
-			}
-
-			IEnumerable<string> directories = Directory.EnumerateDirectories(path, "*", SearchOption.AllDirectories);
-			foreach (string directory in directories)
-			{
-				RecursiveDelete(directory);
-			}
-
-			Directory.Delete(path);
-		}
 
 		[Order(0)]
 		[Test]
@@ -73,7 +59,7 @@ namespace TestGNFS.Integration
 
 			if (Directory.Exists(TestSaveLocation))
 			{
-				RecursiveDelete(TestSaveLocation);
+				TestHelper.RecursiveDelete(TestSaveLocation);
 			}
 
 			DirectoryLocations.SetBaseDirectory(TestSaveLocation);

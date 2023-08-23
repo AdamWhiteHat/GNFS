@@ -59,7 +59,7 @@ namespace GNFSCore
 
 		public DirectoryLocations SaveLocations { get; internal set; }
 
-		public LogMessageDelegate LogFunction { get; set; }
+		public static LogMessageDelegate LogFunction { get; set; }
 
 		public delegate void LogMessageDelegate(string message);
 
@@ -93,7 +93,7 @@ namespace GNFSCore
 				if (!Directory.Exists(SaveLocations.SaveDirectory))
 				{
 					Directory.CreateDirectory(SaveLocations.SaveDirectory);
-					LogMessage($"Directory created.");
+					LogMessage($"Directory created: {SaveLocations.SaveDirectory}");
 				}
 				else
 				{
@@ -128,7 +128,8 @@ namespace GNFSCore
 				if (cancelToken.IsCancellationRequested) { return; }
 
 				ConstructNewPolynomial(this.PolynomialBase, this.PolynomialDegree);
-				LogMessage($"Polynomial constructed.");
+				LogMessage($"Polynomial constructed: {this.CurrentPolynomial}");
+				LogMessage($"Polynomial base: {this.PolynomialBase}");
 
 				if (cancelToken.IsCancellationRequested) { return; }
 
@@ -137,7 +138,6 @@ namespace GNFSCore
 				if (cancelToken.IsCancellationRequested) { return; }
 
 				SetPrimeFactorBases();
-				LogMessage($"Prime bounds calculated.");
 
 				if (cancelToken.IsCancellationRequested) { return; }
 
@@ -147,7 +147,7 @@ namespace GNFSCore
 				if (cancelToken.IsCancellationRequested) { return; }
 
 				CurrentRelationsProgress = new PolyRelationsSieveProgress(this, relationQuantity, relationValueRange);
-				LogMessage($"Relations container initialized.");
+				LogMessage($"Relations container initialized. Target quantity: {relationQuantity}");
 
 				Serialization.Save.All(this);
 			}
@@ -239,6 +239,10 @@ namespace GNFSCore
 
 			PrimeFactorBase.QuadraticFactorBaseMin = PrimeFactorBase.AlgebraicFactorBaseMax + 20;
 			PrimeFactorBase.QuadraticFactorBaseMax = PrimeFactory.GetApproximateValueFromIndex((UInt64)(PrimeFactorBase.QuadraticFactorBaseMin + PrimeFactorBase.QuadraticBaseCount));
+
+			LogMessage($"Rational  Factor Base Bounds: Min: - Max: {PrimeFactorBase.RationalFactorBaseMax}");
+			LogMessage($"Algebraic Factor Base Bounds: Min: - Max: {PrimeFactorBase.AlgebraicFactorBaseMax}");
+			LogMessage($"Quadratic Factor Base Bounds: Min: {PrimeFactorBase.QuadraticFactorBaseMin} Max: {PrimeFactorBase.QuadraticFactorBaseMax}");
 
 			Serialization.Save.All(this);
 			LogMessage("Saved prime factor base bounds.");
@@ -389,7 +393,7 @@ namespace GNFSCore
 		{
 			if (LogFunction != null)
 			{
-				LogFunction.Invoke(message);
+				LogFunction.Invoke("　" + message);
 			}
 		}
 
