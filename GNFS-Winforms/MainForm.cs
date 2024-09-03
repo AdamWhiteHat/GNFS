@@ -535,6 +535,7 @@ namespace GNFS_Winforms
 					SetGnfs(this, localGnfs);
 					HaultAllProcessing();
 					ControlBridge.SetControlEnabledState(panelFunctions, true);
+					ControlBridge.SetControlEnabledState(btnIncreaseSmoothnessBound, true);
 					Logging.LogMessage($"[New factorization job initialization complete]");
 					Logging.LogMessage($"NOTE: You should save your progress now.");
 					PrintCurrentCounts();

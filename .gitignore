@@ -251,3 +251,7 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+
+!Binaries/[Dd]ebug/
+!Binaries/[Rr]elease/

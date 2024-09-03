@@ -1,0 +1,20 @@
+{
+  "Terms": [
+    {
+      "CoEfficient": 8,
+      "Exponent": 0
+    },
+    {
+      "CoEfficient": 29,
+      "Exponent": 1
+    },
+    {
+      "CoEfficient": 15,
+      "Exponent": 2
+    },
+    {
+      "CoEfficient": 1,
+      "Exponent": 3
+    }
+  ]
+}
