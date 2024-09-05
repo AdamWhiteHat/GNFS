@@ -30,11 +30,20 @@
     <Version>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</Version>
     <AssemblyVersion>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</AssemblyVersion>
     <FileVersion>$([System.DateTime]::Now.ToString("yyyy."$([System.DateTime]::Now.DayOfYear)".HHmm"))</FileVersion>
+    <PackageProjectUrl>https://github.com/AdamWhiteHat/GNFS</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExtendedArithmetic.Polynomial" Version="2022.152.744" />
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ExtendedArithmetic.Polynomial" Version="2023.288.635" />
   </ItemGroup>
 
   <ItemGroup>

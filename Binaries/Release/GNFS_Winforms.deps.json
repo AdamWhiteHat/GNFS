@@ -7,10 +7,10 @@
   "targets": {
     ".NETCoreApp,Version=v5.0": {},
     ".NETCoreApp,Version=v5.0/win81-x64": {
-      "GNFS_Winforms/2024.247.0740": {
+      "GNFS_Winforms/2024.249.0827": {
         "dependencies": {
-          "ExtendedArithmetic.Polynomial": "2022.152.744",
-          "GNFSCore": "2024.247.728",
+          "ExtendedArithmetic.Polynomial": "2023.288.635",
+          "GNFSCore": "2024.249.816",
           "runtimepack.Microsoft.NETCore.App.Runtime.win-x64": "5.0.17",
           "runtimepack.Microsoft.WindowsDesktop.App.Runtime.win-x64": "5.0.17"
         },
@@ -1073,19 +1073,19 @@
           }
         }
       },
-      "ExtendedArithmetic.Polynomial/2022.152.744": {
+      "ExtendedArithmetic.Polynomial/2023.288.635": {
         "runtime": {
           "lib/net5.0/ExtendedArithmetic.Polynomial.dll": {
-            "assemblyVersion": "2022.152.744.0",
-            "fileVersion": "2022.152.744.0"
+            "assemblyVersion": "2023.288.635.0",
+            "fileVersion": "2023.288.635.0"
           }
         }
       },
-      "ExtendedNumerics.BigRational/2023.221.2134": {
+      "ExtendedNumerics.BigRational/2023.1000.2.328": {
         "runtime": {
           "lib/net5.0/ExtendedNumerics.BigRational.dll": {
-            "assemblyVersion": "2023.221.2134.0",
-            "fileVersion": "2023.221.2134.0"
+            "assemblyVersion": "2023.1000.2.328",
+            "fileVersion": "2023.1000.2.328"
           }
         }
       },
@@ -1125,24 +1125,24 @@
         }
       },
       "System.Security.Principal.Windows/5.0.0": {},
-      "GNFSCore/2024.247.728": {
+      "GNFSCore/2024.249.816": {
         "dependencies": {
-          "ExtendedArithmetic.Polynomial": "2022.152.744",
-          "ExtendedNumerics.BigRational": "2023.221.2134",
+          "ExtendedArithmetic.Polynomial": "2023.288.635",
+          "ExtendedNumerics.BigRational": "2023.1000.2.328",
           "Newtonsoft.Json": "13.0.3",
           "System.Management": "5.0.0"
         },
         "runtime": {
           "GNFSCore.dll": {
-            "assemblyVersion": "2024.247.728",
-            "fileVersion": "2024.247.0739"
+            "assemblyVersion": "2024.249.816",
+            "fileVersion": "2024.249.0827"
           }
         }
       }
     }
   },
   "libraries": {
-    "GNFS_Winforms/2024.247.0740": {
+    "GNFS_Winforms/2024.249.0827": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -1157,19 +1157,19 @@
       "serviceable": false,
       "sha512": ""
     },
-    "ExtendedArithmetic.Polynomial/2022.152.744": {
+    "ExtendedArithmetic.Polynomial/2023.288.635": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-BtlikPpwMt1wo/ttmSwgRS4bYATrM6gSGhlzayoilJqur9zUG1gPWblP6+mupPfOi2pgpv/M6RLbHljgXNSOkw==",
-      "path": "extendedarithmetic.polynomial/2022.152.744",
-      "hashPath": "extendedarithmetic.polynomial.2022.152.744.nupkg.sha512"
+      "sha512": "sha512-GVEdmoPZEIlSvoUYePY9LQDygdbeKq2hWnS0yZFw20/UWnMPXk5pHPwPFFz/yra+72sncZ9Hj6rlXKiTnJDgeA==",
+      "path": "extendedarithmetic.polynomial/2023.288.635",
+      "hashPath": "extendedarithmetic.polynomial.2023.288.635.nupkg.sha512"
     },
-    "ExtendedNumerics.BigRational/2023.221.2134": {
+    "ExtendedNumerics.BigRational/2023.1000.2.328": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-8udwK9VAQq3cfYnkfAF5Mhh4EsfF25iYo3r7YcJvyJ9g61VhKnHHly+28Ch18hdb4pVpor30EFjXJ61Tu4Hl8A==",
-      "path": "extendednumerics.bigrational/2023.221.2134",
-      "hashPath": "extendednumerics.bigrational.2023.221.2134.nupkg.sha512"
+      "sha512": "sha512-EuczgQ9KIsiElvXug2dQ4zkvR1iXpujJgYs5JONMRxTwhU624Gv+W5/ndKJsmzeCTd9pRiXyB1q69qDh8scOxg==",
+      "path": "extendednumerics.bigrational/2023.1000.2.328",
+      "hashPath": "extendednumerics.bigrational.2023.1000.2.328.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/5.0.0": {
       "type": "package",
@@ -1220,7 +1220,7 @@
       "path": "system.security.principal.windows/5.0.0",
       "hashPath": "system.security.principal.windows.5.0.0.nupkg.sha512"
     },
-    "GNFSCore/2024.247.728": {
+    "GNFSCore/2024.249.816": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

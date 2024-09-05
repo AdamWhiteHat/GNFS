@@ -352,7 +352,10 @@ namespace GNFSCore.SquareRoot
 				if (primes.Count > degree)
 				{
 					primes.Remove(primes.First());
-					values.Remove(values.First());
+					if (values.Count > degree)
+					{
+						values.Remove(values.First());
+					}
 				}
 
 				BigInteger primeProduct = primes.Product();

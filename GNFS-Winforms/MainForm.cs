@@ -70,6 +70,32 @@ namespace GNFS_Winforms
 			}
 		}
 
+		public int RelationQuantity
+		{
+			get
+			{
+				int result = -1;
+				return int.TryParse(tbRelationQuantity.Text, out result) ? result : -1;
+			}
+			set
+			{
+				ControlBridge.SetControlText(tbRelationQuantity, value.ToString());
+			}
+		}
+
+		public BigInteger RelationRange
+		{
+			get
+			{
+				BigInteger result = -1;
+				return BigInteger.TryParse(tbRelationValueRange.Text, out result) ? result : -1;
+			}
+			set
+			{
+				ControlBridge.SetControlText(tbRelationValueRange, value.ToString());
+			}
+		}
+
 		public bool DoesSaveFileExist
 		{
 			get
@@ -153,8 +179,8 @@ namespace GNFS_Winforms
 				form.Base = gnfs.PolynomialBase;
 				form.Bound = gnfs.PrimeFactorBase.RationalFactorBaseMax;
 
-				form.tbRelationQuantity.Text = gnfs.CurrentRelationsProgress.SmoothRelations_TargetQuantity.ToString();
-				form.tbRelationValueRange.Text = gnfs.CurrentRelationsProgress.ValueRange.ToString();
+				form.RelationQuantity = gnfs.CurrentRelationsProgress.SmoothRelations_TargetQuantity;
+				form.RelationRange = gnfs.CurrentRelationsProgress.ValueRange;
 			}
 		}
 
@@ -162,6 +188,7 @@ namespace GNFS_Winforms
 		{
 			ControlBridge.SetControlVisibleState(panelCancel, true);
 			ControlBridge.SetControlVisibleState(panelButtons, false);
+			ControlBridge.SetControlVisibleState(btnIncreaseSmoothnessBound, false);
 
 			_cancellationTokenSource = new CancellationTokenSource();
 			_cancellationToken = _cancellationTokenSource.Token;
@@ -189,6 +216,7 @@ namespace GNFS_Winforms
 
 				ControlBridge.SetControlVisibleState(panelCancel, false);
 				ControlBridge.SetControlVisibleState(panelButtons, true);
+				ControlBridge.SetControlVisibleState(btnIncreaseSmoothnessBound, true);
 
 				Logging.LogMessage($"Processing thread COMPLETED.");
 			}
@@ -254,7 +282,7 @@ namespace GNFS_Winforms
 			}
 			else
 			{
-				newBaseMax = rationalBaseMax + 100000;
+				newBaseMax = rationalBaseMax *= 2;
 			}
 
 			Bound = newBaseMax;
@@ -276,6 +304,8 @@ namespace GNFS_Winforms
 				{
 					Logging.FirstFindRelations = false;
 					breakAfterOneRound = true;
+
+					ControlBridge.SetControlEnabledState(tbRelationValueRange, false);
 				}
 
 				Logging.LogMessage("[Find relations task starting up...]");

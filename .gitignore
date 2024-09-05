@@ -255,3 +255,6 @@ paket-files/
 
 !Binaries/[Dd]ebug/
 !Binaries/[Rr]elease/
+
+/Binaries/Release/Output.log.txt
+/Binaries/Release/GNFS/

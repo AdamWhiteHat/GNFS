@@ -30,7 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExtendedArithmetic.Polynomial" Version="2022.152.744" />
+    <PackageReference Include="ExtendedArithmetic.Polynomial" Version="2023.288.635" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.0" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="6.0.0" />
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
