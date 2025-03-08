@@ -65,7 +65,7 @@ namespace GNFSCore.Core.Data
 		public BigInteger MonicPolynomialDerivativeValueSquared { get; set; }
 
 		private GNFS gnfs { get; set; }
-		public List<BigInteger> RationalNorms { get; set; }
+		public List<BigInteger> RationalNormCollection { get; set; }
 		public List<BigInteger> AlgebraicNormCollection { get; set; }
 		public List<Relation> RelationsSet { get; set; }
 

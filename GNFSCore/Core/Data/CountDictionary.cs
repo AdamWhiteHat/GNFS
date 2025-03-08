@@ -71,10 +71,15 @@ namespace GNFSCore.Core.Data
 			StringBuilder result = new StringBuilder();
 			result.Append(
 				" -> {\t" +
-				string.Join(" * ", this.Select(kvp => $"{kvp.Key}^{kvp.Value}")) +
+				FormatStringAsAProduct() +
 				"\t};"
 				);
 			return result.ToString();
+		}
+
+		public string FormatStringAsAProduct()
+		{
+			return string.Join(" * ", this.Select(kvp => $"{kvp.Key}^{kvp.Value}"));
 		}
 
 		#endregion

@@ -8,11 +8,12 @@ using ExtendedArithmetic;
 
 namespace GNFSCore.Core.Algorithm.SquareRoot
 {
-	using GNFSCore.Core.Algorithm.ExtensionMethods;
 	using GNFSCore.Core.Algorithm;
 	using GNFSCore.Core.Algorithm.IntegerMath;
+	using GNFSCore.Core.Algorithm.ExtensionMethods;
 	using GNFSCore.Core.Data;
 	using GNFSCore.Core.Data.RelationSieve;
+	using System.ComponentModel.DataAnnotations;
 	using static GNFSCore.Core.Data.GNFS;
 
 	public static class SquareRootFinder
@@ -79,7 +80,7 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 				gnfs.LogMessage("SquareFinder.CalculateAlgebraicSide() Completed.");
 
 				gnfs.LogMessage();
-				gnfs.LogMessage($"{sqrt.AlgebraicSquareRootResidue}² ≡ {sqrt.RationalSquareRootResidue}² (mod {sqrt.N})");
+				gnfs.LogMessage($"{sqrt.AlgebraicSquareRootResidue}² ≡ {sqrt.RationalSquareRootResidue}² (mod {gnfs.N})");
 				gnfs.LogMessage();
 
 				BigInteger P = foundFactors.Item1;
@@ -126,7 +127,7 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 		public static void CalculateRationalSide(CancellationToken cancelToken, List<Relation> relations, GNFS gnfs)
 		{
 			gnfs.SquareRoot.RelationsSet = relations;
-			gnfs.SquareRoot.RationalNorms = gnfs.SquareRoot.RelationsSet.Select(rel => rel.RationalNorm).ToList();
+			gnfs.SquareRoot.RationalNormCollection = gnfs.SquareRoot.RelationsSet.Select(rel => rel.RationalNorm).ToList();
 
 			CountDictionary rationalSquareFactorization = new CountDictionary();
 			foreach (var rel in gnfs.SquareRoot.RelationsSet)
@@ -134,31 +135,71 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 				rationalSquareFactorization.Combine(rel.RationalFactorization);
 			}
 
-			string rationalSquareFactorizationString = rationalSquareFactorization.FormatStringAsFactorization();
+			CountDictionary rationalSquareRootFactorization = new CountDictionary();
+			foreach (KeyValuePair<BigInteger, BigInteger> kvp in rationalSquareFactorization)
+			{
+				if (kvp.Value % 2 != 0)
+				{
+					throw new ValidationException($"The rational 'square' contains a prime, {kvp.Key}, raised to an odd power (i.e. fails to satisfy the definition of a square number). There is a problem with the implementation.");
+				}
+				rationalSquareRootFactorization.Add(kvp.Key, kvp.Value / 2);
+			}
+
+			// Calculated in a different way for sanity check comparison #1
+			BigInteger squareRootFromFactorization = BigInteger.One;
+			foreach (var kvp in rationalSquareRootFactorization)
+			{
+				squareRootFromFactorization *= BigInteger.Pow(kvp.Key, (int)kvp.Value);
+			}
+
+			string rationalSquareFactorizationString = rationalSquareFactorization.FormatStringAsAProduct();
+			string rationalSquareRootFactorizationString = rationalSquareFactorization.FormatStringAsAProduct();
 
 			LogFunction.Invoke("");
-			LogFunction.Invoke("Rational Square Dependency:");
-			LogFunction.Invoke(rationalSquareFactorizationString);
+			LogFunction.Invoke("Rational Square Root (as a product of its prime factors):");
+			LogFunction.Invoke($"sqrt({rationalSquareFactorizationString})");
+			LogFunction.Invoke("=");
+			LogFunction.Invoke(rationalSquareRootFactorizationString);
+			LogFunction.Invoke("=");
+			LogFunction.Invoke($"{squareRootFromFactorization}");
+			LogFunction.Invoke("");
 
 			if (cancelToken.IsCancellationRequested) { return; }
 
-			gnfs.SquareRoot.RationalProduct = gnfs.SquareRoot.RationalNorms.Product();
+			gnfs.SquareRoot.RationalProduct = gnfs.SquareRoot.RationalNormCollection.Product();
 
 			LogFunction.Invoke("");
-			LogFunction.Invoke($"δᵣ = {gnfs.SquareRoot.RationalProduct} = {string.Join(" * ", gnfs.SquareRoot.RationalNorms)}");
+			LogFunction.Invoke($"δᵣ = {gnfs.SquareRoot.RationalProduct} = {string.Join(" * ", gnfs.SquareRoot.RationalNormCollection)}");
 
 			BigInteger RationalProductSquareRoot = gnfs.SquareRoot.RationalProduct.SquareRoot();
+			// Calculated in a different way for sanity check comparison #2
+			var rationalProductSquareRoot = gnfs.SquareRoot.RationalNormCollection.Select(n => n.SquareRoot()).Product();
 
-			var product = gnfs.SquareRoot.PolynomialDerivativeValue * RationalProductSquareRoot;
+			BigInteger product = gnfs.SquareRoot.PolynomialDerivativeValue * RationalProductSquareRoot;
 
-			gnfs.SquareRoot.RationalSquareRootResidue = product.Mod(gnfs.SquareRoot.N);
+			gnfs.SquareRoot.RationalSquareRootResidue = product.Mod(gnfs.N);
 
 			LogFunction.Invoke("");
 			LogFunction.Invoke($"δᵣ = {RationalProductSquareRoot}^2 = {gnfs.SquareRoot.RationalProduct}");
-			LogFunction.Invoke($"χ  = {gnfs.SquareRoot.RationalSquareRootResidue} ≡ {gnfs.SquareRoot.PolynomialDerivativeValue} * {RationalProductSquareRoot} (mod {gnfs.SquareRoot.N})");
+			LogFunction.Invoke($"χ  = {gnfs.SquareRoot.RationalSquareRootResidue} ≡ {gnfs.SquareRoot.PolynomialDerivativeValue} * {RationalProductSquareRoot} (mod {gnfs.N})");
 			LogFunction.Invoke("");
 
+			bool sanityCheck1 = squareRootFromFactorization == RationalProductSquareRoot;
+			bool sanityCheck2 = RationalProductSquareRoot == rationalProductSquareRoot;
+
+			LogFunction.Invoke("Sanity checks:");
+			LogFunction.Invoke("");
+			LogFunction.Invoke("∏( (Prime-Factors(||Rational Relations||))^(Prime-Factor-Powers(||Rational Relations||)÷2) ) == SquareRoot(∏( ||Rational Relations|| ))");
+			LogFunction.Invoke($"{squareRootFromFactorization} == {RationalProductSquareRoot}");
+			LogFunction.Invoke($"{sanityCheck1}");
+			LogFunction.Invoke("");
+			LogFunction.Invoke("SquareRoot(∏( ||Rational Relations|| )) == ∏( SquareRoots(||Rational Relations||) )");
+			LogFunction.Invoke($"{RationalProductSquareRoot} == {rationalProductSquareRoot}");
+			LogFunction.Invoke($"{sanityCheck2}");
+			LogFunction.Invoke("");
+			LogFunction.Invoke("IsSquare( ∏( ||Rational Relations|| ) )");
 			gnfs.SquareRoot.IsRationalSquare = gnfs.SquareRoot.RationalProduct.IsSquare();
+
 			if (!gnfs.SquareRoot.IsRationalSquare) // This is an error in implementation. This should never happen, and so must be a bug
 			{
 				throw new Exception($"{nameof(gnfs.SquareRoot.IsRationalSquare)} evaluated to false. This is a sign that there is a bug in the implementation, as this should never be the case if the algorithm has been correctly implemented.");
@@ -271,7 +312,7 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 
 				BigInteger primeProduct = primes.Product();
 
-				if (primeProduct < gnfs.SquareRoot.N)
+				if (primeProduct < gnfs.N)
 				{
 					continue;
 				}
@@ -314,7 +355,7 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 				}
 
 				BigInteger commonModulus = Polynomial.Algorithms.ChineseRemainderTheorem(primes.ToArray(), values.ToArray()); //FiniteFieldArithmetic.ChineseRemainder(primes, values);
-				gnfs.SquareRoot.AlgebraicSquareRootResidue = commonModulus.Mod(gnfs.SquareRoot.N);
+				gnfs.SquareRoot.AlgebraicSquareRootResidue = commonModulus.Mod(gnfs.N);
 
 				LogFunction.Invoke("");
 
@@ -351,15 +392,15 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 				A = max + min;
 				B = max - min;
 
-				U = GCD.FindGCD(gnfs.SquareRoot.N, A);
-				V = GCD.FindGCD(gnfs.SquareRoot.N, B);
+				U = GCD.FindGCD(gnfs.N, A);
+				V = GCD.FindGCD(gnfs.N, B);
 
-				if (U > 1 && U != gnfs.SquareRoot.N)
+				if (U > 1 && U != gnfs.N)
 				{
 					P = U;
 					solutionFound = true;
 				}
-				else if (V > 1 && V != gnfs.SquareRoot.N)
+				else if (V > 1 && V != gnfs.N)
 				{
 					P = V;
 					solutionFound = true;
@@ -368,7 +409,7 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 				if (solutionFound)
 				{
 					BigInteger rem;
-					BigInteger other = BigInteger.DivRem(gnfs.SquareRoot.N, P, out rem);
+					BigInteger other = BigInteger.DivRem(gnfs.N, P, out rem);
 
 					if (rem != 0)
 					{
