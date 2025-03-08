@@ -5,13 +5,14 @@ using System.Numerics;
 using System.Threading;
 using System.Collections.Generic;
 using NUnit.Framework;
-
-using GNFSCore;
-using GNFSCore.Matrix;
-using GNFSCore.SquareRoot;
-using GNFSCore.IntegerMath;
+using GNFSCore.Core.Algorithm.IntegerMath;
 using System.Diagnostics;
 using NUnit.Framework.Internal.Builders;
+using GNFSCore.Core.Data.RelationSieve;
+using GNFSCore.Core.Data.Matrix;
+using GNFSCore.Core.Data;
+using GNFSCore;
+using GNFSCore.Core.Algorithm.SquareRoot;
 
 namespace TestGNFS.Integration
 {
@@ -174,7 +175,7 @@ namespace TestGNFS.Integration
 					gnfs.CurrentRelationsProgress.IncreaseTargetQuantity(100);
 				}
 
-				gnfs.CurrentRelationsProgress.GenerateRelations(cancelToken);
+				gnfs.CurrentRelationsProgress.GenerateRelations(cancelToken, gnfs);
 
 				Console.Write(".");
 				if (gnfs.CurrentRelationsProgress.SmoothRelationsCounter > last)
@@ -210,7 +211,7 @@ namespace TestGNFS.Integration
 			Assert.IsTrue(step02_passed, "IsTrue(step02_passed)");
 			Assert.IsNotNull(gnfs, "IsNotNull(gnfs)");
 
-			MatrixSolve.GaussianSolve(cancelToken, gnfs);
+			MatrixSolver.GaussianSolve(cancelToken, gnfs);
 
 			Assert.IsTrue(gnfs.CurrentRelationsProgress.FreeRelations.Any(), "IsTrue(gnfs.CurrentRelationsProgress.FreeRelations.Any())");
 
@@ -235,7 +236,7 @@ namespace TestGNFS.Integration
 			List<Relation> choosenRelationSet = gnfs.CurrentRelationsProgress.FreeRelations.Where(lst => lst.Count == maxSetSize).First();
 
 
-			bool solutionFound = SquareFinder.Solve(cancelToken, gnfs);
+			bool solutionFound = SquareRootFinder.Solve(cancelToken, gnfs);
 
 			/*	Non-trivial factors also recoverable by doing the following:
 			

@@ -4,6 +4,7 @@ using System.Threading;
 namespace GNFS_Winforms
 {
 	using GNFSCore;
+	using GNFSCore.Core.Data;
 
 	public partial class GnfsUiBridge
 	{
@@ -16,7 +17,7 @@ namespace GNFS_Winforms
 					gnfs.CurrentRelationsProgress.IncreaseTargetQuantity(100);
 				}
 
-				gnfs.CurrentRelationsProgress.GenerateRelations(cancelToken);
+				gnfs.CurrentRelationsProgress.GenerateRelations(cancelToken, gnfs);
 
 				Logging.LogMessage();
 				Logging.LogMessage($"Sieving progress saved at:");

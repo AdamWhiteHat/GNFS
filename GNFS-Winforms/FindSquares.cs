@@ -9,9 +9,9 @@ using ExtendedArithmetic;
 
 namespace GNFS_Winforms
 {
-	using GNFSCore;
-	using GNFSCore.SquareRoot;
-
+	using GNFSCore.Core.Algorithm.SquareRoot;
+	using GNFSCore.Core.Data;
+	using GNFSCore.Core.Data.RelationSieve;
 	public partial class GnfsUiBridge
 	{
 		public static GNFS FindSquares(CancellationToken cancelToken, GNFS gnfs)
@@ -24,7 +24,7 @@ namespace GNFS_Winforms
 			BigInteger polyBase = gnfs.PolynomialBase;
 			List<List<Relation>> freeRelations = gnfs.CurrentRelationsProgress.FreeRelations;
 
-			bool solutionFound = SquareFinder.Solve(cancelToken, gnfs);
+			bool solutionFound = SquareRootFinder.Solve(cancelToken, gnfs);
 
 
 

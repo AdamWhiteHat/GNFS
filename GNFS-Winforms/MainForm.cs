@@ -13,7 +13,8 @@ using System.Collections.Generic;
 namespace GNFS_Winforms
 {
 	using GNFSCore;
-	using GNFSCore.IntegerMath;
+	using GNFSCore.Core.Algorithm.IntegerMath;
+	using GNFSCore.Core.Data;
 	using System.Diagnostics;
 
 	public partial class MainForm : Form
