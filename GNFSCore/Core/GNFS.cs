@@ -61,8 +61,6 @@ namespace GNFSCore
 
 		public static LogMessageDelegate LogFunction { get; set; }
 
-		public delegate void LogMessageDelegate(string message);
-
 		#endregion
 
 		#region Constructors 
@@ -82,6 +80,7 @@ namespace GNFSCore
 			: this()
 		{
 			LogFunction = logFunction;
+			Logging.LogFunction = logFunction;
 			N = n;
 
 			SaveLocations = new DirectoryLocations(N);

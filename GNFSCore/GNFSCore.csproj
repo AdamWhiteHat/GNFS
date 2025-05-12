@@ -29,7 +29,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="ExtendedArithmetic.Polynomial" Version="2023.288.635" />
-		<PackageReference Include="ExtendedNumerics.BigRational" Version="2023.1000.2.328" />
+		<PackageReference Include="ExtendedNumerics.BigRational" Version="3000.0.1.326" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Management" Version="5.0.0" />
 	</ItemGroup>

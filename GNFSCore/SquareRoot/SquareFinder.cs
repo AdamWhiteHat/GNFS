@@ -9,6 +9,7 @@ using ExtendedArithmetic;
 namespace GNFSCore.SquareRoot
 {
 	using ExtendedNumerics.Internal;
+	using GNFSCore.Factors;
 	using IntegerMath;
 	using System.IO;
 	using System.Net.Http.Headers;
@@ -21,7 +22,6 @@ namespace GNFSCore.SquareRoot
 		public BigInteger RationalSquare { get; set; }
 		public BigInteger RationalSquareRootResidue { get; set; }
 		public bool IsRationalSquare { get; set; }
-		public bool IsRationalIrreducible { get; set; }
 
 		public BigInteger AlgebraicProduct { get; set; }
 		public BigInteger AlgebraicSquare { get; set; }
@@ -30,15 +30,13 @@ namespace GNFSCore.SquareRoot
 		public BigInteger AlgebraicSquareRootResidue { get; set; }
 		public List<BigInteger> AlgebraicPrimes { get; set; }
 		public List<BigInteger> AlgebraicResults { get; set; }
-		public bool IsAlgebraicSquare { get; set; }
-		public bool IsAlgebraicIrreducible { get; set; }
 
 		public BigInteger N { get; set; }
 		public Polynomial S { get; set; }
 		public Polynomial TotalS { get; set; }
 		public List<Tuple<BigInteger, BigInteger>> RootsOfS { get; set; }
 		public Polynomial PolynomialRing { get; set; }
-		public List<Polynomial> PolynomialRingElements { get; set; }
+		public List<Polynomial> PolynomialRingElements_PrimeIdeals { get; set; }
 
 		public BigInteger PolynomialBase { get; set; }
 		public Polynomial MonicPolynomial { get; set; }
@@ -51,7 +49,6 @@ namespace GNFSCore.SquareRoot
 		public BigInteger PolynomialDerivativeValue { get; set; }
 		public BigInteger PolynomialDerivativeValueSquared { get; set; }
 
-
 		public Polynomial MonicPolynomialDerivativeSquared { get; set; }
 		public Polynomial MonicPolynomialDerivativeSquaredInField { get; set; }
 
@@ -60,7 +57,6 @@ namespace GNFSCore.SquareRoot
 
 		private GNFS gnfs { get; set; }
 		private List<BigInteger> rationalNorms { get; set; }
-		private List<BigInteger> algebraicNormCollection { get; set; }
 		private List<Relation> relationsSet { get; set; }
 
 		private LogMessageDelegate LogFunction;
@@ -80,17 +76,17 @@ namespace GNFSCore.SquareRoot
 			PolynomialDerivativeSquared = Polynomial.Square(PolynomialDerivative);
 			PolynomialDerivativeSquaredInField = Polynomial.Field.Modulus(PolynomialDerivativeSquared, gnfs.CurrentPolynomial);
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"ƒ'(θ) = {PolynomialDerivative}");
-			LogFunction.Invoke($"ƒ'(θ)² = {PolynomialDerivativeSquared}");
-			LogFunction.Invoke($"ƒ'(θ)² ∈ ℤ[θ] = {PolynomialDerivativeSquaredInField}");
+			Logging.WriteLine();
+			Logging.WriteLine($"ƒ'(θ) = {PolynomialDerivative}");
+			Logging.WriteLine($"ƒ'(θ)² = {PolynomialDerivativeSquared}");
+			Logging.WriteLine($"ƒ'(θ)² ∈ ℤ[θ] = {PolynomialDerivativeSquaredInField}");
 
 			PolynomialDerivativeValue = PolynomialDerivative.Evaluate(gnfs.PolynomialBase);
 			PolynomialDerivativeValueSquared = BigInteger.Pow(PolynomialDerivativeValue, 2);
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"ƒ'(m) = {PolynomialDerivativeValue}");
-			LogFunction.Invoke($"ƒ'(m)² = {PolynomialDerivativeValueSquared}");
+			Logging.WriteLine();
+			Logging.WriteLine($"ƒ'(m) = {PolynomialDerivativeValue}");
+			Logging.WriteLine($"ƒ'(m)² = {PolynomialDerivativeValueSquared}");
 
 
 			MonicPolynomial = Polynomial.MakeMonic(gnfs.CurrentPolynomial, PolynomialBase);
@@ -101,16 +97,11 @@ namespace GNFSCore.SquareRoot
 			MonicPolynomialDerivativeValue = MonicPolynomialDerivative.Evaluate(gnfs.PolynomialBase);
 			MonicPolynomialDerivativeValueSquared = MonicPolynomialDerivativeSquared.Evaluate(gnfs.PolynomialBase);
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"MonicPolynomial: {MonicPolynomial}");
-			LogFunction.Invoke($"MonicPolynomialDerivative: {MonicPolynomialDerivative}");
-			LogFunction.Invoke($"MonicPolynomialDerivativeSquared: {MonicPolynomialDerivativeSquared}");
-			LogFunction.Invoke($"MonicPolynomialDerivativeSquaredInField: {MonicPolynomialDerivativeSquaredInField}");
-		}
-
-		private static bool IsPrimitive(IEnumerable<BigInteger> coefficients)
-		{
-			return (GCD.FindGCD(coefficients) == 1);
+			Logging.WriteLine();
+			Logging.WriteLine($"MonicPolynomial: {MonicPolynomial}");
+			Logging.WriteLine($"MonicPolynomialDerivative: {MonicPolynomialDerivative}");
+			Logging.WriteLine($"MonicPolynomialDerivativeSquared: {MonicPolynomialDerivativeSquared}");
+			Logging.WriteLine($"MonicPolynomialDerivativeSquaredInField: {MonicPolynomialDerivativeSquaredInField}");
 		}
 
 		public static bool Solve(CancellationToken cancelToken, GNFS gnfs)
@@ -156,7 +147,7 @@ namespace GNFSCore.SquareRoot
 				gnfs.LogMessage();
 				gnfs.LogMessage("Calculating Rational Square Root β ∈ ℤ[θ] ...");
 				gnfs.LogMessage();
-				squareRootFinder.CalculateRationalSide(cancelToken, selectedRelationSet);
+				BigInteger rationalSquareRoot = squareRootFinder.CalculateRationalSide(cancelToken, selectedRelationSet);
 
 				if (cancelToken.IsCancellationRequested) { gnfs.LogMessage("Abort: Task canceled by user!"); break; }
 
@@ -167,37 +158,60 @@ namespace GNFSCore.SquareRoot
 				gnfs.LogMessage("δ in a finite field 𝔽ᵨ(θᵨ) ...");
 				gnfs.LogMessage();
 
-				Tuple<BigInteger, BigInteger> foundFactors = squareRootFinder.CalculateAlgebraicSide(cancelToken);
-
-				if (cancelToken.IsCancellationRequested) { gnfs.LogMessage("Abort: Task canceled by user!"); break; }
-
-				gnfs.LogMessage("SquareFinder.CalculateAlgebraicSide() Completed.");
-
-				gnfs.LogMessage();
-				gnfs.LogMessage($"{squareRootFinder.AlgebraicSquareRootResidue}² ≡ {squareRootFinder.RationalSquareRootResidue}² (mod {squareRootFinder.N})");
-				gnfs.LogMessage();
-
-				BigInteger P = foundFactors.Item1;
-				BigInteger Q = foundFactors.Item2;
-
-				bool nonTrivialFactorsFound = (P != 1 || Q != 1);
-				if (nonTrivialFactorsFound)
+				foreach (BigInteger algebraicSquareRoot in squareRootFinder.CalculateAlgebraicSide(cancelToken))
 				{
-					solutionFound = gnfs.SetFactorizationSolution(P, Q);
+					gnfs.LogMessage("SquareFinder.CalculateAlgebraicSide() Completed.");
 
-					gnfs.LogMessage($"Selected solution set index # {freeRelationIndex + 1}");
+					BigInteger min = BigInteger.Min(rationalSquareRoot, algebraicSquareRoot);
+					BigInteger max = BigInteger.Max(rationalSquareRoot, algebraicSquareRoot);
+
+					BigInteger A = max + min;
+					BigInteger B = max - min;
+
+					BigInteger C = GCD.FindGCD(gnfs.N, A);
+					BigInteger D = GCD.FindGCD(gnfs.N, B);
+
+					if ((C > 1 && C != gnfs.N) || (D > 1 && D != gnfs.N))
+					{
+
+						BigInteger P = 1;
+						if (C > 1)
+						{
+							P = C;
+						}
+						else if (D > 1)
+						{
+							P = D;
+						}
+
+						BigInteger Q = gnfs.N / P;
+						if (Q != 1 && Q != gnfs.N)
+						{
+							solutionFound = true;
+						}
+
+						gnfs.SetFactorizationSolution(P, Q);
+						break;
+					}
+
+					if (cancelToken.IsCancellationRequested) { gnfs.LogMessage("Abort: Task canceled by user!"); break; }
+				}
+
+				if (solutionFound)
+				{
+					gnfs.LogMessage();
+					gnfs.LogMessage($"{squareRootFinder.AlgebraicSquareRootResidue}² ≡ {squareRootFinder.RationalSquareRootResidue}² (mod {squareRootFinder.N})");
 					gnfs.LogMessage();
 
-					if (solutionFound)
-					{
-						gnfs.LogMessage("NON-TRIVIAL FACTORS FOUND!");
-						gnfs.LogMessage();
-						gnfs.LogMessage(squareRootFinder.ToString());
-						gnfs.LogMessage();
-						gnfs.LogMessage();
-						gnfs.LogMessage(gnfs.Factorization.ToString());
-						gnfs.LogMessage();
-					}
+
+					gnfs.LogMessage("NON-TRIVIAL FACTORS FOUND!");
+					gnfs.LogMessage();
+					gnfs.LogMessage(squareRootFinder.ToString());
+					gnfs.LogMessage();
+					gnfs.LogMessage();
+					gnfs.LogMessage(gnfs.Factorization.ToString());
+					gnfs.LogMessage();
+
 					break;
 				}
 				else if (cancelToken.IsCancellationRequested)
@@ -218,7 +232,7 @@ namespace GNFSCore.SquareRoot
 			return solutionFound;
 		}
 
-		public void CalculateRationalSide(CancellationToken cancelToken, List<Relation> relations)
+		public BigInteger CalculateRationalSide(CancellationToken cancelToken, List<Relation> relations)
 		{
 			relationsSet = relations;
 			rationalNorms = relationsSet.Select(rel => rel.RationalNorm).ToList();
@@ -231,16 +245,17 @@ namespace GNFSCore.SquareRoot
 
 			string rationalSquareFactorizationString = rationalSquareFactorization.FormatStringAsFactorization();
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke("Rational Square Dependency:");
-			LogFunction.Invoke(rationalSquareFactorizationString);
+			Logging.WriteLine();
+			Logging.WriteLine("Rational Square Dependency:");
+			Logging.WriteLine(rationalSquareFactorizationString);
 
-			if (cancelToken.IsCancellationRequested) { return; }
+			if (cancelToken.IsCancellationRequested) { return -1; }
 
 			RationalProduct = rationalNorms.Product();
+			RationalSquare = RationalProduct;
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"δᵣ = {RationalProduct} = {string.Join(" * ", rationalNorms)}");
+			Logging.WriteLine();
+			Logging.WriteLine($"δᵣ = {RationalProduct} = {string.Join(" * ", rationalNorms)}");
 
 			BigInteger RationalProductSquareRoot = RationalProduct.SquareRoot();
 
@@ -248,25 +263,27 @@ namespace GNFSCore.SquareRoot
 
 			RationalSquareRootResidue = product.Mod(N);
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"δᵣ = {RationalProductSquareRoot}^2 = {RationalProduct}");
-			LogFunction.Invoke($"χ  = {RationalSquareRootResidue} ≡ {PolynomialDerivativeValue} * {RationalProductSquareRoot} (mod {N})");
-			LogFunction.Invoke("");
+			Logging.WriteLine();
+			Logging.WriteLine($"δᵣ = {RationalProductSquareRoot}^2 = {RationalProduct}");
+			Logging.WriteLine($"χ  = {RationalSquareRootResidue} ≡ {PolynomialDerivativeValue} * {RationalProductSquareRoot} (mod {N})");
+			Logging.WriteLine();
 
 			IsRationalSquare = RationalProduct.IsSquare();
 			if (!IsRationalSquare) // This is an error in implementation. This should never happen, and so must be a bug
 			{
 				throw new Exception($"{nameof(IsRationalSquare)} evaluated to false. This is a sign that there is a bug in the implementation, as this should never be the case if the algorithm has been correctly implemented.");
 			}
+
+			return RationalSquareRootResidue;
 		}
 
-		public Tuple<BigInteger, BigInteger> CalculateAlgebraicSide(CancellationToken cancelToken)
+		public IEnumerable<BigInteger> CalculateAlgebraicSide(CancellationToken cancelToken)
 		{
 			RootsOfS.AddRange(relationsSet.Select(rel => new Tuple<BigInteger, BigInteger>(rel.A, rel.B)));
 
-			if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); }
+			if (cancelToken.IsCancellationRequested) { yield break; }
 
-			PolynomialRingElements = new List<Polynomial>();
+			PolynomialRingElements_PrimeIdeals = new List<Polynomial>();
 			foreach (Relation rel in relationsSet)
 			{
 				// poly(x) = A + (B * x)
@@ -279,23 +296,25 @@ namespace GNFSCore.SquareRoot
 						}
 					);
 
-				PolynomialRingElements.Add(newPoly);
+				PolynomialRingElements_PrimeIdeals.Add(newPoly);
 			}
 
-			if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); }
+			if (cancelToken.IsCancellationRequested) { yield break; }
 
-			PolynomialRing = Polynomial.Product(PolynomialRingElements);
+			PolynomialRing = Polynomial.Product(PolynomialRingElements_PrimeIdeals);
 			Polynomial PolynomialRingInField = Polynomial.Field.Modulus(PolynomialRing, MonicPolynomial);
 
+			AlgebraicProduct = PolynomialRing.Evaluate(gnfs.PolynomialBase);
+			AlgebraicProductModF = PolynomialRingInField.Evaluate(gnfs.PolynomialBase);
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"∏ Sᵢ = {PolynomialRing}");
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"∏ Sᵢ = {PolynomialRingInField}");
-			LogFunction.Invoke(" in ℤ");
-			LogFunction.Invoke("");
+			Logging.WriteLine();
+			Logging.WriteLine($"∏ Sᵢ = {PolynomialRing}");
+			Logging.WriteLine();
+			Logging.WriteLine($"∏ Sᵢ = {PolynomialRingInField}");
+			Logging.WriteLine(" in ℤ");
+			Logging.WriteLine();
 
-			if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); }
+			if (cancelToken.IsCancellationRequested) { yield break; }
 
 			// Multiply the product of the polynomial elements by f'(x)^2
 			// This will guarantee that the square root of product of polynomials
@@ -303,224 +322,69 @@ namespace GNFSCore.SquareRoot
 			TotalS = Polynomial.Multiply(PolynomialRing, MonicPolynomialDerivativeSquared);
 			S = Polynomial.Field.Modulus(TotalS, MonicPolynomial);
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"δᵨ = {TotalS}");
-			LogFunction.Invoke($"δᵨ = {S}");
-			LogFunction.Invoke(" in ℤ");
+			AlgebraicSquare = TotalS.Evaluate(gnfs.PolynomialBase);
+			AlgebraicSquareResidue = S.Evaluate(gnfs.PolynomialBase);
 
-			bool solutionFound = false;
+			Logging.WriteLine();
+			Logging.WriteLine($"δᵨ = {TotalS}");
+			Logging.WriteLine($"δᵨ = {S}");
+			Logging.WriteLine(" in ℤ");
 
 			int degree = MonicPolynomial.Degree;
 			Polynomial f = MonicPolynomial;// gnfs.CurrentPolynomial;
 
 			BigInteger lastP = gnfs.QuadraticFactorPairCollection.Last().P; //quadraticPrimes.First(); //BigInteger.Max(fromRoot, fromQuadraticFactorPairs); //N / N.ToString().Length; //((N * 3) + 1).NthRoot(3); //gnfs.QFB.Select(fp => fp.P).Max();
-			lastP = PrimeFactory.GetNextPrime(lastP + 1);
 
-			List<BigInteger> primes = new List<BigInteger>();
-			List<BigInteger> values = new List<BigInteger>();
+			lastP = BigInteger.Max(lastP, N.SquareRoot() * 2);
 
-			int attempts = 7;
-			while (!solutionFound && attempts > 0)
+			BigInteger p;
+
+			if (cancelToken.IsCancellationRequested) { yield break; }
+
+			List<(BigInteger prime, BigInteger value)> compatableFields = new List<(BigInteger prime, BigInteger value)>();
+
+			do
 			{
-				if (primes.Count > 0 && values.Count > 0)
+				p = PrimeFactory.GetNextPrime(lastP + 1);
+
+				if (compatableFields.Count == degree)
 				{
-					primes.Clear();
-					values.Clear();
+					compatableFields.RemoveAt(0);
 				}
 
-				do
+				Polynomial g = Polynomial.Parse($"X^{lastP} - X");
+				Polynomial h = Polynomial.Field.ModMod(g, f, lastP);
+				Polynomial gcd = Polynomial.Field.GCD(h, f, lastP);
+
+				bool isIrreducible = gcd.CompareTo(Polynomial.One) == 0;
+				if (isIrreducible)
 				{
-					if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); }
+					Polynomial sqrtOfS = FiniteFieldArithmetic.SquareRoot(S, gnfs.CurrentPolynomial, p, gnfs.PolynomialDegree, gnfs.PolynomialBase);
 
-					lastP = PrimeFactory.GetNextPrime(lastP + 1);
+					BigInteger eval = sqrtOfS.Evaluate(gnfs.PolynomialBase);
+					BigInteger x = GNFSCore.BigIntegerExtensionMethods.Mod(eval, p);
 
-					Polynomial g = Polynomial.Parse($"X^{lastP} - X");
-					Polynomial h = FiniteFieldArithmetic.ModMod(g, f, lastP);
+					//Polynomial inverse = ModularInverse(sqrtOfS, p);
+					//BigInteger inverseEval = inverse.Evaluate(gnfs.PolynomialBase);
+					//BigInteger inverseX = GNFSCore.BigIntegerExtensionMethods.Mod(inverseEval, p);
 
-					Polynomial gcd = Polynomial.Field.GCD(h, f, lastP);
-
-					bool isIrreducible = gcd.CompareTo(Polynomial.One) == 0;
-					if (!isIrreducible)
-					{
-						continue;
-					}
-
-					primes.Add(lastP);
-				}
-				while (primes.Count < degree);
-
-				if (primes.Count > degree)
-				{
-					primes.Remove(primes.First());
-					if (values.Count > degree)
-					{
-						values.Remove(values.First());
-					}
+					compatableFields.Add(new(p, x));
 				}
 
-				BigInteger primeProduct = primes.Product();
-
-				if (primeProduct < N)
+				if (compatableFields.Count == degree)
 				{
-					continue;
+					AlgebraicPrimes = compatableFields.Select(cf => cf.prime).ToList();
+					AlgebraicResults = compatableFields.Select(cf => cf.value).ToList();
+
+					AlgebraicSquareRootResidue = FiniteFieldArithmetic.ChineseRemainder(N, AlgebraicPrimes, AlgebraicResults);
+					yield return AlgebraicSquareRootResidue;
 				}
 
-				if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); ; }
-
-				bool takeInverse = false;
-				foreach (BigInteger p in primes)
-				{
-					Polynomial choosenPoly = FiniteFieldArithmetic.SquareRoot(S, f, p, degree, gnfs.PolynomialBase);
-					BigInteger choosenX;
-
-					//if (takeInverse)
-					//{
-					//	Polynomial inverse = ModularInverse(choosenPoly, p);
-					//	BigInteger inverseEval = inverse.Evaluate(gnfs.PolynomialBase);
-					//	BigInteger inverseX = inverseEval.Mod(p);
-					//
-					//	choosenPoly = inverse;
-					//	choosenX = inverseX;
-					//}
-					//else
-					//{
-					BigInteger eval = choosenPoly.Evaluate(gnfs.PolynomialBase);
-					BigInteger x = eval.Mod(p);
-
-					choosenX = x;
-					//}
-
-					values.Add(choosenX);
-
-					LogFunction.Invoke("");
-					LogFunction.Invoke($" β = {choosenPoly}");
-					LogFunction.Invoke($"xi = {choosenX}");
-					LogFunction.Invoke($" p = {p}");
-					LogFunction.Invoke($"{primeProduct / p}");
-					LogFunction.Invoke("");
-
-					takeInverse = !takeInverse;
-				}
-
-				BigInteger commonModulus = Polynomial.Algorithms.ChineseRemainderTheorem(primes.ToArray(), values.ToArray()); //FiniteFieldArithmetic.ChineseRemainder(primes, values);
-				AlgebraicSquareRootResidue = commonModulus.Mod(N);
-
-				LogFunction.Invoke("");
-
-				int index = -1;
-				while ((++index) < primes.Count)
-				{
-					var tp = primes[index];
-					var tv = values[index];
-
-					LogFunction.Invoke($"{tp} ≡ {tv} (mod {AlgebraicSquareRootResidue})");
-				}
-
-
-
-				LogFunction.Invoke("");
-				LogFunction.Invoke($"γ = {AlgebraicSquareRootResidue}"); // δ mod N 
-
-				BigInteger algebraicSquareRoot = 1;
-
-				BigInteger min;
-				BigInteger max;
-				BigInteger A;
-				BigInteger B;
-				BigInteger U;
-				BigInteger V;
-				BigInteger P = 0;
-				BigInteger Q;
-
-				if (cancelToken.IsCancellationRequested) { return new Tuple<BigInteger, BigInteger>(1, 1); }
-
-				min = BigInteger.Min(RationalSquareRootResidue, AlgebraicSquareRootResidue);
-				max = BigInteger.Max(RationalSquareRootResidue, AlgebraicSquareRootResidue);
-
-				A = max + min;
-				B = max - min;
-
-				U = GCD.FindGCD(N, A);
-				V = GCD.FindGCD(N, B);
-
-				if (U > 1 && U != N)
-				{
-					P = U;
-					solutionFound = true;
-				}
-				else if (V > 1 && V != N)
-				{
-					P = V;
-					solutionFound = true;
-				}
-
-				if (solutionFound)
-				{
-					BigInteger rem;
-					BigInteger other = BigInteger.DivRem(N, P, out rem);
-
-					if (rem != 0)
-					{
-						solutionFound = false;
-					}
-					else
-					{
-						Q = other;
-						AlgebraicResults = values;
-						//AlgebraicSquareRootResidue = AlgebraicSquareRootResidue;
-						AlgebraicPrimes = primes;
-
-						return new Tuple<BigInteger, BigInteger>(P, Q);
-					}
-				}
-
-				if (!solutionFound)
-				{
-					GNFS.LogFunction($"No solution found amongst the algebraic square roots {{ {string.Join(", ", values.Select(v => v.ToString()))} }} mod primes {{ {string.Join(", ", primes.Select(p => p.ToString()))} }}");
-
-					attempts--;
-				}
+				lastP = p;
 			}
+			while (true);
 
-			return new Tuple<BigInteger, BigInteger>(1, 1);
-		}
-
-		private static Tuple<BigInteger, BigInteger> AlgebraicSquareRoot(Polynomial f, BigInteger m, int degree, Polynomial dd, BigInteger p)
-		{
-			Polynomial startPolynomial = Polynomial.Field.Modulus(dd, p);
-			Polynomial startInversePolynomial = ModularInverse(startPolynomial, p);
-
-			Polynomial startSquared1 = FiniteFieldArithmetic.ModMod(Polynomial.Square(startPolynomial), f, p);
-			Polynomial startSquared2 = FiniteFieldArithmetic.ModMod(Polynomial.Square(startInversePolynomial), f, p);
-
-			Polynomial resultPoly1 = FiniteFieldArithmetic.SquareRoot(startPolynomial, f, p, degree, m);
-			Polynomial resultPoly2 = ModularInverse(resultPoly1, p);
-
-			Polynomial resultSquared1 = FiniteFieldArithmetic.ModMod(Polynomial.Square(resultPoly1), f, p);
-			Polynomial resultSquared2 = FiniteFieldArithmetic.ModMod(Polynomial.Square(resultPoly2), f, p);
-
-			bool bothResultsAgree = (resultSquared1.CompareTo(resultSquared2) == 0);
-
-			bool resultSquaredEqualsInput1 = (startPolynomial.CompareTo(resultSquared1) == 0);
-			bool resultSquaredEqualsInput2 = (startInversePolynomial.CompareTo(resultSquared1) == 0);
-
-			BigInteger result1 = resultPoly1.Evaluate(m).Mod(p);
-			BigInteger result2 = resultPoly2.Evaluate(m).Mod(p);
-
-			BigInteger inversePrime = p - result1;
-			bool testEvaluationsAreModularInverses = inversePrime == result2;
-
-			if (bothResultsAgree && testEvaluationsAreModularInverses)
-			{
-				return new Tuple<BigInteger, BigInteger>(BigInteger.Min(result1, result2), BigInteger.Max(result1, result2));
-			}
-
-			return new Tuple<BigInteger, BigInteger>(BigInteger.Zero, BigInteger.Zero);
-		}
-
-		private static Polynomial ModularInverse(Polynomial poly, BigInteger mod)
-		{
-			return new Polynomial(Term.GetTerms(poly.Terms.Select(trm => (mod - trm.CoEfficient).Mod(mod)).ToArray()));
+			yield break;
 		}
 
 		public override string ToString()
@@ -528,7 +392,7 @@ namespace GNFSCore.SquareRoot
 			StringBuilder result = new StringBuilder();
 
 			result.AppendLine("Polynomial ring:");
-			result.AppendLine($"({string.Join(") * (", PolynomialRingElements.Select(ply => ply.ToString()))})");
+			result.AppendLine($"({string.Join(") * (", PolynomialRingElements_PrimeIdeals.Select(ply => ply.ToString()))})");
 			result.AppendLine();
 			result.AppendLine($"∏ Sᵢ =");
 			result.AppendLine($"{PolynomialRing}");
@@ -551,34 +415,33 @@ namespace GNFSCore.SquareRoot
 			result.AppendLine($"γ² = √( {RationalSquare} )");
 			result.AppendLine($"IsRationalSquare  ? {IsRationalSquare}");
 			result.AppendLine($"γ  =    {RationalSquareRootResidue} mod N"); // δ mod N 
-			result.AppendLine($"IsRationalIrreducible  ? {IsRationalIrreducible}");
 			result.AppendLine();
 			result.AppendLine();
 			result.AppendLine("Square finder, Algebraic:");
 			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicProduct} * {PolynomialDerivativeValue}");
 			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicSquare}");
-			result.AppendLine($"IsAlgebraicSquare ? {IsAlgebraicSquare}");
+			result.AppendLine($"IsAlgebraicSquare ? {AlgebraicSquare.IsSquare()}");
+			result.AppendLine();
 			result.AppendLine($"χ = Sₐ(m) * ƒ'(m) mod N = {AlgebraicSquareRootResidue}");
-			result.AppendLine($"IsAlgebraicIrreducible ? {IsAlgebraicIrreducible}");
 			result.AppendLine();
 			result.AppendLine($"X² / ƒ(m) = {AlgebraicProductModF}  IsSquare? {AlgebraicProductModF.IsSquare()}");
 			result.AppendLine($"S (x)       = {AlgebraicSquareResidue}  IsSquare? {AlgebraicSquareResidue.IsSquare()}");
+			result.AppendLine();
 			result.AppendLine($"AlgebraicResults:");
 			result.AppendLine($"{AlgebraicResults.FormatString(false)}");
 			result.AppendLine();
 			result.AppendLine();
-
 			result.AppendLine("Primes:");
 			result.AppendLine($"{string.Join(" * ", AlgebraicPrimes)}"); // .RelationsSet.Select(rel => rel.B).Distinct().OrderBy(relB => relB))
 			result.AppendLine();
 			result.AppendLine();
-			//result.AppendLine("Roots of S(x):");
-			//result.AppendLine($"{{{string.Join(", ", RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");
-			//result.AppendLine();
-			//result.AppendLine();
-			//result.AppendLine($"∏(a + mb) = {squareRootFinder.RationalProduct}");
-			//result.AppendLine($"∏ƒ(a/b)   = {squareRootFinder.AlgebraicProduct}");
-			//result.AppendLine();
+			result.AppendLine("Roots of S(x):");
+			result.AppendLine($"{{{string.Join(", ", RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");
+			result.AppendLine();
+			result.AppendLine();
+			result.AppendLine($"∏(a + mb) = {RationalProduct}");
+			result.AppendLine($"∏ƒ(a/b)   = {AlgebraicProduct}");
+			result.AppendLine();
 
 			BigInteger min = BigInteger.Min(RationalSquareRootResidue, AlgebraicSquareRootResidue);
 			BigInteger max = BigInteger.Max(RationalSquareRootResidue, AlgebraicSquareRootResidue);
@@ -591,28 +454,27 @@ namespace GNFSCore.SquareRoot
 
 			BigInteger answer = BigInteger.Max(gcdAdd, gcdSub);
 
-
-			result.AppendLine();
-			result.AppendLine($"GCD(N, γ+χ) = {gcdAdd}");
-			result.AppendLine($"GCD(N, γ-χ) = {gcdSub}");
-			result.AppendLine();
-			result.AppendLine($"Solution? {(answer != 1).ToString().ToUpper()}");
-
-			if (answer != 1)
+			if (gnfs.IsFactored)
 			{
 				result.AppendLine();
-				result.AppendLine();
-				result.AppendLine("*********************");
-				result.AppendLine();
-				result.AppendLine($" SOLUTION = {answer} ");
-				result.AppendLine();
-				result.AppendLine("*********************");
-				result.AppendLine();
-				result.AppendLine();
+				result.AppendLine($"Solution? YES");
+
+				if (answer != 1)
+				{
+					result.AppendLine();
+					result.AppendLine();
+					result.AppendLine("*********************");
+					result.AppendLine();
+					result.AppendLine($" P = {gnfs.Factorization.P} ");
+					result.AppendLine($" Q = {gnfs.Factorization.Q} ");
+					result.AppendLine();
+					result.AppendLine("*********************");
+					result.AppendLine();
+					result.AppendLine();
+				}
 			}
 
 			result.AppendLine();
-
 			return result.ToString();
 		}
 	}

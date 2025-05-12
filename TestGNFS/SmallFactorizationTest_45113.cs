@@ -195,6 +195,12 @@ namespace TestGNFS.Integration
 				new Relation(gnfs, 11, 7)
 			};
 
+			foreach (var dep in dependency)
+			{
+				dep.IsPersisted = false;
+				dep.Sieve(gnfs.CurrentRelationsProgress);
+			}
+
 			gnfs.CurrentRelationsProgress = new PolyRelationsSieveProgress(gnfs, 38, 1000);
 
 			foreach (Relation rel in relations)
@@ -220,18 +226,41 @@ namespace TestGNFS.Integration
 				algebraicDependency.Combine(rel.AlgebraicFactorization);
 			}
 
-			GNFSCore.Matrix.MatrixSolve.GaussianSolve(CancellationToken.None, gnfs);
+			//GNFSCore.Matrix.MatrixSolve.GaussianSolve(CancellationToken.None, gnfs);
+			Serialization.Save.Relations.Free.SingleSolution(gnfs, dependency);
+
+			BigInteger Rational_Square = 1;
+			BigInteger Rational_SquareRoot = 1;
+			foreach (var kvp in rationalDependency)
+			{
+				int pow = (int)kvp.Value;
+				Rational_Square *= BigInteger.Pow(kvp.Key, pow);
+				Rational_SquareRoot *= BigInteger.Pow(kvp.Key, pow / 2);
+			}
+
+			BigInteger Algebraic_Square = 1;
+			BigInteger Algebraic_SquareRoot = 1;
+			foreach (var kvp in algebraicDependency)
+			{
+				int pow = (int)kvp.Value;
+				Algebraic_Square *= BigInteger.Pow(kvp.Key, pow);
+				Algebraic_SquareRoot *= BigInteger.Pow(kvp.Key, pow / 2);
+			}
+
 
 			TestContext.WriteLine();
 
-			TestContext.WriteLine("Rational Dependency;");
+			TestContext.WriteLine("Rational Dependency:");
 			TestContext.WriteLine(rationalDependency.ToString());
+			TestContext.WriteLine($"Total (a square number): {Rational_Square}");
 
 			TestContext.WriteLine();
 
 			TestContext.WriteLine("Algebraic Dependency:");
 			TestContext.WriteLine(algebraicDependency.ToString());
+			TestContext.WriteLine($"Total (a square number): {Algebraic_Square}");
 
+			TestContext.WriteLine();
 
 			List<Polynomial> PolynomialRingElements = new List<Polynomial>();
 			foreach (Relation rel in dependency)
@@ -249,7 +278,6 @@ namespace TestGNFS.Integration
 				PolynomialRingElements.Add(newPoly);
 			}
 
-
 			Polynomial PolynomialDerivative = Polynomial.GetDerivativePolynomial(gnfs.CurrentPolynomial);
 			BigInteger PolynomialDerivativeValue = PolynomialDerivative.Evaluate(gnfs.PolynomialBase);
 			BigInteger PolynomialDerivativeValueSquared = BigInteger.Pow(PolynomialDerivativeValue, 2);
@@ -265,26 +293,9 @@ namespace TestGNFS.Integration
 			TestContext.WriteLine($"f'(θ) = {MonicPolynomialDerivativeValue}");
 			TestContext.WriteLine();
 
-			BigInteger sqrtTotal_Algebraic = 1;
-			foreach (var kvp in algebraicDependency)
-			{
-				int pow = (int)kvp.Value / 2;
-				sqrtTotal_Algebraic *= BigInteger.Pow(kvp.Key, pow);
-			}
-
-			BigInteger sqrtTotal_Rational = 1;
-			foreach (var kvp in rationalDependency)
-			{
-				int pow = (int)kvp.Value / 2;
-				sqrtTotal_Rational *= BigInteger.Pow(kvp.Key, pow);
-			}
-
-
 			TestContext.WriteLine();
-			TestContext.WriteLine($"Algebraic Half-Primes Sqrt: {sqrtTotal_Algebraic} * f'(θ) = {(sqrtTotal_Algebraic * MonicPolynomialDerivativeValue)} ≡ {GNFSCore.BigIntegerExtensionMethods.Mod(sqrtTotal_Algebraic * MonicPolynomialDerivativeValue, N)} (mod N)");
-			TestContext.WriteLine($"Rational  Half-Primes Sqrt: {sqrtTotal_Rational}");
-
-
+			TestContext.WriteLine($"Algebraic Half-Primes Sqrt: {Algebraic_SquareRoot} * f'(θ) = {(Algebraic_SquareRoot * MonicPolynomialDerivativeValue)} ≡ {GNFSCore.BigIntegerExtensionMethods.Mod(Algebraic_SquareRoot * MonicPolynomialDerivativeValue, N)} (mod N)");
+			TestContext.WriteLine($"Rational  Half-Primes Sqrt: {Rational_SquareRoot}");
 
 
 			Polynomial PolynomialRing = Polynomial.Product(PolynomialRingElements);
@@ -352,8 +363,8 @@ namespace TestGNFS.Integration
 				TestContext.WriteLine($"(β) = ({inverse})");
 				TestContext.WriteLine($"({inverseX})");
 				TestContext.WriteLine();
-				TestContext.WriteLine($"{p}");
-				TestContext.WriteLine($"{P / p}");
+				TestContext.WriteLine($"  pᵢ = {p}");
+				TestContext.WriteLine($"P/pᵢ = {P / p}");
 
 				if (takeInverse)
 				{
@@ -369,18 +380,15 @@ namespace TestGNFS.Integration
 				takeInverse = !takeInverse;
 			}
 
-
-			BigInteger commonModulus = FiniteFieldArithmetic.ChineseRemainder(primes, values);
+			BigInteger commonModulus = FiniteFieldArithmetic.ChineseRemainder(gnfs.N, primes, values);
 
 			TestContext.WriteLine();
 			TestContext.WriteLine($"ChineseRemainder.Result : {commonModulus}");
 
-			BigInteger expected_ChineseRemainderResult = BigInteger.Parse("694683807559");
+			BigInteger expected_ChineseRemainderResult = BigInteger.Parse("43922");
 			Assert.AreEqual(expected_ChineseRemainderResult, commonModulus);
 
-
 			BigInteger algebraicSquareRoot = GNFSCore.BigIntegerExtensionMethods.Mod(commonModulus, N);
-
 
 			TestContext.WriteLine();
 			TestContext.WriteLine($"χ = {RationalSqrt}");

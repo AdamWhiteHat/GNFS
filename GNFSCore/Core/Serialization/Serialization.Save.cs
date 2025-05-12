@@ -39,9 +39,9 @@ namespace GNFSCore
 					counter++;
 				}
 
-				//Save.FactorBase.Rational(gnfs);
-				//Save.FactorBase.Algebraic(gnfs);
-				//Save.FactorBase.Quadratic(gnfs);
+				Save.FactorBase.Rational(gnfs);
+				Save.FactorBase.Algebraic(gnfs);
+				Save.FactorBase.Quadratic(gnfs);
 
 				Save.FactorPair.Rational(gnfs);
 				Save.FactorPair.Algebraic(gnfs);
@@ -57,7 +57,7 @@ namespace GNFSCore
 				Save.Object(gnfs, gnfs.SaveLocations.GnfsParameters_SaveFile);
 			}
 
-			/*
+			
 			public static class FactorBase
 			{
 				public static void Rational(GNFS gnfs)
@@ -84,7 +84,7 @@ namespace GNFSCore
 					}
 				}
 			}
-			*/
+			
 
 			public static class FactorPair
 			{
