@@ -4,16 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Numerics;
 using Newtonsoft.Json;
-using System.Threading;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace GNFSCore.Core.Data.RelationSieve
+namespace GNFSCore.Data.RelationSieve
 {
-	using GNFSCore.Core.Algorithm;
-	using GNFSCore.Core.Algorithm.ExtensionMethods;
-	using GNFSCore.Core.Algorithm.IntegerMath;
-	using GNFSCore.Core.Data;
+	using Algorithm.ExtensionMethods;
+	using Algorithm.IntegerMath;
 
 	[DataContract]
 	public class PolyRelationsSieveProgress

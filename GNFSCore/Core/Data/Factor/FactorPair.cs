@@ -2,7 +2,7 @@
 using System.Numerics;
 using Newtonsoft.Json;
 
-namespace GNFSCore.Core.Data
+namespace GNFSCore.Data
 {
 	public struct FactorPair : IEquatable<FactorPair>
 	{

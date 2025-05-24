@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GNFSCore
 {
@@ -45,7 +41,7 @@ namespace GNFSCore
 		private static string superscriptCharacters = "⁰¹²³⁴⁵⁶⁷⁸⁹                              ⁽⁾*⁺ ⁻  ⁰¹²³⁴⁵⁶⁷⁸⁹   ⁼   ᴬᴮꟲᴰᴱꟳᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾꟴᴿ ᵀᵁⱽᵂ         ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖ ʳˢᵗᵘᵛʷˣʸᶻ";
 		public static string GetSuperscript(char character)
 		{
-			return superscriptCharacters[(int)character].ToString();
+			return superscriptCharacters[character].ToString();
 		}
 
 		public static string GetSuperscript(int number)
@@ -56,7 +52,7 @@ namespace GNFSCore
 		private static string subscriptCharacters = "₀₁₂₃₄₅₆₇₈₉                              ₍₎ ₊ ₋  ₀₁₂₃₄₅₆₇₈₉   ₌                                   ₐ   ₑ  ₕ  ₖₗₘₙₒₚ  ₛₜ   ₓ  ";
 		public static string GetSubcript(char character)
 		{
-			return subscriptCharacters[(int)character].ToString();
+			return subscriptCharacters[character].ToString();
 		}
 		public static string GetSubscript(int number)
 		{

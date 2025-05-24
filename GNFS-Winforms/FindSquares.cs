@@ -1,17 +1,15 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Collections.Generic;
-using ExtendedArithmetic;
+using GNFSCore.Algorithm.SquareRoot;
+using GNFSCore.Data;
+using GNFSCore.Data.RelationSieve;
 
 namespace GNFS_Winforms
 {
-	using GNFSCore.Core.Algorithm.SquareRoot;
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
+
 	public partial class GnfsUiBridge
 	{
 		public static GNFS FindSquares(CancellationToken cancelToken, GNFS gnfs)

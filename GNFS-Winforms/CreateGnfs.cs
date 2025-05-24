@@ -6,8 +6,7 @@ using System.Threading;
 
 namespace GNFS_Winforms
 {
-	using GNFSCore;
-	using GNFSCore.Core.Data;
+	using GNFSCore.Data;
 
 	public partial class GnfsUiBridge
 	{

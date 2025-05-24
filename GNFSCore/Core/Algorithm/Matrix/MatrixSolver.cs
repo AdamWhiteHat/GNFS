@@ -4,13 +4,12 @@ using System.Numerics;
 using System.Threading;
 using System.Collections.Generic;
 
-namespace GNFSCore.Core.Data.Matrix
+namespace GNFSCore.Algorithm.Matrix
 {
-	using GNFSCore.Core.Algorithm;
-	using GNFSCore.Core.Algorithm.ExtensionMethods;
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
-	using Algorithm.IntegerMath;
+	using Data;
+	using Data.Matrix;
+	using Data.RelationSieve;
+	using ExtensionMethods;
 
 	public static class MatrixSolver
 	{

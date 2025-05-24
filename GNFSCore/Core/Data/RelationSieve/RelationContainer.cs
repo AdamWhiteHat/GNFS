@@ -1,16 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Xml.Linq;
-using System.Numerics;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace GNFSCore.Core.Data.RelationSieve
+namespace GNFSCore.Data.RelationSieve
 {
 	public class RelationContainer
 	{

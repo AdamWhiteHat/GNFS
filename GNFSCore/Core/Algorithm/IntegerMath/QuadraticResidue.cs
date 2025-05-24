@@ -2,14 +2,12 @@
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace GNFSCore.Core.Algorithm.IntegerMath
+namespace GNFSCore.Algorithm.IntegerMath
 {
-	using Factors;
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
+	using Data;
+	using Data.RelationSieve;
 
 	public class QuadraticResidue
 	{
@@ -17,7 +15,7 @@ namespace GNFSCore.Core.Algorithm.IntegerMath
 		public static bool IsQuadraticResidue(BigInteger a, BigInteger p)
 		{
 			BigInteger quotient = BigInteger.Divide(p - 1, 2);
-			BigInteger modPow = BigInteger.ModPow(a, quotient, p);
+			BigInteger modPow = Arithmetic.PowerMod(a, quotient, p);
 
 			return modPow.IsOne;
 		}

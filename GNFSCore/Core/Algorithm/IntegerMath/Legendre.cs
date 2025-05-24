@@ -4,10 +4,11 @@ using System.Text;
 using System.Numerics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using GNFSCore.Core.Algorithm.ExtensionMethods;
 
-namespace GNFSCore.Core.Algorithm.IntegerMath
+namespace GNFSCore.Algorithm.IntegerMath
 {
+	using ExtensionMethods;
+
 	public static class Legendre
 	{
 		/// <summary>

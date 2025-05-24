@@ -2,12 +2,9 @@
 using System.Linq;
 using System.Text;
 using System.Numerics;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.IO;
 
-namespace GNFSCore.Core.Data
+namespace GNFSCore.Data
 {
 	public class Solution
 	{

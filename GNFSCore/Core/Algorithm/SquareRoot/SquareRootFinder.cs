@@ -6,16 +6,13 @@ using System.Threading;
 using System.Collections.Generic;
 using ExtendedArithmetic;
 
-namespace GNFSCore.Core.Algorithm.SquareRoot
+namespace GNFSCore.Algorithm.SquareRoot
 {
-	using GNFSCore.Core.Algorithm;
-
-	using GNFSCore.Core.Algorithm.IntegerMath;
-	using GNFSCore.Core.Algorithm.ExtensionMethods;
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
-	using System.ComponentModel.DataAnnotations;
-	using static GNFSCore.Core.Data.GNFS;
+	using Data;
+	using Data.RelationSieve;
+	using IntegerMath;
+	using ExtensionMethods;
+	using static GNFSCore.Data.GNFS;
 
 	public static class SquareRootFinder
 	{
@@ -174,14 +171,14 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 
 			BigInteger RationalProductSquareRoot = gnfs.SquareRoot.RationalProduct.SquareRoot();
 
-			var product = gnfs.SquareRoot.PolynomialDerivativeValue * RationalProductSquareRoot;
+			BigInteger product = gnfs.SquareRoot.PolynomialDerivativeValue * RationalProductSquareRoot;
 
 			gnfs.SquareRoot.RationalSquareRootResidue = product.Mod(gnfs.N);
 
-			Logging.WriteLine();
-			Logging.WriteLine($"δᵣ = {RationalProductSquareRoot}^2 = {gnfs.SquareRoot.RationalProduct}");
-			Logging.WriteLine($"χ  = {gnfs.SquareRoot.RationalSquareRootResidue} ≡ {gnfs.SquareRoot.PolynomialDerivativeValue} * {RationalProductSquareRoot} (mod {gnfs.N})");
-			Logging.WriteLine();
+			LogFunction.Invoke("");
+			LogFunction.Invoke($"δᵣ = {RationalProductSquareRoot}^2 = {gnfs.SquareRoot.RationalProduct}");
+			LogFunction.Invoke($"χ  = {gnfs.SquareRoot.RationalSquareRootResidue} ≡ {gnfs.SquareRoot.PolynomialDerivativeValue} * {RationalProductSquareRoot} (mod {gnfs.N})");
+			LogFunction.Invoke("");
 
 			gnfs.SquareRoot.IsRationalSquare = gnfs.SquareRoot.RationalProduct.IsSquare();
 			if (!gnfs.SquareRoot.IsRationalSquare) // This is an error in implementation. This should never happen, and so must be a bug

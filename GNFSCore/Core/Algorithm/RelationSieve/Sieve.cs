@@ -1,23 +1,12 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using System.Numerics;
-using Newtonsoft.Json;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
-namespace GNFSCore.Core.Data.RelationSieve
+namespace GNFSCore.Algorithm
 {
-	using Algorithm.IntegerMath;
-	using Interfaces;
-	using Factors;
-	using Matrix;
-	using GNFSCore.Core.Algorithm.ExtensionMethods;
-	using GNFSCore.Core.Data;
+	using Data;
+	using Data.RelationSieve;
 
 	public static class Sieve
 	{

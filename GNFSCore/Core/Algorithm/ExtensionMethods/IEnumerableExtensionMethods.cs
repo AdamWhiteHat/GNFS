@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
-namespace GNFSCore.Core.Algorithm.ExtensionMethods
+namespace GNFSCore.Algorithm.ExtensionMethods
 {
 	public static class IEnumerableExtensionMethods
 	{

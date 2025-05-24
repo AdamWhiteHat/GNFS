@@ -2,8 +2,9 @@
 using System.Linq;
 using System.Numerics;
 using System.Collections.Generic;
+using GNFSCore.Algorithm.IntegerMath;
 
-namespace GNFSCore.Core.Algorithm.ExtensionMethods
+namespace GNFSCore.Algorithm.ExtensionMethods
 {
 	public static class BigIntegerExtensionMethods
 	{
@@ -134,7 +135,7 @@ namespace GNFSCore.Core.Algorithm.ExtensionMethods
 			while (true)
 			{
 				var nval = upperbound + lowerbound >> 1;
-				var tstsq = BigInteger.Pow(nval, root);
+				var tstsq = Arithmetic.Pow(nval, root);
 				if (tstsq > value)
 				{
 					upperbound = nval;
@@ -153,7 +154,7 @@ namespace GNFSCore.Core.Algorithm.ExtensionMethods
 					break;
 				}
 			}
-			remainder = value - BigInteger.Pow(lowerbound, root);
+			remainder = value - Arithmetic.Pow(lowerbound, root);
 			return lowerbound;
 		}
 	}

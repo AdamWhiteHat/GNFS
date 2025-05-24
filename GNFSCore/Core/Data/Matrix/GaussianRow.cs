@@ -3,12 +3,10 @@ using System.Linq;
 using System.Numerics;
 using System.Collections.Generic;
 
-namespace GNFSCore.Core.Data.Matrix
+namespace GNFSCore.Data.Matrix
 {
-	using Factors;
-	using GNFSCore.Core.Algorithm.IntegerMath;
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
+	using RelationSieve;
+	using Algorithm.IntegerMath;
 
 	public class GaussianRow
 	{

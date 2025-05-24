@@ -4,7 +4,7 @@ using System.Numerics;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace GNFSCore.Core.Data
+namespace GNFSCore.Data
 {
 	public class FactorBase
 	{

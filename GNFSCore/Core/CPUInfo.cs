@@ -3,7 +3,7 @@ using System.Linq;
 using System.Management;
 using System.Collections.Generic;
 
-namespace GNFSCore.Core.Algorithm
+namespace GNFSCore
 {
 	public static class CPUInfo
 	{

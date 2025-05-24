@@ -49,4 +49,8 @@
     <PackageReference Include="System.Management" Version="9.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GNFSCore\GNFSCore.csproj" />
+  </ItemGroup>
+
 </Project>

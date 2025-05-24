@@ -5,11 +5,12 @@ using System.Numerics;
 using System.Threading;
 using System.Collections.Generic;
 using NUnit.Framework;
-using GNFSCore.Core.Algorithm.SquareRoot;
-using GNFSCore.Core.Data.RelationSieve;
-using GNFSCore.Core.Data.Matrix;
-using GNFSCore.Core.Data;
 using GNFSCore;
+using GNFSCore.Data;
+using GNFSCore.Algorithm;
+using GNFSCore.Algorithm.Matrix;
+using GNFSCore.Algorithm.SquareRoot;
+using GNFSCore.Data.RelationSieve;
 
 namespace TestGNFS.Integration
 {

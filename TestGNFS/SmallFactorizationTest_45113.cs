@@ -7,16 +7,16 @@ using System.Numerics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Threading;
-using GNFSCore.Core;
-using GNFSCore.Core.Data.RelationSieve;
-using GNFSCore.Core.Data.Matrix;
-using GNFSCore.Core.Algorithm.ExtensionMethods;
-using GNFSCore.Core.Algorithm.SquareRoot;
-using GNFSCore.Core.Data;
+using GNFSCore;
+using GNFSCore.Data;
+using GNFSCore.Algorithm;
+using GNFSCore.Data.RelationSieve;
+using GNFSCore.Algorithm.SquareRoot;
+using GNFSCore.Algorithm.IntegerMath;
+using GNFSCore.Algorithm.ExtensionMethods;
 
 namespace TestGNFS.Integration
 {
-
 	[TestFixture]
 	[SingleThreaded]
 	[NonParallelizable]
@@ -201,7 +201,7 @@ namespace TestGNFS.Integration
 			foreach (var dep in dependency)
 			{
 				dep.IsPersisted = false;
-				GNFSCore.Core.Data.RelationSieve.Sieve.Relation(gnfs.CurrentRelationsProgress, dep);
+				Sieve.Relation(gnfs.CurrentRelationsProgress, dep);
 			}
 
 			gnfs.CurrentRelationsProgress = new PolyRelationsSieveProgress(gnfs, 38, 1000);
@@ -230,15 +230,15 @@ namespace TestGNFS.Integration
 			}
 
 			//MatrixSolver.GaussianSolve(CancellationToken.None, gnfs);
-			GNFSCore.Serialization.Save.Relations.Free.SingleSolution(gnfs, dependency);
+			Serialization.Save.Relations.Free.SingleSolution(gnfs, dependency);
 
 			BigInteger Rational_Square = 1;
 			BigInteger Rational_SquareRoot = 1;
 			foreach (var kvp in rationalDependency)
 			{
 				int pow = (int)kvp.Value;
-				Rational_Square *= BigInteger.Pow(kvp.Key, pow);
-				Rational_SquareRoot *= BigInteger.Pow(kvp.Key, pow / 2);
+				Rational_Square *= Arithmetic.Pow(kvp.Key, pow);
+				Rational_SquareRoot *= Arithmetic.Pow(kvp.Key, pow / 2);
 			}
 
 			BigInteger Algebraic_Square = 1;
@@ -246,8 +246,8 @@ namespace TestGNFS.Integration
 			foreach (var kvp in algebraicDependency)
 			{
 				int pow = (int)kvp.Value;
-				Algebraic_Square *= BigInteger.Pow(kvp.Key, pow);
-				Algebraic_SquareRoot *= BigInteger.Pow(kvp.Key, pow / 2);
+				Algebraic_Square *= Arithmetic.Pow(kvp.Key, pow);
+				Algebraic_SquareRoot *= Arithmetic.Pow(kvp.Key, pow / 2);
 			}
 
 			TestContext.WriteLine();
@@ -266,20 +266,20 @@ namespace TestGNFS.Integration
 
 			Polynomial PolynomialDerivative = Polynomial.GetDerivativePolynomial(gnfs.CurrentPolynomial);
 			BigInteger PolynomialDerivativeValue = PolynomialDerivative.Evaluate(gnfs.PolynomialBase);
-			BigInteger PolynomialDerivativeValueSquared = BigInteger.Pow(PolynomialDerivativeValue, 2);
+			BigInteger PolynomialDerivativeValueSquared = Arithmetic.Pow(PolynomialDerivativeValue, 2);
 
 			BigInteger sqrtTotal_Algebraic = 1;
 			foreach (var kvp in algebraicDependency)
 			{
 				int pow = (int)kvp.Value / 2;
-				sqrtTotal_Algebraic *= BigInteger.Pow(kvp.Key, pow);
+				sqrtTotal_Algebraic *= Arithmetic.Pow(kvp.Key, pow);
 			}
 
 			BigInteger sqrtTotal_Rational = 1;
 			foreach (var kvp in rationalDependency)
 			{
 				int pow = (int)kvp.Value / 2;
-				sqrtTotal_Rational *= BigInteger.Pow(kvp.Key, pow);
+				sqrtTotal_Rational *= Arithmetic.Pow(kvp.Key, pow);
 			}
 
 			Polynomial MonicPolynomial = Polynomial.MakeMonic(gnfs.CurrentPolynomial, gnfs.PolynomialBase);
@@ -288,7 +288,7 @@ namespace TestGNFS.Integration
 
 
 			TestContext.WriteLine();
-			TestContext.WriteLine($"Algebraic Half-Primes Sqrt: {sqrtTotal_Algebraic} * f'(θ) = {(sqrtTotal_Algebraic * MonicPolynomialDerivativeValue)} ≡ {GNFSCore.Core.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(sqrtTotal_Algebraic * MonicPolynomialDerivativeValue, N)} (mod N)");
+			TestContext.WriteLine($"Algebraic Half-Primes Sqrt: {sqrtTotal_Algebraic} * f'(θ) = {(sqrtTotal_Algebraic * MonicPolynomialDerivativeValue)} ≡ {GNFSCore.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(sqrtTotal_Algebraic * MonicPolynomialDerivativeValue, N)} (mod N)");
 			TestContext.WriteLine($"Rational  Half-Primes Sqrt: {sqrtTotal_Rational}");
 
 
@@ -337,10 +337,10 @@ namespace TestGNFS.Integration
 
 			List<BigInteger> rationalNorms = dependency.Select(rel => rel.RationalNorm).ToList();
 			BigInteger RationalProduct = rationalNorms.Product();
-			BigInteger RationalProductSquareRoot = GNFSCore.Core.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.SquareRoot(RationalProduct);
+			BigInteger RationalProductSquareRoot = GNFSCore.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.SquareRoot(RationalProduct);
 
 			var product = PolynomialDerivativeValue * RationalProductSquareRoot;
-			var RationalSqrt = GNFSCore.Core.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(product, N);
+			var RationalSqrt = GNFSCore.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(product, N);
 
 			TestContext.WriteLine();
 			TestContext.WriteLine($"δᵣ = {RationalProductSquareRoot}^2 = {RationalProduct}");
@@ -369,11 +369,11 @@ namespace TestGNFS.Integration
 				Polynomial sqrtOfS = FiniteFieldArithmetic.SquareRoot(S, gnfs.CurrentPolynomial, p, gnfs.PolynomialDegree, gnfs.PolynomialBase);
 
 				BigInteger eval = sqrtOfS.Evaluate(gnfs.PolynomialBase);
-				BigInteger x = GNFSCore.Core.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(eval, p);
+				BigInteger x = GNFSCore.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(eval, p);
 
 				Polynomial inverse = ModularInverse(sqrtOfS, p);
 				BigInteger inverseEval = inverse.Evaluate(gnfs.PolynomialBase);
-				BigInteger inverseX = GNFSCore.Core.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(inverseEval, p);
+				BigInteger inverseX = GNFSCore.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(inverseEval, p);
 
 				TestContext.WriteLine();
 				TestContext.WriteLine($" β  =  {sqrtOfS}");
@@ -408,7 +408,7 @@ namespace TestGNFS.Integration
 			Assert.AreEqual(expected_ChineseRemainderResult, commonModulus);
 
 
-			BigInteger algebraicSquareRoot = GNFSCore.Core.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(commonModulus, N);
+			BigInteger algebraicSquareRoot = GNFSCore.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(commonModulus, N);
 
 
 			TestContext.WriteLine();
@@ -424,7 +424,7 @@ namespace TestGNFS.Integration
 
 		private static Polynomial ModularInverse(Polynomial poly, BigInteger mod)
 		{
-			return new Polynomial(Term.GetTerms(poly.Terms.Select(trm => GNFSCore.Core.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(mod - trm.CoEfficient, mod)).ToArray()));
+			return new Polynomial(Term.GetTerms(poly.Terms.Select(trm => GNFSCore.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(mod - trm.CoEfficient, mod)).ToArray()));
 		}
 
 	}

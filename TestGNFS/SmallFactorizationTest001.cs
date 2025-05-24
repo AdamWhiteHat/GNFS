@@ -6,12 +6,13 @@ using System.Threading;
 using System.Collections.Generic;
 using NUnit.Framework;
 using System.Diagnostics;
-using GNFSCore.Core.Data;
-using GNFSCore.Core.Algorithm;
-using GNFSCore.Core.Data.RelationSieve;
-using GNFSCore.Core.Data.Matrix;
 using GNFSCore;
-using GNFSCore.Core.Algorithm.SquareRoot;
+using GNFSCore.Data;
+using GNFSCore.Algorithm;
+using GNFSCore.Data.Matrix;
+using GNFSCore.Data.RelationSieve;
+using GNFSCore.Algorithm.SquareRoot;
+using GNFSCore.Algorithm.Matrix;
 
 namespace TestGNFS.Integration
 {

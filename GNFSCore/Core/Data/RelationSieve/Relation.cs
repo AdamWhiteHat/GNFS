@@ -1,23 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using System.Numerics;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
-namespace GNFSCore.Core.Data.RelationSieve
+namespace GNFSCore.Data.RelationSieve
 {
-	using Factors;
-	using Matrix;
-	using Interfaces;
 	using Algorithm.IntegerMath;
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Algorithm.ExtensionMethods;
+	using Algorithm.ExtensionMethods;
 
 	public class Relation : IEquatable<Relation>, IEqualityComparer<Relation>
 	{

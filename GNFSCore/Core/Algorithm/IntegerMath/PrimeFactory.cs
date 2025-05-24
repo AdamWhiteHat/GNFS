@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Numerics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace GNFSCore.Core.Algorithm.IntegerMath
+namespace GNFSCore.Algorithm.IntegerMath
 {
-	using System.Numerics;
-
 	public static class PrimeFactory
 	{
 		private static BigInteger MaxValue = 10;

@@ -6,10 +6,8 @@ using System.Threading;
 using System.Collections.Generic;
 using ExtendedArithmetic;
 
-namespace GNFSCore.Core.Data
+namespace GNFSCore.Data
 {
-	using GNFSCore.Core.Data;
-	using Interfaces;
 	public class FactorPairCollection : List<FactorPair>
 	{
 		public FactorPairCollection()

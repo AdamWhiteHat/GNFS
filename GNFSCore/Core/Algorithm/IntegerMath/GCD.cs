@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GNFSCore.Core.Algorithm.IntegerMath
+namespace GNFSCore.Algorithm.IntegerMath
 {
 	public static class GCD
 	{

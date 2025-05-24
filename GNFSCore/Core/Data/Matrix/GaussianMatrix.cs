@@ -3,11 +3,9 @@ using System.Linq;
 using System.Numerics;
 using System.Collections.Generic;
 
-namespace GNFSCore.Core.Data.Matrix
+namespace GNFSCore.Data.Matrix
 {
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
-	using Algorithm.IntegerMath;
+	using RelationSieve;
 
 	public partial class GaussianMatrix : List<bool[]>
 	{

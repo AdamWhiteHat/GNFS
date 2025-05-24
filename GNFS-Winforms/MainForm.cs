@@ -1,22 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Data;
-using System.Text;
-using System.Drawing;
+using System.Diagnostics;
 using System.Numerics;
 using System.Threading;
 using System.Windows.Forms;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using GNFSCore;
+using GNFSCore.Algorithm.IntegerMath;
+using GNFSCore.Data;
 
 namespace GNFS_Winforms
 {
-	using GNFSCore;
-	using GNFSCore.Core.Algorithm.IntegerMath;
-	using GNFSCore.Core.Data;
-	using System.Diagnostics;
-
 	public partial class MainForm : Form
 	{
 		public BigInteger N

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using ExtendedArithmetic;
 using ExtendedNumerics;
+using ExtendedArithmetic;
 
-namespace GNFSCore.Core.Algorithm.IntegerMath
+namespace GNFSCore.Algorithm.IntegerMath
 {
-	using GNFSCore.Core.Data;
-	using Interfaces;
+	using Data;
 
 	public static class Normal
 	{
@@ -46,7 +45,7 @@ namespace GNFSCore.Core.Algorithm.IntegerMath
 			BigRational ab = BigRational.Negate(aD) / bD;
 
 			BigRational left = PolynomialEvaluate_BigRational(poly, ab);
-			BigInteger right = BigInteger.Pow(BigInteger.Negate(b), poly.Degree);
+			BigInteger right = Arithmetic.Pow(BigInteger.Negate(b), poly.Degree);
 
 			BigRational product = right * left;
 

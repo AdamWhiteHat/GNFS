@@ -2,24 +2,14 @@
 using System.Linq;
 using System.Text;
 using System.Numerics;
-using System.Threading;
 using System.Collections.Generic;
 using ExtendedArithmetic;
 
-namespace GNFSCore.Core.Data
+namespace GNFSCore.Data
 {
-	using ExtendedNumerics.Internal;
-	using GNFSCore.Core.Algorithm;
-	using GNFSCore.Core.Algorithm.ExtensionMethods;
-	using GNFSCore.Core.Algorithm.IntegerMath;
-	using GNFSCore.Core.Algorithm.SquareRoot;
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
-
-	using System.IO;
-	using System.Net.Http.Headers;
-	using System.Text.RegularExpressions;
-	using static GNFSCore.Core.Data.GNFS;
+	using RelationSieve;
+	using Algorithm.ExtensionMethods;
+	using Algorithm.IntegerMath;
 
 	public partial class SquareRoot
 	{
@@ -93,7 +83,7 @@ namespace GNFSCore.Core.Data
 			Logging.WriteLine($"ƒ'(θ)² ∈ ℤ[θ] = {PolynomialDerivativeSquaredInField}");
 
 			PolynomialDerivativeValue = PolynomialDerivative.Evaluate(gnfs.PolynomialBase);
-			PolynomialDerivativeValueSquared = BigInteger.Pow(PolynomialDerivativeValue, 2);
+			PolynomialDerivativeValueSquared = Arithmetic.Pow(PolynomialDerivativeValue, 2);
 
 			Logging.WriteLine("");
 			Logging.WriteLine($"ƒ'(m) = {PolynomialDerivativeValue}");
@@ -171,7 +161,7 @@ namespace GNFSCore.Core.Data
 			result.AppendLine($"∏(a + mb) = {RationalProduct}");
 			result.AppendLine($"∏ƒ(a/b)   = {AlgebraicProduct}");
 			result.AppendLine();
-	
+
 			BigInteger min = BigInteger.Min(RationalSquareRootResidue, AlgebraicSquareRootResidue);
 			BigInteger max = BigInteger.Max(RationalSquareRootResidue, AlgebraicSquareRootResidue);
 

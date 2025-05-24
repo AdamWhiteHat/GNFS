@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading;
+using GNFSCore;
+using GNFSCore.Data;
 
 namespace GNFS_Winforms
 {
-	using GNFSCore;
-	using GNFSCore.Core.Data;
-
 	public partial class GnfsUiBridge
 	{
 		public static GNFS FindRelations(CancellationToken cancelToken, GNFS gnfs, bool oneRound)

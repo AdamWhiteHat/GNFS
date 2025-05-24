@@ -3,7 +3,7 @@ using System.Linq;
 using System.Numerics;
 using System.Collections.Generic;
 
-namespace GNFSCore.Core.Algorithm
+namespace GNFSCore.Algorithm
 {
 	public static class StaticRandom
 	{

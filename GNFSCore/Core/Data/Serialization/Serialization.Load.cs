@@ -3,21 +3,13 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
-using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using ExtendedArithmetic;
 
-namespace GNFSCore
+namespace GNFSCore.Data
 {
-	using Factors;
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
-	using Interfaces;
+	using RelationSieve;
 
 	public static partial class Serialization
 	{

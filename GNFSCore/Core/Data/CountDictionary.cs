@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using System.Numerics;
 using System.Collections.Generic;
 
-namespace GNFSCore.Core.Data
+namespace GNFSCore.Data
 {
 	using Interfaces;
 

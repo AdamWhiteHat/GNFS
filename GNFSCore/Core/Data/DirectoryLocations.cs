@@ -3,10 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Collections.Generic;
-using GNFSCore.Core.Data.RelationSieve;
 
-namespace GNFSCore.Core.Data
+namespace GNFSCore.Data
 {
+	using RelationSieve;
+
 	public class DirectoryLocations
 	{
 		private const int showDigits = 22;

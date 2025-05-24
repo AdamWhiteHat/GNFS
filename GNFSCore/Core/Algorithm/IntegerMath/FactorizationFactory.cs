@@ -2,11 +2,10 @@
 using System.Linq;
 using System.Numerics;
 using System.Collections;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-namespace GNFSCore.Core.Algorithm.IntegerMath
+namespace GNFSCore.Algorithm.IntegerMath
 {
 	public static partial class FactorizationFactory
 	{
@@ -33,7 +32,7 @@ namespace GNFSCore.Core.Algorithm.IntegerMath
 
 			foreach (BigInteger a in primeCheckBases)
 			{
-				BigInteger x = BigInteger.ModPow(a, d, input);
+				BigInteger x = Arithmetic.PowerMod(a, d, input);
 				if (x == 1 || x == input - 1)
 				{
 					continue;
@@ -41,7 +40,7 @@ namespace GNFSCore.Core.Algorithm.IntegerMath
 
 				for (int r = 1; r < s; r++)
 				{
-					x = BigInteger.ModPow(x, 2, input);
+					x = Arithmetic.PowerMod(x, 2, input);
 					if (x == 1)
 					{
 						return false;

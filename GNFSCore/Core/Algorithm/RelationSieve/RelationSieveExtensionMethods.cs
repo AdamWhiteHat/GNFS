@@ -10,14 +10,13 @@ using System.Runtime.Serialization;
 
 namespace GNFSCore
 {
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
-	using Core.Algorithm.IntegerMath;
-	using GNFSCore.Core.Algorithm;
+	using Data;
+	using Data.RelationSieve;
+	using Algorithm.IntegerMath;
+	using Algorithm;
 
 	public static class RelationSieveExtensionMethods
 	{
-		
 		public static void GenerateRelations(this PolyRelationsSieveProgress rel, CancellationToken cancelToken, GNFS _gnfs)
 		{
 			if (_gnfs.CurrentRelationsProgress.Relations.SmoothRelations.Any())
@@ -36,7 +35,7 @@ namespace GNFSCore
             }
             */
 
-			rel.SmoothRelations_TargetQuantity = Math.Max(rel.SmoothRelations_TargetQuantity, rel.SmoothRelationsRequiredForMatrixStep); 
+			rel.SmoothRelations_TargetQuantity = Math.Max(rel.SmoothRelations_TargetQuantity, rel.SmoothRelationsRequiredForMatrixStep);
 
 
 			if (rel.A >= rel.ValueRange)

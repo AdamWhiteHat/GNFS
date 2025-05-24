@@ -9,14 +9,11 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ExtendedArithmetic;
 
-namespace GNFSCore.Core.Data
+namespace GNFSCore.Data
 {
 	using Factors;
-	using Interfaces;
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
-	using GNFSCore.Core.Algorithm.IntegerMath;
-	using GNFSCore;
+	using RelationSieve;
+	using Algorithm.IntegerMath;
 
 	[DataContract]
 	public partial class GNFS
@@ -283,14 +280,14 @@ namespace GNFSCore.Core.Data
 			result += PrimeFactory.GetIndexFromValue(primeFactorBase.RationalFactorBaseMax);
 			result += PrimeFactory.GetIndexFromValue(primeFactorBase.AlgebraicFactorBaseMax);
 			*/
-			
+
 			if (polyDegree <= 3) result = 10;
 			else if (polyDegree == 4) result = 20;
 			else if (polyDegree == 5 || polyDegree == 6) result = 40;
 			else if (polyDegree == 7) result = 80;
 			else if (polyDegree >= 8) result = 100;
 
-			return result*2;
+			return result * 2;
 		}
 
 		private void ConstructNewPolynomial(BigInteger polynomialBase, int polyDegree)

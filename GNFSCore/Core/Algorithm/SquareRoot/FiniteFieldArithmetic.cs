@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Numerics;
 using System.Collections.Generic;
-using ExtendedArithmetic;
 
-namespace GNFSCore.Core.Algorithm.SquareRoot
+namespace GNFSCore.Algorithm.SquareRoot
 {
-	using GNFSCore.Core.Algorithm.ExtensionMethods;
-	using GNFSCore.Core.Algorithm.IntegerMath;
+	using IntegerMath;
+	using ExtensionMethods;
+	using Polynomial = ExtendedArithmetic.Polynomial;
 
 	public static class FiniteFieldArithmetic
 	{
@@ -17,7 +17,7 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 		/// <returns></returns>
 		public static Polynomial SquareRoot(Polynomial startPolynomial, Polynomial f, BigInteger p, int degree, BigInteger m)
 		{
-			BigInteger q = BigInteger.Pow(p, degree);
+			BigInteger q = Arithmetic.Pow(p, degree);
 			BigInteger s = q - 1;
 
 			int r = 0;
@@ -44,14 +44,14 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 
 			BigInteger quadraticNonResidue = Legendre.SymbolSearch(m + 1, q, -1);
 			BigInteger theta = quadraticNonResidue;
-			BigInteger minusOne = BigInteger.ModPow(theta, (q - 1) / 2, p);
+			BigInteger minusOne = Arithmetic.PowerMod(theta, (q - 1) / 2, p);
 
 			Logging.EnableLogging(true);
 			Logging.WriteLine($"P = {p}");
 			Logging.WriteLine($"θ = {theta}");
 			Logging.WriteLine();
 
-			//Logging.WriteLine($"(θp + 1)^s = {BigInteger.ModPow(theta, s, p)}");
+			//Logging.WriteLine($"(θp + 1)^s = {Arithmetic.PowerMod(theta, s, p)}");
 			//Logging.WriteLine($"(θp + 1)^((p^d-1)/2) = {minusOne}");
 			Logging.WriteLine($"Quadratic Non-Residue Found = {theta}");
 			Logging.WriteLine($"p ≡ {p.Mod(4)} (mod 4) ≡ {p.Mod(8)} (mod 8)    L(q-1, p) = {Legendre.Symbol((q - 1), p)}");
@@ -83,28 +83,28 @@ namespace GNFSCore.Core.Algorithm.SquareRoot
 				Logging.WriteLine();
 				j = Logging.GetSubscript(i);
 
-				zeta = BigInteger.ModPow(theta, i * s, p);
+				zeta = Arithmetic.PowerMod(theta, i * s, p);
 				Logging.WriteLine($"{j}ζ   = {zeta}");
 
 				zetaSquared = zeta.Square().Mod(p);
-				//BigInteger.ModPow(theta, (2 * i * s), p); 
-				// BigInteger.ModPow(quadraticNonResidue, (i * s * 2), p);
+				//Arithmetic.PowerMod(theta, (2 * i * s), p); 
+				// Arithmetic.PowerMod(quadraticNonResidue, (i * s * 2), p);
 				Logging.WriteLine($"{j}ζ²  = {zetaSquared}");
 
 				zetaInverse = (p - zetaSquared);
 				Logging.WriteLine($"{j}ζ⁻² = {zetaInverse}");
 				Logging.WriteLine();
 
-				lambda = (lambda * BigInteger.Pow(zeta, (int)Math.Pow(2, r - i))).Mod(p);
+				lambda = (lambda * Arithmetic.Pow(zeta, (int)Math.Pow(2, r - i))).Mod(p);
 				Logging.WriteLine($"λ{j}   = {lambda}");
 
-				BigInteger zPow = BigInteger.Pow(zeta, (int)Math.Pow(2, ((r - i) - 1)));
+				BigInteger zPow = Arithmetic.Pow(zeta, (int)Math.Pow(2, ((r - i) - 1)));
 				Polynomial zetaPow = Polynomial.Parse($"{zPow}");
 
 				omegaPoly = Polynomial.Field.Modulus(Polynomial.Multiply(omegaPoly, zetaPow), p);
 
 				Logging.WriteLine($"ω{j}   = ω{Logging.GetSubscript(i - 1)} * ζ^(2^{r} - {i} - 1)");
-				Logging.WriteLine($"ω{j}   = ω{Logging.GetSubscript(i - 1)} * ζ^({BigInteger.Pow(2, r) - i - 1})");
+				Logging.WriteLine($"ω{j}   = ω{Logging.GetSubscript(i - 1)} * ζ^({Arithmetic.Pow(2, r) - i - 1})");
 				Logging.WriteLine($"ω{j}   = {omegaPoly}");
 				Logging.WriteLine($"ω{j}   ≡ {omegaPoly.Evaluate(m).Mod(p)} (mod p)");
 				Logging.WriteLine();

@@ -8,8 +8,8 @@ using ExtendedArithmetic;
 
 namespace GNFSCore.Factors
 {
-	using GNFSCore.Core.Algorithm.FactorBase;
-	using GNFSCore.Core.Data;
+	using Data;
+	using Algorithm.FactorBase;
 
 	public static class Factory
 	{
@@ -37,6 +37,6 @@ namespace GNFSCore.Factors
 		}
 	}
 
-	
+
 }
 

@@ -4,20 +4,12 @@ using System.Linq;
 using System.Numerics;
 using Newtonsoft.Json;
 using ExtendedArithmetic;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace GNFSCore
+namespace GNFSCore.Data
 {
-
-	using Factors;
-	using GNFSCore.Core.Data;
-	using GNFSCore.Core.Data.RelationSieve;
-	using Interfaces;
+	using RelationSieve;
 
 	public static partial class Serialization
 	{
@@ -65,7 +57,7 @@ namespace GNFSCore
 				{
 					if (gnfs.PrimeFactorBase.RationalFactorBase.Any())
 					{
-						Save.Object(gnfs.PrimeFactorBase.RationalFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Core.Data.FactorBase.RationalFactorBase)}.json"));
+						Save.Object(gnfs.PrimeFactorBase.RationalFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Data.FactorBase.RationalFactorBase)}.json"));
 					}
 				}
 
@@ -73,7 +65,7 @@ namespace GNFSCore
 				{
 					if (gnfs.PrimeFactorBase.AlgebraicFactorBase.Any())
 					{
-						Save.Object(gnfs.PrimeFactorBase.AlgebraicFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Core.Data.FactorBase.AlgebraicFactorBase)}.json"));
+						Save.Object(gnfs.PrimeFactorBase.AlgebraicFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Data.FactorBase.AlgebraicFactorBase)}.json"));
 					}
 				}
 
@@ -81,7 +73,7 @@ namespace GNFSCore
 				{
 					if (gnfs.PrimeFactorBase.QuadraticFactorBase.Any())
 					{
-						Save.Object(gnfs.PrimeFactorBase.QuadraticFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Core.Data.FactorBase.QuadraticFactorBase)}.json"));
+						Save.Object(gnfs.PrimeFactorBase.QuadraticFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Data.FactorBase.QuadraticFactorBase)}.json"));
 					}
 				}
 			}
