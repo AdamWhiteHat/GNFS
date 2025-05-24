@@ -5,12 +5,11 @@ using System.Numerics;
 using System.Threading;
 using System.Collections.Generic;
 using NUnit.Framework;
-using GNFSCore.Core.Algorithm.IntegerMath;
 using System.Diagnostics;
-using NUnit.Framework.Internal.Builders;
+using GNFSCore.Core.Data;
+using GNFSCore.Core.Algorithm;
 using GNFSCore.Core.Data.RelationSieve;
 using GNFSCore.Core.Data.Matrix;
-using GNFSCore.Core.Data;
 using GNFSCore;
 using GNFSCore.Core.Algorithm.SquareRoot;
 

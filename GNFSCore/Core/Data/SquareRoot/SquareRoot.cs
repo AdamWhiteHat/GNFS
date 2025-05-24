@@ -27,7 +27,6 @@ namespace GNFSCore.Core.Data
 		public BigInteger RationalSquare { get; set; }
 		public BigInteger RationalSquareRootResidue { get; set; }
 		public bool IsRationalSquare { get; set; }
-		public bool IsRationalIrreducible { get; set; }
 
 		public BigInteger AlgebraicProduct { get; set; }
 		public BigInteger AlgebraicSquare { get; set; }
@@ -36,15 +35,13 @@ namespace GNFSCore.Core.Data
 		public BigInteger AlgebraicSquareRootResidue { get; set; }
 		public List<BigInteger> AlgebraicPrimes { get; set; }
 		public List<BigInteger> AlgebraicResults { get; set; }
-		public bool IsAlgebraicSquare { get; set; }
-		public bool IsAlgebraicIrreducible { get; set; }
 
 		public BigInteger N { get; set; }
 		public Polynomial S { get; set; }
 		public Polynomial TotalS { get; set; }
 		public List<Tuple<BigInteger, BigInteger>> RootsOfS { get; set; }
 		public Polynomial PolynomialRing { get; set; }
-		public List<Polynomial> PolynomialRingElements { get; set; }
+		public List<Polynomial> PolynomialRingElements_PrimeIdeals { get; set; }
 
 		public BigInteger PolynomialBase { get; set; }
 		public Polynomial MonicPolynomial { get; set; }
@@ -57,7 +54,6 @@ namespace GNFSCore.Core.Data
 		public BigInteger PolynomialDerivativeValue { get; set; }
 		public BigInteger PolynomialDerivativeValueSquared { get; set; }
 
-
 		public Polynomial MonicPolynomialDerivativeSquared { get; set; }
 		public Polynomial MonicPolynomialDerivativeSquaredInField { get; set; }
 
@@ -66,7 +62,6 @@ namespace GNFSCore.Core.Data
 
 		private GNFS gnfs { get; set; }
 		public List<BigInteger> RationalNormCollection { get; set; }
-		public List<BigInteger> AlgebraicNormCollection { get; set; }
 		public List<Relation> RelationsSet { get; set; }
 
 		public BigInteger InertPrime_LastValue
@@ -92,17 +87,17 @@ namespace GNFSCore.Core.Data
 			PolynomialDerivativeSquared = Polynomial.Square(PolynomialDerivative);
 			PolynomialDerivativeSquaredInField = Polynomial.Field.Modulus(PolynomialDerivativeSquared, gnfs.CurrentPolynomial);
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"ƒ'(θ) = {PolynomialDerivative}");
-			LogFunction.Invoke($"ƒ'(θ)² = {PolynomialDerivativeSquared}");
-			LogFunction.Invoke($"ƒ'(θ)² ∈ ℤ[θ] = {PolynomialDerivativeSquaredInField}");
+			Logging.WriteLine("");
+			Logging.WriteLine($"ƒ'(θ) = {PolynomialDerivative}");
+			Logging.WriteLine($"ƒ'(θ)² = {PolynomialDerivativeSquared}");
+			Logging.WriteLine($"ƒ'(θ)² ∈ ℤ[θ] = {PolynomialDerivativeSquaredInField}");
 
 			PolynomialDerivativeValue = PolynomialDerivative.Evaluate(gnfs.PolynomialBase);
 			PolynomialDerivativeValueSquared = BigInteger.Pow(PolynomialDerivativeValue, 2);
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"ƒ'(m) = {PolynomialDerivativeValue}");
-			LogFunction.Invoke($"ƒ'(m)² = {PolynomialDerivativeValueSquared}");
+			Logging.WriteLine("");
+			Logging.WriteLine($"ƒ'(m) = {PolynomialDerivativeValue}");
+			Logging.WriteLine($"ƒ'(m)² = {PolynomialDerivativeValueSquared}");
 
 
 			MonicPolynomial = Polynomial.MakeMonic(gnfs.CurrentPolynomial, PolynomialBase);
@@ -113,16 +108,11 @@ namespace GNFSCore.Core.Data
 			MonicPolynomialDerivativeValue = MonicPolynomialDerivative.Evaluate(gnfs.PolynomialBase);
 			MonicPolynomialDerivativeValueSquared = MonicPolynomialDerivativeSquared.Evaluate(gnfs.PolynomialBase);
 
-			LogFunction.Invoke("");
-			LogFunction.Invoke($"MonicPolynomial: {MonicPolynomial}");
-			LogFunction.Invoke($"MonicPolynomialDerivative: {MonicPolynomialDerivative}");
-			LogFunction.Invoke($"MonicPolynomialDerivativeSquared: {MonicPolynomialDerivativeSquared}");
-			LogFunction.Invoke($"MonicPolynomialDerivativeSquaredInField: {MonicPolynomialDerivativeSquaredInField}");
-		}
-
-		private static bool IsPrimitive(IEnumerable<BigInteger> coefficients)
-		{
-			return GCD.FindGCD(coefficients) == 1;
+			Logging.WriteLine("");
+			Logging.WriteLine($"MonicPolynomial: {MonicPolynomial}");
+			Logging.WriteLine($"MonicPolynomialDerivative: {MonicPolynomialDerivative}");
+			Logging.WriteLine($"MonicPolynomialDerivativeSquared: {MonicPolynomialDerivativeSquared}");
+			Logging.WriteLine($"MonicPolynomialDerivativeSquaredInField: {MonicPolynomialDerivativeSquaredInField}");
 		}
 
 		public override string ToString()
@@ -130,7 +120,7 @@ namespace GNFSCore.Core.Data
 			StringBuilder result = new StringBuilder();
 
 			result.AppendLine("Polynomial ring:");
-			result.AppendLine($"({string.Join(") * (", PolynomialRingElements.Select(ply => ply.ToString()))})");
+			result.AppendLine($"({string.Join(") * (", PolynomialRingElements_PrimeIdeals.Select(ply => ply.ToString()))})");
 			result.AppendLine();
 			result.AppendLine($"∏ Sᵢ =");
 			result.AppendLine($"{PolynomialRing}");
@@ -153,18 +143,18 @@ namespace GNFSCore.Core.Data
 			result.AppendLine($"γ² = √( {RationalSquare} )");
 			result.AppendLine($"IsRationalSquare  ? {IsRationalSquare}");
 			result.AppendLine($"γ  =    {RationalSquareRootResidue} mod N"); // δ mod N 
-			result.AppendLine($"IsRationalIrreducible  ? {IsRationalIrreducible}");
 			result.AppendLine();
 			result.AppendLine();
 			result.AppendLine("Square finder, Algebraic:");
 			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicProduct} * {PolynomialDerivativeValue}");
 			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicSquare}");
-			result.AppendLine($"IsAlgebraicSquare ? {IsAlgebraicSquare}");
+			result.AppendLine($"IsAlgebraicSquare ? {AlgebraicSquare.IsSquare()}");
+			result.AppendLine();
 			result.AppendLine($"χ = Sₐ(m) * ƒ'(m) mod N = {AlgebraicSquareRootResidue}");
-			result.AppendLine($"IsAlgebraicIrreducible ? {IsAlgebraicIrreducible}");
 			result.AppendLine();
 			result.AppendLine($"X² / ƒ(m) = {AlgebraicProductModF}  IsSquare? {AlgebraicProductModF.IsSquare()}");
 			result.AppendLine($"S (x)       = {AlgebraicSquareResidue}  IsSquare? {AlgebraicSquareResidue.IsSquare()}");
+			result.AppendLine();
 			result.AppendLine($"AlgebraicResults:");
 			result.AppendLine($"{AlgebraicResults.FormatString(false)}");
 			result.AppendLine();
@@ -174,14 +164,14 @@ namespace GNFSCore.Core.Data
 			result.AppendLine($"{string.Join(" * ", AlgebraicPrimes)}"); // .RelationsSet.Select(rel => rel.B).Distinct().OrderBy(relB => relB))
 			result.AppendLine();
 			result.AppendLine();
-			//result.AppendLine("Roots of S(x):");
-			//result.AppendLine($"{{{string.Join(", ", RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");
-			//result.AppendLine();
-			//result.AppendLine();
-			//result.AppendLine($"∏(a + mb) = {squareRootFinder.RationalProduct}");
-			//result.AppendLine($"∏ƒ(a/b)   = {squareRootFinder.AlgebraicProduct}");
-			//result.AppendLine();
-
+			result.AppendLine("Roots of S(x):");
+			result.AppendLine($"{{{string.Join(", ", RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");
+			result.AppendLine();
+			result.AppendLine();
+			result.AppendLine($"∏(a + mb) = {RationalProduct}");
+			result.AppendLine($"∏ƒ(a/b)   = {AlgebraicProduct}");
+			result.AppendLine();
+	
 			BigInteger min = BigInteger.Min(RationalSquareRootResidue, AlgebraicSquareRootResidue);
 			BigInteger max = BigInteger.Max(RationalSquareRootResidue, AlgebraicSquareRootResidue);
 
@@ -193,24 +183,24 @@ namespace GNFSCore.Core.Data
 
 			BigInteger answer = BigInteger.Max(gcdAdd, gcdSub);
 
-
-			result.AppendLine();
-			result.AppendLine($"GCD(N, γ+χ) = {gcdAdd}");
-			result.AppendLine($"GCD(N, γ-χ) = {gcdSub}");
-			result.AppendLine();
-			result.AppendLine($"Solution? {(answer != 1).ToString().ToUpper()}");
-
-			if (answer != 1)
+			if (gnfs.IsFactored)
 			{
 				result.AppendLine();
-				result.AppendLine();
-				result.AppendLine("*********************");
-				result.AppendLine();
-				result.AppendLine($" SOLUTION = {answer} ");
-				result.AppendLine();
-				result.AppendLine("*********************");
-				result.AppendLine();
-				result.AppendLine();
+				result.AppendLine($"Solution? YES");
+
+				if (answer != 1)
+				{
+					result.AppendLine();
+					result.AppendLine();
+					result.AppendLine("*********************");
+					result.AppendLine();
+					result.AppendLine($" P = {gnfs.Factorization.P} ");
+					result.AppendLine($" Q = {gnfs.Factorization.Q} ");
+					result.AppendLine();
+					result.AppendLine("*********************");
+					result.AppendLine();
+					result.AppendLine();
+				}
 			}
 
 			result.AppendLine();

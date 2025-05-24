@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net5.0-windows</TargetFrameworks>
-		<RuntimeIdentifier>win81-x64</RuntimeIdentifier>
+		<TargetFrameworks>net8.0-windows</TargetFrameworks>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<OutputType>Library</OutputType>
 		<ImplicitUsings>False</ImplicitUsings>
 		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
@@ -31,7 +31,7 @@
 		<PackageReference Include="ExtendedArithmetic.Polynomial" Version="2023.288.635" />
 		<PackageReference Include="ExtendedNumerics.BigRational" Version="3000.0.1.326" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="System.Management" Version="5.0.0" />
+		<PackageReference Include="System.Management" Version="9.0.4" />
 	</ItemGroup>
 
 </Project>

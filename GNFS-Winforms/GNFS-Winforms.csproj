@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
 	<OutputType>WinExe</OutputType>
-    <RuntimeIdentifier>win81-x64</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	<ApplicationHighDpiMode>DpiUnaware</ApplicationHighDpiMode>	 
 	<ApplicationUseCompatibleTextRendering>true</ApplicationUseCompatibleTextRendering>
     <StartupObject>GNFS_Winforms.Program</StartupObject>
@@ -44,10 +44,9 @@
 
   <ItemGroup>
     <PackageReference Include="ExtendedArithmetic.Polynomial" Version="2023.288.635" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\GNFSCore\GNFSCore.csproj" />
+    <PackageReference Include="ExtendedNumerics.BigRational" Version="3000.0.1.326" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Management" Version="9.0.4" />
   </ItemGroup>
 
 </Project>

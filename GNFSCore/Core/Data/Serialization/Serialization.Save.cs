@@ -41,9 +41,9 @@ namespace GNFSCore
 					counter++;
 				}
 
-				//Save.FactorBase.Rational(gnfs);
-				//Save.FactorBase.Algebraic(gnfs);
-				//Save.FactorBase.Quadratic(gnfs);
+				Save.FactorBase.Rational(gnfs);
+				Save.FactorBase.Algebraic(gnfs);
+				Save.FactorBase.Quadratic(gnfs);
 
 				Save.FactorPair.Rational(gnfs);
 				Save.FactorPair.Algebraic(gnfs);
@@ -59,14 +59,13 @@ namespace GNFSCore
 				Save.Object(gnfs, gnfs.SaveLocations.GnfsParameters_SaveFile);
 			}
 
-			/*
 			public static class FactorBase
 			{
 				public static void Rational(GNFS gnfs)
 				{
 					if (gnfs.PrimeFactorBase.RationalFactorBase.Any())
 					{
-						Save.Object(gnfs.PrimeFactorBase.RationalFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(GNFSCore.FactorBase.RationalFactorBase)}.json"));
+						Save.Object(gnfs.PrimeFactorBase.RationalFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Core.Data.FactorBase.RationalFactorBase)}.json"));
 					}
 				}
 
@@ -74,7 +73,7 @@ namespace GNFSCore
 				{
 					if (gnfs.PrimeFactorBase.AlgebraicFactorBase.Any())
 					{
-						Save.Object(gnfs.PrimeFactorBase.AlgebraicFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(GNFSCore.FactorBase.AlgebraicFactorBase)}.json"));
+						Save.Object(gnfs.PrimeFactorBase.AlgebraicFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Core.Data.FactorBase.AlgebraicFactorBase)}.json"));
 					}
 				}
 
@@ -82,11 +81,10 @@ namespace GNFSCore
 				{
 					if (gnfs.PrimeFactorBase.QuadraticFactorBase.Any())
 					{
-						Save.Object(gnfs.PrimeFactorBase.QuadraticFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(GNFSCore.FactorBase.QuadraticFactorBase)}.json"));
+						Save.Object(gnfs.PrimeFactorBase.QuadraticFactorBase, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Core.Data.FactorBase.QuadraticFactorBase)}.json"));
 					}
 				}
 			}
-			*/
 
 			public static class FactorPair
 			{

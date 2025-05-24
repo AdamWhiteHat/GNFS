@@ -14,7 +14,6 @@ namespace GNFSCore.Core.Data.RelationSieve
 	using GNFSCore.Core.Algorithm.ExtensionMethods;
 	using GNFSCore.Core.Algorithm.IntegerMath;
 	using GNFSCore.Core.Data;
-	using Algorithm.IntegerMath;
 
 	[DataContract]
 	public class PolyRelationsSieveProgress

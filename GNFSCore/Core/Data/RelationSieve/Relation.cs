@@ -13,13 +13,11 @@ using System.Xml.Serialization;
 namespace GNFSCore.Core.Data.RelationSieve
 {
 	using Factors;
-	using Algorithm.IntegerMath;
 	using Matrix;
-
 	using Interfaces;
-	using GNFSCore.Core.Algorithm.ExtensionMethods;
-	using GNFSCore.Core.Algorithm.IntegerMath;
+	using Algorithm.IntegerMath;
 	using GNFSCore.Core.Data;
+	using GNFSCore.Core.Algorithm.ExtensionMethods;
 
 	public class Relation : IEquatable<Relation>, IEqualityComparer<Relation>
 	{
