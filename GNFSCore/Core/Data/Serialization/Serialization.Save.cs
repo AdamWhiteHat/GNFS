@@ -15,11 +15,16 @@ namespace GNFSCore.Data
 	{
 		public static class Save
 		{
-			public static void Object(object obj, string filename)
+
+			#region Private Members
+
+			private static void Object(object obj, string filename)
 			{
 				string saveJson = JsonConvert.SerializeObject(obj, Formatting.Indented);
 				File.WriteAllText(filename, saveJson);
 			}
+
+			#endregion
 
 			public static void All(GNFS gnfs)
 			{

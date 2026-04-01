@@ -64,7 +64,7 @@ namespace GNFSCore.Data
 
 		public DirectoryLocations SaveLocations { get; internal set; }
 
-		public static LogMessageDelegate LogFunction { get; set; }
+		public static LogMessageDelegate LogFunction { get; private set; }
 
 		#endregion
 
@@ -390,6 +390,12 @@ namespace GNFSCore.Data
 			{
 				LogFunction.Invoke("　" + message);
 			}
+		}
+
+		public static void SetLogDelegate(LogMessageDelegate logFunction)
+		{
+			LogFunction = logFunction;
+			Logging.LogFunction = logFunction;
 		}
 
 		public bool SetFactorizationSolution(BigInteger p, BigInteger q)

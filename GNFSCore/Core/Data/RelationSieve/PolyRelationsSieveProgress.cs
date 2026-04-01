@@ -40,9 +40,17 @@ namespace GNFSCore.Data.RelationSieve
 		{
 			get
 			{
-				return PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.RationalFactorBaseMax)
-					  + PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.AlgebraicFactorBaseMax)
-					  + _gnfs.QuadraticFactorPairCollection.Count + 3;
+				int temp =	PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.RationalFactorBaseMax)
+							+ PrimeFactory.GetIndexFromValue(_gnfs.PrimeFactorBase.AlgebraicFactorBaseMax)
+							+ _gnfs.QuadraticFactorPairCollection.Count
+							+ 3;
+
+				if(temp % 2 != 0) // Ensure the value returned is even
+				{
+					temp++;
+				}
+
+				return temp;
 			}
 		}
 

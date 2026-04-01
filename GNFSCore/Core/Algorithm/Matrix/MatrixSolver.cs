@@ -22,29 +22,34 @@ namespace GNFSCore.Algorithm.Matrix
 			// This ensure that all the smooth relations are available for the matrix solving step.
 			Serialization.Load.Relations.Smooth(ref gnfs);
 
-
 			List<Relation> smoothRelations = gnfs.CurrentRelationsProgress.SmoothRelations.ToList();
 
 			int smoothCount = smoothRelations.Count;
 
 			BigInteger requiredRelationsCount = gnfs.CurrentRelationsProgress.SmoothRelationsRequiredForMatrixStep;
 
-			GNFS.LogFunction($"Total relations count: {smoothCount}");
-			GNFS.LogFunction($"Relations required to proceed: {requiredRelationsCount}");
+			gnfs.LogMessage($"Total relations count: {smoothCount}");
+			gnfs.LogMessage($"Relations required to proceed: {requiredRelationsCount}");
 
 			while (smoothRelations.Count >= requiredRelationsCount)
 			{
 				// Randomly select n relations from smoothRelations
 				List<Relation> selectedRelations = new List<Relation>();
-				while (
-						selectedRelations.Count < requiredRelationsCount
-						||
-						selectedRelations.Count % 2 != 0 // Force number of relations to be even
-					)
+				while (selectedRelations.Count < requiredRelationsCount)
 				{
-					int randomIndex = StaticRandom.Next(0, smoothRelations.Count);
-					selectedRelations.Add(smoothRelations[randomIndex]);
-					smoothRelations.RemoveAt(randomIndex);
+					selectedRelations.Add(StaticRandom.TakeRandomElement(smoothRelations));
+				}
+
+				if (selectedRelations.Count % 2 != 0) // Force number of relations to be even
+				{
+					if (smoothRelations.Any())
+					{
+						selectedRelations.Add(StaticRandom.TakeRandomElement(smoothRelations));
+					}
+					else
+					{
+						StaticRandom.TakeRandomElement(selectedRelations); // Remove a random relation
+					}
 				}
 
 				GaussianMatrix gaussianReduction = new GaussianMatrix(gnfs, selectedRelations);
@@ -58,8 +63,8 @@ namespace GNFSCore.Algorithm.Matrix
 					List<Relation> relations = GetSolutionSet(gaussianReduction, number);
 					number++;
 
-					BigInteger algebraic = relations.Select(rel => rel.AlgebraicNorm).Product();
-					BigInteger rational = relations.Select(rel => rel.RationalNorm).Product();
+					BigInteger productOfAlgebraicNorms = relations.Select(rel => rel.AlgebraicNorm).Product();
+					BigInteger productOfRationalNorms = relations.Select(rel => rel.RationalNorm).Product();
 
 					CountDictionary algCountDict = new CountDictionary();
 					foreach (var rel in relations)
@@ -67,17 +72,17 @@ namespace GNFSCore.Algorithm.Matrix
 						algCountDict.Combine(rel.AlgebraicFactorization);
 					}
 
-					bool isAlgebraicSquare = algebraic.IsSquare();
-					bool isRationalSquare = rational.IsSquare();
+					bool isAlgebraicProductSquare = productOfAlgebraicNorms.IsSquare();
+					bool isRationalProductSquare = productOfRationalNorms.IsSquare();
 
-					//gnfs.LogFunction("---");
-					//gnfs.LogFunction($"Relations count: {relations.Count}");
-					//gnfs.LogFunction($"(a,b) pairs: {string.Join(" ", relations.Select(rel => $"({rel.A},{rel.B})"))}");
-					//gnfs.LogFunction($"Rational  ∏(a+mb): IsSquare? {isRationalSquare} : {rational}");
-					//gnfs.LogFunction($"Algebraic ∏ƒ(a/b): IsSquare? {isAlgebraicSquare} : {algebraic}");
-					//gnfs.LogFunction($"Algebraic (factorization): {algCountDict.FormatStringAsFactorization()}");
+					//gnfs.LogMessage("---");
+					//gnfs.LogMessage($"Relations count: {relations.Count}");
+					//gnfs.LogMessage($"(a,b) pairs: {string.Join(" ", relations.Select(rel => $"({rel.A},{rel.B})"))}");
+					//gnfs.LogMessage($"Rational  ∏(a+mb): IsSquare? {isRationalProductSquare} : {productOfRationalNorms}");
+					//gnfs.LogMessage($"Algebraic ∏ƒ(a/b): IsSquare? {isAlgebraicProductSquare} : {productOfAlgebraicNorms}");
+					//gnfs.LogMessage($"Algebraic (factorization): {algCountDict.FormatStringAsFactorization()}");
 
-					if (isAlgebraicSquare && isRationalSquare)
+					if (isAlgebraicProductSquare && isRationalProductSquare)
 					{
 						solution.Add(relations);
 						gnfs.CurrentRelationsProgress.AddFreeRelationSolution(relations);

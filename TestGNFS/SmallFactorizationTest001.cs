@@ -28,8 +28,8 @@ namespace TestGNFS.Integration
 
 		private static int degree = 3;
 		private static BigInteger polyBase = 31;
-		private static BigInteger primeBound = 29;
-		private static int relationQuantity = 70;
+		private static BigInteger primeBound = 50;
+		private static int relationQuantity = 60;
 		private static int relationValueRange = 1000;
 		private static BigInteger N = new BigInteger(45113);
 
@@ -133,7 +133,7 @@ namespace TestGNFS.Integration
 
 			Assert.IsTrue(step00_passed, "IsTrue(step00_passed)");
 
-			gnfs = new GNFS(cancelToken, Console.WriteLine, N, polyBase, degree, primeBound, relationQuantity, relationValueRange);
+			gnfs = new GNFS(cancelToken, TestContext.WriteLine, N, polyBase, degree, primeBound, relationQuantity, relationValueRange);
 
 			Assert.IsNotNull(gnfs, "IsNotNull(gnfs)");
 

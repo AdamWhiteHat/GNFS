@@ -68,5 +68,13 @@ namespace GNFSCore.Algorithm
 				}
 			}
 		}
+
+		public static T TakeRandomElement<T>(IList<T> list)
+		{
+			int randomIndex = StaticRandom.Next(list.Count);
+			T result = list[randomIndex];
+			list.RemoveAt(randomIndex);
+			return result;
+		}
 	}
 }

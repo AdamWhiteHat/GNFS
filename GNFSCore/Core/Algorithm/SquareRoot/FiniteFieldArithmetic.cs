@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Collections.Generic;
 
 namespace GNFSCore.Algorithm.SquareRoot
 {
-	using IntegerMath;
 	using ExtensionMethods;
+	using IntegerMath;
 	using Polynomial = ExtendedArithmetic.Polynomial;
 
 	public static class FiniteFieldArithmetic
@@ -144,6 +144,11 @@ namespace GNFSCore.Algorithm.SquareRoot
 			return 1;
 		}
 
+		public static Polynomial ModularInverse(Polynomial poly, BigInteger mod)
+		{
+			return new Polynomial(ExtendedArithmetic.Term.GetTerms(poly.Terms.Select(trm => (mod - trm.CoEfficient).Mod(mod)).ToArray()));
+		}
+
 		/// <summary>
 		/// Finds N such that primes[i] ≡ values[i] (mod N) for all values[i] with 0 &lt; i &lt; a.Length
 		/// </summary>
@@ -179,8 +184,15 @@ namespace GNFSCore.Algorithm.SquareRoot
 			Logging.WriteLine($"Zp = {r}");
 			Logging.WriteLine($"rP = {rP}");
 			Logging.WriteLine();
+			Logging.WriteLine($"  ( z mod N ) - ( rP mod N )");
+			Logging.WriteLine($"  [{Z} ≡ {Z.Mod(n)} (mod N)] - [{rP} ≡ {rP.Mod(n)} (mod N)]");
+			Logging.WriteLine($"  ( {Z.Mod(n)} ) - ( {rP.Mod(n)} )");
+			Logging.WriteLine($"= {finalResult_sqrt}");
 			Logging.WriteLine();
-			Logging.WriteLine($"( z mod N ) - ( rP mod N ) = {Z.Mod(n)} - {rP.Mod(n)} = {finalResult_sqrt}");
+			Logging.WriteLine();
+			Logging.WriteLine($"{finalResult_sqrt} ≡ {Z - r * primeProduct} mod N = {Z} - {r} * {primeProduct}");
+			Logging.WriteLine($"");
+			Logging.WriteLine();
 
 			return finalResult_sqrt;
 		}

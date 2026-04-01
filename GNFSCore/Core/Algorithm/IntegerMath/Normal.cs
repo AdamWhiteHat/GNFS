@@ -52,7 +52,7 @@ namespace GNFSCore.Algorithm.IntegerMath
 			Fraction fractionalPart = product.FractionalPart;
 			if (fractionalPart != Fraction.Zero)
 			{
-				GNFS.LogFunction($"{nameof(Algebraic)} failed to result in an integer. This shouldn't happen.");
+				Logging.WriteLine($"{nameof(Algebraic)} failed to result in an integer. This shouldn't happen.");
 			}
 
 			BigInteger result = product.WholePart;

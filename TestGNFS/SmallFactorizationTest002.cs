@@ -88,7 +88,7 @@ namespace TestGNFS.Integration
 
 			Assert.IsTrue(step00_passed, "IsTrue(step00_passed)");
 
-			gnfs = new GNFS(cancelToken, Console.WriteLine, N, polyBase, degree, primeBound, relationQuantity, relationValueRange);
+			gnfs = new GNFS(cancelToken, TestContext.WriteLine, N, polyBase, degree, primeBound, relationQuantity, relationValueRange);
 
 			Assert.IsNotNull(gnfs, "IsNotNull(gnfs)");
 

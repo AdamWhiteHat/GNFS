@@ -14,14 +14,15 @@ namespace GNFSCore.Data
 	public partial class SquareRoot
 	{
 		public BigInteger RationalProduct { get; set; }
-		public BigInteger RationalSquare { get; set; }
+		public BigInteger RationalProductSquareRoot { get; set; }
 		public BigInteger RationalSquareRootResidue { get; set; }
 		public bool IsRationalSquare { get; set; }
 
 		public BigInteger AlgebraicProduct { get; set; }
-		public BigInteger AlgebraicSquare { get; set; }
 		public BigInteger AlgebraicProductModF { get; set; }
+		public BigInteger AlgebraicSquare { get; set; }
 		public BigInteger AlgebraicSquareResidue { get; set; }
+		public BigInteger AlgebraicSquareRoot { get; set; }
 		public BigInteger AlgebraicSquareRootResidue { get; set; }
 		public List<BigInteger> AlgebraicPrimes { get; set; }
 		public List<BigInteger> AlgebraicResults { get; set; }
@@ -60,49 +61,44 @@ namespace GNFSCore.Data
 			set { gnfs.SquareRoot_Progress_InertPrime_LastValue = value; }
 		}
 
-		public LogMessageDelegate LogFunction;
-
-		public SquareRoot(GNFS sieve)
+		public SquareRoot(GNFS gnfs)
 		{
-			LogFunction = sieve.LogMessage;
-
 			RationalSquareRootResidue = -1;
 			RootsOfS = new List<Tuple<BigInteger, BigInteger>>();
 
-			gnfs = sieve;
-			N = gnfs.N;
-			PolynomialBase = gnfs.PolynomialBase;
+			this.gnfs = gnfs;
+			N = this.gnfs.N;
+			PolynomialBase = this.gnfs.PolynomialBase;
 
-			PolynomialDerivative = Polynomial.GetDerivativePolynomial(gnfs.CurrentPolynomial);
+			PolynomialDerivative = Polynomial.GetDerivativePolynomial(this.gnfs.CurrentPolynomial);
 			PolynomialDerivativeSquared = Polynomial.Square(PolynomialDerivative);
-			PolynomialDerivativeSquaredInField = Polynomial.Field.Modulus(PolynomialDerivativeSquared, gnfs.CurrentPolynomial);
+			PolynomialDerivativeSquaredInField = Polynomial.Field.Modulus(PolynomialDerivativeSquared, this.gnfs.CurrentPolynomial);
 
-			Logging.WriteLine("");
-			Logging.WriteLine($"ƒ'(θ) = {PolynomialDerivative}");
-			Logging.WriteLine($"ƒ'(θ)² = {PolynomialDerivativeSquared}");
-			Logging.WriteLine($"ƒ'(θ)² ∈ ℤ[θ] = {PolynomialDerivativeSquaredInField}");
+			gnfs.LogMessage("");
+			gnfs.LogMessage($"ƒ'(θ) = {PolynomialDerivative}");
+			gnfs.LogMessage($"ƒ'(θ)² = {PolynomialDerivativeSquared}");
+			gnfs.LogMessage($"ƒ'(θ)² ∈ ℤ[θ] = {PolynomialDerivativeSquaredInField}");
 
-			PolynomialDerivativeValue = PolynomialDerivative.Evaluate(gnfs.PolynomialBase);
+			PolynomialDerivativeValue = PolynomialDerivative.Evaluate(this.gnfs.PolynomialBase);
 			PolynomialDerivativeValueSquared = Arithmetic.Pow(PolynomialDerivativeValue, 2);
 
-			Logging.WriteLine("");
-			Logging.WriteLine($"ƒ'(m) = {PolynomialDerivativeValue}");
-			Logging.WriteLine($"ƒ'(m)² = {PolynomialDerivativeValueSquared}");
+			gnfs.LogMessage("");
+			gnfs.LogMessage($"ƒ'(m) = {PolynomialDerivativeValue}");
+			gnfs.LogMessage($"ƒ'(m)² = {PolynomialDerivativeValueSquared}");
 
-
-			MonicPolynomial = Polynomial.MakeMonic(gnfs.CurrentPolynomial, PolynomialBase);
+			MonicPolynomial = Polynomial.MakeMonic(this.gnfs.CurrentPolynomial, PolynomialBase);
 			MonicPolynomialDerivative = Polynomial.GetDerivativePolynomial(MonicPolynomial);
 			MonicPolynomialDerivativeSquared = Polynomial.Square(MonicPolynomialDerivative);
 			MonicPolynomialDerivativeSquaredInField = Polynomial.Field.Modulus(MonicPolynomialDerivativeSquared, MonicPolynomial);
 
-			MonicPolynomialDerivativeValue = MonicPolynomialDerivative.Evaluate(gnfs.PolynomialBase);
-			MonicPolynomialDerivativeValueSquared = MonicPolynomialDerivativeSquared.Evaluate(gnfs.PolynomialBase);
+			MonicPolynomialDerivativeValue = MonicPolynomialDerivative.Evaluate(this.gnfs.PolynomialBase);
+			MonicPolynomialDerivativeValueSquared = MonicPolynomialDerivativeSquared.Evaluate(this.gnfs.PolynomialBase);
 
-			Logging.WriteLine("");
-			Logging.WriteLine($"MonicPolynomial: {MonicPolynomial}");
-			Logging.WriteLine($"MonicPolynomialDerivative: {MonicPolynomialDerivative}");
-			Logging.WriteLine($"MonicPolynomialDerivativeSquared: {MonicPolynomialDerivativeSquared}");
-			Logging.WriteLine($"MonicPolynomialDerivativeSquaredInField: {MonicPolynomialDerivativeSquaredInField}");
+			gnfs.LogMessage("");
+			gnfs.LogMessage($"MonicPolynomial: {MonicPolynomial}");
+			gnfs.LogMessage($"MonicPolynomialDerivative: {MonicPolynomialDerivative}");
+			gnfs.LogMessage($"MonicPolynomialDerivativeSquared: {MonicPolynomialDerivativeSquared}");
+			gnfs.LogMessage($"MonicPolynomialDerivativeSquaredInField: {MonicPolynomialDerivativeSquaredInField}");
 		}
 
 		public override string ToString()
@@ -115,6 +111,9 @@ namespace GNFSCore.Data
 			result.AppendLine($"∏ Sᵢ =");
 			result.AppendLine($"{PolynomialRing}");
 			result.AppendLine();
+			result.AppendLine("Roots of S(x):");
+			result.AppendLine($"{{{string.Join(", ", RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");
+			result.AppendLine();
 			result.AppendLine($"ƒ         = {gnfs.CurrentPolynomial}");
 			result.AppendLine($"ƒ(m)      = {MonicPolynomial}");
 			result.AppendLine($"ƒ'(m)     = {MonicPolynomialDerivative}");
@@ -126,36 +125,34 @@ namespace GNFSCore.Data
 			result.AppendLine($"∏ Sᵢ(m)  *  ƒ'(m)² (mod ƒ) =");
 			result.AppendLine($"{S}");
 			result.AppendLine();
+			result.AppendLine("Primes:");
+			result.AppendLine($"{string.Join(" * ", AlgebraicPrimes)}"); // .RelationsSet.Select(rel => rel.B).Distinct().OrderBy(relB => relB))
+			result.AppendLine();
 			result.AppendLine();
 			result.AppendLine("Square finder, Rational:");
 			result.AppendLine($"γ² = √(  Sᵣ(m)  *  ƒ'(m)²  )");
 			result.AppendLine($"γ² = √( {RationalProduct} * {PolynomialDerivativeValueSquared} )");
-			result.AppendLine($"γ² = √( {RationalSquare} )");
+			result.AppendLine($"γ² =    {RationalProductSquareRoot} * {PolynomialDerivativeValue}");
 			result.AppendLine($"IsRationalSquare  ? {IsRationalSquare}");
 			result.AppendLine($"γ  =    {RationalSquareRootResidue} mod N"); // δ mod N 
 			result.AppendLine();
 			result.AppendLine();
 			result.AppendLine("Square finder, Algebraic:");
-			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicProduct} * {PolynomialDerivativeValue}");
-			result.AppendLine($"    Sₐ(m) * ƒ'(m)  =  {AlgebraicSquare}");
+			result.AppendLine($"χ² =  Sₐ(m) * ƒ'(m)       =  {AlgebraicSquareRoot} * {MonicPolynomialDerivativeValue}");
+			result.AppendLine($"χ² =  Sₐ(m) * ƒ'(m)       =  {AlgebraicSquare}");
+			result.AppendLine($"χ  =  Sₐ(m) * ƒ'(m) mod N =  {AlgebraicSquareRootResidue}");
 			result.AppendLine($"IsAlgebraicSquare ? {AlgebraicSquare.IsSquare()}");
-			result.AppendLine();
-			result.AppendLine($"χ = Sₐ(m) * ƒ'(m) mod N = {AlgebraicSquareRootResidue}");
 			result.AppendLine();
 			result.AppendLine($"X² / ƒ(m) = {AlgebraicProductModF}  IsSquare? {AlgebraicProductModF.IsSquare()}");
 			result.AppendLine($"S (x)       = {AlgebraicSquareResidue}  IsSquare? {AlgebraicSquareResidue.IsSquare()}");
 			result.AppendLine();
-			result.AppendLine($"AlgebraicResults:");
-			result.AppendLine($"{AlgebraicResults.FormatString(false)}");
+			result.AppendLine($"γ = {GNFSCore.Algorithm.ExtensionMethods.BigIntegerExtensionMethods.Mod(RationalProductSquareRoot * PolynomialDerivativeValue, N)} ≡ {RationalProductSquareRoot} * {PolynomialDerivativeValue} (mod {N})");
+			result.AppendLine($"");
+			result.AppendLine($"");
+			result.AppendLine($"");
+			result.AppendLine($"");
+			result.AppendLine($"");
 			result.AppendLine();
-			result.AppendLine();
-
-			result.AppendLine("Primes:");
-			result.AppendLine($"{string.Join(" * ", AlgebraicPrimes)}"); // .RelationsSet.Select(rel => rel.B).Distinct().OrderBy(relB => relB))
-			result.AppendLine();
-			result.AppendLine();
-			result.AppendLine("Roots of S(x):");
-			result.AppendLine($"{{{string.Join(", ", RootsOfS.Select(tup => (tup.Item2 > 1) ? $"{tup.Item1}/{tup.Item2}" : $"{tup.Item1}"))}}}");
 			result.AppendLine();
 			result.AppendLine();
 			result.AppendLine($"∏(a + mb) = {RationalProduct}");

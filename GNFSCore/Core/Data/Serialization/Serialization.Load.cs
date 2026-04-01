@@ -15,13 +15,15 @@ namespace GNFSCore.Data
 	{
 		public static class Load
 		{
-			public static T Generic<T>(string filename)
+			#region Private Members
+
+			private static T Generic<T>(string filename)
 			{
 				string loadJson = File.ReadAllText(filename);
 				return JsonConvert.DeserializeObject<T>(loadJson);
 			}
 
-			public static T GenericFixedArray<T>(string filename)
+			private static T GenericFixedArray<T>(string filename)
 			{
 				string loadJson = File.ReadAllText(filename).TrimStart(',');
 				string fixedJson = FixAppendedJsonArrays(loadJson);
@@ -37,10 +39,14 @@ namespace GNFSCore.Data
 				return inputJson;
 			}
 
-			public static GNFS All(string filename)
+			#endregion
+
+			public static GNFS All(string filename, GNFSCore.LogMessageDelegate logFunction)
 			{
 				string loadJson = File.ReadAllText(filename);
 				GNFS gnfs = JsonConvert.DeserializeObject<GNFS>(loadJson);
+				
+				GNFS.SetLogDelegate(logFunction);
 
 				string directoryName = Path.GetDirectoryName(filename);
 				gnfs.SaveLocations = new DirectoryLocations(directoryName);
@@ -67,7 +73,9 @@ namespace GNFSCore.Data
 				gnfs.CurrentPolynomial = gnfs.PolynomialCollection.First();
 				gnfs.PolynomialDegree = gnfs.CurrentPolynomial.Degree;
 
-				Load.FactorBase(ref gnfs);
+				Load.FactorBase.Rational(ref gnfs);
+				Load.FactorBase.Algebraic(ref gnfs);
+				Load.FactorBase.Quadratic(ref gnfs);
 
 				Load.FactorPair.Rational(ref gnfs);
 				Load.FactorPair.Algebraic(ref gnfs);
@@ -93,17 +101,11 @@ namespace GNFSCore.Data
 				return result;
 			}
 
-			public static void FactorBase(ref GNFS gnfs)
-			{
-				gnfs.SetPrimeFactorBases();
-			}
-
-			/*
 			public static class FactorBase
 			{
 				public static void Rational(ref GNFS gnfs)
 				{
-					string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(GNFSCore.FactorBase.RationalFactorBase)}.json");
+					string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Data.FactorBase.RationalFactorBase)}.json");
 					if (File.Exists(filename))
 					{
 						gnfs.PrimeFactorBase.RationalFactorBase = Load.Generic<List<BigInteger>>(filename);
@@ -112,7 +114,7 @@ namespace GNFSCore.Data
 
 				public static void Algebraic(ref GNFS gnfs)
 				{
-					string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(GNFSCore.FactorBase.AlgebraicFactorBase)}.json");
+					string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Data.FactorBase.AlgebraicFactorBase)}.json");
 					if (File.Exists(filename))
 					{
 						gnfs.PrimeFactorBase.AlgebraicFactorBase = Load.Generic<List<BigInteger>>(filename);
@@ -121,14 +123,13 @@ namespace GNFSCore.Data
 
 				public static void Quadratic(ref GNFS gnfs)
 				{
-					string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(GNFSCore.FactorBase.QuadraticFactorBase)}.json");
+					string filename = Path.Combine(gnfs.SaveLocations.SaveDirectory, $"{nameof(Data.FactorBase.QuadraticFactorBase)}.json");
 					if (File.Exists(filename))
 					{
 						gnfs.PrimeFactorBase.QuadraticFactorBase = Load.Generic<List<BigInteger>>(filename);
 					}
 				}
 			}
-			*/
 
 			public static class FactorPair
 			{
@@ -137,7 +138,6 @@ namespace GNFSCore.Data
 					if (File.Exists(gnfs.SaveLocations.RationalFactorPair_SaveFile))
 					{
 						gnfs.RationalFactorPairCollection = Load.Generic<FactorPairCollection>(gnfs.SaveLocations.RationalFactorPair_SaveFile);
-
 					}
 				}
 
@@ -147,7 +147,6 @@ namespace GNFSCore.Data
 					{
 						gnfs.AlgebraicFactorPairCollection = Load.Generic<FactorPairCollection>(gnfs.SaveLocations.AlgebraicFactorPair_SaveFile);
 					}
-
 				}
 
 				public static void Quadratic(ref GNFS gnfs)
@@ -156,7 +155,6 @@ namespace GNFSCore.Data
 					{
 						gnfs.QuadraticFactorPairCollection = Load.Generic<FactorPairCollection>(gnfs.SaveLocations.QuadraticFactorPair_SaveFile);
 					}
-
 				}
 			}
 
@@ -190,12 +188,14 @@ namespace GNFSCore.Data
 
 				public static void Free(ref GNFS gnfs)
 				{
-					if (gnfs.CurrentRelationsProgress.Relations.FreeRelations.Any(lst => lst.Any(rel => !rel.IsPersisted)))
-					{
-						List<List<Relation>> unsaved = gnfs.CurrentRelationsProgress.Relations.FreeRelations.Where(lst => lst.Any(rel => !rel.IsPersisted)).ToList();
-						foreach (List<Relation> solution in unsaved)
+					List<List<Relation>> unsavedFreeRelations = gnfs.CurrentRelationsProgress.Relations.FreeRelations.Where(lst => lst.Any(rel => !rel.IsPersisted)).ToList();
+
+					if(unsavedFreeRelations.Any())
+					{						
+						foreach (List<Relation> solution in unsavedFreeRelations)
 						{
-							Serialization.Save.Object(solution, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"!!UNSAVED__{nameof(RelationContainer.FreeRelations)}.json"));
+							Save.Relations.Free.SingleSolution(gnfs, solution);
+							//Serialization.Save.Object(solution, Path.Combine(gnfs.SaveLocations.SaveDirectory, $"!!UNSAVED__{nameof(RelationContainer.FreeRelations)}.json"));
 						}
 					}
 
